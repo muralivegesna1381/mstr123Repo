@@ -1,0 +1,68 @@
+diff --git a/node_modules/react-native-photo-editor/android/src/main/java/com/ahmedadeltito/photoeditor/ColorPickerAdapter.java b/node_modules/react-native-photo-editor/android/src/main/java/com/ahmedadeltito/photoeditor/ColorPickerAdapter.java
+index c0bc443..3588d1c 100755
+--- a/node_modules/react-native-photo-editor/android/src/main/java/com/ahmedadeltito/photoeditor/ColorPickerAdapter.java
++++ b/node_modules/react-native-photo-editor/android/src/main/java/com/ahmedadeltito/photoeditor/ColorPickerAdapter.java
+@@ -9,6 +9,8 @@ import android.graphics.drawable.ShapeDrawable;
+ import android.graphics.drawable.shapes.OvalShape;
+ import androidx.annotation.NonNull;
+ import androidx.recyclerview.widget.RecyclerView;
++
++import android.util.Log;
+ import android.view.LayoutInflater;
+ import android.view.View;
+ import android.view.ViewGroup;
+@@ -27,6 +29,8 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
+     private List<Integer> colorPickerColors;
+     private OnColorPickerClickListener onColorPickerClickListener;
+ 
++    private Integer lastItemClickPos = -1;
++
+     public ColorPickerAdapter(@NonNull Context context, @NonNull List<Integer> colorPickerColors) {
+         this.context = context;
+         this.inflater = LayoutInflater.from(context);
+@@ -42,6 +46,19 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
+     @Override
+     public void onBindViewHolder(ViewHolder holder, int position) {
+         buildColorPickerView(holder.colorPickerView, colorPickerColors.get(position));
++
++        ViewGroup.LayoutParams params = holder.colorPickerView.getLayoutParams();
++        params.height = 50;
++        params.width = 50;
++        holder.colorPickerView.setLayoutParams(params);
++        
++        //highlight selected Item
++        if(position==lastItemClickPos){
++            ViewGroup.LayoutParams params1 = holder.colorPickerView.getLayoutParams();
++            params1.height = 75;
++            params1.width = 75;
++            holder.colorPickerView.setLayoutParams(params1);
++        }
+     }
+ 
+     @Override
+@@ -84,8 +101,11 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
+             itemView.setOnClickListener(new View.OnClickListener() {
+                 @Override
+                 public void onClick(View v) {
+-                    if (onColorPickerClickListener != null)
++                    lastItemClickPos = getAdapterPosition();
++                    if (onColorPickerClickListener != null) {
+                         onColorPickerClickListener.onColorPickerClickListener(colorPickerColors.get(getAdapterPosition()));
++                    }
++                    notifyDataSetChanged();
+                 }
+             });
+         }
+diff --git a/node_modules/react-native-photo-editor/android/src/main/java/com/ahmedadeltito/photoeditor/PhotoEditorActivity.java b/node_modules/react-native-photo-editor/android/src/main/java/com/ahmedadeltito/photoeditor/PhotoEditorActivity.java
+index 9bf2eb7..753de77 100755
+--- a/node_modules/react-native-photo-editor/android/src/main/java/com/ahmedadeltito/photoeditor/PhotoEditorActivity.java
++++ b/node_modules/react-native-photo-editor/android/src/main/java/com/ahmedadeltito/photoeditor/PhotoEditorActivity.java
+@@ -756,7 +756,7 @@ public class PhotoEditorActivity extends AppCompatActivity implements View.OnCli
+                 .of(uri, Uri.fromFile(new File(this.getTmpDir(this), UUID.randomUUID().toString() + ".jpg")))
+                 .withOptions(options);
+ 
+-        uCrop.start(this);
++        uCrop.start(this,69);
+     }
+ 
+ 
