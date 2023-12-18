@@ -59,6 +59,7 @@ const  AddOBSSelectPetUI = ({route, ...props }) => {
                 <SelectPetComponent 
                 petsArray = {petsArray}
                 selectedIndex = {props.selectedIndex}
+                selectedPName = {props.selectedPName}
                 selectPetAction = {selectPetAction}
                 />
             </View>

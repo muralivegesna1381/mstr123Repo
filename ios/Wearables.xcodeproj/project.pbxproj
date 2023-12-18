@@ -15,30 +15,6 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		16D91817DF1241238C5F9DA0 /* Poppins-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0F84DDF7645E4B9C8ED1B524 /* Poppins-BoldItalic.ttf */; };
-		18456EBA28310C3E00D29D88 /* BubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EA228310C3B00D29D88 /* BubbleView.swift */; };
-		18456EBB28310C3E00D29D88 /* ZDChatController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EA328310C3B00D29D88 /* ZDChatController.swift */; };
-		18456EBC28310C3E00D29D88 /* ChatViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EA428310C3B00D29D88 /* ChatViewControllerDelegate.swift */; };
-		18456EBD28310C3E00D29D88 /* ChatTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EA528310C3B00D29D88 /* ChatTVCell.swift */; };
-		18456EBE28310C3E00D29D88 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EA628310C3B00D29D88 /* APIClient.swift */; };
-		18456EBF28310C3E00D29D88 /* VisitorMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EA728310C3C00D29D88 /* VisitorMessageCell.swift */; };
-		18456EC028310C3E00D29D88 /* ZendeskChatManagerObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EA828310C3C00D29D88 /* ZendeskChatManagerObject.swift */; };
-		18456EC128310C3E00D29D88 /* CellTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EA928310C3C00D29D88 /* CellTypes.swift */; };
-		18456EC228310C3E00D29D88 /* AgentMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EAA28310C3C00D29D88 /* AgentMessageCell.swift */; };
-		18456EC328310C3E00D29D88 /* ChatUIEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EAB28310C3C00D29D88 /* ChatUIEvent.swift */; };
-		18456EC428310C3E00D29D88 /* AgentImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EAC28310C3C00D29D88 /* AgentImageCell.swift */; };
-		18456EC528310C3E00D29D88 /* ZendeskChatManagerObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 18456EAD28310C3C00D29D88 /* ZendeskChatManagerObject.m */; };
-		18456EC628310C3E00D29D88 /* AgentImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EAE28310C3C00D29D88 /* AgentImageView.swift */; };
-		18456EC728310C3E00D29D88 /* BubbleViewCellType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EAF28310C3D00D29D88 /* BubbleViewCellType.swift */; };
-		18456EC828310C3E00D29D88 /* VisitorImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EB028310C3D00D29D88 /* VisitorImageCell.swift */; };
-		18456EC928310C3E00D29D88 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EB128310C3D00D29D88 /* ChatViewController.swift */; };
-		18456ECA28310C3E00D29D88 /* ChatEventsProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EB228310C3D00D29D88 /* ChatEventsProcessor.swift */; };
-		18456ECB28310C3E00D29D88 /* ZDChatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 18456EB328310C3D00D29D88 /* ZDChatManager.m */; };
-		18456ECC28310C3E00D29D88 /* ZDChatManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EB428310C3D00D29D88 /* ZDChatManager.swift */; };
-		18456ECD28310C3E00D29D88 /* ChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EB528310C3D00D29D88 /* ChatCell.swift */; };
-		18456ECE28310C3E00D29D88 /* ZDChat.xib in Resources */ = {isa = PBXBuildFile; fileRef = 18456EB628310C3D00D29D88 /* ZDChat.xib */; };
-		18456ECF28310C3E00D29D88 /* TableCellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EB728310C3E00D29D88 /* TableCellFactory.swift */; };
-		18456ED028310C3E00D29D88 /* ZDCChatEvent+ChatItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EB828310C3E00D29D88 /* ZDCChatEvent+ChatItem.swift */; };
-		18456ED128310C3E00D29D88 /* ChatDelegateDateSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18456EB928310C3E00D29D88 /* ChatDelegateDateSource.swift */; };
 		1BF3F9B12C094BA9B85D04B3 /* Barlow-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BE4DFFEFD2D942CCAE8A01FC /* Barlow-Regular.ttf */; };
 		1D7B4701DE044FD2AF647A54 /* Poppins-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 37C7A3302F2F48F3B4B277A2 /* Poppins-SemiBoldItalic.ttf */; };
 		20AB2C2D4B3142C0B327E4B6 /* Barlow-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 468D6C0C12F945C4ADA6F693 /* Barlow-Italic.ttf */; };
@@ -62,10 +38,13 @@
 		94CEC7EBF4C5401785911AB7 /* Barlow-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AC4DD8611A6F47F387A87AB3 /* Barlow-Thin.ttf */; };
 		9756BDF1A58981B86912A245 /* Pods_Wearables.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5FC92E637C1E1581E56002FD /* Pods_Wearables.framework */; };
 		9A6D02C5299A6ECF0063B054 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* SplashScreen.storyboard */; };
-		9A86BBCE2AA876D400174253 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A86BBCD2AA876D400174253 /* GoogleService-Info.plist */; };
+		9A8B790F2ABF3689007DE2B2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A8B790E2ABF3689007DE2B2 /* GoogleService-Info.plist */; };
 		9D61E8E6C3BD47C8A1A428FE /* Poppins-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6B8C333FB2F743E7A206D5CE /* Poppins-Black.ttf */; };
 		A3A946CB4DA645B8ACD3D522 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FB5BEFEFD6804D77A507BAA8 /* Poppins-Bold.ttf */; };
 		A644D0D4F3EE4E9EA250DCEF /* Poppins-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8DD9BDA7E25743B0AE0A33E3 /* Poppins-ExtraBoldItalic.ttf */; };
+		A81871F82B27452A00540DA7 /* RNOpenCvLibrary.mm in Sources */ = {isa = PBXBuildFile; fileRef = A81871F72B27452A00540DA7 /* RNOpenCvLibrary.mm */; };
+		A81871FB2B2745B800540DA7 /* ObjectDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81871F92B2745B700540DA7 /* ObjectDetection.swift */; };
+		A81871FC2B2745B800540DA7 /* ObjectDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = A81871FA2B2745B800540DA7 /* ObjectDetection.m */; };
 		A853CA052A1B31E800E5FB1D /* VideoMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A853CA042A1B31E800E5FB1D /* VideoMainViewController.m */; };
 		A853CA082A1B8B7900E5FB1D /* ChangeViewBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = A853CA072A1B8B7900E5FB1D /* ChangeViewBridge.m */; };
 		A853CA0A2A1B8C7700E5FB1D /* NativeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A853CA092A1B8C7700E5FB1D /* NativeViewController.swift */; };
@@ -73,6 +52,8 @@
 		A859FD342A1253EC00501E26 /* RangeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A859FD312A1253EC00501E26 /* RangeSlider.swift */; };
 		A859FD352A1253EC00501E26 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A859FD322A1253EC00501E26 /* Main.storyboard */; };
 		A859FD362A1253EC00501E26 /* VideoMainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A859FD332A1253EC00501E26 /* VideoMainViewController.swift */; };
+		A8E7EDF92AFB7F170005F973 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8E7EDF82AFB7F160005F973 /* opencv2.framework */; };
+		A8E7EDFB2AFB7F190005F973 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8E7EDFA2AFB7F190005F973 /* opencv2.framework */; };
 		B8EB1EA14B8A44C39F892D8C /* Barlow-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 360E0FDDB5114B9C9C400248 /* Barlow-SemiBold.ttf */; };
 		BA49B9A1E16E4D079C93FBA1 /* Barlow-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5005D8C917C84EC48459D80C /* Barlow-BoldItalic.ttf */; };
 		BC44F84F163D4200A088F504 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0EC143F801CF48EA85711D40 /* Poppins-SemiBold.ttf */; };
@@ -82,6 +63,8 @@
 		E11F5F9BBF2A47B7A7E0A640 /* Poppins-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 48CC57DF5CDC4414A755B24B /* Poppins-Light.ttf */; };
 		E341614021FB4219BA1CCE37 /* Barlow-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 791D189A4F33419F92EABF4D /* Barlow-ExtraLight.ttf */; };
 		E92486B1EFC94B338E8B899C /* Barlow-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83F821C0D2A943C3986AE8DA /* Barlow-MediumItalic.ttf */; };
+		F4CDF5C72B26395900D87B40 /* ZendeskChatbot.m in Sources */ = {isa = PBXBuildFile; fileRef = F4CDF5C52B26395900D87B40 /* ZendeskChatbot.m */; };
+		F4CDF5C82B26395900D87B40 /* ZendeskChatbot.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CDF5C62B26395900D87B40 /* ZendeskChatbot.swift */; };
 		FB47ED652770ED5700E06521 /* EncryptPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB47ED602770ED5600E06521 /* EncryptPassword.swift */; };
 		FB47ED662770ED5700E06521 /* GTMBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = FB47ED612770ED5700E06521 /* GTMBase64.m */; };
 		FB47ED672770ED5700E06521 /* NSString+TripleDES.m in Sources */ = {isa = PBXBuildFile; fileRef = FB47ED632770ED5700E06521 /* NSString+TripleDES.m */; };
@@ -115,30 +98,6 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Wearables/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Wearables/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Wearables/main.m; sourceTree = "<group>"; };
-		18456EA228310C3B00D29D88 /* BubbleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BubbleView.swift; sourceTree = "<group>"; };
-		18456EA328310C3B00D29D88 /* ZDChatController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZDChatController.swift; sourceTree = "<group>"; };
-		18456EA428310C3B00D29D88 /* ChatViewControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatViewControllerDelegate.swift; sourceTree = "<group>"; };
-		18456EA528310C3B00D29D88 /* ChatTVCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatTVCell.swift; sourceTree = "<group>"; };
-		18456EA628310C3B00D29D88 /* APIClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
-		18456EA728310C3C00D29D88 /* VisitorMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisitorMessageCell.swift; sourceTree = "<group>"; };
-		18456EA828310C3C00D29D88 /* ZendeskChatManagerObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZendeskChatManagerObject.swift; sourceTree = "<group>"; };
-		18456EA928310C3C00D29D88 /* CellTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellTypes.swift; sourceTree = "<group>"; };
-		18456EAA28310C3C00D29D88 /* AgentMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgentMessageCell.swift; sourceTree = "<group>"; };
-		18456EAB28310C3C00D29D88 /* ChatUIEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatUIEvent.swift; sourceTree = "<group>"; };
-		18456EAC28310C3C00D29D88 /* AgentImageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgentImageCell.swift; sourceTree = "<group>"; };
-		18456EAD28310C3C00D29D88 /* ZendeskChatManagerObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZendeskChatManagerObject.m; sourceTree = "<group>"; };
-		18456EAE28310C3C00D29D88 /* AgentImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgentImageView.swift; sourceTree = "<group>"; };
-		18456EAF28310C3D00D29D88 /* BubbleViewCellType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BubbleViewCellType.swift; sourceTree = "<group>"; };
-		18456EB028310C3D00D29D88 /* VisitorImageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisitorImageCell.swift; sourceTree = "<group>"; };
-		18456EB128310C3D00D29D88 /* ChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
-		18456EB228310C3D00D29D88 /* ChatEventsProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatEventsProcessor.swift; sourceTree = "<group>"; };
-		18456EB328310C3D00D29D88 /* ZDChatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZDChatManager.m; sourceTree = "<group>"; };
-		18456EB428310C3D00D29D88 /* ZDChatManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZDChatManager.swift; sourceTree = "<group>"; };
-		18456EB528310C3D00D29D88 /* ChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatCell.swift; sourceTree = "<group>"; };
-		18456EB628310C3D00D29D88 /* ZDChat.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ZDChat.xib; sourceTree = "<group>"; };
-		18456EB728310C3E00D29D88 /* TableCellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableCellFactory.swift; sourceTree = "<group>"; };
-		18456EB828310C3E00D29D88 /* ZDCChatEvent+ChatItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ZDCChatEvent+ChatItem.swift"; sourceTree = "<group>"; };
-		18456EB928310C3E00D29D88 /* ChatDelegateDateSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatDelegateDateSource.swift; sourceTree = "<group>"; };
 		1ECD759AF9974F6B95C40B9C /* Barlow-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Light.ttf"; path = "../assets/fonts/Barlow-Light.ttf"; sourceTree = "<group>"; };
 		24B1551E5F184E4CA351A3A0 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Regular.ttf"; path = "../assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; };
 		2C03224222068B7F742D7108 /* Pods-Wearables-WearablesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wearables-WearablesTests.release.xcconfig"; path = "Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -162,9 +121,13 @@
 		8DD9BDA7E25743B0AE0A33E3 /* Poppins-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBoldItalic.ttf"; path = "../assets/fonts/Poppins-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
 		9252F49433C34087BEFA8620 /* Poppins-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-MediumItalic.ttf"; path = "../assets/fonts/Poppins-MediumItalic.ttf"; sourceTree = "<group>"; };
 		99A05D50F8354ED3B4C4CFD7 /* Barlow-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Bold.ttf"; path = "../assets/fonts/Barlow-Bold.ttf"; sourceTree = "<group>"; };
-		9A86BBCD2AA876D400174253 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9A8B790E2ABF3689007DE2B2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9F97FE06375F4C558CB7A0BE /* Poppins-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-BlackItalic.ttf"; path = "../assets/fonts/Poppins-BlackItalic.ttf"; sourceTree = "<group>"; };
 		A41E151EFE934C1181FA9ED2 /* Barlow-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Medium.ttf"; path = "../assets/fonts/Barlow-Medium.ttf"; sourceTree = "<group>"; };
+		A81871F62B27452A00540DA7 /* RNOpenCvLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenCvLibrary.h; sourceTree = "<group>"; };
+		A81871F72B27452A00540DA7 /* RNOpenCvLibrary.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RNOpenCvLibrary.mm; sourceTree = "<group>"; };
+		A81871F92B2745B700540DA7 /* ObjectDetection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectDetection.swift; sourceTree = "<group>"; };
+		A81871FA2B2745B800540DA7 /* ObjectDetection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectDetection.m; sourceTree = "<group>"; };
 		A853CA042A1B31E800E5FB1D /* VideoMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoMainViewController.m; sourceTree = "<group>"; };
 		A853CA062A1B8B5E00E5FB1D /* ChangeViewBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChangeViewBridge.h; sourceTree = "<group>"; };
 		A853CA072A1B8B7900E5FB1D /* ChangeViewBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ChangeViewBridge.m; sourceTree = "<group>"; };
@@ -173,6 +136,8 @@
 		A859FD312A1253EC00501E26 /* RangeSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RangeSlider.swift; sourceTree = "<group>"; };
 		A859FD322A1253EC00501E26 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		A859FD332A1253EC00501E26 /* VideoMainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoMainViewController.swift; sourceTree = "<group>"; };
+		A8E7EDF82AFB7F160005F973 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
+		A8E7EDFA2AFB7F190005F973 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		AB0BAD2986994887902291BF /* Poppins-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-LightItalic.ttf"; path = "../assets/fonts/Poppins-LightItalic.ttf"; sourceTree = "<group>"; };
 		AB54B0D284C44A39923D818B /* Barlow-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-ExtraBold.ttf"; path = "../assets/fonts/Barlow-ExtraBold.ttf"; sourceTree = "<group>"; };
 		AC4DD8611A6F47F387A87AB3 /* Barlow-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Thin.ttf"; path = "../assets/fonts/Barlow-Thin.ttf"; sourceTree = "<group>"; };
@@ -184,6 +149,9 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EE333480FD34C06BB9BB3AE3 /* Pods_Wearables_WearablesTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wearables_WearablesTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F173630C47AA4308921659A5 /* Pods-Wearables.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wearables.debug.xcconfig"; path = "Target Support Files/Pods-Wearables/Pods-Wearables.debug.xcconfig"; sourceTree = "<group>"; };
+		F461D15C2B0B458E003B0536 /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		F4CDF5C52B26395900D87B40 /* ZendeskChatbot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZendeskChatbot.m; sourceTree = "<group>"; };
+		F4CDF5C62B26395900D87B40 /* ZendeskChatbot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZendeskChatbot.swift; sourceTree = "<group>"; };
 		F624704C82A84ACFA060B06E /* Barlow-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-ThinItalic.ttf"; path = "../assets/fonts/Barlow-ThinItalic.ttf"; sourceTree = "<group>"; };
 		FB47ED5E2770ED5600E06521 /* Wearables-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Wearables-Bridging-Header.h"; sourceTree = "<group>"; };
 		FB47ED5F2770ED5600E06521 /* GTMBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMBase64.h; sourceTree = "<group>"; };
@@ -204,6 +172,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A8E7EDF92AFB7F170005F973 /* opencv2.framework in Frameworks */,
 				33D42E6DFB4D1824CADB8027 /* Pods_Wearables_WearablesTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -212,6 +181,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A8E7EDFB2AFB7F190005F973 /* opencv2.framework in Frameworks */,
 				9756BDF1A58981B86912A245 /* Pods_Wearables.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -239,37 +209,21 @@
 		13B07FAE1A68108700A75B9A /* Wearables */ = {
 			isa = PBXGroup;
 			children = (
+				F4CDF5C52B26395900D87B40 /* ZendeskChatbot.m */,
+				F4CDF5C62B26395900D87B40 /* ZendeskChatbot.swift */,
+				F461D15C2B0B458E003B0536 /* PrefixHeader.pch */,
+				A8E7EDFA2AFB7F190005F973 /* opencv2.framework */,
 				A859FD322A1253EC00501E26 /* Main.storyboard */,
 				A859FD312A1253EC00501E26 /* RangeSlider.swift */,
 				A859FD332A1253EC00501E26 /* VideoMainViewController.swift */,
-				18456EAC28310C3C00D29D88 /* AgentImageCell.swift */,
-				18456EAE28310C3C00D29D88 /* AgentImageView.swift */,
-				18456EAA28310C3C00D29D88 /* AgentMessageCell.swift */,
-				18456EA628310C3B00D29D88 /* APIClient.swift */,
-				18456EA228310C3B00D29D88 /* BubbleView.swift */,
-				18456EAF28310C3D00D29D88 /* BubbleViewCellType.swift */,
-				18456EA928310C3C00D29D88 /* CellTypes.swift */,
-				18456EB528310C3D00D29D88 /* ChatCell.swift */,
-				18456EB928310C3E00D29D88 /* ChatDelegateDateSource.swift */,
-				18456EB228310C3D00D29D88 /* ChatEventsProcessor.swift */,
-				18456EA528310C3B00D29D88 /* ChatTVCell.swift */,
-				18456EAB28310C3C00D29D88 /* ChatUIEvent.swift */,
-				18456EB128310C3D00D29D88 /* ChatViewController.swift */,
-				18456EA428310C3B00D29D88 /* ChatViewControllerDelegate.swift */,
-				18456EB728310C3E00D29D88 /* TableCellFactory.swift */,
-				18456EB028310C3D00D29D88 /* VisitorImageCell.swift */,
-				18456EA728310C3C00D29D88 /* VisitorMessageCell.swift */,
-				18456EB828310C3E00D29D88 /* ZDCChatEvent+ChatItem.swift */,
-				18456EB628310C3D00D29D88 /* ZDChat.xib */,
-				18456EA328310C3B00D29D88 /* ZDChatController.swift */,
-				18456EB328310C3D00D29D88 /* ZDChatManager.m */,
-				18456EB428310C3D00D29D88 /* ZDChatManager.swift */,
-				18456EAD28310C3C00D29D88 /* ZendeskChatManagerObject.m */,
-				18456EA828310C3C00D29D88 /* ZendeskChatManagerObject.swift */,
+				A81871F62B27452A00540DA7 /* RNOpenCvLibrary.h */,
+				A81871F72B27452A00540DA7 /* RNOpenCvLibrary.mm */,
 				FB5C4CEF27C1452E000BA5AD /* Wearables.entitlements */,
 				FB47ED642770ED5700E06521 /* EncryptPassword.m */,
 				FB47ED602770ED5600E06521 /* EncryptPassword.swift */,
 				FB47ED5F2770ED5600E06521 /* GTMBase64.h */,
+				A81871FA2B2745B800540DA7 /* ObjectDetection.m */,
+				A81871F92B2745B700540DA7 /* ObjectDetection.swift */,
 				FB47ED612770ED5700E06521 /* GTMBase64.m */,
 				FB47ED622770ED5700E06521 /* NSString+TripleDES.h */,
 				FB47ED692770ED8200E06521 /* GTMDefines.h */,
@@ -336,6 +290,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A8E7EDF82AFB7F160005F973 /* opencv2.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				5FC92E637C1E1581E56002FD /* Pods_Wearables.framework */,
 				EE333480FD34C06BB9BB3AE3 /* Pods_Wearables_WearablesTests.framework */,
@@ -355,7 +310,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				9A86BBCD2AA876D400174253 /* GoogleService-Info.plist */,
+				9A8B790E2ABF3689007DE2B2 /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* Wearables */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* WearablesTests */,
@@ -526,7 +481,6 @@
 				E11F5F9BBF2A47B7A7E0A640 /* Poppins-Light.ttf in Resources */,
 				0622989EE7D84F5B910D1FEC /* Poppins-LightItalic.ttf in Resources */,
 				5ABDE411FFA343C9965DA65A /* Poppins-Medium.ttf in Resources */,
-				18456ECE28310C3E00D29D88 /* ZDChat.xib in Resources */,
 				9A6D02C5299A6ECF0063B054 /* SplashScreen.storyboard in Resources */,
 				5B70CBC6E759458797ABE86B /* Poppins-MediumItalic.ttf in Resources */,
 				5DA033E300644547884ACA74 /* Poppins-Regular.ttf in Resources */,
@@ -534,7 +488,7 @@
 				1D7B4701DE044FD2AF647A54 /* Poppins-SemiBoldItalic.ttf in Resources */,
 				DBFC461FF70B4C4597744D20 /* Poppins-Thin.ttf in Resources */,
 				3A8C0871D8264A91B0C4161E /* Poppins-ThinItalic.ttf in Resources */,
-				9A86BBCE2AA876D400174253 /* GoogleService-Info.plist in Resources */,
+				9A8B790F2ABF3689007DE2B2 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -728,41 +682,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				18456EC128310C3E00D29D88 /* CellTypes.swift in Sources */,
 				A853CA052A1B31E800E5FB1D /* VideoMainViewController.m in Sources */,
 				FB7B99D427CD2CBF00B8AAE7 /* RNThumbnail.m in Sources */,
-				18456ECB28310C3E00D29D88 /* ZDChatManager.m in Sources */,
-				18456EBB28310C3E00D29D88 /* ZDChatController.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
-				18456EC028310C3E00D29D88 /* ZendeskChatManagerObject.swift in Sources */,
-				18456EC228310C3E00D29D88 /* AgentMessageCell.swift in Sources */,
-				18456ED128310C3E00D29D88 /* ChatDelegateDateSource.swift in Sources */,
-				18456EC328310C3E00D29D88 /* ChatUIEvent.swift in Sources */,
-				18456EC728310C3E00D29D88 /* BubbleViewCellType.swift in Sources */,
-				18456EC528310C3E00D29D88 /* ZendeskChatManagerObject.m in Sources */,
-				18456EC628310C3E00D29D88 /* AgentImageView.swift in Sources */,
-				18456ECD28310C3E00D29D88 /* ChatCell.swift in Sources */,
-				18456EBA28310C3E00D29D88 /* BubbleView.swift in Sources */,
 				A853CA0A2A1B8C7700E5FB1D /* NativeViewController.swift in Sources */,
-				18456EBC28310C3E00D29D88 /* ChatViewControllerDelegate.swift in Sources */,
-				18456ED028310C3E00D29D88 /* ZDCChatEvent+ChatItem.swift in Sources */,
-				18456EC828310C3E00D29D88 /* VisitorImageCell.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
-				18456ECC28310C3E00D29D88 /* ZDChatManager.swift in Sources */,
 				A859FD362A1253EC00501E26 /* VideoMainViewController.swift in Sources */,
+				A81871FB2B2745B800540DA7 /* ObjectDetection.swift in Sources */,
 				FB47ED652770ED5700E06521 /* EncryptPassword.swift in Sources */,
+				A81871F82B27452A00540DA7 /* RNOpenCvLibrary.mm in Sources */,
+				F4CDF5C82B26395900D87B40 /* ZendeskChatbot.swift in Sources */,
 				FB47ED662770ED5700E06521 /* GTMBase64.m in Sources */,
 				A853CA082A1B8B7900E5FB1D /* ChangeViewBridge.m in Sources */,
+				A81871FC2B2745B800540DA7 /* ObjectDetection.m in Sources */,
 				A859FD342A1253EC00501E26 /* RangeSlider.swift in Sources */,
-				18456EC928310C3E00D29D88 /* ChatViewController.swift in Sources */,
-				18456ECA28310C3E00D29D88 /* ChatEventsProcessor.swift in Sources */,
-				18456ECF28310C3E00D29D88 /* TableCellFactory.swift in Sources */,
 				FB47ED682770ED5700E06521 /* EncryptPassword.m in Sources */,
-				18456EBF28310C3E00D29D88 /* VisitorMessageCell.swift in Sources */,
-				18456EBD28310C3E00D29D88 /* ChatTVCell.swift in Sources */,
+				F4CDF5C72B26395900D87B40 /* ZendeskChatbot.m in Sources */,
 				FB47ED672770ED5700E06521 /* NSString+TripleDES.m in Sources */,
-				18456EBE28310C3E00D29D88 /* APIClient.swift in Sources */,
-				18456EC428310C3E00D29D88 /* AgentImageCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -783,6 +719,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -795,7 +735,10 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SDKROOT)/usr/lib/swift$(inherited)",
+					"$(PROJECT_DIR)/opencv2.framework/Versions/A",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -814,6 +757,10 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = WearablesTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -822,7 +769,10 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SDKROOT)/usr/lib/swift$(inherited)",
+					"$(PROJECT_DIR)/opencv2.framework/Versions/A",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -843,9 +793,14 @@
 				CODE_SIGN_ENTITLEMENTS = Wearables/Wearables.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3.1;
+				CURRENT_PROJECT_VERSION = 3.2;
 				DEVELOPMENT_TEAM = GUTBJ785HC;
 				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_NO_COMMON_BLOCKS = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Wearables/Info.plist;
@@ -855,13 +810,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0;
+				MARKETING_VERSION = 3.2;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.HPN.wearablesclinicaltrials;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ctepl.wearablesclinicaltrialsdev;
 				PRODUCT_NAME = Wearables;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -884,9 +840,13 @@
 				CODE_SIGN_ENTITLEMENTS = Wearables/Wearables.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3.1;
+				CURRENT_PROJECT_VERSION = 3.2;
 				DEVELOPMENT_TEAM = GUTBJ785HC;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_NO_COMMON_BLOCKS = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Wearables/Info.plist;
@@ -896,13 +856,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0;
+				MARKETING_VERSION = 3.2;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.HPN.wearablesclinicaltrials;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ctepl.wearablesclinicaltrialsdev;
 				PRODUCT_NAME = Wearables;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

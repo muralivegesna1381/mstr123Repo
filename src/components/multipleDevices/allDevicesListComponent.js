@@ -60,7 +60,7 @@ const AllDevicesListComponent = ({navigation, route, ...props }) => {
     };
 
     const navigateToPrevious = () => {  
-        navigation.navigate('DashBoardService');
+        navigation.pop();
     };
 
     const popOkBtnAction = () => {

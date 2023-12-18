@@ -161,7 +161,6 @@ const PswdComponent = ({ navigation, route, ...props }) => {
                 NotifyToSecondaryEmail:isNotification,
             };
         }
-
         // await psdRequest({ variables: { input: json } });
         creatPsd(json,token);
 

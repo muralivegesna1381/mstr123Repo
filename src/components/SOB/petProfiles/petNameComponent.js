@@ -26,6 +26,9 @@ const PetNameComponent = ({ route, ...props }) => {
     const [deviceType, set_deviceType] = useState(undefined);
     const [date, set_Date] = useState(new Date());
     const [isLoading, set_isLoading] = useState(false);
+    const [isfromPetBFIOnBoarding, set_isfromPetBFIOnBoarding] = useState(false);
+    const [isFrom, set_isFrom] = useState(undefined)
+
 
     const [petParentObj, set_petParentObj] = useState(undefined);
     const [isParentAddress, set_isParentAddress] = useState(false);
@@ -35,18 +38,18 @@ const PetNameComponent = ({ route, ...props }) => {
     let sJosnObj = useRef();
 
     React.useEffect(() => {
- 
+
         getPetParentAddress();
-        
+
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
         const focus = navigation.addListener("focus", () => {
             set_Date(new Date());
             initialSessionStart();
             getSOBDetails();
             firebaseHelper.reportScreen(firebaseHelper.screen_SOB_petName);
-            firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_SOB_petName, "User in SOB Pet Name selection Screen", '');           
+            firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_SOB_petName, "User in SOB Pet Name selection Screen", '');
         });
-        
+
         const unsubscribe = navigation.addListener('blur', () => {
             initialSessionStop();
         });
@@ -57,10 +60,11 @@ const PetNameComponent = ({ route, ...props }) => {
             initialSessionStop();
             BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
         };
-        
+
     }, []);
 
     useEffect(() => {
+
         if (route.params?.deviceNumber) {
             set_deviceNo(route.params?.deviceNumber);
         }
@@ -69,7 +73,11 @@ const PetNameComponent = ({ route, ...props }) => {
             set_deviceType(route.params?.deviceType);
         }
 
-    }, [route.params?.deviceNumber, route.params?.deviceType]);
+        if (route.params?.isFrom) {
+            set_isFrom(route.params?.isFrom);
+        }
+
+    }, [route.params?.deviceNumber, route.params?.deviceType, route.params?.isFrom]);
 
     const handleBackButtonClick = () => {
         backBtnAction();
@@ -92,6 +100,16 @@ const PetNameComponent = ({ route, ...props }) => {
         } else {
             sJosnObj.current = {};
         }
+
+        //get type of onboarding
+        let type = await DataStorageLocal.getDataFromAsync(Constant.ONBOARDING_PET_BFI);
+        if (type === Constant.IS_FROM_PET_BFI) {
+            set_isfromPetBFIOnBoarding(true)
+        } else {
+            set_isfromPetBFIOnBoarding(false)
+        }
+
+
     };
 
     const getPetParentAddress = async () => {
@@ -125,8 +143,8 @@ const PetNameComponent = ({ route, ...props }) => {
 
             if (userDetailsServiceObj.responseData) {
                 set_petParentObj(userDetailsServiceObj.responseData);
-                if(userDetailsServiceObj.responseData.petParentAddress && Object.keys(userDetailsServiceObj.responseData.petParentAddress).length !== 0) {
-                    set_petParentAddress(userDetailsServiceObj.responseData.petParentAddress);
+                if(userDetailsServiceObj.responseData.address && Object.keys(userDetailsServiceObj.responseData.address).length !== 0) {
+                    set_petParentAddress(userDetailsServiceObj.responseData.address);
                     set_isParentAddress(true);
                 }
             } else {
@@ -139,7 +157,7 @@ const PetNameComponent = ({ route, ...props }) => {
 
         if (userDetailsServiceObj && userDetailsServiceObj.error) {
             let errors = userDetailsServiceObj.error.length > 0 ? userDetailsServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'error : '+errors);
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'error : ' + errors);
         }
     };
 
@@ -152,13 +170,31 @@ const PetNameComponent = ({ route, ...props }) => {
         sJosnObj.current.isPetWithPetParent = sJosnObj.current ? sJosnObj.current.isPetWithPetParent : 0;
         sJosnObj.current.isSkip = sJosnObj.current ? sJosnObj.current.isSkip : !isParentAddress;
         firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_submit_btn, firebaseHelper.screen_SOB_petName, "User entered the Pet name", 'PetName : ' + petFirstName + last);
-        await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));
-        navigation.navigate('PetTypeComponent');
+
+        //Skip Dog/Cat Selection. for pet BFI right now we are going with only dog
+        let type = await DataStorageLocal.getDataFromAsync(Constant.ONBOARDING_PET_BFI);
+        if (type === Constant.IS_FROM_PET_BFI) {
+            sJosnObj.current.speciesName = "Canine";
+            sJosnObj.current.speciesId = "1";
+            await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));
+            navigation.navigate('PetGenderComponent');
+        } else {
+            await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));
+            navigation.navigate('PetTypeComponent');
+        }
+
+
     };
 
     const backBtnAction = async () => {
         await DataStorageLocal.removeDataFromAsync(Constant.ONBOARDING_OBJ);
-        navigation.navigate('DashBoardService');
+        navigation.pop()
+        // if(isFrom === 'Dashboard') {
+        //     navigation.navigate('DashBoardService');
+        // } else {
+        //     navigation.navigate('MenuComponent');
+        // }
+        
     };
 
     const validatePetName = (pFName, pLName) => {
@@ -187,11 +223,11 @@ const PetNameComponent = ({ route, ...props }) => {
 
             <View style={{ width: wp('100%'), height: hp('70%'), justifyContent: 'center', alignItems: 'center' }}>
                 <KeyboardAwareScrollView bounces={true} showsVerticalScrollIndicator={false} enableOnAndroid={true} scrollEnabled={true} scrollToOverflowEnabled={true} enableAutomaticScroll={true}>
-                    <View style={{ height: hp('60%'), marginTop: hp('8%'), }}>
+                    <View style={{ height: hp('80%'), marginTop: hp('8%'), }}>
 
                         <View style={{ width: wp('80%'), height: hp('40%') }}>
                             <Text style={CommonStyles.headerTextStyle}>{'Lets get to know'}</Text>
-                            <Text style={CommonStyles.headerTextStyle}>{' your pet'}</Text>
+                            <Text style={CommonStyles.headerTextStyle}>{'your pet'}</Text>
 
                             <View style={{ marginTop: hp('4%') }} >
 
@@ -225,10 +261,17 @@ const PetNameComponent = ({ route, ...props }) => {
 
                         </View>
 
-                        <View style={{ height: hp('20%'), width: wp('80%'), alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
-                            <Image style={styles.dogImgStyels} source={require("./../../../../assets/images/dogImages/dogImg7.svg")} />
-                            <Image style={styles.catStyels} source={require("./../../../../assets/images/dogImages/cat.svg")} />
-                        </View>
+                        {!isfromPetBFIOnBoarding ?
+                            <View style={{ height: hp('20%'), width: wp('80%'), alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
+                                <Image style={styles.dogImgStyels} source={require("./../../../../assets/images/dogImages/dogImg7.svg")} />
+                                <Image style={styles.catStyels} source={require("./../../../../assets/images/dogImages/cat.svg")} />
+                            </View> :
+
+                            <View style={{ height: hp('15%'), width: wp('80%'), alignItems: 'center', justifyContent: 'center' }}>
+                                <Image style={styles.dogImgStyels} source={require("./../../../../assets/images/dogImages/dogImg7.svg")} />
+                                <Text style={CommonStyles.noRecordsTextStyle1}>{"Note: Pet BFI is your go-to feature! But hey, cat lovers, hold your paws – this ones not for your feline friends"}</Text>
+                            </View>
+                        }
 
                     </View>
 

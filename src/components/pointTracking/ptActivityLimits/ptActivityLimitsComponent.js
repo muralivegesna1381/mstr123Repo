@@ -10,6 +10,7 @@ const PTActivityLimitsComponent  = ({ navigation,route, ...props }) => {
     const [ptActivityLimits, set_ptActivityLimits] = useState(undefined);
     const [title, set_title] = useState('Pet parent is encouraged to record observations, Images, videos which are identified as activities under an ACTIVE campaign, will be enabled by the HPN team in WCT Mobile App.\n\nPet parent is allowed to submit any number of activities of their pets that are relevant to the campaign, but only a limited number of submissions will be approved and campaign points will be awarded to pet parents.\n\nThe cut-off for each activity submission is decided by the HPN team.');
     const [fromScreen, set_fromScreen] = useState(undefined);
+    const [campagainName, set_campagainName] = useState(undefined);
 
     useEffect(() => {
 
@@ -26,7 +27,11 @@ const PTActivityLimitsComponent  = ({ navigation,route, ...props }) => {
             set_ptActivityLimits(route.params?.ptActivityLimits);
         }
 
-    }, [route.params?.ptActivityLimits]);
+        if (route.params?.campagainName) {
+            set_campagainName(route.params?.campagainName);
+        }
+
+    }, [route.params?.ptActivityLimits,route.params?.campagainName]);
 
     const handleBackButtonClick = () => {
         backBtnAction();
@@ -73,7 +78,11 @@ const PTActivityLimitsComponent  = ({ navigation,route, ...props }) => {
             <View style={{ width: wp('90%'), height: hp('70%'), alignSelf: 'center' }}>
 
 
-                <View style={{marginTop: hp('5%'), alignSelf: 'center' }}>
+                <View style={{marginTop: hp('3%')}}>
+                    <Text style={[styles.headerStyle1,]}>{campagainName}</Text>
+                </View>
+
+                <View style={{marginTop: hp('3%'), alignSelf: 'center' }}>
                     <Text style={[styles.headerStyle,]}>{title}</Text>
                 </View>
 
@@ -100,6 +109,12 @@ const styles = StyleSheet.create({
     headerStyle : {
         fontSize: fonts.fontXSmall,
         ...CommonStyles.textStyleSemiBold,
+        color:'black',
+    },
+
+    headerStyle1 : {
+        fontSize:fonts.fontNormal,
+    ...CommonStyles.textStyleBold,
         color:'black',
     },
 

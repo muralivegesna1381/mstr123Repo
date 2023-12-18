@@ -100,6 +100,20 @@ import PetAddressEditConfirmComponent from '../components/petEdit/petAddressEdit
 import PetAddressEditComponent from '../components/petEdit/petAddressEditComponent';
 import PTActivityLimitsComponent from '../components/pointTracking/ptActivityLimits/ptActivityLimitsComponent';
 import AllDevicesListComponent from '../components/multipleDevices/allDevicesListComponent';
+import PetListBFIScoringScreen from './../bfiComponents/scoreBFI/petListBFIScoringScreen'
+import PetSubmittedImagesScreen from './../bfiComponents/scoreBFI/petSubmittedImagesScreen'
+import PetImageCaptureComponent from '../bfiComponents/captureImages/petImageCaptureComponent';
+import PetListComponent from '../bfiComponents/captureImages/petList/petListComponent';
+import PetInformationComponent from '../bfiComponents/captureImages/petInformation/petInformationComponent';
+import CameraComponent from '../bfiComponents/captureImages/cameraComponent/CameraComponent';
+import BFIScoreMain from '../bfiComponents/scoreBFI/BFIScoringMain';
+import InstructionsPage from '../bfiComponents/captureImages/instructions/instructionsComponent'
+import ReviewComponent from '../bfiComponents/reviewScreen/reviewScreen';
+import PetFoodInfoComponent from '../components/SOB/petProfiles/petFoodInfoComponent';
+import SubmittedScoreComponent from '../bfiComponents/scoreBFI/submittedScore/submittedScoreComponent';
+import BFIScoreInstructions from '../bfiComponents/scoreBFI/bfiScoreInstructionsComponent';
+import BFIUserDashboardComponent from '../components/bfiUserDashboard/bfiUserDashbaordComponent';
+import ParentProfileComponent from '../components/SOB/petParentProfile/ParentProfileComponent';
 
 const Stack = createNativeStackNavigator();
 
@@ -304,7 +318,35 @@ const AppStack = () => {
       <Stack.Screen name="PTActivityLimitsComponent" component={PTActivityLimitsComponent} options={{ headerShown: false, }} />
 
       <Stack.Screen name="AllDevicesListComponent" component={AllDevicesListComponent} options={{ headerShown: false, }} />
-      
+
+      <Stack.Screen name="PetListBFIScoringScreen" component={PetListBFIScoringScreen} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="PetSubmittedImagesScreen" component={PetSubmittedImagesScreen} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="PetImageCaptureComponent" component={PetImageCaptureComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="PetListComponent" component={PetListComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="PetInformationComponent" component={PetInformationComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="CameraComponent" component={CameraComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="InstructionsPage" component={InstructionsPage} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="BFIScoreMain" component={BFIScoreMain} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="ReviewComponent" component={ReviewComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="PetFoodInfoComponent" component={PetFoodInfoComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="SubmittedScoreComponent" component={SubmittedScoreComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="BFIScoreInstructions" component={BFIScoreInstructions} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="BFIUserDashboardComponent" component={BFIUserDashboardComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="ParentProfileComponent" component={ParentProfileComponent} options={{ headerShown: false, }} />
+
     </Stack.Navigator>
 
   );

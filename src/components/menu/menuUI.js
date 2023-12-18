@@ -3,39 +3,11 @@ import {View,StyleSheet,Text,TouchableOpacity,Image, FlatList, ImageBackground,P
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import Fonts from './../../utils/commonStyles/fonts'
 import CommonStyles from './../../utils/commonStyles/commonStyles';
+import AlertComponent from './../../utils/commonComponents/alertComponent';
+import LoaderComponent from './../../utils/commonComponents/loaderComponent';
+import * as Constant from "./../../utils/constants/constant";
 
 const  MenuUI = ({route, ...props }) => {
-
-  const [renderArray, set_renderArray] = useState(undefined);
-
-    useEffect(() => {
-
-      let tempArray = [];
-      if(props.modularityArray&&props.renderArray){
-        
-        for (let i=0; i<props.renderArray.length; i++){
-          if(props.modularityArray.includes(props.renderArray[i].mobileAppConfigID)){
-            tempArray.push(props.renderArray[i]);
-          }
-        }
-        
-      } else {
-
-        if(props.renderArray){
-        
-          for (let i=0; i<props.renderArray.length; i++){
-            if(props.renderArray[i].mobileAppConfigID === 0){
-              tempArray.push(props.renderArray[i]);
-            }
-  
-          }
-        }
-
-      }
-
-      set_renderArray(tempArray);
-      
-    }, [props.renderArray,props.modularityArray]);
 
     const menuBtnAction = (item,index) => {
       props.menuBtnAction(item);
@@ -43,6 +15,10 @@ const  MenuUI = ({route, ...props }) => {
 
     const menuHeaderBtnAction = () => {
       props.menuHeaderBtnAction();
+    };
+
+    const popOkBtnAction = () => {
+      props.popOkBtnAction();
     };
 
     return (
@@ -63,7 +39,7 @@ const  MenuUI = ({route, ...props }) => {
 
             <FlatList
                 style={styles.flatcontainer}
-                data={renderArray}
+                data={props.renderArray ? props.renderArray : []}
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item, index }) => (
 
@@ -84,6 +60,21 @@ const  MenuUI = ({route, ...props }) => {
             />
 
           </View>
+
+          {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
+            <AlertComponent
+              header = {props.popUpAlert}
+              message={props.popUpMessage}
+              isLeftBtnEnable = {false}
+              isRightBtnEnable = {true}
+              leftBtnTilte = {'NO'}
+              rightBtnTilte = {'OK'}
+              popUpRightBtnAction = {() => popOkBtnAction()}
+                        // popUpLeftBtnAction = {() => popCancelBtnAction()}
+            />
+          </View> : null}
+
+          {props.isLoading === true ? <LoaderComponent isLoader={false} loaderText = {Constant.DEFAULT_LOADER_MSG} isButtonEnable = {false} /> : null} 
 
         </View>
     );
@@ -141,19 +132,19 @@ const  MenuUI = ({route, ...props }) => {
     },
 
     btnImgStyle : {
-      width:wp('10%'),
-      height:hp('10%'),
+      width:wp('20%'),
+      // height:hp('10%'),
       resizeMode:'contain',
     },
 
     btnImgStylePad : {
       height:hp('10%'),
-      width:wp('10%'),
+      width:wp('20%'),
       resizeMode:'contain',
     },
 
     hImgStyle : {
-      width:wp('6%'),
+      width:wp('4%'),
       aspectRatio:1,
       resizeMode:'contain',
     },

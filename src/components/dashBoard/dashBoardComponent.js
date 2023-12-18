@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {Platform,PermissionsAndroid,Linking} from 'react-native';
+import {Platform,PermissionsAndroid,Linking,NativeModules} from 'react-native';
 import DashBoardUI from './dashBoardUI';
 import { useQuery} from "@apollo/react-hooks";
 import { useNavigation } from "@react-navigation/native";
@@ -23,7 +23,8 @@ const  DasBoardComponent = ({route, ...props }) => {
     const { loading:loadingData, data:uploadDashboardData } = useQuery(Queries.UPDATE_DASHBOARD_DATA, { fetchPolicy: "cache-only" });
     const { loading:vbackgrndloading, data:uploadMediaData } = useQuery(Queries.UPLOAD_VIDEO_BACKGROUND_STATUS, { fetchPolicy: "cache-only" });
     const { loading:loadingQst, data:uploadQstMediaData } = useQuery(Queries.UPLOAD_QUESTIONNAIRE_VIDEO_BACKGROUND_STATUS, { fetchPolicy: "cache-only" });
-
+    const { loading: captureBFILoading, data: captureBFIData } = useQuery(Queries.UPLOAD_CAPTURE_BFI_BACKGROUND_STATUS, { fetchPolicy: "cache-only" });
+  
     const [uploadStatus, set_uploadStatus] = useState(undefined);
     const [observationText, set_observationText] = useState(undefined);
     const [fileName, set_fileName] = useState(undefined);
@@ -37,6 +38,11 @@ const  DasBoardComponent = ({route, ...props }) => {
     const [questProgressTxt, set_questProgressTxt] = useState(undefined);
     const [questInternetType, set_questInternetType] = useState(undefined);
     const [isPTDropdown, set_isPTDropdown] = useState(undefined)
+  
+    const [bfiUploadStatus, set_bfiUploadStatus] = useState(undefined);
+    const [bfiFileName, set_bfiFileName] = useState(undefined);
+    const [bfiUploadProgress, set_bfiUploadProgress] = useState(undefined);
+    const [bfiProgressText, set_bfiProgressText] = useState(undefined);
 
     const navigation = useNavigation();
 
@@ -46,6 +52,19 @@ const  DasBoardComponent = ({route, ...props }) => {
       if(Platform.OS==='android'){
         requestStoragePermission();
       } 
+      //Logging out Zendesk from here
+      // Calling android method from here for Zendesk logout
+      if(Platform.OS === 'android') { 
+        NativeModules.ZendeskChatModule.logOutFromZendeskWindow("logout" ,(convertedVal) => {
+             //handle callback if needed     
+        });
+      }
+      // Calling iOS method from here for Zendesk logout
+      else{
+        NativeModules.ZendeskChatbot.logOutFromZendeskMessagingWindow( "logout", (value) => {
+           //handle callback if needed
+        });
+      }   
 
     }, []);
 
@@ -167,6 +186,30 @@ const  DasBoardComponent = ({route, ...props }) => {
     }
         
     }, [uploadQstMediaData]);
+  
+    useEffect(() => {
+
+      console.log("captureBFIData",captureBFIData)
+      if(captureBFIData && captureBFIData.data.__typename === 'UploadCaptureBFIBackgroundStatus'){
+        if(captureBFIData.data.stausType==='Uploading Done'){
+          set_bfiUploadStatus(undefined);
+        } else {
+          set_bfiUploadStatus(captureBFIData.data.statusUpload);
+        }
+        if(captureBFIData.data.fileName){
+          set_bfiFileName(captureBFIData.data.fileName);
+        } else {
+          set_bfiFileName('');
+        }
+        if(captureBFIData.data.uploadProgress){
+          set_bfiUploadProgress(captureBFIData.data.uploadProgress);
+        }
+        if(captureBFIData.data.progressTxt){
+          set_bfiProgressText(captureBFIData.data.progressTxt);
+        }
+    }
+        
+    }, [captureBFIData]);
 
     const requestStoragePermission = async () => {
       try {
@@ -296,14 +339,29 @@ const  DasBoardComponent = ({route, ...props }) => {
             }
           }
 
-        } else if(value==='Support'){
+        } else if(value === 'Support'){
           props.clearObjects();
           updateTimer('Support','Continue');
           firebaseHelper.logEvent(firebaseHelper.event_dashboard_Support, firebaseHelper.screen_dashboard, "Support button clicked", "Internet Status: " + internet.toString());
-          navigation.navigate('SupportComponent');
+          navigation.navigate('SupportComponent',{isFrom:'Dashboard'});
         } else if (value === 'Chat'){
-          updateTimer('Chatboat','Continue');
-          navigation.navigate('ChatBotComponent');
+          /*
+          * Zendesk is implemented in native android and iOS. Based on platform that is using the app
+          * we are launching the SDK from the native module methods from here
+          * For android we call the launchZendeskChatWindow method and for iOS we call launchZendeskMessagingWindow
+          */
+          if(Platform.OS === 'android') {
+                NativeModules.ZendeskChatModule.launchZendeskChatWindow("chatstart" ,(convertedVal) => {
+                  //callback can be handled here
+          });
+        }
+        else{
+          NativeModules.ZendeskChatbot.launchZendeskMessagingWindow( "chatstart", (value) => {
+            //callback can be handled here
+             });
+        }
+         updateTimer('Chatboat','Continue');
+          //navigation.navigate('ChatBotComponent');
         }
             
       }
@@ -318,11 +376,12 @@ const  DasBoardComponent = ({route, ...props }) => {
       if(!internet){
         createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
       } else {
-          updateTimer('Timer','Stop');
-          props.clearObjects();
-          await DataStorageLocal.saveDataToAsync(Constant.TIMER_SELECTED_PET, JSON.stringify(props.defaultPetObj));
-          Apolloclient.client.writeQuery({query: Queries.TIMER_START_QUERY,data: {data: {timerStart:'',__typename: 'TimerStartQuery'}},});
-          navigation.navigate('TimerComponent'); 
+        updateTimer('Timer','Stop');
+        props.clearObjects();
+        await DataStorageLocal.saveDataToAsync(Constant.TIMER_SELECTED_PET, JSON.stringify(props.defaultPetObj));
+        await DataStorageLocal.saveDataToAsync(Constant.TIMER_PETS_ARRAY, JSON.stringify(props.timePetsArray));
+        Apolloclient.client.writeQuery({query: Queries.TIMER_START_QUERY,data: {data: {timerStart:'',__typename: 'TimerStartQuery'}},});
+        navigation.navigate('TimerComponent',{isFrom:'Dashboard'});           
       } 
     };
 
@@ -490,7 +549,7 @@ const  DasBoardComponent = ({route, ...props }) => {
           updateTimer('Questionnaire','Continue');
           props.clearObjects();
           await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(props.defaultPetObj));
-          navigation.navigate('QuestionnaireStudyComponent');
+          navigation.navigate('QuestionnaireStudyComponent',{isFrom:'Dashboard'});
         }
 
     };
@@ -561,13 +620,13 @@ const  DasBoardComponent = ({route, ...props }) => {
               await DataStorageLocal.saveDataToAsync(Constant.SENSOR_TYPE_CONFIGURATION,'Sensor');
             }
           }
-          navigation.navigate('MultipleDevicesComponent',{petObject:props.defaultPetObj});
+          navigation.navigate('MultipleDevicesComponent',{petObject:props.defaultPetObj, isFrom:'Dashboard'});
             // navigation.navigate('SensorInitialComponent',{defaultPetObj:props.defaultPetObj});
 
         } else if(value==='ONBOARD YOUR PET'){
             firebaseHelper.logEvent(firebaseHelper.event_dashboard_onBoaring, firebaseHelper.screen_dashboard, "Onboard your Pet button clicked", "New User");
             await DataStorageLocal.removeDataFromAsync(Constant.ONBOARDING_OBJ);
-            navigation.navigate('PetNameComponent');
+            navigation.navigate('PetNameComponent',{isFrom:'Dashboard'});
         }
       }
 
@@ -631,7 +690,69 @@ const  DasBoardComponent = ({route, ...props }) => {
 
     const updateQuestionnareCount = () => {
       props.updateQuestionnareCount();
-    }
+    };
+
+    const captureImages = async () => {
+
+      ptDropAction();
+      let internet = await internetCheck.internetCheck();
+      firebaseHelper.logEvent(firebaseHelper.event_dashboard_CaptureImages_selection, firebaseHelper.screen_dashboard, "Score Images button clicked", "Internet Status: " + internet.toString());
+      if(!internet){
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
+      } else {
+        updateTimer('Settings','Continue');
+        props.clearObjects();
+      }
+      
+    };
+
+    const featureActions = async (item) => {
+
+      ptDropAction();
+      let internet = await internetCheck.internetCheck();
+      firebaseHelper.logEvent(firebaseHelper.event_dashboard_CaptureImages_selection, firebaseHelper.screen_dashboard, "Score Images button clicked", "Internet Status: " + internet.toString());
+      if(!internet){
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
+      } else {
+        props.clearObjects();
+
+        if(item.action === 'Capture Images') {
+          updateTimer('PetListComponent','Continue');
+          navigation.navigate('PetListComponent');
+        } else if(item.action === 'Score Pet') {
+
+          updateTimer('SelectBSCScoringComponent','Continue');
+          navigation.navigate('SelectBSCScoringComponent');
+  
+        } else if(item.action === 'Eating Enthusiasim') {
+
+          updateTimer('EatingEnthusiasticComponent','Continue');
+          navigation.navigate('EatingEnthusiasticComponent');
+  
+        } else if(item.action === 'Pet Weight') {
+
+          updateTimer('WeighAction','Continue');
+          navigation.navigate('PetWeightHistoryComponent',{petObject:props.defaultPetObj,petWeightUnit:props.petWeightUnit});
+
+        }
+        
+      }
+
+    };
+
+    const foodRecommand = async () => {
+
+      ptDropAction();
+      let internet = await internetCheck.internetCheck();
+      firebaseHelper.logEvent(firebaseHelper.event_dashboard_CaptureImages_selection, firebaseHelper.screen_dashboard, "Score Images button clicked", "Internet Status: " + internet.toString());
+      if(!internet){
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
+      } else {
+        updateTimer('Settings','Continue');
+        props.clearObjects();
+      }
+
+    };
 
     return (
       <>
@@ -649,7 +770,6 @@ const  DasBoardComponent = ({route, ...props }) => {
             isObsEnable = {props.isObsEnable}
             isTimer = {props.isTimer}
             isModularityService = {props.isModularityService}
-            birthday = {props.birthday}
             weight = {props.weight}
             weightUnit = {props.weightUnit}
             isEatingEnthusiasm = {props.isEatingEnthusiasm}
@@ -660,11 +780,6 @@ const  DasBoardComponent = ({route, ...props }) => {
             isQuestLoading = {props.isQuestLoading}
             isDeceased = {props.isDeceased}
             supportMetialsArray = {props.supportMetialsArray}
-            isFirmwareUpdate = {props.isFirmwareUpdate}
-            firmware = {props.firmware}
-            deviceNumber = {props.deviceNumber}
-            lastSeen = {props.lastSeen}
-            battery = {props.battery}
             devicesCount = {props.devicesCount}
             popUpMessage = {props.popUpMessage}
             popUpAlert = {props.popUpAlert}
@@ -699,7 +814,11 @@ const  DasBoardComponent = ({route, ...props }) => {
             questFileName = {questFileName}
             questUploadProgress = {questUploadProgress}
             questProgressTxt = {questProgressTxt}
-            questInternetType = {questInternetType}
+            questInternetType={questInternetType}
+            bfiUploadStatus={bfiUploadStatus}
+            bfiUploadProgress={bfiUploadProgress}
+            bfiFileName={bfiFileName}
+            bfiProgressText = {bfiProgressText}
             ptActivityLimits = {props.ptActivityLimits}
             questSubmitLength = {props.questSubmitLength}
             isPTDropdown = {isPTDropdown}
@@ -710,9 +829,9 @@ const  DasBoardComponent = ({route, ...props }) => {
             quickSetupAction = {quickSetupAction}
             editPetAction = {editPetAction}
             firmwareUpdateAction = {firmwareUpdateAction}
-            weightAction = {weightAction}
-            enthusiasticAction = {enthusiasticAction}
-            imageScoreAction = {imageScoreAction}
+            // weightAction = {weightAction}
+            // enthusiasticAction = {enthusiasticAction}
+            // imageScoreAction = {imageScoreAction}
             quickQuestionAction = {quickQuestionAction}
             quickQuestionnaireAction = {quickQuestionnaireAction}
             setupDeviceAction = {setupDeviceAction}
@@ -721,6 +840,10 @@ const  DasBoardComponent = ({route, ...props }) => {
             internetQuestBtnAction = {internetQuestBtnAction}
             devicesSelectionAction = {devicesSelectionAction}
             updateQuestionnareCount = {updateQuestionnareCount}
+            captureImages ={captureImages}
+            foodRecommand = {foodRecommand}
+            featureActions = {featureActions}
+            
           />
       </>
        

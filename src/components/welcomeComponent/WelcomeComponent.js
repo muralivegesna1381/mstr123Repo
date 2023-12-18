@@ -56,9 +56,9 @@ const WelcomeComponent = ({navigation, route, ...props }) => {
       rnBiometrics.biometricKeysExist().then((resultObject) => {
         const { keysExist } = resultObject;
           if (keysExist && userEmail && userPsd && userPsd !== 'undefined') {
-            navigation.navigate('LoginComponent',{"isAuthEnabled" : true});                  
+            navigation.navigate('LoginComponent',{"isAuthEnabled" : true});
           } else {
-            navigation.navigate('LoginComponent',{"isAuthEnabled" : false});
+             navigation.navigate('LoginComponent',{"isAuthEnabled" : false});
           }
       })  
     };
@@ -85,6 +85,7 @@ const WelcomeComponent = ({navigation, route, ...props }) => {
         <BottomComponent1
           topBtnTitle = {'LOGIN'}
           bottomBtnTitle  = {'NEW USER ?'}
+          bottomBtnEnable = {true}
           topButtonAction = {async () => topButtonAction()}
           bottomButtonAction = {async () => bottomButtonAction()}
           >

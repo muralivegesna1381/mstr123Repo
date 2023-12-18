@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, BackHandler } from 'react-native';
 import SelectBSCScoringUI from './SelectBSCScoringUI';
 import * as Constant from "./../../utils/constants/constant";
@@ -15,7 +15,7 @@ const SelectBSCScoringComponent = ({ navigation, route, ...props }) => {
     const [popupMsg, set_popupMsg] = useState(undefined);
     const [scoringArray, set_scoringArray] = useState([]);
     const [date, set_Date] = useState(new Date());
-    const [popupAlert,set_popupAlert] = useState(undefined);
+    const [popupAlert, set_popupAlert] = useState(undefined);
     const [defaultPetObj, set_defaultPetObj] = useState(undefined);
 
     let popIdRef = useRef(0);
@@ -25,14 +25,14 @@ const SelectBSCScoringComponent = ({ navigation, route, ...props }) => {
     let trace_Get_Pet_ImageScoring_Scales_API_Complete;
 
     useEffect(() => {
-        
+
         getInitialData();
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
 
         const focus = navigation.addListener("focus", () => {
             set_Date(new Date());
             firebaseHelper.reportScreen(firebaseHelper.screen_image_based_score);
-            firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_image_based_score, "User in ImageBased scoring Screen", ''); 
+            firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_image_based_score, "User in ImageBased scoring Screen", '');
             imageScoringBCSScoringPageSessionStart();
         });
 
@@ -40,12 +40,12 @@ const SelectBSCScoringComponent = ({ navigation, route, ...props }) => {
             imageScoringBCSScoringPageSessionStop();
         });
 
-         return () => {
-           imageScoringBCSScoringPageSessionStop();
-           unsubscribe();
-           BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
-         };
-     
+        return () => {
+            imageScoringBCSScoringPageSessionStop();
+            unsubscribe();
+            BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+        };
+
     }, []);
 
     const getInitialData = async () => {
@@ -56,52 +56,52 @@ const SelectBSCScoringComponent = ({ navigation, route, ...props }) => {
         petObj = JSON.parse(petObj);
         set_defaultPetObj(petObj);
         let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        getPetImageScoringScales(petObj.petID,token);
+        getPetImageScoringScales(petObj.petID, token);
     };
 
-    const getPetImageScoringScales = async (petId,token) => {
+    const getPetImageScoringScales = async (petId, token) => {
 
-        let getImgScoreServiceObj = await ServiceCalls.getPetImageScoringScales(petId,token);
+        let getImgScoreServiceObj = await ServiceCalls.getPetImageScoringScales(petId, token);
         set_isLoading(false);
         isLoadingdRef.current = 0;
         stopFBTraceGetPetImageScoringScales();
 
-        if(getImgScoreServiceObj && getImgScoreServiceObj.logoutData){
-          AuthoriseCheck.authoriseCheck();
-          navigation.navigate('WelcomeComponent');
-          return;
-        }
-        
-        if(getImgScoreServiceObj && !getImgScoreServiceObj.isInternet){
-            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
+        if (getImgScoreServiceObj && getImgScoreServiceObj.logoutData) {
+            AuthoriseCheck.authoriseCheck();
+            navigation.navigate('WelcomeComponent');
             return;
         }
-  
-        if(getImgScoreServiceObj && getImgScoreServiceObj.statusData){
-            
-            if(getImgScoreServiceObj.responseData && getImgScoreServiceObj.responseData.length > 0){
+
+        if (getImgScoreServiceObj && !getImgScoreServiceObj.isInternet) {
+            createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
+            return;
+        }
+
+        if (getImgScoreServiceObj && getImgScoreServiceObj.statusData) {
+
+            if (getImgScoreServiceObj.responseData && getImgScoreServiceObj.responseData.length > 0) {
                 set_scoringArray(getImgScoreServiceObj.responseData);
             } else {
                 set_scoringArray([]);
-                firebaseHelper.logEvent(firebaseHelper.event_image_scoring_pet_image_scoring_scales_api_success, firebaseHelper.screen_image_based_score, "Get Pet Image Scoring scales Api success", "Response length: "+getImgScoreServiceObj.responseData.length);
+                firebaseHelper.logEvent(firebaseHelper.event_image_scoring_pet_image_scoring_scales_api_success, firebaseHelper.screen_image_based_score, "Get Pet Image Scoring scales Api success", "Response length: " + getImgScoreServiceObj.responseData.length);
             }
-        
+
         } else {
             firebaseHelper.logEvent(firebaseHelper.event_image_scoring_pet_image_scoring_scales_api_failure, firebaseHelper.screen_image_based_score, "Get Pet Image Scoring scales Api failed", "Service Status : false");
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
         }
-  
-        if(getImgScoreServiceObj && getImgScoreServiceObj.error) {
+
+        if (getImgScoreServiceObj && getImgScoreServiceObj.error) {
             let errors = getImgScoreServiceObj.error.length > 0 ? getImgScoreServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_image_scoring_pet_image_scoring_scales_api_failure, firebaseHelper.screen_image_based_score, "Get Pet Image Scoring scales Api failed", "error : "+errors);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+            firebaseHelper.logEvent(firebaseHelper.event_image_scoring_pet_image_scoring_scales_api_failure, firebaseHelper.screen_image_based_score, "Get Pet Image Scoring scales Api failed", "error : " + errors);
+            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
         }
     }
 
     const imageScoringBCSScoringPageSessionStart = async () => {
         trace_inBCS_Scoring_Screen = await perf().startTrace('t_Image_Scoring_BCS_Scoring_Screen');
     };
-    
+
     const imageScoringBCSScoringPageSessionStop = async () => {
         await trace_inBCS_Scoring_Screen.stop();
     };
@@ -117,12 +117,12 @@ const SelectBSCScoringComponent = ({ navigation, route, ...props }) => {
 
     // Navigates to previous screen
     const navigateToPrevious = () => {
-        if(isLoadingdRef.current === 0 && popIdRef.current === 0){
+        if (isLoadingdRef.current === 0 && popIdRef.current === 0) {
             navigation.navigate('DashBoardService');
         }
     };
 
-    const createPopup = (title,msg,isPop) => {
+    const createPopup = (title, msg, isPop) => {
         set_popupAlert(title);
         set_popupMsg(msg);
         set_isPopUp(isPop);
@@ -139,19 +139,28 @@ const SelectBSCScoringComponent = ({ navigation, route, ...props }) => {
 
     // Navigates to Images scoring component
     const selectActivityAction = (item, index) => {
+        console.log("item", item)
         let itemName = item && item.imageScaleName ? item.imageScaleName : ''
-        firebaseHelper.logEvent(firebaseHelper.event_image_scoring_button_trigger, firebaseHelper.screen_image_based_score, "User selected item", ''+itemName);
+        firebaseHelper.logEvent(firebaseHelper.event_image_scoring_button_trigger, firebaseHelper.screen_image_based_score, "User selected item", '' + itemName);
+        
         navigation.navigate('ImageScoringMainComponent', { scoreObj: item });
+
+        // //Redirect to new BFI Scoring screen for dog
+        // if (defaultPetObj.speciesId === "1" && item.scoringType === "BFI Scoring") {
+        //     navigation.navigate('PetListBFIScoringScreen');
+        // } else {
+        //     navigation.navigate('ImageScoringMainComponent', { scoreObj: item });
+        // }
     };
 
     return (
         <SelectBSCScoringUI
             isPopUp={isPopUp}
             popupMsg={popupMsg}
-            popupAlert = {popupAlert}
+            popupAlert={popupAlert}
             isLoading={isLoading}
             scoringArray={scoringArray}
-            defaultPetObj = {defaultPetObj}
+            defaultPetObj={defaultPetObj}
             navigateToPrevious={navigateToPrevious}
             popOkBtnAction={popOkBtnAction}
             selectActivityAction={selectActivityAction}

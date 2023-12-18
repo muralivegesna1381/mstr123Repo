@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, BackHandler } from 'react-native';
+import { View, BackHandler,NativeModules } from 'react-native';
 import AccountInfoUi from './accountInfoUI';
 import * as Queries from "./../../config/apollo/queries";
 import * as DataStorageLocal from './../../utils/storage/dataStorageLocal';
@@ -22,6 +22,7 @@ let trace_Account_API_Complete;
 let POP_AUTHENTICATION = 1;
 let POP_REMOVE_AUTHENTICATION = 3;
 let POP_LOG_OUT = 2;
+let POP_DELETE_ACCOUNT = 4;
 
 const Environment = JSON.parse(BuildEnv.Environment());
 
@@ -51,6 +52,7 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
   const [enabled, set_enabled] = useState(false);
   const [popupType, set_popupType] = useState(0);
   const [bio_Enable, set_bio_Enable] = useState(false);
+  const [userRole, set_userRole] = useState(undefined)
 
   let popIdRef = useRef(0);
   let isLoadingdRef = useRef(0);
@@ -60,6 +62,7 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
 
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     getDetailsDeviceDetails();
+    getUserRole();
     const focus = navigation.addListener("focus", () => {
       set_Date(new Date());
       initialSessionStart();
@@ -81,6 +84,11 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
     };
 
   }, []);
+
+  const getUserRole = async () => {
+    let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
+    set_userRole(userRole);
+  };
 
   // Android physical backbutton
   const handleBackButtonClick = () => {
@@ -184,15 +192,15 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
         set_phoneNo(userDetailsServiceObj.responseData.phoneNumber);
         set_isNotification(userDetailsServiceObj.responseData.notifyToSecondaryEmail);
         set_secondaryEmail(userDetailsServiceObj.responseData.secondaryEmail);
-        if(userDetailsServiceObj.responseData.petParentAddress && Object.keys(userDetailsServiceObj.responseData.petParentAddress).length !== 0 ) {
-            set_pAddressObj(userDetailsServiceObj.responseData.petParentAddress);
-            let tempLine2 = userDetailsServiceObj.responseData.petParentAddress.address2 && userDetailsServiceObj.responseData.petParentAddress.address2 !== '' ? userDetailsServiceObj.responseData.petParentAddress.address2 + ', ' : '';
-            let address = userDetailsServiceObj.responseData.petParentAddress.address1 + ', ' 
+        if(userDetailsServiceObj.responseData.address && Object.keys(userDetailsServiceObj.responseData.address).length !== 0 ) {
+            set_pAddressObj(userDetailsServiceObj.responseData.address);
+            let tempLine2 = userDetailsServiceObj.responseData.address.address2 && userDetailsServiceObj.responseData.address.address2 !== '' ? userDetailsServiceObj.responseData.address.address2 + ', ' : '';
+            let address = userDetailsServiceObj.responseData.address.address1 + ', ' 
             + tempLine2
-            + userDetailsServiceObj.responseData.petParentAddress.city + ', ' 
-            + userDetailsServiceObj.responseData.petParentAddress.state+ ', '
-            + userDetailsServiceObj.responseData.petParentAddress.country+ ', '
-            + userDetailsServiceObj.responseData.petParentAddress.zipCode;
+            + userDetailsServiceObj.responseData.address.city + ', ' 
+            + userDetailsServiceObj.responseData.address.state+ ', '
+            + userDetailsServiceObj.responseData.address.country+ ', '
+            + userDetailsServiceObj.responseData.address.zipCode;
             set_pAddress(address);
         }
         
@@ -217,14 +225,14 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
   const navigateToPrevious = () => {
 
     if (isLoadingdRef.current === 0 && popIdRef.current === 0) {
-      navigation.navigate('DashBoardService');
+      navigation.pop();
     }
 
   };
 
   // Log out of the app
-  const logOutAction = async () => {
-
+  const logOutAction = async (id) => {
+    
     let timerData = await DataStorageLocal.getDataFromAsync(Constant.TIMER_OBJECT);
     timerData = JSON.parse(timerData);
 
@@ -233,7 +241,7 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
 
     let questData = await DataStorageLocal.getDataFromAsync(Constant.QUEST_UPLOAD_DATA);
     questData = JSON.parse(questData);
-
+    
     if (obsData && obsData.length > 0) {
 
       firebaseHelper.logEvent(firebaseHelper.event_account_logout, firebaseHelper.screen_account_main, "User tried to logout when Observation is being uploaded", 'Email : ' + email);
@@ -262,12 +270,25 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
       set_popupType(0);
 
     } else {
+       //Logging out Zendesk from here
+      // Calling android method from here for Zendesk logout
+      if(Platform.OS === 'android') {
+        NativeModules.ZendeskChatModule.logOutFromZendeskWindow("logout" ,(convertedVal) => {
+             //handle callback if needed     
+        });
+      }
+      else{
+         // Calling iOS method from here for Zendesk logout
+        NativeModules.ZendeskChatbot.logOutFromZendeskMessagingWindow( "logout", (value) => {
+           //handle callback if needed
+        });
+      }
       set_popAlert('Alert');
       set_isPopUpLeft(true);
       set_isPopUpLeftTitle('CANCEL');
-      set_popUpMessage(Constant.LOG_OUT_MSG);
-      set_popBtnName("LOG OUT");
-      set_popupType(2);
+      set_popUpMessage(id === 100 ? Constant.LOG_OUT_MSG : Constant.DELETE_USER_MSG );
+      set_popBtnName(id === 100 ? "LOG OUT" : "ACCEPT");
+      set_popupType(id === 100 ? 2 : 4);
     }
     set_isPopUp(true);
     popIdRef.current = 1;
@@ -326,9 +347,10 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
     const rnBiometrics = new ReactNativeBiometrics();
     set_isPopUp(false);
     popIdRef.current = 0;
+
     if (popupType === POP_LOG_OUT) {
+
       set_isLoading(true);
-      
       rnBiometrics.biometricKeysExist().then(async (resultObject) => {
         const { keysExist } = resultObject
         
@@ -344,11 +366,60 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
 
       firebaseHelper.logEvent(firebaseHelper.event_account_logout, firebaseHelper.screen_account_main, "User logged out", 'Email : ' + email);
       Apolloclient.client.writeQuery({ query: Queries.LOG_OUT_APP, data: { data: { isLogOut: 'logOut', __typename: 'LogOutApp' } }, });
-      PushNotification.cancelAllLocalNotifications();
+      removeUserData();
+      setTimeout(async () => {  
+        
+        set_isLoading(false)
+        // navigation.navigate('WelcomeComponent');
+        let user = await DataStorageLocal.getDataFromAsync(Constant.USER_EMAIL_LOGIN);
+        let pd = await DataStorageLocal.getDataFromAsync(Constant.USER_PSD_LOGIN);
+        if(user && pd && pd !== 'undefined') {
+          navigation.navigate('LoginComponent',{"isAuthEnabled" : enabled}); 
+        } else {
+          navigation.navigate('LoginComponent',{"isAuthEnabled" : false}); 
+        }
+        
+      },2000)
 
-      // await DataStorageLocal.removeDataFromAsync(Constant.IS_USER_LOGGED_INN);
+    }else if (popupType === POP_DELETE_ACCOUNT) {
+
+      deleteUserAccount();
+
+    } else if (popupType === POP_AUTHENTICATION) {
+
+      popCancelBtnAction();
+      set_enabled(true);
+      rnBiometrics.biometricKeysExist().then((resultObject) => {
+        const { keysExist } = resultObject
+
+          if (keysExist) {
+          } else {
+            rnBiometrics.createKeys().then((resultObject) => {
+              const { publicKey } = resultObject
+              sendPublicKeyToServer(publicKey)
+            })
+          }
+      })
+
+    } else if (popupType === POP_REMOVE_AUTHENTICATION) {
+
+      popCancelBtnAction();
+      set_enabled(false);
+      rnBiometrics.deleteKeys().then((resultObject) => {
+        const { keysDeleted } = resultObject
+      })
+
+    } else {
+      popCancelBtnAction();
+    }
+
+  };
+
+  const removeUserData = async () => {
+
+    PushNotification.cancelAllLocalNotifications();
       
-      await DataStorageLocal.removeDataFromAsync(Constant.DEFAULT_PET_OBJECT);
+    await DataStorageLocal.removeDataFromAsync(Constant.DEFAULT_PET_OBJECT);
       await DataStorageLocal.removeDataFromAsync(Constant.APP_TOKEN);
       await DataStorageLocal.removeDataFromAsync(Constant.CLIENT_ID);
       await DataStorageLocal.removeDataFromAsync(Constant.PET_ID);
@@ -404,46 +475,13 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
       await DataStorageLocal.removeDataFromAsync(Constant.SELECTED_QUESTIONNAIRE);
       await DataStorageLocal.removeDataFromAsync(Constant.ANSWERED_SECTIONS);
       await DataStorageLocal.removeDataFromAsync(Constant.CTW_QUESTIONNAIRE);
-      
-      setTimeout(async () => {  
-        set_isLoading(false)
-        // navigation.navigate('WelcomeComponent');
-        let user = await DataStorageLocal.getDataFromAsync(Constant.USER_EMAIL_LOGIN);
-        let pd = await DataStorageLocal.getDataFromAsync(Constant.USER_PSD_LOGIN);
-        if(user && pd && pd !== 'undefined') {
-          navigation.navigate('LoginComponent',{"isAuthEnabled" : enabled}); 
-        } else {
-          navigation.navigate('LoginComponent',{"isAuthEnabled" : false}); 
-        }
-        
-      },2000)
 
-    } else if (popupType === POP_AUTHENTICATION) {
-
-      popCancelBtnAction();
-      set_enabled(true);
-      rnBiometrics.biometricKeysExist().then((resultObject) => {
-        const { keysExist } = resultObject
-
-          if (keysExist) {
-          } else {
-            rnBiometrics.createKeys().then((resultObject) => {
-              const { publicKey } = resultObject
-              sendPublicKeyToServer(publicKey)
-            })
-          }
-      })
-
-    } else if (popupType === POP_REMOVE_AUTHENTICATION) {
-
-      popCancelBtnAction();
-      set_enabled(false);
-      rnBiometrics.deleteKeys().then((resultObject) => {
-      const { keysDeleted } = resultObject
-      })
-
-    }
-
+      await DataStorageLocal.removeDataFromAsync(Constant.ALL_PETS_ARRAY);
+      await DataStorageLocal.removeDataFromAsync(Constant.USER_ROLE_ID);
+      await DataStorageLocal.removeDataFromAsync(Constant.USER_ROLE_DETAILS);
+      await DataStorageLocal.removeDataFromAsync(Constant.USER_ROLE_CAPTURE_IMGS);
+      await DataStorageLocal.removeDataFromAsync(Constant.USER_ID);
+    
   };
 
   // Popup cancel action
@@ -481,6 +519,76 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
 
   };
 
+  const deleteUserAccount = async () => {
+
+    const rnBiometrics = new ReactNativeBiometrics();
+    set_isLoading(true);
+    isLoadingdRef.current = 1;
+    let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
+    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
+    // firebaseHelper.logEvent(firebaseHelper.event_delete_account_main_api, firebaseHelper.screen_account_main, "Initiated the user Account delete Api ", 'Client ID : ' + clientIdTemp);
+    let json = {
+      PetParentId: clientIdTemp,
+    };
+    let userDetailsServiceObj = await ServiceCalls.deleteUserAccount(json, token);
+    set_isLoading(false);
+    isLoadingdRef.current = 0;
+
+    if (userDetailsServiceObj && userDetailsServiceObj.logoutData) {
+      AuthoriseCheck.authoriseCheck();
+      navigation.navigate('WelcomeComponent');
+      return;
+    }
+
+    if (userDetailsServiceObj && !userDetailsServiceObj.isInternet) {
+      set_popAlert(Constant.ALERT_NETWORK);
+      set_popUpMessage(Constant.NETWORK_STATUS);
+      set_isPopUpLeft(false);
+      set_popBtnName("OK");
+      set_isPopUp(true);
+      set_popupType(0);
+      return;
+    }
+
+    if (userDetailsServiceObj && userDetailsServiceObj.statusData) {
+      Apolloclient.client.writeQuery({ query: Queries.LOG_OUT_APP, data: { data: { isLogOut: 'logOut', __typename: 'LogOutApp' } }, });
+      removeUserData();
+      await DataStorageLocal.removeDataFromAsync(Constant.USER_EMAIL_LOGIN);
+      await DataStorageLocal.removeDataFromAsync(Constant.USER_PSD_LOGIN);
+      await DataStorageLocal.removeDataFromAsync(Constant.FCM_TOKEN);
+      await rnBiometrics.deleteKeys().then((resultObject) => {
+        const { keysDeleted } = resultObject
+      });
+
+      navigation.navigate('LoginComponent',{"isAuthEnabled" : false}); 
+
+    } else {
+
+      set_popAlert(Constant.ALERT_DEFAULT_TITLE);
+      set_popUpMessage(Constant.SERVICE_FAIL_MSG);
+      set_isPopUpLeft(false);
+      set_popBtnName("OK");
+      set_isPopUp(true);
+      set_popupType(0);
+      firebaseHelper.logEvent(firebaseHelper.event_delete_account_main_api_fail, firebaseHelper.screen_account_main, "Delete Account Api Failed", 'error : Status false');
+    }
+
+    if (userDetailsServiceObj && userDetailsServiceObj.error) {
+      set_popAlert(Constant.ALERT_DEFAULT_TITLE);
+      set_popUpMessage(Constant.SERVICE_FAIL_MSG);
+      set_isPopUpLeft(false);
+      set_popBtnName("OK");
+      set_isPopUp(true);
+      set_popupType(0);
+      firebaseHelper.logEvent(firebaseHelper.event_delete_account_main_api_fail, firebaseHelper.screen_account_main, "Delete Account Api Failed", 'error : Service error');
+    }
+
+  };
+
+  const deleteAccountAction = (value) => {
+    logOutAction(value);
+  };
+
   return (
     <AccountInfoUi
       email={email}
@@ -503,11 +611,13 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
       authenticationType = {authenticationType}
       isPopUpLeftTitle = {isPopUpLeftTitle}
       bio_Enable = {bio_Enable}
+      userRole = {userRole}
       navigateToPrevious={navigateToPrevious}
       logOutAction={logOutAction}
       popOkBtnAction={popOkBtnAction}
       popCancelBtnAction={popCancelBtnAction}
       btnAction={btnAction}
+      deleteAccountAction = {deleteAccountAction}
       selectAuthentication = {selectAuthentication}
     />
   );

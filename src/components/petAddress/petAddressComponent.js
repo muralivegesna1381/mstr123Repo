@@ -224,10 +224,17 @@ const PetAddressComponent = ({ navigation, route, ...props }) => {
     };
 
     const updateLocalData = async (addChangeObj) => {
-        sJosnObj.current.petLocation = sJosnObj.current.petParentObj.petParentAddress;
+        sJosnObj.current.petLocation = sJosnObj.current.petParentObj && sJosnObj.current.petParentObj.petParentAddress ? sJosnObj.current.petParentObj.petParentAddress : undefined;
         sJosnObj.current.petLocationNew = sJosnObj.current.isSameAddress === 'notSame' ? addChangeObj : sJosnObj.current.petLocationNew;
         await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));
-        navigation.navigate('SensorTypeComponent',{isFrom:'petAddress'});
+        
+        //Skip Sensor part if navigation is from PET BFI
+        let type = await DataStorageLocal.getDataFromAsync(Constant.ONBOARDING_PET_BFI);
+        if (type === Constant.IS_FROM_PET_BFI) {
+            navigation.navigate('PetReviewComponent');
+        } else {
+            navigation.navigate('SensorTypeComponent', { isFrom: 'petAddress' });
+        }
     }
 
     return (

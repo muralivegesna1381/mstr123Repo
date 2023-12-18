@@ -50,6 +50,7 @@ const  TimerPetSelectionUI = ({route, ...props }) => {
                 petsArray = {petsArray}
                 defaultPetObj = {defaultPetObj}
                 selectedIndex = {selectedIndex}
+                selectedPName = {props.selectedPName}
                 selectPetAction = {selectPetAction}
                 />
             </View>
@@ -92,7 +93,7 @@ const  TimerPetSelectionUI = ({route, ...props }) => {
 
     dogImgStyle : {
         width:wp('70%'),
-        height:hp('70%'),
+        // height:hp('70%'),
         resizeMode:'contain',
     }
 

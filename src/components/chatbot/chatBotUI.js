@@ -123,7 +123,7 @@ return(
           renderBubble={renderBubble}
           inverted={false}
           renderUsernameOnMessage={true}
-          onLongPress={(ctx, currentMessage) => {console.log("Tap")}}
+          onLongPress={(ctx, currentMessage) => {}}
           renderInputToolbar={props => customtInputToolbar(props)}
           // renderSystemMessage={props => customSystemMessage(props)}
           // textInputProps = {props => customInputMessage(props)}

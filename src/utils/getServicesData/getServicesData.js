@@ -23,6 +23,7 @@ export async function loginWearablesApp (jsonValue) {
         obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet};
         return obj;
     } 
+
     await fetch(Environment.uri + "migrated/ClientLogin/v2",
       {
         method: "POST",
@@ -34,6 +35,7 @@ export async function loginWearablesApp (jsonValue) {
         body:JSON.stringify(jsonValue),
       }
     ).then((response) => response.json()).then(async (data) => {
+
         if(data && data.errors && data.errors.length && (data.errors[0].code==='WEARABLES_TKN_003' || data.errors[0].code==='WEARABLES_WEB_APP_EXCEPTION')){
             logoutData = true;
         } else {
@@ -42,7 +44,10 @@ export async function loginWearablesApp (jsonValue) {
 
         if (data && data.success && data.result) {
             statusData = {status :data.success,responseCode:data.responseCode,responseMessage:data.responseMessage};
-            responseData = {email : data.result.UserDetails.Email, clientId : data.result.UserDetails.ClientID, tokenValue : data.result.UserDetails.Token}
+            if(data.result.UserDetails){
+                responseData = {userDetails : data.result.UserDetails}
+            }
+            
         } else {
             statusData = undefined;
         }
@@ -118,29 +123,31 @@ export async function getClientInfo (jsonValue,token) {
         return obj;
     } 
 
-    await fetch(Environment.uri + "migrated/GetClientInfo/v2",
+    // await fetch(Environment.uri + "migrated/GetClientInfo/v2",
+    await fetch(Environment.uri + "getProfileInfo",//app/getProfileInfo
       {
-        method: "POST",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
           "ClientToken" : token
         },
-        body:JSON.stringify(jsonValue),
+        // body:JSON.stringify(jsonValue),
       }
     ).then((response) => response.json()).then(async (data) => {
+
         if(data && data.errors && data.errors.length && data.errors[0].code==='WEARABLES_TKN_003'){
             logoutData = true;
         } else {
             logoutData = false;
         }
 
-        if (data && data.success) {
+        if (data && data.status.success) {
 
-            statusData = data.success;
-            if( data.result && data.result.Key ) {
+            statusData = data.status.success;
+            if( data.response && data.response.user ) {
 
-                responseData = data.result.ClientInfo;
+                responseData = data.response.user;
 
             } else {
                 statusData = undefined;
@@ -149,13 +156,6 @@ export async function getClientInfo (jsonValue,token) {
         } else {
             statusData = undefined;
         }
-
-        // if (data && data.success && data.result) {
-        //     statusData = {status :data.success, responseCode:data.responseCode, responseMessage:data.responseMessage};
-        //     responseData = {email : data.result.email, clientId : data.result.clientID, firstName : data.result.firstName, fullName : data.result.fullName, lastName : data.result.lastName, phoneNumber : data.result.phoneNumber, secondaryEmail:data.result.secondaryEmail, isNotification:data.result.notifyToSecondaryEmail}
-        // } else {
-        //     statusData = undefined;
-        // }
 
     }).catch((error) => {
         returnError = error;
@@ -309,7 +309,7 @@ export async function updateSensorSetupStatus (jsonValue,token) {
 };
 
 ////// OTP API //////
-export async function checkClientSMSCode (jsonValue,token) {
+/*export async function checkClientSMSCode (jsonValue,token) {
 
     let returnError = undefined;
     let statusData = undefined;
@@ -352,10 +352,10 @@ export async function checkClientSMSCode (jsonValue,token) {
 
     obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet}
     return obj;
-};
+};*/
 
 ////// OTP API //////
-export async function setClientPasswordBySMSCode (jsonValue,token) {
+/*export async function setClientPasswordBySMSCode (jsonValue,token) {
 
     let returnError = undefined;
     let statusData = undefined;
@@ -398,7 +398,7 @@ export async function setClientPasswordBySMSCode (jsonValue,token) {
 
     obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet}
     return obj;
-};
+};*/
 
 ////// Validate Sensor API //////
 export async function validateDeviceNumber (jsonValue, token) {
@@ -770,6 +770,7 @@ export async function getModularityPermission (petIDArray, token) {
         obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet};
         return obj;
     } 
+
     // await fetch(Environment.uri + "pets/getMobileAppConfigs/" + petID,
     await fetch(Environment.uri + "pets/getMobileAppConfigs/",
       {
@@ -2198,7 +2199,7 @@ export async function forgotPasswordValidateEmail (jsonValue) {
         body:JSON.stringify(jsonValue),
       }
     ).then((response) => response.json()).then(async (data) => {
-                
+
         if (data && data.success && data.result.Key) {
             statusData = data.success;
         } else if (data.result && data.result.Value !== '') { 
@@ -2283,6 +2284,7 @@ export async function registerUserValidateEmail (jsonValue) {
         body:JSON.stringify(jsonValue),
       }
     ).then((response) => response.json()).then(async (data) => {
+
         if (data && data.result && data.result.ClientID !== 0) {
             statusData = data.success;
             responseData = data.result;
@@ -2326,6 +2328,7 @@ export async function createPassword (jsonValue,apiName) {
         body:JSON.stringify(jsonValue),
       }
     ).then((response) => response.json()).then(async (data) => {
+
         if (data && data.success) {
             statusData = data.success;
         } else {
@@ -2426,5 +2429,343 @@ export async function updatePetInfo (finalJson,token) {
     });
 
     obj = {invalidData : invalidData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet}
+    return obj;
+};
+
+////// Individual Configs API //////
+export async function configPermissionAPI (clientId,value,token) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+    
+    let internet  = await internetCheck();
+    if(!internet) {
+        obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet};
+        return obj;
+    } 
+
+    await fetch(Environment.uri + "pets/getPetsByPetParentIdAndMobileAppConfigId/"+clientId+'/'+value,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "ClientToken" : token
+        },
+      }
+    ).then((response) => response.json()).then(async (data) => {
+
+        if(data && data.errors && data.errors.length && data.errors[0].code==='WEARABLES_TKN_003'){
+            logoutData = true;
+        } else {
+            logoutData = false;
+        }
+
+        if (data && data.status.success) {
+            statusData = data.status.success;
+            if(data.response && data.response.pets){
+                responseData = data.response.pets;
+            }
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        returnError = error;
+    });
+
+    obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet}
+    return obj;
+};
+
+////// Delete PetParent Account API //////
+export async function deleteUserAccount(jsonValue,token) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+
+    let internet  = await internetCheck();
+    if(!internet) {
+        obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet};
+        return obj;
+    } 
+
+    await fetch(Environment.uri + "migrated/deleteAccount", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "ClientToken" : token
+        },
+        body : JSON.stringify(jsonValue)
+      }
+    ).then((response) => response.json()).then(async (data) => {
+
+        if(data && data.errors && data.errors.length && data.errors[0].code==='WEARABLES_TKN_003'){
+            logoutData = true;
+        } else {
+            logoutData = false;
+        }
+
+        if (data.success) {
+            statusData = data.success;
+
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        returnError = error;
+    });
+
+    let obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError,isInternet : internet}
+    return obj;
+
+};
+
+
+////// Get capture image orientation Positions //////
+export async function getCaptureBFIImageOrientationPositions (token) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet  = await internetCheck();
+    if(!internet) {
+        obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet};
+        return obj;
+    } 
+
+    await fetch(Environment.uri + "petBfi/getPetImagePositions",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "ClientToken" : token
+        },
+      }
+    ).then((response) => response.json()).then(async (data) => {
+        if(data && data.errors && data.errors.length && data.errors[0].code==='WEARABLES_TKN_003'){
+            logoutData = true;
+        } else {
+            logoutData = false;
+        }
+
+        if (data.status.success) {
+            statusData = data.status.success;
+            if (data.response) {
+                responseData = data.response.imagePositions;
+            }
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        returnError = error;
+    });
+
+    obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet}
+    return obj;
+};
+
+//// Submit captured images to server //////
+export async function submitCaptureBFIImages (token, requestBody) {
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet  = await internetCheck();
+    if(!internet) {
+        obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet};
+        return obj;
+    } 
+
+    await fetch(Environment.uri + "petBfi/savePetBfiImages",
+      {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "ClientToken" : token
+          },
+          body: JSON.stringify(requestBody),
+      }
+    ).then((response) => response.json()).then(async (data) => {
+        console.log("responseAPI",data)
+        if(data && data.errors && data.errors.length && data.errors[0].code==='WEARABLES_TKN_003'){
+            logoutData = true;
+        } else {
+            logoutData = false;
+        }
+
+        if (data.status.success) {
+            statusData = data.status.success;
+            if (data.response) {
+                responseData = data.response;
+            }
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        returnError = error;
+    });
+
+    obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet}
+    return obj;
+};
+
+//// Get BFI scores Data //////
+export async function getBfiImageScores (token) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet  = await internetCheck();
+    if(!internet) {
+        obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet};
+        return obj;
+    } 
+
+    await fetch(Environment.uri + "petBfi/getBfiImageScores/1",
+      {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "ClientToken" : token
+          },
+      }
+    ).then((response) => response.json()).then(async (data) => {
+        if(data && data.errors && data.errors.length && data.errors[0].code==='WEARABLES_TKN_003'){
+            logoutData = true;
+        } else {
+            logoutData = false;
+        }
+
+        if (data.status.success) {
+            statusData = data.status.success;
+            if (data.response) {
+                responseData = data.response;
+            }
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        returnError = error;
+    });
+
+    obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet}
+    return obj;
+};
+
+//// Submit Selected score to server////
+export async function submitBFIScore (token,request) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet  = await internetCheck();
+    if(!internet) {
+        obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet};
+        return obj;
+    } 
+
+    await fetch(Environment.uri + "petBfi/savePetBfiImageScore",
+      {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "ClientToken" : token
+          },
+          body: JSON.stringify(request),
+      }
+    ).then((response) => response.json()).then(async (data) => {
+        if(data && data.errors && data.errors.length && data.errors[0].code==='WEARABLES_TKN_003'){
+            logoutData = true;
+        } else {
+            logoutData = false;
+        }
+
+        if (data.status.success) {
+            statusData = data.status.success;
+            if (data.response) {
+                responseData = data.response;
+            }
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        returnError = error;
+    });
+
+    obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet}
+    return obj;
+};
+
+////// Pet Parent Pets to capture BFI photos by pet parent ID //////
+export async function getPetsToCaptureBfiImages(clientID, token, pageNo, searchText) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    await fetch(Environment.uri + "petBfi/getPetsToCaptureBfiImages?petParentId=" + clientID + "&speciesId=1&pageNo=" + pageNo + "&pageLength=10&searchText=" + searchText,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "ClientToken": token
+            },
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data && data.errors && data.errors.length && data.errors[0].code === 'WEARABLES_TKN_003') {
+            logoutData = true;
+        } else {
+            logoutData = false;
+        }
+
+        if (data.status.success) {
+            statusData = data.status.success;
+            if (data.response) {
+                responseData = data.response.pets;
+            }
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };

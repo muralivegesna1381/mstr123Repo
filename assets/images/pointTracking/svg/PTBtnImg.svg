@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="246" height="43" viewBox="0 0 246 43">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.012" y1="-0.214" x2="1.117" y2="2.24" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#d9e6c9"/>
+      <stop offset="1" stop-color="#e0ffba"/>
+    </linearGradient>
+  </defs>
+  <rect id="Segmented_Control_background" data-name="Segmented Control background" width="246" height="43" rx="9" fill="url(#linear-gradient)"/>
+</svg>

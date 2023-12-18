@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text} from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import BottomComponent from "./../../../utils/commonComponents/bottomComponent";
-import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
 import fonts from './../../../utils/commonStyles/fonts'
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
 import CommonStyles from './../../../utils/commonStyles/commonStyles';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import moment from 'moment';
+import * as DataStorageLocal from './../../../utils/storage/dataStorageLocal';
+import * as Constant from "./../../../utils/constants/constant";
 
-const  PetReviewUI = ({route, ...props }) => {
+const PetReviewUI = ({ route, ...props }) => {
 
     const [popUpMessage, set_popUpMessage] = useState(undefined);
     const [popUpTitle, set_popUpTitle] = useState(undefined);
@@ -24,6 +26,7 @@ const  PetReviewUI = ({route, ...props }) => {
     const [popRightTitle, set_popRightTitle] = useState(false);
     const [isSOBSubmitted, set_isSOBSubmitted] = useState(false);
     const [petAddress, set_petAddress] = useState(undefined);
+    const [isFromPetBFI, set_isFromPetBFI] = useState(false);
 
     useEffect(() => {
         set_email(props.email);
@@ -35,7 +38,7 @@ const  PetReviewUI = ({route, ...props }) => {
         set_sobJson(props.sobJson);
         set_isLoading(props.isLoading);
         set_isSOBSubmitted(props.isSOBSubmitted);
-    }, [props.sobJson,props.isLoading,props.isSOBSubmitted]);
+    }, [props.sobJson, props.isLoading, props.isSOBSubmitted]);
 
     useEffect(() => {
         set_popUpTitle(props.popUpTitle);
@@ -43,7 +46,11 @@ const  PetReviewUI = ({route, ...props }) => {
         set_popLeftTitle(props.popLeftTitle);
         set_popRightTitle(props.popRightTitle);
         set_isPopUp(props.isPopUp);
-    }, [props.isPopUp,props.popUpMessage,props.popUpTitle,props.popRightTitle,props.popLeftTitle]);
+    }, [props.isPopUp, props.popUpMessage, props.popUpTitle, props.popRightTitle, props.popLeftTitle]);
+
+    useEffect(() => {
+        checkNavigationIsFromPetBFI()
+    }, []);
 
     const nextButtonAction = () => {
         props.submitAction();
@@ -61,9 +68,17 @@ const  PetReviewUI = ({route, ...props }) => {
         props.popCancelBtnAction();
     }
 
+    //check if navigation coming from BFI hide device info
+    const checkNavigationIsFromPetBFI = async () => {
+        let type = await DataStorageLocal.getDataFromAsync(Constant.ONBOARDING_PET_BFI);
+        if (type === Constant.IS_FROM_PET_BFI)
+            set_isFromPetBFI(true)
+
+    };
+
     return (
         <View style={[CommonStyles.mainComponentStyle]}>
-          <View style={[CommonStyles.headerView,{}]}>
+            <View style={[CommonStyles.headerView, {}]}>
                 <HeaderComponent
                     isBackBtnEnable={!isSOBSubmitted}
                     isSettingsEnable={false}
@@ -71,104 +86,105 @@ const  PetReviewUI = ({route, ...props }) => {
                     isTImerEnable={false}
                     isTitleHeaderEnable={true}
                     title={'Review Information'}
-                    backBtnAction = {() => backBtnAction()}
+                    backBtnAction={() => backBtnAction()}
                 />
             </View>
 
-            <View style={{width: wp('90%'),height: hp('68%'),alignSelf:'center'}}>
+            <View style={{ width: wp('90%'), height: hp('75%'), alignSelf: 'center' }}>
                 <KeyboardAwareScrollView>
                     <View style={styles.backSOBDataViewStyle}>
 
-                        <View style={{justifyContent:'center'}}>
+                        {!isFromPetBFI ?
+                            <View style={{ justifyContent: 'center' }}>
 
-                            <Text style={styles.subHeaderTextStyles}>{'Device Info'}</Text>
+                                <Text style={styles.subHeaderTextStyles}>{'Device Info'}</Text>
 
-                            <View style={styles.dataViewStyle}>
+                                <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
-                                    <Text style={styles.labelTextStyles}>{'Device Number'}</Text>
-                                    {sobJson && sobJson.deviceNo && sobJson.deviceNo.length < 10 ? <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo}</Text> 
-                                    : (sobJson && sobJson.deviceNo ? <View>
-                                        <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo.substring(0,9)}</Text>
-                                        <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo.substring(9,sobJson.deviceNo.length)}</Text>
-                                    </View> : null)}
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
+                                        <Text style={styles.labelTextStyles}>{'Device Number'}</Text>
+                                        {sobJson && sobJson.deviceNo && sobJson.deviceNo.length < 10 ? <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo}</Text>
+                                            : (sobJson && sobJson.deviceNo ? <View>
+                                                <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo.substring(0, 9)}</Text>
+                                                <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo.substring(9, sobJson.deviceNo.length)}</Text>
+                                            </View> : null)}
+                                    </View>
+
                                 </View>
-                                
-                            </View>
 
-                            <View style={styles.dataViewStyle}>
+                                <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
-                                    <Text style={styles.labelTextStyles}>{'Sensor Type'}</Text>
-                                    <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.deviceType : ''}</Text>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
+                                        <Text style={styles.labelTextStyles}>{'Sensor Type'}</Text>
+                                        <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.deviceType : ''}</Text>
+                                    </View>
+
                                 </View>
-                                
-                            </View>
 
-                        </View>
+                            </View> : undefined}
 
-                        <View style={{justifyContent:'center'}}>
+                        <View style={{ justifyContent: 'center' }}>
 
                             <Text style={styles.subHeaderTextStyles}>{'Pet Info'}</Text>
 
                             <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                     <Text style={styles.labelTextStyles}>{'Pet Name'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.petName : ''}</Text>
                                 </View>
-                                
+
                             </View>
 
                             <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                     <Text style={styles.labelTextStyles}>{'Pet'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.speciesId === 2 ? 'Cat' : 'Dog' : ''}</Text>
                                 </View>
-                                
+
                             </View>
 
                             <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                     <Text style={styles.labelTextStyles}>{'Breed'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.breedName : ''}</Text>
                                 </View>
-                                
+
                             </View>
 
                             <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                     <Text style={styles.labelTextStyles}>{'Pet Age'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{sobJson ? "" + moment(sobJson.petAge).format("MM-DD-YYYY") : ''}</Text>
                                 </View>
-                                
+
                             </View>
 
                             <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                     <Text style={styles.labelTextStyles}>{'Weight'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.weight + ' ' + sobJson.weightType : ''}</Text>
                                 </View>
-                                
+
                             </View>
 
                             <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                     <Text style={styles.labelTextStyles}>{'Gender'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.gender : ''}</Text>
                                 </View>
-                                
+
                             </View>
 
                             <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
-                                    <Text style={styles.labelTextStyles}>{sobJson && sobJson.gender==='Male' ? 'Neutered' : 'Spayed'}</Text>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
+                                    <Text style={styles.labelTextStyles}>{sobJson && sobJson.gender === 'Male' ? 'Neutered' : 'Spayed'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.isNeutered : ''}</Text>
                                 </View>
 
@@ -176,44 +192,47 @@ const  PetReviewUI = ({route, ...props }) => {
 
                             <View style={styles.dataViewStyle}>
 
-                            {props.petAddress ? <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
+                                {props.petAddress ? <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                     <Text style={styles.labelTextStyles}>{'Pet Address'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{props.petAddress}</Text>
-                                </View> : null}
+                                </View> : <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
+                                    <Text style={styles.labelTextStyles}>{'Pet Address'}</Text>
+                                    <Text style={styles.selectedDataTextStyles}>{'--'}</Text>
+                                </View>}
 
                             </View>
 
                         </View>
 
-                        <View style={{justifyContent:'center'}}>
+                        <View style={{ justifyContent: 'center' }}>
 
                             <Text style={styles.subHeaderTextStyles}>{'Your Info'}</Text>
 
                             <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                     <Text style={styles.labelTextStyles}>{'Name'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{name}</Text>
                                 </View>
-                                
+
                             </View>
 
                             <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                     <Text style={styles.labelTextStyles}>{'Email'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{email}</Text>
                                 </View>
-                                
+
                             </View>
 
                             <View style={styles.dataViewStyle}>
 
-                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                     <Text style={styles.labelTextStyles}>{'Phone'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{phNo}</Text>
                                 </View>
-                                
+
                             </View>
 
                         </View>
@@ -224,73 +243,73 @@ const  PetReviewUI = ({route, ...props }) => {
 
             <View style={CommonStyles.bottomViewComponentStyle}>
                 <BottomComponent
-                    rightBtnTitle = {'SUBMIT'}
-                    leftBtnTitle = {'BACK'}
-                    isLeftBtnEnable = {!isSOBSubmitted}
-                    rigthBtnState = {true}
-                    isRightBtnEnable = {true}
-                    rightButtonAction = {async () => nextButtonAction()}
-                    leftButtonAction = {async () => backBtnAction()}
+                    rightBtnTitle={'SUBMIT'}
+                    leftBtnTitle={'BACK'}
+                    isLeftBtnEnable={!isSOBSubmitted}
+                    rigthBtnState={true}
+                    isRightBtnEnable={true}
+                    rightButtonAction={async () => nextButtonAction()}
+                    leftButtonAction={async () => backBtnAction()}
                 />
-            </View>   
+            </View>
 
             {isPopUp ? <View style={CommonStyles.customPopUpStyle}>
                 <AlertComponent
-                    header = {popUpTitle}
+                    header={popUpTitle}
                     message={popUpMessage}
-                    isLeftBtnEnable = {props.isLftBtnEnable}
-                    isRightBtnEnable = {true}
-                    leftBtnTilte = {popLeftTitle}
-                    rightBtnTilte = {popRightTitle}
-                    popUpRightBtnAction = {() => popOkBtnAction()}
-                    popUpLeftBtnAction = {() => popCancelBtnAction()}
+                    isLeftBtnEnable={props.isLftBtnEnable}
+                    isRightBtnEnable={true}
+                    leftBtnTilte={popLeftTitle}
+                    rightBtnTilte={popRightTitle}
+                    popUpRightBtnAction={() => popOkBtnAction()}
+                    popUpLeftBtnAction={() => popCancelBtnAction()}
                 />
             </View> : null}
-            {isLoading === true ? <LoaderComponent isLoader={true} loaderText = {'Please wait..'} isButtonEnable = {false} /> : null} 
-         </View>
+            {isLoading === true ? <LoaderComponent isLoader={true} loaderText={'Please wait..'} isButtonEnable={false} /> : null}
+        </View>
     );
-  }
-  
-  export default PetReviewUI;
+}
 
-  const styles = StyleSheet.create({
+export default PetReviewUI;
 
-    backSOBDataViewStyle : {
-        alignItems:'center'
+const styles = StyleSheet.create({
+
+    backSOBDataViewStyle: {
+        alignItems: 'center'
     },
 
-    subHeaderTextStyles : {
+    subHeaderTextStyles: {
         ...CommonStyles.textStyleLight,
         fontSize: fonts.fontXLarge,
-        color:'black',
+        color: 'black',
         marginTop: hp("5%"),
     },
 
-    dataViewStyle : {
-        minHeight:hp('6%'),
-        width:wp('90%'),
+    dataViewStyle: {
+        minHeight: hp('6%'),
+        width: wp('90%'),
         marginTop: hp("2%"),
-        borderRadius:5,
-        borderColor:'#EAEAEA',
-        borderWidth:1,
-        justifyContent:'center',
-        alignItems:'center'
+        borderRadius: 5,
+        borderColor: '#EAEAEA',
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
 
-    labelTextStyles : {
+    labelTextStyles: {
         ...CommonStyles.textStyleMedium,
         fontSize: fonts.fontMedium,
-        color:'black',
-        flex:1,
-        alignSelf:'center'
+        color: 'black',
+        flex: 1,
+        alignSelf: 'center'
     },
 
-    selectedDataTextStyles : {
+    selectedDataTextStyles: {
         ...CommonStyles.textStyleBold,
         fontSize: fonts.fontMedium,
-        color:'black',
-        flex:1,
-        textAlign:'right'
+        color: 'black',
+        flex: 1,
+        textAlign: 'right'
     },
 
-  });
+});

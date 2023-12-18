@@ -82,8 +82,13 @@ const PetGenderComponent = ({ route, ...props }) => {
         navigation.navigate('PetNeuteredComponent');
     };
 
-    const backBtnAction = () => {
-        navigation.navigate('PetTypeComponent');
+    const backBtnAction = async() => {
+        let type = await DataStorageLocal.getDataFromAsync(Constant.ONBOARDING_PET_BFI);
+        if (type === Constant.IS_FROM_PET_BFI) {
+            navigation.navigate('PetNameComponent');
+        } else {
+            navigation.navigate('PetTypeComponent');
+        }
     };
 
     const popOkBtnAction = () => {

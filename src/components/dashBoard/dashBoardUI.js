@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import {View,ScrollView,Text,Image,TouchableOpacity,ImageBackground,Linking,ActivityIndicator,FlatList,Platform} from 'react-native';
 import DashBoardStyles from './dashBoardStyles';
 import BottomComponent from "./../../utils/commonComponents/bottomComponent";
@@ -8,27 +8,79 @@ import HeaderComponent from './../../utils/commonComponents/headerComponent';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 import CommonStyles from './../../utils/commonStyles/commonStyles';
 import LeaderBoardService from './../pointTracking/leaderBoard/leaderBoardService';
-import moment from "moment";
 import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import Highlighter from 'react-native-highlight-words';
+import Carousel, {Pagination} from 'react-native-snap-carousel';
+import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
+import * as Constant from "./../../utils/constants/constant";
 
-let imageScoreDogImg = require("../../../assets/images/otherImages/png/imageScaleDogBckImg.png");
-let imageScoreCatImg = require("../../../assets/images/otherImages/png/imageScaleCatBckImg.png");
-let eatingDogBckImg = require("../../../assets/images/otherImages/png/eatingDogBackImg.png");
-let eatingCatBckImg = require("../../../assets/images/otherImages/png/eatingCatBackImg.png");
 let dogSetupMissingImg = require("../../../assets/images/dogImages/dogImg5.svg");
 let catSetupMissingImg = require("../../../assets/images/dogImages/catImg5.svg");
+let leftSignImg = require("../../../assets/images/dashBoardImages/svg/leftSign.svg");
+let rightSignImg = require("../../../assets/images/dashBoardImages/svg/rightSign.svg");
 
 const  DashBoardUI = ({route, ...props }) => {
 
-    const [questUploadStatus, set_questUploadStatus] = useState(undefined);
+    const [dashboardViewArray, set_dashboardViewArray] = useState([{'id':2, 'name':'Tasks'}]);
+    const [dbrdFeatureArray, set_dbrdFeatureArray] = useState([]);
+
+    const[activeItem, set_activeItem] = useState(0);
+    const [tabItem, set_tabItem] = useState(1);
+    const carouselRef = useRef(null);
+    const carouselFeatureRef = useRef(null);
+    const tabItemRef = useRef(1);
+    const [isScrollEndReached, set_isScrollEndReached] = useState(null);
+    const flatDBRef = useRef(null);
 
     useEffect(() => {
-        set_questUploadStatus(props.questUploadStatus);
-    }, [props.questUploadStatus,props.isPopLeft]);
 
-    useEffect(() => {
-    }, [props.defaultPetObj]);
+        prepareSliderWidgets(props.isCaptureImages,props.isEatingEnthusiasm,props.isImageScoring,props.isPetWeight,props.weight,props.weightUnit,props.defaultPetObj);
+
+    }, [props.isCaptureImages,props.isEatingEnthusiasm,props.isImageScoring,props.isPetWeight,props.weight,props.weightUnit,props.defaultPetObj]);
+
+    const prepareSliderWidgets = async (isCaptureImages,isEatingEnthusiasm,isImageScoring,isPetWeight,weight,weightUnit,dPet) => {
+
+        let tempArr = [];
+        let obj;
+        let isCapture = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_CAPTURE_IMGS);
+        // set_dbrdFeatureArray([]);
+        if(isCapture && parseInt(isCapture) === 67 && dPet && parseInt(dPet.speciesId) === 1) {
+            
+            obj = {'id':1, 'action':'Capture Images', 'text1':'Capture','text2':'Images For','text3':'Scoring','bColor':'#FFF7ED','brColor':'#F5B054','imgPath':require('./../../../assets/images/dashBoardImages/svg/dog-bfi.svg')}
+            tempArr.push(obj);
+        } 
+        if(isImageScoring) {
+            
+            obj = {'id':2, 'action':'Score Pet', 'text1':'Score your','text2':'pets body','text3':'condition','bColor':'#F1F0FD','brColor':'#5A02FF','imgPath':require('./../../../assets/images/dashBoardImages/svg/body_condition.svg')}
+            tempArr.push(obj);
+        } 
+        
+        if(isEatingEnthusiasm) {
+
+            obj = {'id':3, 'action':'Eating Enthusiasim', 'text1':'How enthusiastic','text2':'is your pet at','text3':'mealtime?','bColor':'#F5FCFA','brColor':'#2AC779','imgPath':require('./../../../assets/images/dashBoardImages/svg/slider-food.svg')}
+            tempArr.push(obj);
+        } 
+        if(isPetWeight) {
+            
+            obj = {'id':4, 'action':'Pet Weight', 'text1':'Is your Pet','text2':'Fluffy or Fit?','text3':weight ? weight + ' ' + (weightUnit ? weightUnit : '' ) : '------','bColor':'#F5F9FC','brColor':'#2A97C7','imgPath':require('./../../../assets/images/dashBoardImages/svg/dog-weight.svg')}
+            tempArr.push(obj);
+        }
+
+        
+        setTimeout(() => {  
+            // set_isFirstLoad(false);
+            set_isScrollEndReached(false);
+            flatDBRef?.current?.scrollToIndex({
+                animated: true,
+                index: 0,
+            });
+            // if(tempArr.length < 2) {
+            //     set_isScrollEndReached(false)
+            // }
+        }, 500)
+        set_dbrdFeatureArray(tempArr);
+
+    };
 
     const editPetAction = (item) => {
         props.editPetAction(item);
@@ -43,6 +95,7 @@ const  DashBoardUI = ({route, ...props }) => {
     };
 
     const refreshDashBoardDetails = (pObject) => {
+
         props.refreshDashBoardDetails('swiped',pObject);
     };
 
@@ -110,6 +163,74 @@ const  DashBoardUI = ({route, ...props }) => {
         props.devicesSelectionAction();
     };
 
+    const renderScrollItem = (index) => {
+        set_tabItem(index+1)
+        tabItemRef.current = index;
+        carouselRef.current.snapToItem(index);
+    };
+
+    const renderScrollFeatureItem = (index) => {
+        // set_tabItem(index+1)
+        set_activeItem(index);
+        carouselFeatureRef.current.snapToItem(index);
+    };
+
+    const captureImages = () => {
+        props.captureImages();
+    };
+
+    const foodRecommand = () => {
+        props.foodRecommand();
+    };
+
+    const featureActions = (item) => {
+        props.featureActions(item);
+    };
+
+        // flat list end listener
+    const handleEndReached = (event) => {
+
+        // if(!isFirstLoad) {
+        //     set_isScrollEndReached(true); 
+        // }
+        set_isScrollEndReached(true); 
+    };
+    
+    //flat list start listener
+    const handleStartReached = (event) => {
+        const { contentOffset } = event.nativeEvent;
+        if (contentOffset.x === 0) {
+            set_isScrollEndReached(false); 
+        }
+    };
+
+    const getPagination = () => {
+
+        return (
+            <Pagination
+              dotsLength={dbrdFeatureArray ? dbrdFeatureArray.length : 0}
+              activeDotIndex={activeItem}
+              containerStyle={{marginTop:-25}}
+              dotStyle={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 5,
+                  marginHorizontal: -5,
+                  backgroundColor: '#29C779'
+              }}
+              inactiveDotStyle={{
+                width: 8,
+                height: 8,
+                borderRadius: 5,
+                marginHorizontal: -5,
+                backgroundColor: 'grey'
+              }}
+              inactiveDotOpacity={0.4}
+              inactiveDotScale={0.9}
+            />
+        );
+    };
+
     // DashBoard page Styles
     const {
         mainComponentStyle,
@@ -125,44 +246,17 @@ const  DashBoardUI = ({route, ...props }) => {
         ytLinkViewStyle,
         youTubeThumbs,
         leadeBoardStyle,
-        tilesViewStyle,
-        sensorSelView,
-        petDetailsView,
-        questionnaireView,
-        petDHeaderTextStyle,
-        petDSubHeaderTextStyle,
-        actyHeaderTextStyle,
-        questionnaireTextStyle,
-        sensorHeader2,
-        sensorSubHeader2,
-        sensorSubHeader4,
-        actySubHeaderTextStyle,
         buttonstyle,
         btnTextStyle,
-        openButtonstyle,
-        openBtnTextStyle,
         missingTextStyle,
         missingTextStyle1,
         missingBackViewStyle,
-        indexTextStyle,
-        detailsImgsStyle,
-        detailsBubImgStyle,
         missingDogImgStyle,
         missingCatImgStyle,
-        qstButtonstyle,
-        qstbtnImgStyle,
-        wtbtnImgStyle,
-        qstPointsHeaderTextStyle,
         quickselctionViewStyle,
         quickActionsInnerViewStyle,
         quickbtnInnerImgStyle,
         quickbtnInnerTextStyle,
-        firmwareAlertStyle,
-        eatingScoreViewStyle,
-        eatingScoreSubViewStyle,
-        enthusasticTextStyle,
-        enthusiasticBtnStyle,
-        imgScoreTextStyle,
         progressStyle,
         name,
         flatcontainer,
@@ -172,12 +266,412 @@ const  DashBoardUI = ({route, ...props }) => {
         playIconStyle,
         backdrop1,
         alertTextStyle,
-        sensorSubHeader3,
-        questHTextStyle,
-        questSHTextStyle,
         questCountTextStyle,
-        authIconStyle
+        dashboardViewStyle,
+        tyleViewStyle,
+        tylebckViewStyle,
+        questBackViewStyle,
+        questArrowStyle,
+        questBackStyle,
+        questHeaderTextStyle,
+        questArrowImgStyle,
+        questSubHeaderTextStyle,
+        questDogImgStyle,
+        sliderTextStyle,
+        tyleActivityStyle,
+        activityHeaderTextStyle,
+        foodImgImgStyle,
+        activityFoodTextStyle,
+        activityFoodTextStyle1,
+        uploadTextStyle,
+        uploadSubTextStyle
     } = DashBoardStyles;
+
+    const renderDashboardItem = ({item, index}) => {
+
+        return (
+            <View style={[dashboardViewStyle,{backgroundColor:item.id === 1 ? 'white':'white'}]}>
+                {item.id === 1 ? renderActivityView() : renderTasksView()}
+            </View>
+        );
+    }
+
+    const renderFeatureItems = ({item,index}) => {
+
+        return (
+
+            <TouchableOpacity onPress={() => {featureActions(item)}}>
+                            
+                <View style ={[tyleViewStyle,{backgroundColor:item.bColor,borderColor:item.brColor,alignItems:'flex-end',marginRight: index === dbrdFeatureArray.length - 1 ? wp('0%') : wp('3%')}]}>
+
+                    <View style={{flex:3,marginLeft:wp('3%'),height:hp('10%'),justifyContent:'center',}}>
+                        <View style={{justifyContent:'center',}}>
+                            <Text style={[sliderTextStyle,{color:item.brColor}]}>{item.text1}</Text>
+                            <Text style={[sliderTextStyle,{color:item.brColor}]}>{item.text2}</Text>
+                            <Text style={[sliderTextStyle,{color:item.brColor}]}>{item.text3}</Text>
+                        </View>
+                                    
+                        <Image source={require('./../../../assets/images/dashBoardImages/svg/right-arrow.svg')} style={[questArrowImgStyle,{tintColor : item.brColor,marginTop:hp('0.5%')}]}></Image>
+
+                    </View>
+
+                    <View style={{flex:1,justifyContent:'flex-end',justifyContent:'flex-end',marginBottom:item.id === 3 ? hp('1.2%') : hp('2.5%')}}>
+                        <Image source={item.imgPath} style={[questDogImgStyle,{marginLeft:wp('-4%')}]}></Image>
+                    </View>
+
+                </View>
+                            
+            </TouchableOpacity>
+                            
+        )
+    }
+
+    const renderActivityView = () => {
+
+        return (
+    
+            <View style = {{marginBottom:hp('27%'),alignItems:'center',marginTop:hp('2%')}}>
+
+                <ScrollView showsVerticalScrollIndicator={false}>
+
+                    <View style = {{width:wp('90%'),justifyContent:'center'}}>
+
+                    <Text style={[activityHeaderTextStyle]}>{'Daily Behavior'}</Text>
+                    <View style = {{flexDirection:'row', justifyContent:'space-between',marginTop:hp('2%')}}>
+                        <View style = {tyleActivityStyle}>
+
+                        </View>
+
+                        <View style = {tyleActivityStyle}>
+
+                        </View>
+                    </View>
+
+                </View>
+
+                <View style = {{width:wp('90%'),justifyContent:'center',marginTop:hp('2%')}}>
+
+                    <Text style={[activityHeaderTextStyle]}>{'Forward Motion Goal'}</Text>
+                    <View style = {{flexDirection:'row', justifyContent:'space-between',marginTop:hp('2%')}}>
+                        <View style = {[tyleActivityStyle,{width:wp('90%')}]}>
+
+                        </View>
+                    </View>
+
+                </View>
+
+                <View style = {{width:wp('90%'),justifyContent:'center',marginTop:hp('2%')}}>
+
+                    <Text style={[activityHeaderTextStyle]}>{'Weight'}</Text>
+                    <View style = {{flexDirection:'row', justifyContent:'space-between',marginTop:hp('2%')}}>
+                        <View style = {[tyleActivityStyle,{width:wp('90%'),height:hp('25%')}]}>
+
+                        </View>
+                    </View>
+
+                </View>
+
+                <View style = {[tyleActivityStyle,{width:wp('90%'),height:hp('6%'),justifyContent:'center',marginTop:hp('2%'),alignItems:'center'}]}>
+
+                    <View style = {{flexDirection:'row', justifyContent:'space-between',width:wp('85%')}}>
+
+                        <View style = {{flex:1,height:hp('6%'),alignItems:'center'}}>
+                            <Image source={require('./../../../assets/images/dashBoardImages/svg/home-food.svg')} style={[foodImgImgStyle,{}]}></Image>
+                        </View>
+
+                        <View style = {{flex:3,height:hp('6%'),justifyContent:'center'}}>
+                            <Text style={[activityFoodTextStyle]}>{'Recommended Food for Today'}</Text>
+                            <Text style={[activityFoodTextStyle1]}>{'500 Grms'}</Text>
+                        </View>
+
+                        <View style = {{flex:0.7,height:hp('6%'),justifyContent:'center'}}>
+
+                        <TouchableOpacity style={{alignItems:'center'}} onPress={() => {foodRecommand()}}>
+                            <Image source={require('./../../../assets/images/dashBoardImages/svg/right-arrow.svg')} style={[questArrowImgStyle,{}]}></Image>
+                        </TouchableOpacity>
+                        </View>
+
+                    </View>
+
+                </View>
+
+                {!props.isDeviceMissing && props.isDeviceSetupDone ? <View style = {{marginTop:hp('2%')}}>
+
+                        <ImageBackground style={quickselctionViewStyle} resizeMode="stretch" source={require("../../../assets/images/dashBoardImages/png/quickGradient.png")}>
+
+                            {props.isTimerEnable && !props.isModularityService ? <View style={quickActionsInnerViewStyle}>
+                                <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Timer')}}>
+                                    <Image source={require("../../../assets/images/dashBoardImages/svg/dashTimerIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('2%')}] :[quickbtnInnerImgStyle]}/>
+                                    <Text style={quickbtnInnerTextStyle}>{"TIMER"}</Text>
+                                </TouchableOpacity>                          
+                            </View> : (props.isModularityService ? <View style={quickActionsInnerViewStyle}><ActivityIndicator size="small" color="gray"/></View> : null)}
+
+                            {props.isObsEnable && !props.isModularityService ? <View style={quickActionsInnerViewStyle}>
+                                <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Quick Video')}}>
+                                    <Image source={require("../../../assets/images/dashBoardImages/svg/dashQuickVideo.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                                    <Text style={quickbtnInnerTextStyle}>{"QUICK VIDEO"}</Text>
+                                </TouchableOpacity>                          
+                            </View> : (props.isModularityService ? <View style={quickActionsInnerViewStyle}><ActivityIndicator size="small" color="gray"/></View> : null)}
+
+                            {!props.isDeviceMissing && props.isDeviceSetupDone ? <View style={quickActionsInnerViewStyle}>
+                                <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Chat')}}>
+                                    <Image source={require("../../../assets/images/dashBoardImages/svg/chatIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                                    <Text style={quickbtnInnerTextStyle}>{"CHAT"}</Text>
+                                </TouchableOpacity>                          
+                            </View> :  null}
+
+                            <View style={quickActionsInnerViewStyle}>
+                                <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Support')}}>
+                                    <Image source={require("../../../assets/images/dashBoardImages/svg/chatQuickIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                                    <Text style={quickbtnInnerTextStyle}>{"SUPPORT"}</Text>
+                                </TouchableOpacity>                          
+                            </View>
+
+                        </ImageBackground>
+
+                    </View> : null}
+                </ScrollView>
+
+            </View>
+    
+        );
+    }
+
+    const renderTasksView = () => {
+
+        return (
+    
+            <View style = {{justifyContent:'center',marginBottom: hp('12%'),marginTop:Platform.isPad ? (props.isTimer ? hp('-2%') : hp('-1%')) : hp('-1.5%')}}>
+
+                <ScrollView showsVerticalScrollIndicator={false}>
+
+                    {props.uploadStatus ? <View style={{width:wp('100%'),height:Platform.isPad ? hp('12%') : hp('10%'),alignItems:'center',justifyContent:'center',backgroundColor:'#818588',marginBottom: props.questUploadStatus ? hp('0%') : hp('1%')}}>
+
+                        {props.internetType === "cellular" ? <View style={{width:wp('90%'),flexDirection:'row'}}>
+
+                            <View style={{width:wp('60%'),justifyContent:'center',alignitems:'center'}}>
+                                <Text style={alertTextStyle}>{'Media cannot be uploaded on cellular network. Please switch to Wi-Fi and try again.'}</Text>                               
+                            </View>
+
+                            <View style={{width:wp('30%'),height:hp('6%'),alignItems:'center',justifyContent:'center'}}>
+                                <TouchableOpacity style= {{width:wp('25%'),height:hp('4%'),backgroundColor:'red',alignItems:'center',justifyContent:'center',borderRadius:5}} onPress={() => {internetBtnAction()}}>
+                                    <Text style={alertTextStyle}>{'TRY AGAIN'}</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                        </View> : 
+                                    
+                        <View style={{width:wp('90%'),height:hp('6%'),flexDirection:'row'}}>
+
+                            <View style={{width:wp('60%'),height:hp('6%'),justifyContent:'center'}}>
+                                <Text style={[uploadTextStyle,{color:'white'}]}>{'Observation : '+(props.observationText && props.observationText.length > 15 ? props.observationText.replace('/r','/').slice(0, 15)+"..." : props.observationText)}</Text>
+                                <Text style={[uploadSubTextStyle,{color:'white',marginTop:hp('1%')}]}>{props.uploadStatus + " "+ props.fileName}</Text>
+                            </View>
+
+                            <View style={{width:wp('30%'),height:hp('6%'),alignItems:'center',justifyContent:'center'}}>
+
+                                <View style={{width:wp('12%'),aspectRatio:1,backgroundColor:'#000000AA',borderRadius:100,borderColor:'#6BC100',borderWidth:2,alignItems:'center',justifyContent:'center'}}>
+                                    <Text style={progressStyle}>{props.uploadProgress}</Text>
+                                </View>
+
+                                <Text style={{color:'white'}}>{props.progressTxt}</Text>
+                                        
+                            </View>
+
+                        </View>}
+
+                    </View> : null}
+
+                    {props.questUploadStatus ? <View style={{width:wp('100%'),marginBottom:hp('1%'),height:Platform.isPad ? hp('12%') : hp('10%'),alignItems:'center',justifyContent:'center',backgroundColor:'#2E2E2E'}}>
+
+                        {props.questInternetType === "cellular" ? <View style={{width:wp('90%'),flexDirection:'row'}}>
+
+                            <View style={{width:wp('60%'),justifyContent:'center',alignitems:'center'}}>
+                                <Text style={alertTextStyle}>{'Questionnaire Media cannot be uploaded on cellular network. Please switch to Wi-Fi and try again.'}</Text>                               
+                            </View>
+
+                            <View style={{width:wp('30%'),height:hp('6%'),alignItems:'center',justifyContent:'center'}}>
+                                <TouchableOpacity style= {{width:wp('25%'),height:hp('4%'),backgroundColor:'red',alignItems:'center',justifyContent:'center',borderRadius:5}} onPress={() => {internetQuestBtnAction()}}>
+                                    <Text style={alertTextStyle}>{'TRY AGAIN'}</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                        </View> 
+                                    
+                        : 
+                                    
+                        <View style={{width:wp('90%'),height:hp('6%'),flexDirection:'row'}}>
+
+                            <View style={{width:wp('60%'),height:hp('6%'),justifyContent:'center'}}>
+                                <Text style={[uploadTextStyle,{color:'white'}]}>{'Questionnaire : '+(props.questText && props.questText.length > 15 ? props.questText.replace('/r','/').slice(0, 15)+"..." : props.questText)}</Text>
+                                <Text style={[uploadSubTextStyle,{color:'white',marginTop:hp('1%')}]}>{props.questUploadStatus + " "+ props.questFileName}</Text>
+                            </View>
+
+                            <View style={{width:wp('30%'),height:hp('6%'),alignItems:'center',justifyContent:'center'}}>
+
+                                <View style={{width:wp('12%'),aspectRatio:1,backgroundColor:'#000000AA',borderRadius:100,borderColor:'#6BC100',borderWidth:2,alignItems:'center',justifyContent:'center'}}>
+                                    <Text style={progressStyle}>{props.questUploadProgress}</Text>
+                                </View>
+
+                                <Text style={{color:'white'}}>{props.questProgressTxt}</Text>
+                                        
+                            </View>
+
+                        </View>}
+
+                    </View> : null}
+
+                    {props.bfiUploadStatus ? <View style={{width:wp('100%'),height:Platform.isPad ? hp('12%') : hp('10%'),alignItems:'center',justifyContent:'center',backgroundColor:'#818588',marginBottom: props.bfiUploadStatus ? hp('0%') : hp('1%')}}>
+                        <View style={{width:wp('90%'),height:hp('6%'),flexDirection:'row'}}>
+
+                            <View style={{width:wp('60%'),height:hp('6%'),justifyContent:'center'}}>
+                                <Text style={[uploadSubTextStyle,{color:'white',marginTop:hp('1%')}]}>{props.bfiUploadStatus + " "+ props.bfiFileName}</Text>
+                            </View>
+
+                            <View style={{width:wp('30%'),height:hp('6%'),alignItems:'center',justifyContent:'center'}}>
+
+                                <View style={{width:wp('12%'),aspectRatio:1,backgroundColor:'#000000AA',borderRadius:100,borderColor:'#6BC100',borderWidth:2,alignItems:'center',justifyContent:'center'}}>
+                                    <Text style={progressStyle}>{props.bfiUploadProgress}</Text>
+                                </View>
+
+                                <Text style={{color:'white'}}>{props.bfiProgressText}</Text>
+                                        
+                            </View>
+
+                        </View>
+
+                    </View> : null}
+
+                    {(!props.isDeviceMissing && props.isDeviceSetupDone && dbrdFeatureArray.length > 0) ? <View style={[tylebckViewStyle,{alignItems:'center',marginTop: props.questUploadStatus || props.questUploadStatus ? hp('0.5%'): (props.isTimer && (!props.uploadStatus) && props.isTimer && (!props.questUploadStatus) ? hp('1%') : hp('0.5%')),}]}>
+
+                        {/* <ScrollView snapToAlignment={"start"} style={{width:wp('93.5%'), alignSelf:'center'}} horizontal = {true} showsHorizontalScrollIndicator={false}> */}
+
+                            <View style ={{flexDirection:'row'}}>
+                                {/* {renderFeatureItems()} */}
+                                <FlatList
+                                    // style={{backgroundcolor:'green'}}
+                                    ref={flatDBRef}
+                                    data={dbrdFeatureArray}
+                                    horizontal = {true}
+                                    showsVerticalScrollIndicator={false}
+                                    showsHorizontalScrollIndicator={false}
+                                    renderItem={renderFeatureItems}
+                                    onScroll={handleStartReached}
+                                    onEndReached={handleEndReached}
+                                    enableEmptySections={true}
+                                    keyExtractor={(item) => item.titleOrQuestion}
+                                />
+                            </View>
+
+                        {/* </ScrollView>  */}
+
+                    </View> : null}
+
+                    {dbrdFeatureArray && dbrdFeatureArray.length > 2 ? <View>
+                        {/* {getPagination()} */}
+                        <View style = {{flexDirection:'row',width:wp('93.5%'),alignSelf:'center',justifyContent:'center', marginTop:Platform.isPad ? hp('1%') : hp('0.5%')}}>
+                            {<Image source={require('./../../../assets/images/dashBoardImages/svg/arrow-black-left.svg')} style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),tintColor:'black',marginRight:wp('1.5%')}] : [questArrowImgStyle,{tintColor:'black',marginRight:wp('1.5%')}]}></Image>}
+                            <Image source={!isScrollEndReached ? leftSignImg : rightSignImg} style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),tintColor:'black',marginRight:wp('1.5%')}] : [questArrowImgStyle,{tintColor:'black'}]}></Image>
+                            { <Image source={require('./../../../assets/images/dashBoardImages/svg/arrow-black-right.svg')} style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),tintColor:'black',marginLeft:wp('1.5%'),marginRight:wp('0.5%')}] : [questArrowImgStyle,{tintColor:'black',marginLeft:wp('1.5%')}]}></Image>}
+                        </View>
+                    </View> : null}
+
+                    {props.isQuestionnaireEnable && props.questionnaireData && props.questionnaireData.length > 0 ? <View style={Platform.isPad ? [questBackViewStyle,{marginTop:hp('4%'),}] : [questBackViewStyle,{marginTop:dbrdFeatureArray.length > 0 ? (dbrdFeatureArray.length > 2 ? hp('1%') : hp('2%')) : hp('2%')}]}>
+
+                        <View style={{flexDirection:'row'}}>
+                            <View style={[questBackStyle,{justifyContent:'center'}]}>
+
+                                <View style={{justifyContent:'center',marginLeft: wp("2%")}}>
+                                    <Text style={[questHeaderTextStyle]}>{'Questionnaires'}</Text>
+                                </View>
+
+                                <View style = {{flexDirection:'row',marginLeft: wp("2%")}}>
+                                    <View style = {{flexDirection:'row',marginRight: wp("12%"),}}> 
+                                        <Text style={[questCountTextStyle,]}>{props.questionnaireDataLength < 10 && props.questionnaireDataLength !== 0 ? '0'+props.questionnaireDataLength : props.questionnaireDataLength}</Text>
+                                        <View style={{justifyContent:'flex-end',marginBottom: hp("0.5%")}}>
+                                            <Text style={[questSubHeaderTextStyle,{color:'#6BC100',marginLeft: wp("1%")}]}>{'Open'}</Text>
+                                        </View>
+                                    </View>
+                                    <View style = {{flexDirection:'row'}}> 
+                                    <Text style={[questCountTextStyle,{color:'#FF9202'}]}>{props.questSubmitLength < 10 && props.questSubmitLength !== 0 ? '0'+props.questSubmitLength : props.questSubmitLength}</Text>
+                                        <View style={{justifyContent:'flex-end',marginBottom: hp("0.5%")}}>
+                                            <Text style={[questSubHeaderTextStyle,{color:'#FF9202',marginLeft: wp("1%")}]}>{'Completed'}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+
+                            </View>
+
+                            <View style={questArrowStyle}>
+
+                                <TouchableOpacity style={{width:wp("15%"),marginTop : Platform.isPad ? hp("1%") : hp("1.6%")}} onPress={() => {quickQuestionnaireAction()}}>
+                                    <Image source={require('./../../../assets/images/dashBoardImages/svg/right-arrow.svg')} style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),}] : [questArrowImgStyle, {marginLeft: wp("-2%"),}]}></Image>
+                                </TouchableOpacity>
+                    
+                            </View>
+
+                        </View>
+                        
+                    </View> : null}
+
+                    {props.isPTEnable && !props.isDeviceMissing && props.isDeviceSetupDone? <View style={Platform.isPad ? [leadeBoardStyle,{height:hp('38%'),}] : [leadeBoardStyle]}>
+                        <LeaderBoardService
+                            leaderBoardArray = {props.leaderBoardArray}
+                            leaderBoardPetId = {props.leaderBoardPetId}
+                            leaderBoardCurrent = {props.leaderBoardCurrent}
+                            campagainName = {props.campagainName}
+                            campagainArray = {props.campagainArray}
+                            currentCampaignPet = {props.currentCampaignPet}
+                            isSwipedModularity = {props.isSwipedModularity}
+                            isPTDropdown = {props.isPTDropdown}
+                            enableLoader = {props.enableLoader}
+                            ptActivityLimits = {props.ptActivityLimits}
+                        ></LeaderBoardService>
+
+                    </View> : (props.isPTLoading ? <View style={{height:hp('3%'),justifyContent:'center'}}><ActivityIndicator size="small" color="gray"/></View> : null)} 
+
+                    {!props.isDeviceMissing && props.isDeviceSetupDone ? <View style={{marginTop: Platform.isPad ? hp('1.5%') : hp('1%')}}>
+
+                        <ImageBackground style={quickselctionViewStyle} resizeMode="stretch" source={require("../../../assets/images/dashBoardImages/png/quickGradient.png")}>
+
+                            {props.isTimerEnable && !props.isModularityService ? <View style={quickActionsInnerViewStyle}>
+                                <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Timer')}}>
+                                    <Image source={require("../../../assets/images/dashBoardImages/svg/dashTimerIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                                    <Text style={[quickbtnInnerTextStyle]}>{"TIMER"}</Text>
+                                </TouchableOpacity>                          
+                            </View> : (props.isModularityService ? <View style={quickActionsInnerViewStyle}><ActivityIndicator size="small" color="gray"/></View> : null)}
+
+                            {props.isObsEnable && !props.isModularityService ? <View style={quickActionsInnerViewStyle}>
+                                <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Quick Video')}}>
+                                    <Image source={require("../../../assets/images/dashBoardImages/svg/dashQuickVideo.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle,{width:wp('5%')}]}/>
+                                    <Text style={quickbtnInnerTextStyle}>{"QUICK VIDEO"}</Text>
+                                </TouchableOpacity>                          
+                            </View> : (props.isModularityService ? <View style={quickActionsInnerViewStyle}><ActivityIndicator size="small" color="gray"/></View> : null)}
+
+                            {!props.isDeviceMissing && props.isDeviceSetupDone ? <View style={quickActionsInnerViewStyle}>
+                                <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Chat')}}>
+                                    <Image source={require("../../../assets/images/dashBoardImages/svg/chatIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                                    <Text style={quickbtnInnerTextStyle}>{"CHAT"}</Text>
+                                </TouchableOpacity>                          
+                            </View> :  null}
+
+                            <View style={quickActionsInnerViewStyle}>
+                                <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Support')}}>
+                                    <Image source={require("../../../assets/images/dashBoardImages/svg/chatQuickIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                                    <Text style={quickbtnInnerTextStyle}>{"SUPPORT"}</Text>
+                                </TouchableOpacity>                          
+                            </View>
+
+                        </ImageBackground>
+
+                    </View> : null}
+
+                </ScrollView>
+
+            </View>
+    
+        );
+    }
 
     const renderMeterials = ({ item, index }) => {
         return (
@@ -208,7 +702,7 @@ const  DashBoardUI = ({route, ...props }) => {
     };
 
     return (
-        <View style={[mainComponentStyle]}>
+        <View style={[mainComponentStyle,{backgroundColor : props.isFirstUser ? "#F5F7F9" : 'white'}]}>
 
             <View style={[headerView,{}]}>
                 <HeaderComponent
@@ -243,7 +737,6 @@ const  DashBoardUI = ({route, ...props }) => {
                                 
                                 <Image source={require("./../../../assets/images/otherImages/png/fUserMultiplePets.png")} style={youTubeThumbs}/>
                                 <Text style={[ftytLnksHeaderHeader]}>{'How to Set Up Multiple Pets'}</Text>
-                                {/* <Image source={require("./../../../assets/images/otherImages/svg/rightArrowLightImg.svg")} style={{marginLeft: wp("1%"), marginRight: wp("1%"),width:wp('3%'),aspectRatio:1}}/> */}
 
                             </View>
                         </TouchableOpacity>
@@ -253,7 +746,6 @@ const  DashBoardUI = ({route, ...props }) => {
                             
                                 <Image source={require("./../../../assets/images/otherImages/svg/hpn1First.svg")} style={youTubeThumbs}/>
                                 <Text style={[ftytLnksHeaderHeader]}>{'How to Charge the Sensor'}</Text>
-                                {/* <Image source={require("./../../../assets/images/otherImages/svg/rightArrowLightImg.svg")} style={{marginLeft: wp("1%"), marginRight: wp("1%"),width:wp('3%'),aspectRatio:1}}/> */}
 
                             </View>
                         </TouchableOpacity>
@@ -263,7 +755,6 @@ const  DashBoardUI = ({route, ...props }) => {
                             
                                 <Image source={require("./../../../assets/images/otherImages/svg/hpn1First.svg")} style={youTubeThumbs}/>
                                 <Text style={[ftytLnksHeaderHeader]}>{'How to Setup the Sensor'}</Text>
-                                {/* <Image source={require("./../../../assets/images/otherImages/svg/rightArrowLightImg.svg")} style={{marginLeft: wp("1%"), marginRight: wp("1%"),width:wp('3%'),aspectRatio:1}}/> */}
 
                             </View>
                         </TouchableOpacity>
@@ -272,9 +763,9 @@ const  DashBoardUI = ({route, ...props }) => {
 
                 </View> : 
                 
-                <View>
+                <View style = {{height:props.isDeviceMissing || !props.isDeviceSetupDone || props.isFirstUser ? hp('75%') : hp('90%')}}>
 
-                    <View style={[CommonStyles.petsSelViewHeaderStyle]}>
+                    <View style={[CommonStyles.petsSelViewHeaderStyle,{marginBottom:hp('1%')}]}>
 
                         <PetsSelectionCarousel
                             petsArray={props.petsArray}
@@ -290,413 +781,106 @@ const  DashBoardUI = ({route, ...props }) => {
 
                     </View>
 
-                    <View style={{marginBottom:hp('5%'),height:hp('75%')}}>
+                    <View style={{marginTop: props.isTimer ? (Platform.isPad ? hp('14%') : hp('11.5%')) : hp('0%'), marginBottom: !props.isDeviceSetupDone || props.isDeviceMissing ? hp('18%') : hp('1%'),}}>
 
-                        <ScrollView>
-
-                            <View style={{marginTop: props.isTimer ? (Platform.isPad ? hp('14%') : hp('11.5%')) : hp('0%'), marginBottom: props.isTimer || !props.isDeviceSetupDone || props.isDeviceMissing ? hp('18%') : hp('18%'),}}>
-
-                                {props.uploadStatus ? <View style={{width:wp('100%'),height:hp('10%'),alignItems:'center',justifyContent:'center',backgroundColor:'#818588'}}>
-
-                                    {props.internetType === "cellular" ? 
-                                    
-                                    <View style={{width:wp('90%'),flexDirection:'row'}}>
-
-                                        <View style={{width:wp('60%'),justifyContent:'center',alignitems:'center'}}>
-                                            <Text style={alertTextStyle}>{'Media cannot be uploaded on cellular network. Please switch to Wi-Fi and try again.'}</Text>                               
-                                        </View>
-
-                                        <View style={{width:wp('30%'),height:hp('6%'),alignItems:'center',justifyContent:'center'}}>
-                                            <TouchableOpacity style= {{width:wp('25%'),height:hp('4%'),backgroundColor:'red',alignItems:'center',justifyContent:'center',borderRadius:5}} onPress={() => {internetBtnAction()}}>
-                                            <Text style={alertTextStyle}>{'TRY AGAIN'}</Text>
-                                            </TouchableOpacity>
-                                        </View>
-
-                                    </View> 
-                                    
-                                    : 
-                                    
-                                    <View style={{width:wp('90%'),height:hp('6%'),flexDirection:'row'}}>
-
-                                        <View style={{width:wp('60%'),height:hp('6%'),justifyContent:'center'}}>
-                                            <Text style={{color:'white'}}>{'Observation : '+(props.observationText && props.observationText.length > 15 ? props.observationText.replace('/r','/').slice(0, 15)+"..." : props.observationText)}</Text>
-                                            <Text style={{color:'white',marginTop:hp('1%')}}>{props.uploadStatus + " "+ props.fileName}</Text>
-                                        </View>
-
-                                        <View style={{width:wp('30%'),height:hp('6%'),alignItems:'center',justifyContent:'center'}}>
-
-                                            <View style={{width:wp('12%'),aspectRatio:1,backgroundColor:'#000000AA',borderRadius:100,borderColor:'#6BC100',borderWidth:2,alignItems:'center',justifyContent:'center'}}>
-                                                <Text style={progressStyle}>{props.uploadProgress}</Text>
-                                            </View>
-
-                                            <Text style={{color:'white'}}>{props.progressTxt}</Text>
-                                        
-                                        </View>
-
-                                    </View>}
-
-                                </View> : null}
-
-                                {questUploadStatus ? <View style={{width:wp('100%'),height:hp('10%'), marginTop:props.questUploadStatus ? hp('0.1%') : hp('0.1%'),alignItems:'center',justifyContent:'center',backgroundColor:'#2E2E2E'}}>
-
-                                    {props.questInternetType === "cellular" ? 
-                                    
-                                    <View style={{width:wp('90%'),flexDirection:'row'}}>
-
-                                        <View style={{width:wp('60%'),justifyContent:'center',alignitems:'center'}}>
-                                            <Text style={alertTextStyle}>{'Questionnaire Media cannot be uploaded on cellular network. Please switch to Wi-Fi and try again.'}</Text>                               
-                                        </View>
-
-                                        <View style={{width:wp('30%'),height:hp('6%'),alignItems:'center',justifyContent:'center'}}>
-                                            <TouchableOpacity style= {{width:wp('25%'),height:hp('4%'),backgroundColor:'red',alignItems:'center',justifyContent:'center',borderRadius:5}} onPress={() => {internetQuestBtnAction()}}>
-                                            <Text style={alertTextStyle}>{'TRY AGAIN'}</Text>
-                                            </TouchableOpacity>
-                                        </View>
-
-                                    </View> 
-                                    
-                                    : 
-                                    
-                                    <View style={{width:wp('90%'),height:hp('6%'),flexDirection:'row'}}>
-
-                                        <View style={{width:wp('60%'),height:hp('6%'),justifyContent:'center'}}>
-                                            <Text style={{color:'white'}}>{'Questionnaire : '+(props.questText && props.questText.length > 15 ? props.questText.replace('/r','/').slice(0, 15)+"..." : props.questText)}</Text>
-                                            <Text style={{color:'white',marginTop:hp('1%')}}>{props.questUploadStatus + " "+ props.questFileName}</Text>
-                                        </View>
-
-                                        <View style={{width:wp('30%'),height:hp('6%'),alignItems:'center',justifyContent:'center'}}>
-
-                                            <View style={{width:wp('12%'),aspectRatio:1,backgroundColor:'#000000AA',borderRadius:100,borderColor:'#6BC100',borderWidth:2,alignItems:'center',justifyContent:'center'}}>
-                                                <Text style={progressStyle}>{props.questUploadProgress}</Text>
-                                            </View>
-
-                                            <Text style={{color:'white'}}>{props.questProgressTxt}</Text>
-                                        
-                                        </View>
-
-                                    </View>}
-
-                                </View> : null}
-
-                                {props.isPTEnable && !props.isDeviceMissing && props.isDeviceSetupDone? <View style={leadeBoardStyle}>
-                                    <LeaderBoardService
-                                        leaderBoardArray = {props.leaderBoardArray}
-                                        leaderBoardPetId = {props.leaderBoardPetId}
-                                        leaderBoardCurrent = {props.leaderBoardCurrent}
-                                        campagainName = {props.campagainName}
-                                        campagainArray = {props.campagainArray}
-                                        currentCampaignPet = {props.currentCampaignPet}
-                                        isSwipedModularity = {props.isSwipedModularity}
-                                        isPTDropdown = {props.isPTDropdown}
-                                        enableLoader = {props.enableLoader}
-                                        ptActivityLimits = {props.ptActivityLimits}
-                                    ></LeaderBoardService>
-
-                                </View> : (props.isPTLoading ? <View style={{height:hp('3%'),justifyContent:'center',marginTop:hp('1%')}}><ActivityIndicator size="small" color="gray"/></View> : null)}  
-
-                                {!props.isDeviceMissing && props.isDeviceSetupDone ? <View>
-
-                                    <ImageBackground style={quickselctionViewStyle} resizeMode="stretch" source={require("../../../assets/images/dashBoardImages/png/quickGradient.png")}>
-
-                                        {props.isTimerEnable && !props.isModularityService ? <View style={quickActionsInnerViewStyle}>
-                                            <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Timer')}}>
-                                                <Image source={require("../../../assets/images/dashBoardImages/svg/dashTimerIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
-                                                <Text style={quickbtnInnerTextStyle}>{"TIMER"}</Text>
-                                            </TouchableOpacity>                          
-                                        </View> : (props.isModularityService ? <View style={quickActionsInnerViewStyle}><ActivityIndicator size="small" color="gray"/></View> : null)}
-
-                                        {props.isObsEnable && !props.isModularityService ? <View style={quickActionsInnerViewStyle}>
-                                            <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Quick Video')}}>
-                                                <Image source={require("../../../assets/images/dashBoardImages/svg/dashQuickVideo.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
-                                                <Text style={quickbtnInnerTextStyle}>{"QUICK VIDEO"}</Text>
-                                            </TouchableOpacity>                          
-                                        </View> : (props.isModularityService ? <View style={quickActionsInnerViewStyle}><ActivityIndicator size="small" color="gray"/></View> : null)}
-
-                                        {!props.isDeviceMissing && props.isDeviceSetupDone ? <View style={quickActionsInnerViewStyle}>
-                                            <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Chat')}}>
-                                                <Image source={require("../../../assets/images/dashBoardImages/svg/chatIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
-                                                <Text style={quickbtnInnerTextStyle}>{"CHAT"}</Text>
-                                            </TouchableOpacity>                          
-                                        </View> :  null}
-
-                                        <View style={quickActionsInnerViewStyle}>
-                                            <TouchableOpacity style={{alignItems:'center'}} onPress={() => {quickSetupAction('Support')}}>
-                                                <Image source={require("../../../assets/images/dashBoardImages/svg/chatQuickIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
-                                                <Text style={quickbtnInnerTextStyle}>{"SUPPORT"}</Text>
-                                            </TouchableOpacity>                          
-                                        </View>
-
-                                    </ImageBackground>
-
-                                    </View> : null}
-
-                                    {!props.isDeviceMissing && props.isDeviceSetupDone ? <View style={[sensorSelView]}>
-                            <View style={{flex:1.7,justifyContent:'center',alignItems:'center',height:hp('8%'),}}>
-
-                                <Text style={sensorHeader2}>{'SENSOR'}</Text>
-                                {props.deviceNumber && props.deviceNumber.length < 10 ? <Text style={[sensorSubHeader2,]}>{props.deviceNumber}</Text> 
-                                : (props.deviceNumber ? <View>
-                                    <Text style={[sensorSubHeader4]}>{props.deviceNumber.substring(0,9)}</Text>
-                                    <Text style={[sensorSubHeader4,]}>{props.deviceNumber.substring(9,props.deviceNumber.length)}</Text>
-                                </View> : null)}
-
-                            </View>
-
-                            <View style={{flex:1.7,justifyContent:'center',alignItems:'center'}}>
-                                
-                                <TouchableOpacity style={{alignItems:'center'}} disabled={props.isFirmwareUpdate ? false : true} onPress={() => {firmwareUpdateAction('firmwareUpdate')}}>
-                                    
-                                    <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>  
-                                        <View style={{alignItems:'center',justifyContent:'space-between'}}>
-                                            <Text style={sensorHeader2}>{'FIRMWARE'}</Text>
-                                            <Text style={[sensorSubHeader2,{}]}>{props.firmware ? props.firmware : '--'}</Text>
-                                        </View> 
-                                        {props.isFirmwareUpdate ? <Image source={require("../../../assets/images/otherImages/svg/firmwareAlert.svg")} style={[firmwareAlertStyle,{}]}/> : null}
-                                    </View>
-                                </TouchableOpacity>
-                                
-                            </View> 
-
-                            <View style={{flex:1.7,justifyContent:'center',alignItems:'center'}}>
-                                <Text style={sensorHeader2}>{'LAST SYNC'}</Text>
-                                <Text style={props.lastSeen && props.lastSeen.length > 10 ? [sensorSubHeader3,{}] : [sensorSubHeader2,{}]}>{props.lastSeen ? props.lastSeen : '--'}</Text>
-                            </View>
-
-                            {props.isDeviceSetupDone ? <View style={{flex:1.7,alignItems:'center',justifyContent:'center'}}>
-
-                                    {<View style={{justifyContent:'space-between',alignItems:'center',}}>
-                                        <Text style={sensorHeader2}>{'BATTERY'}</Text>
-                                        <Text style={[sensorSubHeader2,{color: props.battery && parseInt(props.battery) < 20 ? 'red' : '#6fc309'}]}>{props.battery ? props.battery + "%" : "--"}</Text>
-                                    </View>}
-                                
-                            </View> : null}
-
-                            {props.defaultPetObj && props.devicesCount > 1 ? <TouchableOpacity style={{width:wp("12%"),height:hp("7%"),justifyContent:'center',alignItems:'center',}} onPress={() => {devicesSelectionAction()}}>
-                                    <View style={{width:wp("8%"),height:hp("3.5%"),backgroundColor:'#E0DCDC',justifyContent:'center',alignItems:'center',marginRight: hp("1%"),marginLeft: hp("1%"),borderRadius:5}}>
-                                        <Image source={require("../../../assets/images/otherImages/svg/rightArrowLightImg.svg")} style={{marginLeft: wp("1%"), marginRight: wp("1%"),width:wp('2%'),height:hp('2%')}}/>
-                                    </View>
-                                        
-                                    </TouchableOpacity> : null}
-
-                            </View> : null}
-
-                                    {!props.isDeviceMissing && props.isDeviceSetupDone ? <View style={[petDetailsView]}>
-                                        <View style={{flexDirection:'row', marginTop:hp('1%'),justifyContent:'space-between'}}>
-
-                                            <View style={tilesViewStyle}>
-                                                <View style={detailsBubImgStyle}>
-                                                    <Image source={require("../../../assets/images/dashBoardImages/svg/birthday.svg")} style={Platform.isPad ? [detailsImgsStyle, {height:hp('4%'),}] : [detailsImgsStyle]}/>
-                                                </View>
-
-                                                <View style={{justifyContent:'center'}}>
-                                                    <Text style={petDHeaderTextStyle}>{"BIRTH DAY"}</Text>
-                                                    <Text style={props.birthday ? [petDSubHeaderTextStyle,{width:wp('25%')}] : [petDSubHeaderTextStyle,{width:wp('25%'),color:'grey'}]}>{props.birthday ? moment(new Date(props.birthday)).format("MM-DD-YYYY") : '------'}</Text>
-                                                </View>
-
-                                            </View>
-
-                                            <View style={[tilesViewStyle,]}>
-
-                                                <View style={{flexDirection:'row',flex:2}}>
-                                                    <View style={[detailsBubImgStyle,{}]}>
-                                                        <Image source={require("../../../assets/images/dashBoardImages/svg/weight.svg")} style={Platform.isPad ? [detailsImgsStyle, {height:hp('4%'),}] : [detailsImgsStyle]}/>
-                                                    </View>
-
-                                                    <View style={{justifyContent:'center'}}>
-                                                        <Text style={petDHeaderTextStyle}>{"WEIGHT"}</Text>
-                                                        <Text style={props.weight ? [petDSubHeaderTextStyle] : [petDSubHeaderTextStyle,{color:'grey'}]}>{props.weight ? props.weight + ' ' + (props.weightUnit? props.weightUnit : '' ) : '------'}</Text>
-                                                    </View>
-                                                </View>
-
-                                                {props.isPetWeight ? <TouchableOpacity style={{width:wp("13%"),height:hp("7%"),justifyContent:'center',alignContent:'center',flex:0.8}} onPress={() => {weightAction()}}>
-                                                    {/* <View style={[qstButtonstyle,{alignSelf:'flex-start'}]}> */}
-                                                        <Image source={require("../../../assets/images/dashBoardImages/svg/greenRightArrowBtnImg.svg")} style={Platform.isPad ? [wtbtnImgStyle,{alignSelf:'center',width: hp("5%"),height: hp("5%"),}] :[wtbtnImgStyle,{alignSelf:'center'}]}/>
-                                                    {/* </View> */}
-                                                    
-                                                </TouchableOpacity> : null}
-
-                                            </View>
-
-                                        </View>
-
-                                        {props.isEatingEnthusiasm ? <View>
-
-                                            <ImageBackground style={Platform.isPad ? [eatingScoreViewStyle,{height:hp('20%')}] : [eatingScoreViewStyle]} resizeMode="stretch" source={props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? eatingDogBckImg : eatingCatBckImg}>
-
-                                                <View style={eatingScoreSubViewStyle}>
-                                                
-                                                    <View>
-                                                        <Text style={enthusasticTextStyle}>{'HOW'}</Text>
-                                                        <Text style={enthusasticTextStyle}>{'ENTHUSIASTIC'}</Text>
-                                                        <Text style={enthusasticTextStyle}>{'IS YOUR PET WHILE'}</Text>
-                                                        <Text style={enthusasticTextStyle}>{'HAVING THEIR FOOD ?'}</Text>
-                                                    </View>
-                                                    <View>
-                                                        <TouchableOpacity style={[enthusiasticBtnStyle,{}]} onPress={() => {enthusiasticAction()}}>
-                                                            <Text style={[sensorSubHeader2,{color:'black'}]}>{'TELL US NOW'}</Text>
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                </View>
-                                                    
-                                            </ImageBackground>
-
-                                        </View> : null}
-
-                                        {props.isImageScoring ? <View>
-
-                                            <ImageBackground style={Platform.isPad ? [eatingScoreViewStyle,{height:hp('20%')}] : [eatingScoreViewStyle]} resizeMode="stretch" source={props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? imageScoreDogImg : imageScoreCatImg}>
-
-                                                <View style={eatingScoreSubViewStyle}>
-                                                
-                                                    <View>
-                                                        <Text style={imgScoreTextStyle}>{'SCORE YOUR'}</Text>
-                                                        <Text style={imgScoreTextStyle}>{'PET BASED'}</Text>
-                                                        <Text style={imgScoreTextStyle}>{'ON THE SCALE'}</Text>
-                                                    </View>
-                                                    <View>
-                                                        <TouchableOpacity style={[enthusiasticBtnStyle,{}]} onPress={() => {imageScoreAction()}}>
-                                                            <Text style={[sensorSubHeader2,{color:'black'}]}>{'START NOW'}</Text>
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                </View>
-                                                    
-                                            </ImageBackground>
-
-                                        </View> : null}
-
-                                    </View> : null}
-
-                                    {props.isQuestionnaireEnable && props.questionnaireData && props.questionnaireData.length > 0 ? <View style={[questionnaireView]}>
-
-                                        <View style={{flexDirection:'row',justifyContent:'space-between', alignItems:'center'}}>
-                                            <Text style={[actyHeaderTextStyle,{alignSelf:'center'}]}>{"QUESTIONNAIRE"}</Text>
-                                            <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                                            
-                                                {!props.isModularityService ? <TouchableOpacity disabled = {true} style={{width:wp("15%"),}} onPress={() => {quickQuestionnaireAction()}}>
-                                                    <View  style={[qstButtonstyle,{flexDirection:'row',justifyContent:'center',alignItems:'center',width:wp("15%"),}]}>
-                                                        
-                                                    </View>
-                                                </TouchableOpacity> : <View><ActivityIndicator size="small" color="gray"/></View>}
-                                            </View>
-
-                                        </View>
-
-                                        <View style={{}}>
-
-                                            <View style={{backgroundColor:'white',width:wp('90%'),height:hp('8%'),marginTop:wp('1%'),borderRadius:5, alignItems:'center',justifyContent:'center'}}>
-
-                                                <View style={{width:wp('80%'),height:hp('8%'),flexDirection:'row',alignItems:'center'}}>
-                                                    <View style={{flex:2}}>
-                                                        <Text style={[questHTextStyle]}>{'COMPLETED'}</Text>
-                                                        <Text style={[questSHTextStyle]}>{'QUESTIONNAIRES'}</Text>
-                                                    </View>
-
-                                                    <View style={{width:wp('10%'),height:hp('6%'),justifyContent:'center'}}>
-
-                                                        <ImageBackground source={require("./../../../assets/images/otherImages/svg/recBlue.svg")} style={[qstbtnImgStyle,{justifyContent:'center',alignItems:'center'}]}>
-                                                            <Text style={[questCountTextStyle,{color:'#48D2FF'}]}>{props.questSubmitLength < 10 && props.questSubmitLength !== 0 ? '0'+props.questSubmitLength : props.questSubmitLength}</Text>
-                                                        </ImageBackground>
-
-                                                    </View>
-                                                </View>
-
-                                            </View>
-
-                                            {props.questionnaireDataLength > 0 ? <View style={{backgroundColor:'white',width:wp('90%'),height:hp('8%'),marginTop:wp('1%'),borderRadius:5, flexDirection:'row', alignItems:'center',justifyContent:'center'}}>
-
-                                            <View style={{width:wp('80%'),height:hp('8%'),flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-
-                                                <View style={{width:wp('43%'),height:hp('8%'),justifyContent:'center'}}>
-                                                    <Text style={[questHTextStyle]}>{'OPEN'}</Text>
-                                                    <Text style={[questSHTextStyle]}>{'QUESTIONNAIRES'}</Text>
-                                                </View>
-
-                                                <View style= {{flexDirection:'row',width:wp('40%'),alignItems:'center', justifyContent:'flex-end'}}>
-
-                                                    <View style={{alignItems:'center'}}>
-                                                        <ImageBackground source={require("./../../../assets/images/otherImages/svg/recGreen.svg")} style={[qstbtnImgStyle,{justifyContent:'center',alignItems:'center',}]}>
-                                                            <Text style={[questCountTextStyle,]}>{props.questionnaireDataLength < 10 && props.questionnaireDataLength !== 0 ? '0'+props.questionnaireDataLength : props.questionnaireDataLength}</Text>
-                                                        </ImageBackground>
-                                                    </View>
-
-                                                    <TouchableOpacity style={{}} onPress={() => {quickQuestionnaireAction()}}>
-                                                        <View style={[qstButtonstyle,{flexDirection:'row',justifyContent:'center',alignItems:'center',width:wp("15%"),}]}>
-                                                            <Image source={require("../../../assets/images/dashBoardImages/svg/greenRightArrowBtnImg.svg")} style={[qstbtnImgStyle,{width: hp("6%"),height: hp("6%"),}]}/>
-                                                        </View>
-                                                    </TouchableOpacity> 
-                                                    
-                                                </View> 
-                                                    
-                                            </View> 
-
-                                            </View> : null}
-
-                                            {props.questionnaireDataLength > 0 ? <View style={{flexDirection:'row', justifyContent:'space-between',backgroundColor:'white'}}>
-                                                <View style={{flexDirection:'row',flex:1}}>
-                                                    <Text style={[indexTextStyle]}>{"1  "}</Text>
-                                                    <View style={{justifyContent:'center'}}>
-                                                        <Text style={questionnaireTextStyle}>{props.questionnaireData[0].questionnaireName && props.questionnaireData[0].questionnaireName.length > 23 ? props.questionnaireData[0].questionnaireName.slice(0, 23) + "..." : props.questionnaireData[0].questionnaireName}</Text>
-                                                        <Text style={actySubHeaderTextStyle}>{'Due by: '+ props.questionnaireData[0].endDate ? moment(new Date(props.questionnaireData[0].endDate)).format("MM-DD-YYYY")  : ''}</Text>
-                                                    </View>
-                                                </View>
-
-                                                {!props.isModularityService ? <TouchableOpacity style={[openButtonstyle]} onPress={() => {quickQuestionAction(props.questionnaireData[0])}}>
-                                                    <Text style={props.questionnaireData[0].status === "Elapsed" ? [openBtnTextStyle,{color:'red'}] : [openBtnTextStyle]}>{props.questionnaireData[0].status.toUpperCase()}</Text>
-                                                </TouchableOpacity> : <View style={[openButtonstyle]}><ActivityIndicator size="small" color="gray"/></View>}
-
-                                            </View> : null}
-                                        </View>
-
-                                        
-
-                                    </View> : (props.isQuestLoading ? <View style={[questionnaireView,{alignItems:'center',justifyContent:'center'}]}>
-                                        <ActivityIndicator size="large" color="gray"/>
-                                    </View> : null)}
-
-                                    {props.isDeceased ? <View style={{width:wp('90%'),height:hp('50%'), alignSelf:'center',justifyContent:'center'}}>
-                                        <View style={[buttonstyle]}>
-                                            <Text style={[btnTextStyle,{color:'black',textAlign:'center'}]}>{'Some App features are restricted for this pet. \nPlease reach out to the customer support for more details.'}</Text>
-                                        </View>
-
-                                    </View> : (props.isDeviceMissing || !props.isDeviceSetupDone ? <View style={{width:wp('90%'), alignSelf:'center',justifyContent:'center'}}>
-
-                                        <Image source={props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? dogSetupMissingImg : catSetupMissingImg} style={props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? [missingDogImgStyle] : [missingCatImgStyle]}/>
-                                        <View style={[buttonstyle]}>
-                                            <Text style={[btnTextStyle]}>{props.isDeviceMissing ? 'DEVICE MISSING' : !props.isDeviceSetupDone ? 'SETUP PENDING' : ''}</Text>
-                                        </View>
-
-                                        <View style={missingBackViewStyle}>
                         
-                                            <Text style={missingTextStyle}>{props.deviceStatusText}</Text>
-                                            {props.supportMetialsArray && props.supportMetialsArray.length > 0 ? <Text style={missingTextStyle1} onPress={ ()=>                    
-                                                Linking.openURL(replaceCommaLine('mailto:support@wearablesclinicaltrials.com?subject=Support&body='))}>{<Highlighter
-                                                highlightStyle={{color: 'blue',textDecorationLine: 'underline'}}
-                                                searchWords={['wearables support']}
-                                                textToHighlight={replaceCommaLine('If you are facing any difficulty in setting your sensor up, please go through the below items or contact wearables support.')}
-                                            />}</Text> : null}
+                        {/* {!props.isDeviceMissing && props.isDeviceSetupDone ? <View style={tabViewStyle}>
 
-                                            <FlatList
-                                                style={flatcontainer}
-                                                data={props.supportID && props.supportID === 16 ? props.supportSPendingArray : props.supportDMissingArray}
-                                                showsVerticalScrollIndicator={false}
-                                                renderItem={renderMeterials}
-                                                enableEmptySections={true}
-                                                keyExtractor={(item) => item.titleOrQuestion}
-                                                numColumns={3}
-                                            />
+                            <TouchableOpacity style={[tabItemRef.current === 0 ? tabViewEnableBtnStyle : tabViewBtnStyle]} onPress={() => {tabItemRef.current = 0,carouselRef.current.snapToItem(0)}}>
+                                <Text style={[tabBtnTextStyle]}>{'Activity'}</Text>
+                            </TouchableOpacity>
 
-                                        </View>
+                            <TouchableOpacity style={[tabItemRef.current === 1 ? tabViewEnableBtnStyle : tabViewBtnStyle]} onPress={() => {tabItemRef.current = 1,carouselRef.current.snapToItem(1);}}>
+                                <Text style={[tabBtnTextStyle,{marginRight:hp('0.2%')}]}>{'Tasks'}</Text>
+                            </TouchableOpacity>
+                                
+                        </View> : null} */}
 
-                                    </View> : null)}
+                        {!props.isDeviceMissing && props.isDeviceSetupDone ? <View style={{alignItems:'center',marginTop:props.isTimer || props.uploadStatus || props.questUploadStatus ? hp('1%') : hp('0%')}}>
+
+                            {/* <Carousel
+                                ref={carouselRef}
+                                data={dashboardViewArray}
+                                renderItem={renderDashboardItem}
+                                sliderWidth={wp('100%')}
+                                itemWidth={wp('100%')} 
+                                // itemHeight={hp('100%')}
+                                // sliderHeight={hp('100%')}
+                                showthumbs = {false}
+                                layout={'default'}
+                                activeSlideAlignment = {'start'}
+                                firstItem={tabItemRef.current}
+                                hasParallaxImages={true}
+                                onSnapToItem={data => renderScrollItem(data)}
+                                inactiveSlideOpacity = {1}
+                                useScrollView={true}
+                                enableSnap = {true}
+                            /> */}
+                            {renderTasksView()}
+                        </View> : null}
+
+                        {props.isDeceased ? <View style={{width:wp('90%'),height:hp('50%'), alignSelf:'center',justifyContent:'center'}}>
+                            
+                            <View style={[buttonstyle]}>
+                                <Text style={[btnTextStyle,{color:'black',textAlign:'center'}]}>{'Some App features are restricted for this pet. \nPlease reach out to the customer support for more details.'}</Text>
                             </View>
 
-                        </ScrollView>
+                        </View> : (props.isDeviceMissing || !props.isDeviceSetupDone ? <View style={{width:wp('100%'), alignSelf:'center'}}>
+
+                        {props.bfiUploadStatus ? <View style={{width:wp('100%'),height:Platform.isPad ? hp('12%') : hp('10%'),alignItems:'center',justifyContent:'center',backgroundColor:'#818588',marginBottom: props.bfiUploadStatus ? hp('0%') : hp('1%')}}>
+                        <View style={{width:wp('90%'),height:hp('6%'),flexDirection:'row'}}>
+
+                            <View style={{width:wp('60%'),height:hp('6%'),justifyContent:'center'}}>
+                                <Text style={[uploadSubTextStyle,{color:'white',marginTop:hp('1%')}]}>{props.bfiUploadStatus + " "+ props.bfiFileName}</Text>
+                            </View>
+
+                            <View style={{width:wp('30%'),height:hp('6%'),alignItems:'center',justifyContent:'center'}}>
+
+                                <View style={{width:wp('12%'),aspectRatio:1,backgroundColor:'#000000AA',borderRadius:100,borderColor:'#6BC100',borderWidth:2,alignItems:'center',justifyContent:'center'}}>
+                                    <Text style={progressStyle}>{props.bfiUploadProgress}</Text>
+                                </View>
+
+                                <Text style={{color:'white'}}>{props.bfiProgressText}</Text>
+                                        
+                            </View>
+
+                        </View>
+
+                    </View> : null}
+                            <Image source={props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? dogSetupMissingImg : catSetupMissingImg} style={props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? [missingDogImgStyle] : [missingCatImgStyle]}/>
+                            <View style={[buttonstyle]}>
+                               <Text style={[btnTextStyle]}>{props.isDeviceMissing ? 'DEVICE MISSING' : !props.isDeviceSetupDone ? 'SETUP PENDING' : ''}</Text>
+                            </View>
+
+                            <View style={missingBackViewStyle}>
+                        
+                                <Text style={missingTextStyle}>{props.deviceStatusText}</Text>
+                                {props.supportMetialsArray && props.supportMetialsArray.length > 0 ? <Text style={missingTextStyle1} onPress={ ()=>                    
+                                    Linking.openURL(replaceCommaLine('mailto:support@wearablesclinicaltrials.com?subject=Support&body='))}>{<Highlighter
+                                    highlightStyle={{color: 'blue',textDecorationLine: 'underline'}}
+                                    searchWords={['wearables support']}
+                                    textToHighlight={replaceCommaLine('If you are facing any difficulty in setting your sensor up, please go through the below items or contact wearables support.')}
+                                />}</Text> : null}
+
+                                <FlatList
+                                    style={flatcontainer}
+                                    data={props.supportID && props.supportID === 16 ? props.supportSPendingArray : props.supportDMissingArray}
+                                    showsVerticalScrollIndicator={false}
+                                    renderItem={renderMeterials}
+                                    enableEmptySections={true}
+                                    keyExtractor={(item) => item.titleOrQuestion}
+                                    numColumns={3}
+                                />
+
+                            </View>
+
+                        </View> : null)}
 
                     </View>
 
                 </View>}
 
-                {props.isDeceased ? null :(props.isDeviceMissing || !props.isDeviceSetupDone || props.isFirstUser ? <View style={CommonStyles.bottomViewComponentStyle}>
+                {props.isDeceased ? null :(props.isDeviceMissing || !props.isDeviceSetupDone || props.isFirstUser ? <View style={[CommonStyles.bottomViewComponentStyle,{height:Platform.OS === 'android' ? hp('10%') : hp('13%')}]}>
                     <BottomComponent
                         rightBtnTitle = {props.buttonTitle}
                         isLeftBtnEnable = {false}
@@ -707,16 +891,16 @@ const  DashBoardUI = ({route, ...props }) => {
                 </View> : null)}    
 
                 {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
-                <AlertComponent
-                    header = {props.popUpAlert}
-                    message={props.popUpMessage}
-                    isLeftBtnEnable = {props.isPopLeft}
-                    isRightBtnEnable = {true}
-                    leftBtnTilte = {'NO'}
-                    rightBtnTilte = {props.popUpRBtnTitle}
-                    popUpRightBtnAction = {() => popOkBtnAction()}
-                    popUpLeftBtnAction = {() => popCancelBtnAction()}
-                />
+                    <AlertComponent
+                        header = {props.popUpAlert}
+                        message={props.popUpMessage}
+                        isLeftBtnEnable = {props.isPopLeft}
+                        isRightBtnEnable = {true}
+                        leftBtnTilte = {'NO'}
+                        rightBtnTilte = {props.popUpRBtnTitle}
+                        popUpRightBtnAction = {() => popOkBtnAction()}
+                        popUpLeftBtnAction = {() => popCancelBtnAction()}
+                    />
             </View> : null}
                 {props.isLoading === true ? <LoaderComponent isLoader={false} loaderText = {props.loaderMsg} isButtonEnable = {false} /> : null} 
         </View>

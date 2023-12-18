@@ -233,7 +233,7 @@ const TimerData = ({route, ...props }) => {
     };
 
     const minmizeBtnAction = () => {
-        navigateToPrevious();
+        props.minmizeBtnAction();
     };
 
     const onButtonStart = async (dateValue) => {

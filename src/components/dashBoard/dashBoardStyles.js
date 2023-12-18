@@ -11,8 +11,9 @@ import fonts from './../../utils/commonStyles/fonts';
 const DashBoardStyles = StyleSheet.create({
 
     mainComponentStyle : {
+        width:wp('100%'),
         flex:1,
-        backgroundColor:'#F5F7F9'
+        backgroundColor:'white'
     },
 
     headerView : {
@@ -95,103 +96,8 @@ const DashBoardStyles = StyleSheet.create({
     },
 
     leadeBoardStyle : {
-        height:hp('38%'),
+        height:hp('35%'),
         width:wp('100%'),
-        backgroundColor:'#DFF3FA'
-    },
-
-    tilesViewStyle : {
-        flexDirection:'row',
-        borderWidth:0.5,
-        borderColor:'#dedede',
-        borderRadius:5,
-        width:wp('44%'),
-        height:hp('8%'),
-        backgroundColor:'white',
-        alignItems:'center'
-    },
-
-    sensorSelView : {
-        width:wp('90%'),
-        minHeight:hp('8%'),
-        borderRadius:5,
-        alignSelf:'center',
-        marginTop:hp('1%'),
-        borderColor:'#dedede',
-        borderWidth:0.5,
-        flexDirection:'row',
-        backgroundColor:'white'
-    },
-
-    petDetailsView : {
-        width:wp('90%'),
-        minHeight:hp('10%'),
-        alignSelf:'center',
-        // marginTop:hp('1%'),
-    },
-
-    questionnaireView : {
-        width:wp('90%'),
-        height:hp('12%'),
-        alignSelf:'center',
-        marginTop:hp('1%'),
-    },
-
-    petDHeaderTextStyle : {
-        fontSize: fonts.fontSmall,
-        ...CommonStyles.textStyleLight,
-        color: 'black', 
-    },
-
-    petDSubHeaderTextStyle : {
-        fontSize: fonts.fontMedium,
-        ...CommonStyles.textStyleBold,
-        color: 'black',       
-    },
-
-    actyHeaderTextStyle : {
-        fontSize: fonts.fontMedium,
-        ...CommonStyles.textStyleExtraBold,
-        color: 'black', 
-    },
-
-    questionnaireTextStyle : {
-        fontSize: fonts.fontXSmall,
-        ...CommonStyles.textStyleSemiBold,
-        color: 'black', 
-    },
-
-    sensorHeader2 : {
-        fontSize: fonts.fontSmall,
-        ...CommonStyles.textStyleBold,
-        color: 'black', 
-        marginBottom: hp("0.5%"),
-    },
-
-    sensorSubHeader2 : {
-        fontSize: fonts.fontSmall,
-        ...CommonStyles.textStyleBold,
-        color: '#6fc309', 
-    },
-
-    sensorSubHeader3 : {
-        fontSize: fonts.fontSmall,
-        ...CommonStyles.textStyleBold,
-        color: '#6fc309', 
-    },
-
-    sensorSubHeader4 : {
-        fontSize: fonts.fontTiny,
-        ...CommonStyles.textStyleBold,
-        color: '#6fc309', 
-        marginLeft:hp('0.5%'), 
-    },
-
-    actySubHeaderTextStyle : {
-        fontSize: fonts.fontXSmall,
-        ...CommonStyles.textStyleBold,
-        color: '#9DA2A9', 
-        marginBottom: hp("0.5%"),
     },
 
     buttonstyle : {
@@ -203,49 +109,6 @@ const DashBoardStyles = StyleSheet.create({
         color: '#DE1111',
         fontSize: fonts.fontNormal,
         ...CommonStyles.textStyleBold,
-    },
-
-    qstButtonstyle : {
-        width: hp("6%"),
-        height: hp("6%"),
-    },
-
-    qstbtnImgStyle : {
-        width: hp("4.5%"),
-        height: hp("4.5%"),
-        resizeMode:'contain',
-        
-    },
-
-    wtbtnImgStyle : {
-        // flex:1,
-        resizeMode:'contain',
-        // marginLeft:hp('1%'),   
-    },
-
-    qstPointsHeaderTextStyle : {
-        fontSize: fonts.fontLarge,
-        ...CommonStyles.textStyleExtraBold,
-        color: '#6BC100', 
-        marginBottom:hp('0.5%'), 
-    },
-
-    openButtonstyle : {
-        backgroundColor: "white",
-        width: hp("10%"),
-        height: hp("4%"),
-        borderRadius: hp("0.5%"),
-        justifyContent: "center",
-        alignItems:'center',
-        borderColor:'#EAEAEA',
-        borderWidth:2.0,
-        marginRight:hp('2%'), 
-    },
-
-    openBtnTextStyle: {
-        color: 'black',
-        fontSize: fonts.fontXSmall,
-        ...CommonStyles.textStyleExtraBold,
     },
 
     missingTextStyle : {
@@ -269,32 +132,6 @@ const DashBoardStyles = StyleSheet.create({
         marginTop:hp('1%'),
     },
 
-    indexTextStyle : {
-        fontSize: fonts.fontXXLarge,
-        ...CommonStyles.textStyleBold,
-        color: '#6BC100', 
-        marginLeft:hp('1%'),
-        marginBottom:hp('1%'),
-    },
-
-    detailsImgsStyle : {      
-        width:wp('8%'),
-        height:hp('3%'),
-        resizeMode:'contain'
-    },
-
-    detailsBubImgStyle : {       
-        width:wp('10%'),
-        aspectRatio:1,
-        borderColor:'#6BC105',
-        alignItems:'center',
-        justifyContent:'center', 
-        borderWidth:1,
-        borderRadius:5,
-        marginLeft:hp('1.5%'),
-        marginRight:hp('1%'),
-    },
-
     missingDogImgStyle : {
         width:wp('15%'),
         resizeMode:'contain',
@@ -311,11 +148,11 @@ const DashBoardStyles = StyleSheet.create({
     },
 
     quickselctionViewStyle : {
-        width:wp('90%'),
-        height:hp('8%'),
+        width:wp('93.5%'),
+        height:hp('6%'),
         borderRadius:5,
         alignSelf:'center',
-        marginTop:hp('1%'),
+        justifyContent:'center',
         flexDirection:'row',
         backgroundColor:'#BEEEFF',
     },
@@ -328,29 +165,23 @@ const DashBoardStyles = StyleSheet.create({
     },
 
     quickbtnInnerImgStyle : {
-        width:wp('6%'),
-        height:hp('4%'),
+        width:wp('4%'),
+        height:hp('2.5%'),
         resizeMode:'contain',
     },
 
     quickbtnInnerTextStyle : {
-        fontSize: fonts.fontSmall,
+        fontSize: fonts.fontXTiny,
         ...CommonStyles.textStyleBold,
         color: 'black', 
         alignSelf:'center',
-    },
-
-    firmwareAlertStyle : {
-        width:wp('4%'),
-        height:hp('3%'),
-        resizeMode:'contain',
-        marginLeft:wp('0.5%'),
+        marginTop:wp('0.5%'),
     },
   
     flatcontainer: {
         width: wp("90%"),
         marginTop: hp("2%"),
-        flex:1,
+        // flex:1,
     },
 
     name: {
@@ -367,7 +198,6 @@ const DashBoardStyles = StyleSheet.create({
         width:wp('26%'),
         height:hp('14%'),
         borderRadius:5,
-        backgroundColor:'white',
         margin:  hp('1%'),
         alignSelf:'flex-start'
     },
@@ -393,48 +223,6 @@ const DashBoardStyles = StyleSheet.create({
         resizeMode: "contain",
     },
 
-    eatingScoreViewStyle : {
-        flexDirection:'row',
-        marginTop:hp('1%'),
-        justifyContent:'space-between',
-        width:wp('90%'),
-        height:hp('16%'),
-        flexDirection:'row',
-        alignItems:'center',
-    },
-
-    eatingScoreSubViewStyle : {
-        width:wp('43%'),
-        height:hp('18%'),
-        borderRadius:5,
-        justifyContent:'center'   
-    },
-
-    enthusasticTextStyle : {
-        ...CommonStyles.textStyleBold,
-        fontSize: fonts.fontSmall,
-        textAlign: "left",
-        marginLeft:hp('2%'),
-    },
-
-    enthusiasticBtnStyle : {
-        width:wp('25%'),
-        height:hp('4%'),
-        backgroundColor:'white',
-        borderRadius:5,
-        marginLeft:hp('2%'),
-        marginTop:hp('1%'),
-        alignItems:'center',
-        justifyContent:'center'
-    },
-
-    imgScoreTextStyle : {
-        ...CommonStyles.textStyleBold,
-        fontSize: fonts.fontXSmall,
-        textAlign: "left",
-        marginLeft:hp('2%'),
-    },
-
     progressStyle : {
         fontSize: fonts.fontSmall,
         ...CommonStyles.textStyleSemiBold,
@@ -448,26 +236,149 @@ const DashBoardStyles = StyleSheet.create({
         textAlign: "center",
     },
 
-    questHTextStyle : {
-        fontSize: fonts.fontSmall,
-        ...CommonStyles.textStyleRegular,
-        color: 'grey', 
-        marginBottom:hp('0.5%'),
-    },
-
-    questSHTextStyle : {
-        fontSize: fonts.fontSmall,
-        ...CommonStyles.textStyleBold,
-        color: 'black', 
-        // marginBottom:hp('0.5%'), 
-    },
-
     questCountTextStyle : {
         fontSize: fonts.fontLarge,
         ...CommonStyles.textStyleBold,
         color: '#6BC100', 
         marginBottom:hp('0.5%'), 
         marginLeft:hp('0.5%'), 
+    },
+
+    dashboardViewStyle : {
+        height:hp('100%'), 
+        width:wp('100%'), 
+    },
+
+    tylebckViewStyle : {
+        height:hp('11%'), 
+        width:wp('93.5%'), 
+        alignSelf:'center',
+        flexDirection:'row', 
+        marginBottom:hp('1%'),
+        marginTop:hp('0.5%'),
+    },
+
+    tyleViewStyle : {
+        height:hp('11%'), 
+        width:wp('45.2%'), 
+        borderWidth:1,
+        borderRadius:10,
+        flexDirection:'row',
+    },
+
+    questBackViewStyle : {
+        height:hp('7%'), 
+        width:wp('93.5%'), 
+        alignItems:'center',
+        justifyContent:'center',
+        borderRadius:10,
+        shadowColor: '#132533',
+        shadowOffset: { width: 1, height: 3 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3, 
+        elevation: 3,
+        alignSelf:'center',
+        marginBottom:hp('1%'),
+        backgroundColor:'white',
+    },
+
+    questBackStyle : {
+        height: hp("7%"),
+        width: wp("10%"),
+        justifyContent:'center',
+        flex:3
+    },
+
+    questArrowStyle : {
+        aspectRatio:1,
+        justifyContent:'center',
+        flex:0.5
+    },
+
+    questArrowImgStyle : {
+        height: hp("2%"),
+        width: wp("6%"),
+        alignSelf:'flex-start',
+        resizeMode: "contain",
+        // marginTop: hp("0.5%"),
+    },
+
+    questDogImgStyle : {
+        height: hp("5.5%"),
+        aspectRatio:1,
+        resizeMode: "contain",
+    },
+
+    questHeaderTextStyle : {
+        fontSize: fonts.fontXSmall,
+        ...CommonStyles.textStyleMedium,
+        color: 'black', 
+    },
+
+    questSubHeaderTextStyle : {
+        fontSize: fonts.fontSmall,
+        ...CommonStyles.textStyleSemiBold,
+        color: 'black', 
+    },
+
+    questCountTextStyle : {
+        fontSize: fonts.fontXLarge,
+        ...CommonStyles.textStyleBold,
+        color: '#6BC100', 
+    },
+
+    sliderTextStyle : {
+        fontSize: fonts.fontXSmall,
+        ...CommonStyles.textStyleSemiBold,
+        color: 'black', 
+    },
+
+    tyleActivityStyle : {
+        height: hp("15%"),
+        width: wp("43.5%"),
+        shadowColor: 'grey',
+        shadowOffset: { width: 2, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 1, 
+        backgroundColor:'white',
+        borderRadius:10
+    },
+
+    activityHeaderTextStyle : {
+        fontSize: fonts.fontXSmall,
+        ...CommonStyles.textStyleSemiBold,
+        color: 'black', 
+    },
+
+    foodImgImgStyle : {
+        height: hp("6%"),
+        aspectRatio:1,
+        justifyContent:'center',
+        resizeMode: "contain",
+    },
+
+    activityFoodTextStyle : {
+        fontSize: fonts.fontTiny,
+        ...CommonStyles.textStyleLight,
+        color: 'black', 
+    },
+
+    activityFoodTextStyle1 : {
+        fontSize: fonts.fontXSmall,
+        ...CommonStyles.textStyleLight,
+        color: 'black', 
+    },
+
+    uploadTextStyle : {
+        fontSize: fonts.fontXSmall,
+        ...CommonStyles.textStyleSemiBold,
+        color: 'white', 
+    },
+
+    uploadSubTextStyle : {
+        fontSize: fonts.fontXSmall,
+        ...CommonStyles.textStyleRegular,
+        color: 'white', 
     },
 
 });

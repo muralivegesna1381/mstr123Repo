@@ -108,8 +108,10 @@ const UpdateSecondaryEmailService = ({ navigation, route, ...props }) => {
         set_isLoading(true);
         isLoadingdRef.current = 1;
         let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
+        let userId = await DataStorageLocal.getDataFromAsync(Constant.USER_ID);
         let json = {
             ClientID: "" + clientIdTemp,
+            UserId : userId,
             FirstName: firstName,
             LastName: lastName ,
             PhoneNumber: phnNo,
@@ -126,7 +128,6 @@ const UpdateSecondaryEmailService = ({ navigation, route, ...props }) => {
         trace_SecondaryEmail_API_Complete = await perf().startTrace('t_ChangeClientInfo_SecondaryEmail_API');
         let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
         let cNameServiceObj = await ServiceCalls.changeClientInfo(json, token);
-
         set_isLoading(false);
         isLoadingdRef.current = 0;
         stopFBTrace();
@@ -153,6 +154,8 @@ const UpdateSecondaryEmailService = ({ navigation, route, ...props }) => {
                 } else if(cNameServiceObj.responseData.Value && cNameServiceObj.responseData.Value !=='') {
                     firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_api_fail, firebaseHelper.screen_change_secondary_email, "Update Secondary email Api failed", 'error : ', cNameServiceObj.responseData.Value);
                     createPopup(Constant.ALERT_DEFAULT_TITLE, cNameServiceObj.responseData.Value, true, 'OK', false,0,1,false);
+                } else {
+                    createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SECONDARY_EMAIL_ERROR_UPDATE, true, 'OK', false,0,1,false);
                 }
                               
             } else {                 

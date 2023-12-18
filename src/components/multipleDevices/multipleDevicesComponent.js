@@ -13,6 +13,7 @@ const MultipleDevicesComponent = ({navigation, route, ...props }) => {
     const [petObj, set_petObj] = useState(undefined);
     const [isPopUp, set_isPopUp] = useState(false);
     const [date, set_Date] = useState(new Date());
+    const [isFrom, set_isFrom] = useState(undefined);
 
     React.useEffect(() => {
 
@@ -41,7 +42,11 @@ const MultipleDevicesComponent = ({navigation, route, ...props }) => {
           set_petObj(route.params?.petObject);
         }
 
-    }, [route.params?.petObject]);
+        if(route.params?.isFrom){
+            set_isFrom(route.params?.isFrom);
+        }
+
+    }, [route.params?.petObject, route.params?.isFrom]);
 
     const initialSessionStart = async () => {
         trace_inMultipleDevicesScreen = await perf().startTrace('t_inMultipleDevicesScreen');
@@ -52,8 +57,8 @@ const MultipleDevicesComponent = ({navigation, route, ...props }) => {
     };
 
     // Navigates to previous screen
-    const navigateToPrevious = () => {  
-        navigation.navigate('DashBoardService');
+    const navigateToPrevious = () => { 
+        navigation.pop();
     };
 
     const addButtonAction = async () => {

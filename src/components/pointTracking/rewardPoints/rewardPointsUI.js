@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {View,StyleSheet,Text,TouchableOpacity,Image,ImageBackground,FlatList,ActivityIndicator} from 'react-native';
+import {View,StyleSheet,Text,TouchableOpacity,Image,ImageBackground,FlatList,ActivityIndicator,Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import fonts from '../../../utils/commonStyles/fonts'
@@ -129,7 +129,7 @@ const  RewardPointsUi = ({route, ...props }) => {
           />
         </View>
 
-        <View style={styles.topContainer}>
+        <View style={[styles.topContainer,{marginTop:Platform.isPad ? hp('5%') : hp('0%')}]}>
 
           <ImageBackground style={styles.rewardImgStyle} source={require("./../../../../assets/images/pointTracking/svg/rewardsHeaderBackImg.svg")}>
 
@@ -143,9 +143,9 @@ const  RewardPointsUi = ({route, ...props }) => {
 
         </View>
 
-        <View style={styles.middleContainer}>
+        <View style={[styles.middleContainer,{marginTop:Platform.isPad ? hp('-3%') : hp('-7%')}]}>
 
-          <View style={{alignItems:'center',justifyContent:'center',marginTop:wp('3%')}}>
+          <View style={{alignItems:'center',justifyContent:'center',marginTop:Platform.isPad ? hp('5%') : hp('3%')}}>
             <Text style={styles.petNameStyle}>{leaderBoardCurrent && Object.keys(leaderBoardCurrent).length !== 0 ? leaderBoardCurrent.petName : ''}</Text>
             <Text style={styles.noOfPointsStyle}>{selectedBtn === "Awarded" ? "Total Reward Points" : "Total Redeemable Points"}</Text>
             {selectedBtn === "Awarded" ? <Text style={[styles.petPointstyle]}>{totalRewardPoints}</Text>
@@ -167,11 +167,11 @@ const  RewardPointsUi = ({route, ...props }) => {
             
         </View>
 
-        <View style={styles.bottomContainer}>
+        <View style={[styles.bottomContainer]}>
 
           {selectedBtn === "Awarded" ? (awardedArray.length>0 ? 
                 
-            <View style = {{marginBottom: wp("5%")}}>
+            <View style = {{marginBottom: hp("40%")}}>
               <FlatList
                 data={awardedArray}
                 renderItem={renderItem}
@@ -224,16 +224,18 @@ const  RewardPointsUi = ({route, ...props }) => {
   const styles = StyleSheet.create({
 
     topContainer: {
-      flex:1,
+      // flex:1,
+      marginTop: hp("3%"),
     },
 
     middleContainer: {
-      flex:1,
-      marginTop: hp("5%"),
+      // flex:1,
+      // marginTop: hp("5%"),
     },
 
     bottomContainer: {
-      flex:2,
+      // flex:2,
+      marginBottom : hp("18%"),
     },
 
     rewardImgStyle: {
@@ -284,7 +286,7 @@ const  RewardPointsUi = ({route, ...props }) => {
       ...CommonStyles.textStyleSemiBold,
       textAlign: "left",
       color: "black",
-      fontSize: fonts.fontMedium1,
+      fontSize: fonts.fontMedium,
     },
           
     btnTextStyle1: {

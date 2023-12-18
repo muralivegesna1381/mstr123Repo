@@ -177,8 +177,10 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
     const updateAddress = async (objAddress) => {
 
         let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
+        let userId = await DataStorageLocal.getDataFromAsync(Constant.USER_ID);
         let jsonTemp = {
             ClientID: "" + clientIdTemp,
+            UserId : userId,
             FirstName: firstName,
             LastName: secondName ,
             PhoneNumber: phnNo,

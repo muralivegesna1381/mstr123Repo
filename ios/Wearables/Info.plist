@@ -42,11 +42,11 @@
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Requires Media</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>To connect to your pet's sensor, We need to enable Bluetooth on your device.</string>
+	<string>To connect to your pet&apos;s sensor, We need to enable Bluetooth on your device.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>To connect to your pet's sensor, We need to enable Bluetooth on your device.</string>
+	<string>To connect to your pet&apos;s sensor, We need to enable Bluetooth on your device.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>This lets you take photos which can be added to Observation entries or for your pet’s profile picture.</string>
+	<string>This lets you take photos which can be used to record your pet’s activities or for your pet’s profile picture.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>This app uses your Bio Metrics</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -123,5 +123,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>ZendeskChannelID</key>
+	<string>eyJzZXR0aW5nc191cmwiOiJodHRwczovL3dlYXJhYmxlcy56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhBVjhYNTFTVjA3NkU1U0pNUjlCOU5UNy5qc29uIn0=</string>
 </dict>
 </plist>

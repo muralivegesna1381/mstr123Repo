@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="78.717" height="78.717" viewBox="0 0 78.717 78.717">
+  <g id="Group_14422" data-name="Group 14422" transform="translate(-27.628 -140)">
+    <rect id="Material_-_Vibrant_Primary_Text_-_Dark" data-name="Material - Vibrant Primary Text - Dark" width="78.717" height="78.717" rx="5" transform="translate(27.628 140)" fill="rgba(255,255,255,0.96)"/>
+    <g id="Group_2280" data-name="Group 2280" transform="translate(-125.735 -286.656)">
+      <path id="Path_5452" data-name="Path 5452" d="M20,0A20,20,0,1,1,0,20,20,20,0,0,1,20,0Z" transform="translate(172.363 445.656)" fill="#5b629f"/>
+      <g id="Ellipse_338" data-name="Ellipse 338" transform="translate(181.135 454.429)" fill="#3fd68e" stroke="#fff" stroke-width="2">
+        <ellipse cx="11.229" cy="11.228" rx="11.229" ry="11.228" stroke="none"/>
+        <ellipse cx="11.229" cy="11.228" rx="10.229" ry="10.228" fill="none"/>
+      </g>
+      <g id="Layer_2" data-name="Layer 2" transform="translate(184.374 457.281)">
+        <g id="flash">
+          <rect id="Rectangle_85376" data-name="Rectangle 85376" width="16" height="16" fill="#fff" opacity="0"/>
+          <path id="Path_12668" data-name="Path 12668" d="M8.725,15.622a.663.663,0,0,1-.658-.738l.512-4.712H4.664a.665.665,0,0,1-.552-1.037L9.357,1.292a.662.662,0,0,1,1.21.412L10.054,6.45h3.915a.665.665,0,0,1,.552,1.037L9.277,15.33a.665.665,0,0,1-.552.292Z" transform="translate(-1.317 -0.311)" fill="#fff"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

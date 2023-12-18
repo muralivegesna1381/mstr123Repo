@@ -50,18 +50,18 @@ export const SEND_EMAIL_VERIFICATON_CODE = gql`
   }
 `;
 
-export const GET_USER_VERIFICATION_ACCOUNT = gql`
-  mutation verificationCode {
-    verificationCode(input: $input)@rest(type: "verificationCode" method: "POST" path: "migrated/CheckClientSMSCode") {
-      success
-      errors
-      warnings
-      responseCode
-      responseMessage
-      result
-    }
-  }
-`;
+// export const GET_USER_VERIFICATION_ACCOUNT = gql`
+//   mutation verificationCode {
+//     verificationCode(input: $input)@rest(type: "verificationCode" method: "POST" path: "migrated/CheckClientSMSCode") {
+//       success
+//       errors
+//       warnings
+//       responseCode
+//       responseMessage
+//       result
+//     }
+//   }
+// `;
 
 export const GET_USER_EMAIL_VERIFICATION_CODE = gql`
   mutation emailVerification {
@@ -81,31 +81,31 @@ export const GET_USER_EMAIL_VERIFICATION_CODE = gql`
   }
 `;
 
-export const GET_USER_CREATE_PASSWORD = gql`
-  mutation createPassword {
-    createPassword(input: $input)@rest(type: "createPassword" method: "POST" path: "migrated/SetClientPasswordBySMSCode") {
-      success
-      errors
-      warnings
-      responseCode
-      responseMessage
-      result
-    }
-  }
-`;
+// export const GET_USER_CREATE_PASSWORD = gql`
+//   mutation createPassword {
+//     createPassword(input: $input)@rest(type: "createPassword" method: "POST" path: "migrated/SetClientPasswordBySMSCode") {
+//       success
+//       errors
+//       warnings
+//       responseCode
+//       responseMessage
+//       result
+//     }
+//   }
+// `;
 
-export const Manage_ClientInfo = gql`
-  mutation ManageClientInfo {
-    ManageClientInfo(input: $input)@rest(type: "ManageClientInfo" method: "POST" path: "migrated/ManageClientInfo") {
-      success
-      errors
-      warnings
-      responseCode
-      responseMessage
-      result
-    }
-  }
-`;
+// export const Manage_ClientInfo = gql`
+//   mutation ManageClientInfo {
+//     ManageClientInfo(input: $input)@rest(type: "ManageClientInfo" method: "POST" path: "migrated/ManageClientInfo") {
+//       success
+//       errors
+//       warnings
+//       responseCode
+//       responseMessage
+//       result
+//     }
+//   }
+// `;
 
 export const GET_BEHAVIORS = gql`
   query getBehaviors {
@@ -506,6 +506,31 @@ export const UPDATE_DASHBOARD_DATA = gql`
   query UpdateDashboardData {
     data {
       isRefresh
+    }
+  }
+`;
+
+
+export const UPLOAD_CAPTURE_BFI_BACKGROUND = gql`
+  query UploadCaptureBFIBackground {
+    data {
+      bfiData
+    }
+  }
+`;
+
+export const UPLOAD_CAPTURE_BFI_BACKGROUND_STATUS = gql`
+  query UploadCaptureBFIBackgroundStatus {
+    data {
+      statusUpload
+      stausType
+      mediaTYpe
+      questName
+      fileName
+      uploadProgress
+      progressTxt
+      internetType
+      uploadMode
     }
   }
 `;

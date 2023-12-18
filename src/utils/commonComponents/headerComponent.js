@@ -4,7 +4,7 @@ import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-nati
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
 
-const HeaderComponent = ({navigation, route,isChatEnable,isTImerEnable,isSettingsEnable,isBackBtnEnable,title,isTitleHeaderEnable,moduleName,headerColor,...props }) => {
+const HeaderComponent = ({navigation, route,isChatEnable, isInfoEnable,isTImerEnable,isSettingsEnable,isBackBtnEnable,title,isTitleHeaderEnable,moduleName,headerColor,...props }) => {
 
     useEffect (() => {
     },[]);
@@ -23,6 +23,10 @@ const HeaderComponent = ({navigation, route,isChatEnable,isTImerEnable,isSetting
 
     const backBtnAction = () => {
         props.backBtnAction();
+    }
+
+    const infoBtnAction = () => {
+        props.infoBtnAction();
     }
 
     return (
@@ -57,6 +61,10 @@ const HeaderComponent = ({navigation, route,isChatEnable,isTImerEnable,isSetting
 
                         {isChatEnable ? <TouchableOpacity onPress = {() => chatBtnAction()}>
                             <Image source={require("../../../assets/images/chatImages/closeChat.svg")} style={{marginLeft: wp("3%"), marginRight: wp("3%"),width:wp('6%'),height:wp('6%')}}/>
+                        </TouchableOpacity> : null}
+
+                        {isInfoEnable ? <TouchableOpacity onPress = {() => infoBtnAction()}>
+                            <Image source={require("../../../assets/images/bfiGuide/svg/info.svg")} style={{marginLeft: wp("3%"), marginRight: wp("3%"),width:wp('6%'),height:wp('6%')}}/>
                         </TouchableOpacity> : null}
 
                     </View>}
@@ -98,9 +106,8 @@ const styles = StyleSheet.create({
     backBtnEnableStyle : {
         marginLeft: wp("2%"),
         width:wp('6%'),
-        height:wp('6%'),
+        height:wp('4%'),
         resizeMode:'contain',
-        
     },
 
     titleStyle : {
@@ -108,8 +115,7 @@ const styles = StyleSheet.create({
         fontSize: fonts.fontNormal,
         ...CommonStyles.textStyleBold,
         textAlign:'center',
-        marginLeft: wp("2%"),
-        
+        marginLeft: wp("2%"),       
     },
 
     separatorViewStyle : {

@@ -19,13 +19,7 @@ const PERMISSION_PETWEIGHT = 7;
 const Permission_EatingEnthusiasm = 8;
 const PERMISSION_IMAGESCORING = 9;
 
-let trace_Dashboard_GetPets_Complete;
 let trace_inDashBoard;
-let trace_Questionnaire_API_Complete;
-let trace_Get_Support_Meterials_API_Complete;
-let trace_campaign_API_Complete;
-let trace_LeaderBoard_Campaign_API_Complet;
-let trace_Modularity_API_Complet;
 
 const DasBoardService = ({ navigation, route, ...props }) => {
 
@@ -42,12 +36,8 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   const [deviceStatusText, set_deviceStatusText] = useState(undefined);
   const [buttonTitle, set_buttonTitle] = useState(undefined);
   const [isTimer, set_isTimer] = useState(false);
-  const [firmware, set_firmware] = useState(undefined);
-  const [birthday, set_birthday] = useState(undefined);
-  const [lastSeen, set_lastSeen] = useState(undefined);
   const [weight, set_weight] = useState(undefined);
   const [weightUnit, set_weightUnit] = useState(undefined);
-  const [deviceNumber, set_deviceNumber] = useState(undefined);
   const [isEatingEnthusiasm, set_isEatingEnthusiasm] = useState(false);
   const [isImageScoring, set_isImageScoring] = useState(false);
   const [isPetWeight, set_isPetWeight] = useState(false);
@@ -56,9 +46,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   const [isQuestionnaireEnable, set_isQuestionnaireEnable] = useState(false);
   const [isDeceased, set_isDeceased] = useState(undefined);
   const [supportMetialsArray, set_supportMetialsArray] = useState();
-  const [isFirmwareUpdate, set_isFirmwareUpdate] = useState(false);
   const [devicesCount, set_devicesCount] = useState(undefined);
-  const [battery, set_battery] = useState(undefined);
   const [isPopUp, set_isPopUp] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
   const [popUpAlert, set_popUpAlert] = useState(undefined);
@@ -72,7 +60,6 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   const [leaderBoardCurrent, set_leaderBoardCurrent] = useState(undefined);
   const [campagainArray, set_campagainArray] = useState([]);
   const [campagainName, set_campagainName] = useState("");
-  const [isSwipedModularity, set_isSwipedModularity] = useState (false);
   const [isPTLoading, set_isPTLoading] = useState(false);
   const [questionnaireDataLength,set_questionnaireDataLength] = useState(undefined);
   const [questSubmitLength,set_questSubmitLength] = useState(0);
@@ -82,7 +69,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   const [supportSPendingArray, set_supportSPendingArray] = useState([]);
   const [supportDMissingArray, set_supportDMissingArray] = useState([]);
   const [supportID,set_supportID] = useState(undefined);
-  const [ptActivityLimits, set_ptActivityLimits] = useState(undefined)
+  const [ptActivityLimits, set_ptActivityLimits] = useState(undefined);
 
   var setupDonePetsRef = useRef([]);
   var setupDonePetsLength = useRef(0);
@@ -95,12 +82,12 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   var pushPTPetsArray = useRef([]);
   var isDefaultModularity = useRef(false);
   var currentCampaignPet = useRef(undefined);
-  var modularitySetupDonePetsRef = useRef(undefined);
   var petArrayRef = useRef(undefined);
 
   React.useEffect(() => {
 
     clearObjects();
+    // removeItems();
     const focus = navigation.addListener("focus", () => {
       set_Date(new Date());
       dashBoardSessionStart();
@@ -143,7 +130,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
    const handleBackButtonClick = () => {
     set_popUpAlert('Exit App');
-    set_popUpMessage('Are you sure?');
+    set_popUpMessage(Constant.ARE_YOU_SURE_YOU_WANT_EXIT);
     set_popUpRBtnTitle('YES');
     set_isPopupLeft(true);
     set_isPopUp(true);
@@ -180,6 +167,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   };
 
   const getUserDetails = async () => {
+
     let firstName = await Storage.getDataFromAsync(Constant.SAVE_FIRST_NAME);
     let secondName = await Storage.getDataFromAsync(Constant.SAVE_SECOND_NAME);
     if (firstName){
@@ -188,6 +176,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     if (secondName){
       set_secondName(secondName);
     }
+    
   };
 
   /**
@@ -200,10 +189,8 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
     let clientID = await Storage.getDataFromAsync(Constant.CLIENT_ID);
     let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
-    trace_Dashboard_GetPets_Complete = await perf().startTrace('t_DashBoard_GetPets_Info_API');
 
     let serviceCallsObj = await ServiceCalls.getPetParentPets(clientID,token);
-    await trace_Dashboard_GetPets_Complete.stop();
     if(serviceCallsObj && serviceCallsObj.logoutData){
       AuthoriseCheck.authoriseCheck();
       navigation.navigate('WelcomeComponent');
@@ -218,35 +205,14 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
     if(serviceCallsObj && serviceCallsObj.statusData) {
       if(serviceCallsObj && serviceCallsObj.responseData && serviceCallsObj.responseData.length > 0){
-        let tempArray = [];
-        let tempArray1 = [];
+        // let tempArray = [];
+        // let tempArray1 = [];
         if (serviceCallsObj.responseData.length > 0) {
           set_isFirstUser(false);
           set_petsArray(serviceCallsObj.responseData);
           petArrayRef.current = serviceCallsObj.responseData;
           await Storage.saveDataToAsync(Constant.ALL_PETS_ARRAY, JSON.stringify(serviceCallsObj.responseData));
           setDefaultSlide(serviceCallsObj.responseData);
-          for (let i = 0; i < serviceCallsObj.responseData.length; i++) {
-            
-            let devices = serviceCallsObj.responseData[i].devices;
-            for (let j = 0; j < devices.length; j++) {
-              if (devices.length > 0 && devices[j].isDeviceSetupDone) {
-                tempArray.push(serviceCallsObj.responseData[i]);
-                tempArray1.push(serviceCallsObj.responseData[i].petID);
-              }
-            }
-          }
-
-          let duplicates = getUnique(tempArray, 'petID');
-          tempArray = duplicates;
-          setupDonePetsRef.current = tempArray;
-          setupDonePetsLength.current = tempArray.length;
-          modularitySetupDonePetsRef.current = tempArray1;
-
-          if(setupDonePetsRef.current && setupDonePetsRef.current.length === 0) {
-            removeModularity()
-          }
-
         } 
       
       } else {
@@ -278,6 +244,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     await Storage.removeDataFromAsync(Constant.QUESTIONNAIR_PETS_ARRAY);
     await Storage.removeDataFromAsync(Constant.ADD_OBSERVATIONS_PETS_ARRAY);
   }
+
   const setDefaultSlide = async (petsArray) => {
 
     let defaultPet = await Storage.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
@@ -315,7 +282,6 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
       set_weight(defaultPet.weight);
       set_weightUnit(defaultPet.weightUnit);
-      set_birthday(defaultPet.birthday);
 
       if(parseInt(defaultPet.petStatus) === 3 || parseInt(defaultPet.petStatus) === 4){
         set_isDeceased(true);
@@ -330,16 +296,11 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       if((defaultPet.devices[0].deviceNumber || defaultPet.devices[0].deviceNumber != "")){
 
         set_isDeviceMissing(false);
-        set_deviceNumber(defaultPet.devices[0].deviceNumber); 
-        set_firmware(defaultPet.devices[0].firmware); 
-        set_lastSeen(defaultPet.devices[0].lastSeen); 
-        set_isFirmwareUpdate(defaultPet.devices[0].isFirmwareVersionUpdateRequired);
-        set_battery(defaultPet.devices[0].battery);
 
         if(defaultPet.devices[0].isDeviceSetupDone){
 
           set_isDeviceSetupDone(true);
-          await getPetModularity(modularitySetupDonePetsRef.current,defaultPet.petID);
+          await getPetModularity(defaultPet.petID);
 
         } else {
 
@@ -377,26 +338,27 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   };
 
   const refreshDashBoardDetails = async (value,pObject) => {
+
     set_supportMetialsArray([]);
-    set_isLoading(true);
+    // set_isLoading(true);
     enableLoader.current = true;
     isDefaultModularity.current = true;
     modularityServiceCount.current = 0;
     setupDonePetsLength.current = 1;
     setDefaultSlide(petsArray);
     // getDashBoardPets();
+
   };
 
-  const getPetModularity = async (petIdArray,petId) => {
+  const getPetModularity = async (petId) => {
 
     if(enableLoader.current) {
       set_isLoading(true);
     }
-    let obj = {"petIds":petIdArray}
+
+    let obj = {"petIds":[petId]}
     let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
-    trace_Modularity_API_Complet= await perf().startTrace('t_DashBoard_GetPets_Info_API');
     let modularServiceObj = await ServiceCalls.getModularityPermission(obj,token);
-    await trace_Modularity_API_Complet.stop();
 
     if(modularServiceObj && modularServiceObj.logoutData){
       AuthoriseCheck.authoriseCheck();
@@ -412,7 +374,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
     if(modularServiceObj && modularServiceObj.statusData) {
       if(modularServiceObj && modularServiceObj.responseData){
-        await updatePermissionsArrays(modularServiceObj.responseData);
+        // await updatePermissionsArrays(modularServiceObj.responseData);
         await checkModularPermissions(modularServiceObj.responseData, petId);
       } else {
         firebaseHelper.logEvent(firebaseHelper.event_dashboard_getModularity_fail, firebaseHelper.screen_dashboard, "Dashboard Modularity Service", 'Getting Modularity in Dashboard : No Datafound');
@@ -439,11 +401,31 @@ const DasBoardService = ({ navigation, route, ...props }) => {
    * @param {*} setupDonePet 
    */
    const savePetsForTImer = async (timerPets) => {
+
     if (timerPets && timerPets.length > 0) {
-      await Storage.saveDataToAsync(Constant.TIMER_PETS_ARRAY, JSON.stringify(timerPets));
+      let timerPetsTemp = await getsetupFeaturePets(timerPets);
+      await Storage.saveDataToAsync(Constant.TIMER_PETS_ARRAY, JSON.stringify(timerPetsTemp));
     } else {
       await Storage.removeDataFromAsync(Constant.TIMER_PETS_ARRAY);
     }
+
+  };
+
+  // finds out the setup done pets
+  const getsetupFeaturePets = (pets) => {
+
+    let tempArray = [];
+    for (let i = 0; i < pets.length; i++) {   
+      let devices = pets[i].devices;
+      for (let j = 0; j < devices.length; j++) {
+        if (devices.length > 0 && devices[j].isDeviceSetupDone) {
+          tempArray.push(pets[i]);
+        }
+      }
+    }
+
+    let duplicates = getUnique(tempArray, 'petID');
+    return duplicates;
   };
 
   /**
@@ -453,7 +435,8 @@ const DasBoardService = ({ navigation, route, ...props }) => {
    */
   const savePetsForQuestionnaire = async (questPets) => {
     if (questPets && questPets.length > 0) {
-      await Storage.saveDataToAsync(Constant.QUESTIONNAIR_PETS_ARRAY, JSON.stringify(questPets));
+      let qstPetsTemp = await getsetupFeaturePets(questPets);
+      await Storage.saveDataToAsync(Constant.QUESTIONNAIR_PETS_ARRAY, JSON.stringify(qstPetsTemp));
     } else {
       await Storage.removeDataFromAsync(Constant.QUESTIONNAIR_PETS_ARRAY);
     }
@@ -467,7 +450,8 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
   const savePetsForObservations = async (obsPets) => {
     if (obsPets && obsPets.length > 0) {
-      await Storage.saveDataToAsync(Constant.ADD_OBSERVATIONS_PETS_ARRAY, JSON.stringify(obsPets));
+      let obsPetsTemp = await getsetupFeaturePets(obsPets);
+      await Storage.saveDataToAsync(Constant.ADD_OBSERVATIONS_PETS_ARRAY, JSON.stringify(obsPetsTemp));
     } else {
       await Storage.removeDataFromAsync(Constant.ADD_OBSERVATIONS_PETS_ARRAY);
     }
@@ -488,6 +472,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
         } 
 
       }
+
       if(newValue) {
         updateModularity(newValue[0]);
       } else {
@@ -495,44 +480,6 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       }
     }
 
-  };
-
-  const updatePermissionsArrays = async (modularArray) => {
-
-    let obsArray = []
-    let timeArray = [];
-    let questArray = [];
-    let modularArrayMain = Object.keys(modularArray).map(key => ({[key]: modularArray[key]}));
-    for (let k = 0; k < modularArrayMain.length; k++) {
-
-      let newKey = Object.keys(modularArrayMain[k]);
-        var temp = petArrayRef.current.filter(item => item.petID.toString() === newKey[0].toString());
-        if(temp) {
-          let configArray = Object.values(modularArrayMain[k]);
-          configArray = configArray[0]
-          
-          if(configArray) {
-            for (let i = 0; i < configArray.length; i++) {
-              if (configArray[i].mobileAppConfigId === PERMISSION_OBSERVATIONS) {
-                obsArray.push(temp[0]);
-              } 
-          
-              if (configArray[i].mobileAppConfigId === PERMISSION_QUESTIONNAIRE) {
-                questArray.push(temp[0]);
-              } 
-          
-              if (configArray[i].mobileAppConfigId === PERMISSION_TIMER) {
-                timeArray.push(temp[0]);
-              } 
-
-            }
-          }
-        }
-
-      }
-      await savePetsForObservations(obsArray);
-      await savePetsForQuestionnaire(questArray);
-      await savePetsForTImer(timeArray);
   };
 
   const updateModularity = async (modularArray1) => {
@@ -551,6 +498,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     firebaseHelper.logEvent(firebaseHelper.event_dashboard_defaultPet_modularity, firebaseHelper.screen_dashboard, "DBoard Default Pet Permissions", 'P Set : '+JSON.stringify(modularArray));
     if (modularArray.includes(PERMISSION_OBSERVATIONS)) {
       set_isObsEnable(true);
+      await permissionPetsAPI(56);
     } else {
       set_isObsEnable(false);
     }
@@ -571,6 +519,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
     if (modularArray.includes(PERMISSION_QUESTIONNAIRE)) {
       set_isQuestionnaireEnable(true);
+      await permissionPetsAPI(54);
       await getQuestionnaireData();
     } else {
       set_isQuestionnaireEnable(false);    
@@ -578,6 +527,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
     if (modularArray.includes(PERMISSION_TIMER)) {
       set_isTimerEnable(true);
+      await permissionPetsAPI(60);
     } else {
       set_isTimerEnable(false);
     }
@@ -622,10 +572,8 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     let defaultPet = await Storage.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
     defaultPet = JSON.parse(defaultPet);
     let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
-    trace_Questionnaire_API_Complete = await perf().startTrace('t_DashBoard_Questionnaire_Info_API');
     let questServiceObj = await ServiceCalls.getQuestionnaireData(defaultPet.petID,token);
 
-    await trace_Questionnaire_API_Complete.stop();
     set_isQuestLoading(false);
     // if(!ptExists.current){
       set_isLoading(false);
@@ -668,10 +616,8 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     defaultPet = JSON.parse(defaultPet);
     set_leaderBoardPetId(defaultPet.petID);
 
-    trace_campaign_API_Complete = await perf().startTrace('t_Campaign_Details_API');
     let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
     let serviceCallsObj = await ServiceCalls.getCampaignListByPet(defaultPet.petID,token);
-    await trace_campaign_API_Complete.stop();
 
     if(serviceCallsObj && serviceCallsObj.logoutData){
       AuthoriseCheck.authoriseCheck();
@@ -720,14 +666,9 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   const getLeaderBoardDetails = async (campId, campaignPetId) => {
 
     let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
-    trace_LeaderBoard_Campaign_API_Complet = await perf().startTrace('t_Campaign_Details_API');
-
     let serviceCallsObj = await ServiceCalls.getLeaderBoardByCampaignId(campId,campaignPetId,token);
-    await trace_LeaderBoard_Campaign_API_Complet.stop();
-    // setTimeout(async () => {  
-    //   set_isLoading(false);
-    // }, 2000);
     set_isPTLoading(false);
+
     if(serviceCallsObj && serviceCallsObj.logoutData){
       AuthoriseCheck.authoriseCheck();
       navigation.navigate('WelcomeComponent');
@@ -786,11 +727,9 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       set_isLoading(true);
     }
     set_loaderMsg(Constant.DASHBOARD_LOADING_MSG);
-    trace_Get_Support_Meterials_API_Complete = await perf().startTrace('t_Get_Support_Meterials_API');
     let supportMetObj = await ServiceCalls.getAppSupportDocs(id,token);
     set_isLoading(false);
     set_isPTLoading(false);
-    await trace_Get_Support_Meterials_API_Complete.stop();
 
     if(supportMetObj && supportMetObj.logoutData){
       AuthoriseCheck.authoriseCheck();
@@ -822,6 +761,50 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       set_isLoading(false);
       let errors = supportMetObj.error.length > 0 ? supportMetObj.error[0].code : '';
       firebaseHelper.logEvent(firebaseHelper.event_dashboard_getMeterials_fail, firebaseHelper.screen_dashboard, "Dashboard Support Meterials Failed", 'error : ', errors);
+    }
+
+  };
+
+  const permissionPetsAPI = async (mId) => {
+
+    let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
+    let clientId = await Storage.getDataFromAsync(Constant.CLIENT_ID);
+    let userRoleDetails = await Storage.getDataFromAsync(Constant.USER_ROLE_DETAILS);
+    userRoleDetails = JSON.parse(userRoleDetails);
+
+    let permissionServiceObj = await ServiceCalls.configPermissionAPI(clientId,mId,token);
+
+    if(permissionServiceObj && permissionServiceObj.logoutData){
+      AuthoriseCheck.authoriseCheck();
+      navigation.navigate('WelcomeComponent');
+      return;
+    }
+
+    if(permissionServiceObj && !permissionServiceObj.isInternet){
+      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
+      return;
+    }
+
+    if(permissionServiceObj && permissionServiceObj.statusData){
+
+      if (permissionServiceObj.responseData) {
+
+        if(mId === 60){
+          savePetsForTImer(permissionServiceObj.responseData);
+        } else if(mId === 56){
+          savePetsForObservations(permissionServiceObj.responseData);
+        }else if(mId === 54){
+          savePetsForQuestionnaire(permissionServiceObj.responseData);
+        }
+        // return permissionServiceObj.responseData
+      }
+
+    } else {
+      createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+    }
+
+    if(permissionServiceObj && permissionServiceObj.error) {
+      createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
     }
 
   };
@@ -876,7 +859,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   };
 
   const popOkBtnAction = () => {
-    if(popUpMessage==='Are you sure?'){
+    if(popUpMessage===Constant.ARE_YOU_SURE_YOU_WANT_EXIT){
       RNExitApp.exitApp();
     }
     clearPopup();
@@ -979,7 +962,6 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       buttonTitle = {buttonTitle}
       isObsEnable = {isObsEnable}
       isTimer = {isTimer}
-      birthday = {birthday}
       weight = {weight}
       weightUnit = {weightUnit}
       isEatingEnthusiasm = {isEatingEnthusiasm}
@@ -991,11 +973,6 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       isQuestLoading = {isQuestLoading}
       isDeceased = {isDeceased}
       supportMetialsArray = {supportMetialsArray}
-      isFirmwareUpdate = {isFirmwareUpdate}
-      firmware = {firmware}
-      deviceNumber = {deviceNumber}
-      lastSeen = {lastSeen}
-      battery = {battery}
       devicesCount = {devicesCount}
       popUpMessage = {popUpMessage}
       popUpAlert = {popUpAlert}
@@ -1011,7 +988,6 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       campagainName = {campagainName}
       campagainArray = {campagainArray}
       currentCampaignPet = {currentCampaignPet.current}
-      isSwipedModularity = {isSwipedModularity}
       enableLoader = {enableLoader.current}
       isPTLoading = {isPTLoading}
       questionnaireDataLength = {questionnaireDataLength}

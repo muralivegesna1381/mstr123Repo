@@ -13,6 +13,7 @@ const  TimerPetSelectionComponent = ({navigation, route, ...props }) => {
     const [nxtBtnEnable, set_nxtBtnEnable] = useState(undefined);
     const [defaultPetObj, set_defaultPetObj] = useState(undefined);
     const [selectedIndex, set_selectedIndex] = useState(undefined);
+    const [selectedPName, set_selectedPName] = useState(undefined);
     const [date, set_Date] = useState(new Date());
 
     useEffect(() => {
@@ -39,6 +40,7 @@ const  TimerPetSelectionComponent = ({navigation, route, ...props }) => {
     }, []);
 
      useEffect(() => {
+
          if(route.params?.petsArray){
             let duplicates = getUnique(route.params?.petsArray, 'petID');
             set_petsArray(duplicates);
@@ -47,7 +49,8 @@ const  TimerPetSelectionComponent = ({navigation, route, ...props }) => {
                     if(duplicates[i].petID === route.params?.defaultPetObj.petID){
                         set_selectedPet(duplicates[i]);
                         set_selectedIndex(i);
-                        set_nxtBtnEnable(true);                    
+                        set_nxtBtnEnable(true);  
+                        set_selectedPName(duplicates[i].petName);                  
                     }
                 }
             }
@@ -98,6 +101,7 @@ const  TimerPetSelectionComponent = ({navigation, route, ...props }) => {
             defaultPetObj = {defaultPetObj}
             nxtBtnEnable = {nxtBtnEnable}
             selectedIndex = {selectedIndex}
+            selectedPName = {selectedPName}
             navigateToPrevious = {navigateToPrevious}
             submitAction = {submitAction}
             selectPetAction = {selectPetAction}

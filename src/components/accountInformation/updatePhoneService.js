@@ -101,6 +101,7 @@ const UpdatePhoneService = ({ navigation, route, ...props }) => {
         set_isLoading(true);
         isLoadingdRef.current = 1;
         let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
+        let userId = await DataStorageLocal.getDataFromAsync(Constant.USER_ID);
         let phoneTemp = phn.replace(/\D/g, "");
         let phoneTemp1 = phoneTemp.substring(0, 3);
         phoneTemp1 = "(" + phoneTemp1 + ")";
@@ -110,6 +111,7 @@ const UpdatePhoneService = ({ navigation, route, ...props }) => {
 
         let json = {
             ClientID: parseInt(clientIdTemp),
+            UserId : userId,
             FirstName: firstName ? firstName : ' ',
             LastName: lastName ? lastName : ' ',
             PhoneNumber: phn ? cCode + phoneTemp1 + phoneTemp2 + phoneTemp3 : '',

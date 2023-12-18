@@ -6,7 +6,6 @@ import HeaderComponent from './../../../utils/commonComponents/headerComponent';
 import fonts from './../../../utils/commonStyles/fonts'
 import CommonStyles from './../../../utils/commonStyles/commonStyles';
 import * as DataStorageLocal from './../../../utils/storage/dataStorageLocal';
-import BuildEnvJAVA from './../../../config/environment/enviJava.config';
 import * as Constant from "./../../../utils/constants/constant";
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
@@ -165,7 +164,7 @@ const PetFeedingPreferencesComponentUI = ({ navigation, route, ...props }) => {
     const nextButtonAction = async () => {
 
         sJosnObj.current.eatTimeArray = tempAnswersArray.current;
-        sJosnObj.current.isSkip = sJosnObj.current && sJosnObj.current.petParentObj && sJosnObj.current.petParentObj.petParentAddress && Object.keys(sJosnObj.current.petParentObj.petParentAddress).length > 0 ? false : true;
+        sJosnObj.current.isSkip = sJosnObj.current && sJosnObj.current.petParentObj && sJosnObj.current.petParentObj.address && Object.keys(sJosnObj.current.petParentObj.address).length > 0 ? false : true;
         sJosnObj.current.isSameAddress = sJosnObj.current.isSkip ? 'notSame' : sJosnObj.current.isSameAddress;
         sJosnObj.current.isPetWithPetParent = 0;
         await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));

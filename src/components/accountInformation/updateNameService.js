@@ -100,8 +100,10 @@ const UpdateNameService = ({ navigation, route, ...props }) => {
         set_isLoading(true);
         isLoadingdRef.current = 1;
         let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
+        let userId = await DataStorageLocal.getDataFromAsync(Constant.USER_ID);
         let json = {
             ClientID: "" + clientIdTemp,
+            UserId : userId,
             FirstName: frst,
             LastName: lastName ? last : ' ',
             PhoneNumber: phnNo ? phnNo : '',
@@ -109,6 +111,7 @@ const UpdateNameService = ({ navigation, route, ...props }) => {
             NotifyToSecondaryEmail:isNotification,
             PetParentAddress : petParentAddress ? petParentAddress : {}
         };
+
         changeInfoApi(json);
 
     };

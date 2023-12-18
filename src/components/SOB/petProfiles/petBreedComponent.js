@@ -177,7 +177,8 @@ const PetBreedComponent = ({ route, ...props }) => {
         sJosnObj.current.breedName = breedName;
         firebaseHelper.logEvent(firebaseHelper.event_SOB_petBreed_submit_btn, firebaseHelper.screen_SOB_petBreed, "User selected Pet Breed", 'Breed Id : ' + breedId);
         await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));
-        navigation.navigate('PetAgeComponent');
+        //navigation.navigate('PetAgeComponent');
+        navigation.navigate('PetFoodInfoComponent');
     };
 
     const backBtnAction = () => {

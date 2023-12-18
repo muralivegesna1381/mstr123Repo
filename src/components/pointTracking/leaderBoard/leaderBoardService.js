@@ -178,7 +178,7 @@ const  LeaderBoardService = ({route, ...props }) => {
         createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);  
       } else {
         updateTimer('leaderBoard');
-        navigation.navigate("PTActivityLimitsComponent", {ptActivityLimits:ptActivityLimits});
+        navigation.navigate("PTActivityLimitsComponent", {ptActivityLimits:ptActivityLimits,campagainName:campagainName});
       }
       
     };

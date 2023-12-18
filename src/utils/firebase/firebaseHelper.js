@@ -204,6 +204,7 @@ export const event_dashboard_getMeterials_Api = 'Dboard_Get_Meterials_Api';
 export const event_dashboard_getMeterials_success = 'Dboard_Get_Meterials_Api_Success';
 export const event_dashboard_getMeterials_fail = 'Dboard_Get_Meterials_Api_Fail';
 export const event_dashboard_defaultPet_Status = 'Dboard_Get_default_pet_status';
+export const event_dashboard_CaptureImages_selection = 'Dboard_Cap_Images_Btn_Trigr';
 
 /////////////////////////// Timer Main Page //////////////////////////
 export const event_timer_go_action = 'Timer_Main_Go_Btn_Trig';
@@ -236,7 +237,7 @@ export const event_observations_view_btn = 'Obs_View_Action_Trigger';
 export const event_observation_list_api = 'Obs_List_Api';
 export const event_observation_list_api_success = 'Obs_List_Api_Success';
 export const event_observation_list_api_fail = 'Obs_List_Api_Fail';
-export const event_observation_list_Swipe_Action= 'Obs_List_Swipe_Trig';
+export const event_observation_list_Swipe_Action = 'Obs_List_Swipe_Trig';
 export const event_behaviors_api = 'Get_Behaviors_Api';
 export const event_behaviors_api_success = 'Get_Behaviors_Api_Success';
 export const event_behaviors_api_fail = 'Get_Behaviors_Api_Fail';
@@ -504,6 +505,24 @@ export const event_PLocation_Selection_btn = 'SOB_PetAdrsEditConf_Sel_Btn_Action
 export const event_menu = 'Menu_Button_Trigger';
 export const event_back_btn_action = 'Back_Button_Trigger';
 export const event_screen = "screen_visit";
+
+/////////////////////////// BFI Guide //////////////////////////
+export const event_score_submit_screen_entered = 'score_submit_screen_entered';
+export const event_score_submit_btn_clicked = 'score_submit_btn_clicked';
+export const event_bfi_score_submit_api = 'bfi_score_submit_api';
+export const event_getscore_ids_api = 'getscore_ids_api';
+export const screen_submit_bfiScore = 'submit_bfiScore';
+
+export const screen_capture_bfi = 'capture_bfi';
+export const event_add_pet_click = 'add_pet_click';
+export const event_existing_pet_clicked = 'existing_pet_clicked';
+export const event_capture_bfi_submitted = 'capture_bfi_submitted';
+export const event_capture_bfi_submitted_api = 'capture_bfi_submitted_api';
+export const event_get_pets_api = 'get_pets_api';
+export const event_get_capture_image_pos = 'get_capture_image_positions';
+export const event_submit_capture_bfi = 'submit_capture_bfi';
+export const event_image_classification_api_fails = 'image_classification_api_fails';
+
 
 export async function setUserId(userId) {
     if (isAnalyticsEnabled) {

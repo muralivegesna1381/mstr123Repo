@@ -145,6 +145,20 @@ const  PetEditUI = ({navigation,route, ...props }) => {
                                 </View>
                                 
                             </View>
+                            
+                            <View style={styles.dataViewStyle}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
+                            <Text style={styles.labelTextStyles}>{'Food Brand'}</Text>
+                            <Text style={styles.selectedDataTextStyles}>{props.petObj && props.petObj.brandName ? props.petObj.brandName : '--'}</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.dataViewStyle}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
+                            <Text style={styles.labelTextStyles}>{'Food Quantity'}</Text>
+                            <Text style={styles.selectedDataTextStyles}>{props.petObj && props.petObj.foodIntake ? props.petObj.foodIntake + " " + (props.petObj.feedUnit === 1 ? "Cups" : "Grams") : '--'}</Text>
+                        </View>
+                    </View>
 
                             <View style={styles.dataViewStyle}>
 

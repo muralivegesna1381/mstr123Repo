@@ -58,7 +58,7 @@ const  TimerWidgetUI = ({route, ...props }) => {
                 width: wp('100%'),
                 height: Platform.isPad ? hp('14%') : hp('12%'),
                 bottom: hp('45%'),
-                top:hp('24%'),}}>
+                top:hp('20.5%'),}}>
 
                 <View>
 

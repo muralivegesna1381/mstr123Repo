@@ -153,7 +153,7 @@ const  ObservationsListUI = ({route, ...props }) => {
         /> : null}
       </View>
 
-      <View style={{height:hp('58%'),}}>
+      <View style={{height:hp('66%')}}>
 
         {observationsArray && observationsArray.length > 0 ? <View style={{height:hp('5%'),width:wp('100%'),flexDirection:'row',justifyContent:'center',alignSelf:'center',alignItems:'center'}}>
           <Text style={[styles.hTextextStyle,{flex:1.2,textAlign:'center'}]}>{''}</Text>

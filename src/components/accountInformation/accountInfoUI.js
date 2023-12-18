@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
-import BottomComponent from "../../utils/commonComponents/bottomComponent";
+import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
+import BottomComponent from "../../utils/commonComponents/bottomComponent1";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from '../../utils/commonComponents/headerComponent';
 import Fonts from '../../utils/commonStyles/fonts'
@@ -43,7 +43,7 @@ const AccountInfoUi = ({ route, ...props }) => {
 
     // Logs out of the app
     const rightButtonAction = async () => {
-        props.logOutAction();
+        props.logOutAction(100);
     };
 
     // Popup ok button action
@@ -65,6 +65,10 @@ const AccountInfoUi = ({ route, ...props }) => {
         props.selectAuthentication();
     };
 
+    const deleteAccountAction = () => {
+        props.deleteAccountAction(101);
+    }
+
     return (
         
         <View style={[styles.mainComponentStyle]}>
@@ -80,11 +84,11 @@ const AccountInfoUi = ({ route, ...props }) => {
                 />
             </View>
 
-                <View style={{ alignItems: 'center', width: wp('100%'), height: hp('72%')}}>
+            <View style={{ alignItems: 'center', width: wp('100%'), height: hp('72%')}}>
                 
-                    {props.bio_Enable ? <View style={[styles.renderBckView]}>
+                {props.bio_Enable ? <View style={[styles.renderBckView]}>
 
-                      <TouchableOpacity style={{flexDirection:'row', alignItems:'center'}} onPress={() => selectAuthentication()}>
+                    <TouchableOpacity style={{flexDirection:'row', alignItems:'center'}} onPress={() => selectAuthentication()}>
 
                         <View style={{minHeight: hp('10%'),flex:1, alignItems:'center',justifyContent:'center'}}>
                           <Image source={authImg} style={[styles.imgStyle]}/>
@@ -99,12 +103,12 @@ const AccountInfoUi = ({ route, ...props }) => {
                           <Image source={tickImg} style={[styles.tickImgStyle]}/>
                         </View> : null}
 
-                      </TouchableOpacity>
+                    </TouchableOpacity>
                       
-                    </View> : null}
+                 </View> : null}
 
-                    <View style={{ marginTop: hp('2%'),height: props.bio_Enable ? hp('55%') : hp('75%')}}>
-                    <KeyboardAwareScrollView>
+                <View style={{ marginTop: hp('2%'),height: props.bio_Enable ? hp('45%') : (props.userRole === '7' ? hp('60%') : hp('70%'))}}>
+                    <ScrollView showsVerticalScrollIndicator={false}>
                         <TouchableOpacity onPress={() => btnAction("Name")}>
 
                             <View style={{ flexDirection: 'row' }}>
@@ -168,7 +172,7 @@ const AccountInfoUi = ({ route, ...props }) => {
 
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={() => btnAction("PetParentAddress")}>
+                       {props.userRole === '7' ? <TouchableOpacity onPress={() => btnAction("PetParentAddress")}>
 
                             <View style={{ flexDirection: 'row' }}>
                                 <View style={[styles.backViewStyle,{minHeight: hp('8%')}]}>
@@ -180,26 +184,38 @@ const AccountInfoUi = ({ route, ...props }) => {
                                 </View>
                             </View>
 
-                        </TouchableOpacity>
+                        </TouchableOpacity> : null}
 
-                        <View style={{alignItems:'center',marginTop: hp('4%'),}}>
+                        <View style={{alignItems:'center',marginTop: hp("2%"),bottom:0,alignSelf:'center',justifyContent:'center'}}>
                         <Text style={styles.subHeaderTextStyle}>{props.versionNumber}</Text>
                         <Text style={styles.subHeaderTextStyle}>{props.buildVersion}<Text style={styles.subHeaderTextStyle}>{props.enviName === 'tst' ? " (Testing)" : ""}</Text></Text>
                     </View>
-                        </KeyboardAwareScrollView>
-                    </View>
+                </ScrollView>
+                    
+            </View>
 
-                </View>
+        </View>
 
-            <View style={CommonStyles.bottomViewComponentStyle}>
+            {/* <View style={CommonStyles.bottomViewComponentStyle}>
                 <BottomComponent
                     rightBtnTitle={'LOG OUT'}
-                    leftBtnTitle={''}
+                    leftBtnTitle={'DELETE ACCOUNT'}
                     rigthBtnState={true}
-                    isLeftBtnEnable={false}
+                    isLeftBtnEnable={true}
                     isRightBtnEnable={true}
                     rightButtonAction={async () => rightButtonAction()}
+                    leftButtonAction={async () => deleteAccountAction()}
+                ></BottomComponent>
+            </View> */}
 
+            <View style={[CommonStyles.bottomViewComponentStyle,{height: props.userRole && props.userRole === '7' ? hp('25%') : hp('13%')}]}>
+                <BottomComponent
+                    topBtnTitle={'LOG OUT'}
+                    bottomBtnTitle={'DELETE ACCOUNT'}
+                    isDelete = {true}
+                    bottomBtnEnable = {props.userRole && props.userRole === '7' ? true : false}
+                    topButtonAction={async () => rightButtonAction()}
+                    bottomButtonAction={async () => deleteAccountAction()}
                 ></BottomComponent>
             </View>
 

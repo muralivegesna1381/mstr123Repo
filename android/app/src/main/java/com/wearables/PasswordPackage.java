@@ -25,9 +25,12 @@ public class PasswordPackage implements ReactPackage {
         //We import the module file here
         modules.add(new com.passwordenvryption.PasswordEncryption(reactContext));
         modules.add(new com.wearables.VideoCompression(reactContext));
-        modules.add(new ChatbotBridgingManager(reactContext));
+       // modules.add(new ChatbotBridgingManager(reactContext));
         modules.add(new com.wearables.QuestionnaireMediaCompression(reactContext));
         modules.add(new K4lVideoTrimmerModule(reactContext));
+        modules.add(new ZendeskChatModule(reactContext));
+        modules.add(new ImageBlueIdentification(reactContext));
+        modules.add(new ImageObjectDetection(reactContext));
         return modules;
     }
 

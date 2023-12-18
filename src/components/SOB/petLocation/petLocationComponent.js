@@ -90,15 +90,15 @@ const PetLocationComponent = ({ route, ...props }) => {
             set_petName(sJson.petName);
             set_pAddressObj(sJson.petParentObj);
 
-            if(sJson.petParentObj && sJson.petParentObj.petParentAddress && Object.keys(sJson.petParentObj.petParentAddress).length !== 0 ) {
+            if(sJson.petParentObj && sJson.petParentObj.address && Object.keys(sJson.petParentObj.address).length !== 0 ) {
 
-                let tempLine2 = sJson.petParentObj.petParentAddress.address2 && sJson.petParentObj.petParentAddress.address2 !== '' ? sJson.petParentObj.petParentAddress.address2 + ', ' : '';
-                let address = sJson.petParentObj.petParentAddress.address1 + ', ' 
+                let tempLine2 = sJson.petParentObj.address.address2 && sJson.petParentObj.address.address2 !== '' ? sJson.petParentObj.address.address2 + ', ' : '';
+                let address = sJson.petParentObj.address.address1 + ', ' 
                 + tempLine2
-                + sJson.petParentObj.petParentAddress.city + ', ' 
-                + sJson.petParentObj.petParentAddress.state+ ', '
-                + sJson.petParentObj.petParentAddress.country+ ', '
-                + sJson.petParentObj.petParentAddress.zipCode;
+                + sJson.petParentObj.address.city + ', ' 
+                + sJson.petParentObj.address.state+ ', '
+                + sJson.petParentObj.address.country+ ', '
+                + sJson.petParentObj.address.zipCode;
 
                 set_pAddress(address);
             }
@@ -118,22 +118,22 @@ const PetLocationComponent = ({ route, ...props }) => {
             set_petName(petObject.petName);
         }
         
-        if(pParentObj && Object.keys(pParentObj.petParentAddress).length !== 0) {
+        if(pParentObj && Object.keys(pParentObj.address).length !== 0) {
 
             let address = '';
-            if(pParentObj.petParentAddress.address2 && pParentObj.petParentAddress.address2 !== '') {
-                address = pParentObj.petParentAddress.address1 + ', ' 
-                + pParentObj.petParentAddress.city + ', ' 
-                + pParentObj.petParentAddress.state+ ', '
-                + pParentObj.petParentAddress.country+ ', '
-                + pParentObj.petParentAddress.zipCode;
+            if(pParentObj.address.address2 && pParentObj.address.address2 !== '') {
+                address = pParentObj.address.address1 + ', ' 
+                + pParentObj.address.city + ', ' 
+                + pParentObj.address.state+ ', '
+                + pParentObj.address.country+ ', '
+                + pParentObj.address.zipCode;
             } else {
-                address = pParentObj.petParentAddress.address1 + ', ' 
-                + pParentObj.petParentAddress.address2 + ', '
-                + pParentObj.petParentAddress.city + ', ' 
-                + pParentObj.petParentAddress.state+ ', '
-                + pParentObj.petParentAddress.country+ ', '
-                + pParentObj.petParentAddress.zipCode;
+                address = pParentObj.address.address1 + ', ' 
+                + pParentObj.address.address2 + ', '
+                + pParentObj.address.city + ', ' 
+                + pParentObj.address.state+ ', '
+                + pParentObj.address.country+ ', '
+                + pParentObj.address.zipCode;
             }
 
             set_pAddress(address);
@@ -149,7 +149,7 @@ const PetLocationComponent = ({ route, ...props }) => {
 
         let ppAddress = {}
         if(addressType.current === 'same') {
-            ppAddress = sJosnObj.current.petParentObj.petParentAddress;
+            ppAddress = sJosnObj.current.petParentObj.address;
         } else {
             ppAddress = sJosnObj.current.petLocationNew;
         }

@@ -1,4 +1,4 @@
-import React, { useState,useRef } from 'react';
+import React, { useState,useRef, useEffect } from 'react';
 import {View,BackHandler} from 'react-native';
 import QuestionnaireStudyUI from './questionnaireStudyUI';
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
@@ -21,6 +21,7 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
     const [isLoading, set_isLoading] = useState(false);
     const [questionnaireData, set_questionnaireData] = useState(undefined);
     const [date, set_Date] = useState(new Date());
+    const [isFrom, set_isFrom] = useState(undefined);
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
@@ -53,6 +54,14 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
         };
 
     }, [navigation]);
+
+    useEffect(() => {
+
+      if(route.params?.isFrom){
+          set_isFrom(route.params?.isFrom);
+      }
+
+    }, [route.params?.isFrom]);
 
     const handleBackButtonClick = () => {
         navigateToPrevious();
@@ -147,7 +156,7 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
     const navigateToPrevious = () => { 
       if(isLoadingdRef.current === 0 && popIdRef.current === 0){
         firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_questionnaire_study, "User clicked on back button to navigate to DashBoardService", '');
-        navigation.navigate("DashBoardService");  
+        navigation.pop();
       }    
     };
 

@@ -70,7 +70,7 @@ const  BeaconsInitialComponent = ({navigation,route, ...props }) => {
 
       if(popIdRef.current === 0){
         firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_beacons_instructions, "User clicked on back button to navigate to DashBoardService", '');
-        navigation.navigate('DashBoardService');  
+        navigation.navigate('MenuComponent');  
       }
         
     };

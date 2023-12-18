@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TouchableOpacity,Image,FlatList, ImageBackground,ActivityIndicator} from 'react-native';
+import {View,StyleSheet,Text,TouchableOpacity,Image,FlatList, ImageBackground,ActivityIndicator,Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import fonts from '../../../utils/commonStyles/fonts'
@@ -51,7 +51,7 @@ const  CampaignUi = ({route, ...props }) => {
 
               <View style={item.petId === leaderPetId ? [styles.bgViewStyle,{backgroundColor:'#6BC105'}] : [styles.bgViewStyle]}>
                 <Text style={item.petId === leaderPetId ? [styles.rankTxtStyle,{color:'white'}] : [styles.rankTxtStyle]}>{item.rank}</Text>
-                <ImageBackground style={styles.bgViewImgStyle} source= {defaultPetImg}>
+                <ImageBackground style={Platform.isPad ? [styles.bgViewImgStyle,{width:wp('6%'),}] : [styles.bgViewImgStyle]} source= {defaultPetImg}>
                   {item && item.petPhotoUrl && item.petPhotoUrl!=="" ? <ImageBackground>
                     <ImageBackground style={styles.bgViewImgStyle} source= {{uri: item.petPhotoUrl}} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => set_imgLoader(false)}>
                       {imgLoader ? <ActivityIndicator size='small' color="grey"/> : null}

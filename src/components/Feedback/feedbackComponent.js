@@ -97,7 +97,7 @@ const FeedbackComponent = ({navigation, route, ...props }) => {
       // Navigates to Dashboard
     const navigateToPrevious = () => {  
       if(isLoadingdRef.current === 0 && popIdRef.current === 0){
-        navigation.navigate('DashBoardService');
+        navigation.pop();
       }      
     };
 

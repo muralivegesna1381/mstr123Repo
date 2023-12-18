@@ -14,10 +14,8 @@ import {View,Alert,Platform,NativeModules,NativeEventEmitter} from 'react-native
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 import CommonStyles from './../../utils/commonStyles/commonStyles';
 import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
-import BuildEnvJAVA from './../../config/environment/enviJava.config';
 import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
 
-const EnvironmentJava = JSON.parse(BuildEnvJAVA.EnvironmentJava());
 var RNFS = require('react-native-fs');
 
 const VideoUploadComponent = ({navigation, route,...props }) => {

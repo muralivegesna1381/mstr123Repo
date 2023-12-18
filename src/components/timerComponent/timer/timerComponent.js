@@ -15,6 +15,7 @@ const TimerComponent = ({navigation, route, ...props }) => {
     const [activityText, set_activityText] = useState(undefined);
     const [date, set_Date] = useState(new Date());
     const [activeTimer, set_activeTimer] = useState(false);
+    const [isFrom, set_isFrom] = useState(undefined);
 
     useEffect(() => {
 
@@ -50,10 +51,14 @@ const TimerComponent = ({navigation, route, ...props }) => {
         }
 
         if(route.params?.activityText){
-            set_activityText(route.params?.activityText)
+            set_activityText(route.params?.activityText);
+        }
+
+        if(route.params?.isFrom){
+            set_isFrom(route.params?.isFrom);
         }
         
-    }, [route.params?.timerPetsArray,route.params?.duration,route.params?.activityText]);
+    }, [route.params?.timerPetsArray,route.params?.duration,route.params?.activityText,route.params?.isFrom]);
   
     useEffect(() => {
         
@@ -77,7 +82,13 @@ const TimerComponent = ({navigation, route, ...props }) => {
     };
 
     const navigateToPrevious = () => {  
-        navigation.navigate('DashBoardService');
+
+        if(isFrom === 'Dashboard') {
+            navigation.navigate('DashBoardService');
+        } else {
+            navigation.navigate('MenuComponent');
+        }
+        
     }
 
     const goBtnAction = async () => {
@@ -97,7 +108,7 @@ const TimerComponent = ({navigation, route, ...props }) => {
 
     const minmizeBtnAction = () => {
         firebaseHelper.logEvent(firebaseHelper.event_timer_minimize_time, firebaseHelper.screen_timer_main, "Timer Minimize button clicked", "");
-        navigateToPrevious();
+        navigation.navigate('DashBoardService');
     };
 
     const timerLogsBtnAction = async () => {

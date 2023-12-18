@@ -15,6 +15,7 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
     const [selectedPet, set_selectedPet] = useState(undefined);
     const [nxtBtnEnable, set_nxtBtnEnable] = useState(undefined);
     const [selectedIndex, set_selectedIndex] = useState(undefined);
+    const [selectedPName, set_selectedPName] = useState(undefined);
     const [isPopUp, set_isPopUp] = useState(false);
     const [popUpMessage, set_popUpMessage] = useState(undefined);
     const [popUpAlert, set_popUpAlert] = useState(undefined);
@@ -58,6 +59,7 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
                     if(duplicates[i].petID === route.params?.defaultPetObj.petID){
                         set_selectedPet(duplicates[i]);
                         set_selectedIndex(i);
+                        set_selectedPName(duplicates[i].petName);
                         set_nxtBtnEnable(true);                    
                     }
                 }
@@ -178,6 +180,7 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
             popUpAlert = {popUpAlert}
             isPopUp = {isPopUp}
             fromScreen = {fromScreen}
+            selectedPName = {selectedPName}
             navigateToPrevious = {navigateToPrevious}
             submitAction = {submitAction}
             selectPetAction = {selectPetAction}

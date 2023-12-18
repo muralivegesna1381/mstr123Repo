@@ -125,31 +125,62 @@ const LoginComponent = ({ navigation, route, ...props }) => {
 
   };
 
-  const setBasicValues = async (emailValue, clientIdValue, tokenValue,userP) => {
-    await DataStorageLocal.saveDataToAsync(Constant.APP_TOKEN, "" + tokenValue);
-    await DataStorageLocal.saveDataToAsync(Constant.CLIENT_ID, "" + clientIdValue);
-    await DataStorageLocal.saveDataToAsync(Constant.USER_EMAIL_LOGIN, "" + emailValue);
+  const setBasicValues = async (userDetails,userP) => {
+
+    await DataStorageLocal.saveDataToAsync(Constant.APP_TOKEN, "" + userDetails.Token);
+    await DataStorageLocal.saveDataToAsync(Constant.CLIENT_ID, "" + userDetails.ClientID);
+    await DataStorageLocal.saveDataToAsync(Constant.USER_EMAIL_LOGIN, "" + userDetails.Email);
     await DataStorageLocal.saveDataToAsync(Constant.USER_PSD_LOGIN, userP);
-    set_clientId(clientIdValue);
-    set_tokenValue(tokenValue);
-    firebaseHelper.setUserId(emailValue + "");
-    firebaseHelper.setUserProperty(emailValue + "", clientIdValue + "");
-    getLoginPets(clientIdValue);
+    await DataStorageLocal.saveDataToAsync(Constant.USER_ROLE_ID, userDetails.RoleId.toString());
+    await DataStorageLocal.saveDataToAsync(Constant.USER_ROLE_DETAILS, JSON.stringify(userDetails));
+    await DataStorageLocal.saveDataToAsync(Constant.USER_ID, userDetails.UserId.toString());
+    
+    if(userDetails && userDetails.RolePermissions && userDetails.RolePermissions.length > 0) {
+      let capturePermission = await userDetails.RolePermissions.filter(item => parseInt(item.menuId) === 67);
+      if(capturePermission && capturePermission.length > 0 && capturePermission[0].menuId === 67) {
+        await DataStorageLocal.saveDataToAsync(Constant.USER_ROLE_CAPTURE_IMGS, capturePermission[0].menuId.toString());
+      } else {
+        await DataStorageLocal.removeDataFromAsync(Constant.USER_ROLE_CAPTURE_IMGS);
+      }
+      
+    }
+
+    set_clientId(userDetails.ClientID);
+    set_tokenValue(userDetails.Token);
+    firebaseHelper.setUserId(userDetails.Email + "");
+    firebaseHelper.setUserProperty(userDetails.Email + "", userDetails.ClientID + "");
+
+    if(userDetails.RoleId && userDetails.RoleId === 7) {
+      getLoginPets(userDetails.ClientID,userDetails.UserId);
+    } else if(userDetails.RoleId && userDetails.RoleId === 9) {
+      isLoadingdRef.current = 0;
+      set_isLoading(false);
+      navigation.navigate("BFIUserDashboardComponent");
+      Apolloclient.client.writeQuery({ query: Queries.LOG_OUT_APP, data: { data: { isLogOut: 'logOut', __typename: 'LogOutApp' } },});
+    } else if(userDetails.RoleId && userDetails.RoleId === 8) {
+      isLoadingdRef.current = 0;
+      set_isLoading(false);
+      navigation.navigate('PetListBFIScoringScreen');
+    } else {
+      isLoadingdRef.current = 0;
+      set_isLoading(false);
+      navigation.navigate("DashBoardService");
+    } 
+
   };
 
   // Getting the Pets details of the user from backend
-  const getLoginPets = async (client) => {
+  const getLoginPets = async (client,userId) => {
     
     trace_Login_Get_Pets_API_Complete = await perf().startTrace('t_Login_Screen_Get_Pets_API');
     let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
     set_isLoading(true);
     isLoadingdRef.current = 1;
-    
+
     let loginPetServiceCallsObj = await ServiceCalls.getPetParentPets(client,token);
     set_isLoading(false);
     isLoadingdRef.current = 0;
     stopFBTraceGetPets();
-
     if(loginPetServiceCallsObj && loginPetServiceCallsObj.statusData){
 
       if(loginPetServiceCallsObj && loginPetServiceCallsObj.responseData){
@@ -159,7 +190,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
         if (loginPetServiceCallsObj.responseData.length > 0) {
           set_firstTimeUser(false);
           isFirstTime.current = false;
-          saveFirstTimeUser(false,client,token);
+          saveFirstTimeUser(false,client,token,userId);
           set_isLoading(false);
           isLoadingdRef.current = 0;
           saveUserLogStatus();
@@ -168,7 +199,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
           firebaseHelper.logEvent(firebaseHelper.event_login_getPets_success, firebaseHelper.screen_login, "Login Getpets Service Success", 'User Total Pets : ' + '0');
           isFirstTime.current = true;
           set_firstTimeUser(true);
-          saveFirstTimeUser(true, client,token);
+          saveFirstTimeUser(true, client,token,userId);
           saveUserLogStatus();        
         }
       
@@ -252,20 +283,20 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   }
 
   // When user has no pets, saves the status as First time user
-  const saveFirstTimeUser = async (value, client,token) => {
+  const saveFirstTimeUser = async (value, client,token,userId) => {
 
     await DataStorageLocal.saveDataToAsync(Constant.IS_FIRST_TIME_USER, JSON.stringify(value));
-    getUserDetailsDB(client,token);
+    getUserDetailsDB(client,token,userId);
 
   };
 
   // Api to fetch the user details
-  const getUserDetailsDB = async (client,token) => {
+  const getUserDetailsDB = async (client,token,userId) => {
 
     set_isLoading(true);
     isLoadingdRef.current = 1;
     let json = {
-      ClientID: "" + client,
+      ClientID: client,
     };
     trace_Login_Get_UserDetails_API_Complete = await perf().startTrace('t_Login_Screen_Get_UserDetails_API');
     let userDetailsServiceObj = await ServiceCalls.getClientInfo(json,token);
@@ -332,7 +363,6 @@ const LoginComponent = ({ navigation, route, ...props }) => {
     set_isLoading(true);
     isLoadingdRef.current = 1;
     set_loaderMsg(Constant.LOGIN_LOADER_MSG);
-
     let json = {
       Email: email,
       Password: psd,
@@ -347,9 +377,20 @@ const LoginComponent = ({ navigation, route, ...props }) => {
 
     if(loginServiceObj && loginServiceObj.statusData && loginServiceObj.responseData){
 
-      setBasicValues(loginServiceObj.responseData.email, loginServiceObj.responseData.clientId, loginServiceObj.responseData.tokenValue,psd);
-      firebaseHelper.logEvent(firebaseHelper.event_login_success, firebaseHelper.screen_login, "Login Service Success", 'email : ', loginServiceObj.responseData.email);
-        
+      if(loginServiceObj.responseData.userDetails && loginServiceObj.responseData.userDetails.RolePermissions.length === 0) {
+
+        firebaseHelper.logEvent(firebaseHelper.event_login_fail, firebaseHelper.screen_login, "Login Service Fail", 'Invali Credentials');
+        createPopup(Constant.LOGIN_FAILED_ALERT,Constant.LOGIN_FAILED_MSG,'OK',true,false,true,1,0);
+        set_isLoading(false);
+        isLoadingdRef.current = 0;
+
+      } else {
+
+        setBasicValues(loginServiceObj.responseData.userDetails,psd);
+        firebaseHelper.logEvent(firebaseHelper.event_login_success, firebaseHelper.screen_login, "Login Service Success", 'email : ', loginServiceObj.responseData.userDetails.Email);
+
+      }
+
     } else {
 
       firebaseHelper.logEvent(firebaseHelper.event_login_fail, firebaseHelper.screen_login, "Login Service Fail", 'Invali Credentials');
@@ -479,6 +520,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   };
 
   const backBtnAction = () => {
+
     if(isLoadingdRef.current === 0 && popIdRef.current === 0){
       // firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_login, "User clicked on back button to navigate to WelcomeComponent", '');
       navigation.navigate("WelcomeComponent");
@@ -510,7 +552,6 @@ const LoginComponent = ({ navigation, route, ...props }) => {
 
     let userEmail = await DataStorageLocal.getDataFromAsync(Constant.USER_EMAIL_LOGIN);
     let userPsd = await DataStorageLocal.getDataFromAsync(Constant.USER_PSD_LOGIN);
-  
     const rnBiometrics = new ReactNativeBiometrics({ allowDeviceCredentials: true });
     rnBiometrics.biometricKeysExist().then((resultObject) => {
       const { keysExist } = resultObject

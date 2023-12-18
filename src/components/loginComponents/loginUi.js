@@ -59,7 +59,7 @@ const  LoginUI = ({route, ...props }) => {
     useEffect(() => {
       if (logOutdata && logOutdata.data.__typename === 'LogOutApp' && logOutdata.data.isLogOut === 'logOut') {
         set_userEmail(null);
-        set_userPswd(undefined);
+        set_userPswd(null);
         set_isHidePassword(true);
       }
     }, [logOutdata]);
@@ -220,15 +220,15 @@ const  LoginUI = ({route, ...props }) => {
       </View> 
 
       <View style={CommonStyles.bottomViewComponentStyle}>
-                <BottomComponent
-                    rightBtnTitle = {'LOGIN'}
-                    leftBtnTitle  = {'RESET'}
-                    rigthBtnState = {isEmailValid ? true : false}
-                    isLeftBtnEnable = {false}
-                    isRightBtnEnable = {true}
-                    rightButtonAction = {async () => rightButtonAction()}
-                    leftButtonAction = {async () => leftButtonAction()}
-                ></BottomComponent>
+        <BottomComponent
+          rightBtnTitle = {'LOGIN'}
+          leftBtnTitle  = {'RESET'}
+          rigthBtnState = {isEmailValid ? true : false}
+          isLeftBtnEnable = {false}
+          isRightBtnEnable = {true}
+          rightButtonAction = {async () => rightButtonAction()}
+          leftButtonAction = {async () => leftButtonAction()}
+        ></BottomComponent>
       </View>   
 
       {isPopUp ? <View style={CommonStyles.customPopUpStyle}>

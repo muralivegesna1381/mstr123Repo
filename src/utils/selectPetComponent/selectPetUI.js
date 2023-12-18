@@ -11,26 +11,27 @@ const  SelectPetUI = ({route, ...props }) => {
     const [petsArray, set_petsArray] = useState(undefined);
     const [selectIndex, set_selectIndex] = useState(undefined);
     const [imgLoader, set_imgLoader] = useState([]);
-
+    const flatListRef = React.useRef();
     let indexArray = useRef([]);
 
     useEffect(() => {
         set_petsArray(props.petsArray);
         set_selectIndex(props.selectedIndex);
+        if(props.selectedIndex && props.selectedPName) {
+            scrollToIndexInitial(props.selectedIndex,props.selectedPName,props.petsArray);
+        }
         
     }, [props.petsArray,props.selectedIndex]);
 
     const selectPetAction = (item,index) => {
-
         set_selectIndex(index);
         props.selectPetAction(item);
-
-    }
+    };
 
     const onloadStarting = (index) => {
         indexArray.current.push(index);
         set_imgLoader(true);
-    }
+    };
 
     const onloadEnding = (index) => {
         
@@ -39,7 +40,31 @@ const  SelectPetUI = ({route, ...props }) => {
             indexArray.current.splice(index1, 1);
         }
         set_imgLoader(false);
-    }
+    };
+
+      // Scrolls to selected pet
+    const scrollToIndexInitial = (index,pName,pArray) => {
+
+        setTimeout(() => {  
+            scrollToIndexSearch(pArray); 
+        }, 1000); 
+
+    };
+
+    // Scrolls to selected pet from search
+    const scrollToIndexSearch = (pArray) => {
+
+        setTimeout(() => {
+
+            if(pArray) {
+                var temp = pArray.findIndex(item => item.petName === props.selectedPName);
+                let indexNew = parseInt(temp / 3);
+                flatListRef.current.scrollToIndex({ index: indexNew });
+            }
+            
+        }, 100);
+
+      };
 
     return (
         <View style={[CommonStyles.mainComponentStyle]}>
@@ -54,6 +79,7 @@ const  SelectPetUI = ({route, ...props }) => {
             <View style={{width:wp('90%'),minHeight:hp('45%'),alignSelf:'center'}}>
 
                 <FlatList
+                    ref={flatListRef}
                     style={styles.flatcontainer}
                     data={petsArray}
                     showsVerticalScrollIndicator={false}

@@ -4,7 +4,7 @@ import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-nati
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
 
-const BottomComponent1 = ({navigation,  topBtnTitle, bottomBtnTitle, isBottom, ...props }) => {
+const BottomComponent1 = ({navigation, topBtnTitle, bottomBtnTitle, isDelete, bottomBtnEnable,...props }) => {
 
     useEffect (() => {
     },[]);
@@ -24,8 +24,8 @@ const BottomComponent1 = ({navigation,  topBtnTitle, bottomBtnTitle, isBottom, .
                 <Text style={[styles.topBtnTextStyle]}>{topBtnTitle}</Text>
             </TouchableOpacity>
 
-            {!isBottom ? <TouchableOpacity style={[styles.bottomButtonstyle]} onPress={() => {bottomButtonAction()}}>
-                <Text style={[styles.bottomBtnTextStyle]}>{bottomBtnTitle}</Text>
+            {bottomBtnEnable ? <TouchableOpacity style={[styles.bottomButtonstyle,{backgroundColor:isDelete ? 'red' : '#E8E8EA'}]} onPress={() => {bottomButtonAction()}}>
+                <Text style={[styles.bottomBtnTextStyle,{color:isDelete ? 'white' : 'black'}]}>{bottomBtnTitle}</Text>
             </TouchableOpacity> : null}
             
         </View>
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
         borderRadius: hp("0.5%"),
         justifyContent: "center",
         alignItems:'center',
-        borderColor:'#333333',
+        // borderColor:'red',
         borderWidth:1.0,
         marginVertical:wp('2%'),
       },
