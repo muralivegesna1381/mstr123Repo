@@ -5,7 +5,6 @@
  * @format
  * @flow strict-local
  */
-
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Alert, StatusBar, Platform } from 'react-native';
 import { ApolloProvider } from '@apollo/react-hooks';
@@ -36,7 +35,6 @@ import "./ignoreWarnings";
 const App = () => {
 
   useEffect(() => {
-
     checkPermission();
     onAppBootstrap();
     messageListener();
