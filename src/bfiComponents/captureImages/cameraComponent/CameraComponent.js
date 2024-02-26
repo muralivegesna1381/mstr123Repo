@@ -5,6 +5,7 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-na
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import fonts from '../../../utils/commonStyles/fonts';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const CameraComponent = ({ navigation, route, ...props }) => {
     const camera = useRef(null);
@@ -12,11 +13,12 @@ const CameraComponent = ({ navigation, route, ...props }) => {
     const [cameraFlash, set_CameraFlash] = useState('off');
     const [cameraHDR, set_CameraHDR] = useState(false);
     const [cameraZoom, set_cameraZoom] = useState(false);
+    const [cameraZoomValue, set_cameraZoomValue] = useState(1);
     const [cameraNightMode, set_cameraNightMode] = useState(false);
+    const [fullBodyFlip, set_fullBodyFlip] = useState(false);
 
     const devices = useCameraDevices()
     const device = devices[cameraFlip];
-
     const supportsCameraFlipping = useMemo(() => devices.back != null && devices.front != null, [devices.back, devices.front]);
     const supportsFlash = device?.hasFlash ?? false;
 
@@ -42,10 +44,20 @@ const CameraComponent = ({ navigation, route, ...props }) => {
             //Get Path from camera
             const photo = await camera.current.takePhoto({});
             const photoPath = 'file://' + photo.path
-            AsyncStorage.setItem("CAMERA_PATH", photoPath);
-            navigation.navigate('PetImageCaptureComponent', {
-                indexPos: route.params?.indexPos,
-                imagePath: photoPath
+            ImagePicker.openCropper({
+                path: 'file://' + photo.path,
+                width: 400,
+                height: 500,
+                compressImageQuality: 1
+            }).then(image => {
+                navigation.navigate('PetImageCaptureComponent', {
+                    indexPos: route.params?.indexPos,
+                    imagePath: photoPath,
+                    imageCroppedPath: image.path
+                })
+
+            }).catch((error) => {
+                navigation.pop()
             })
         }
     };
@@ -97,12 +109,15 @@ const CameraComponent = ({ navigation, route, ...props }) => {
         navigation.pop()
     };
 
+    const updateZoomValue = (flag) => {
+        if (flag) set_cameraZoomValue(cameraZoomValue + 0.25)
+        else set_cameraZoomValue(cameraZoomValue - 0.25)
+    };
+
     if (device == null) { return <Text>Loading</Text> }
     else {
         return (
-
             <View style={styles.container}>
-
                 <Camera
                     ref={camera}
                     style={StyleSheet.absoluteFill}
@@ -111,36 +126,54 @@ const CameraComponent = ({ navigation, route, ...props }) => {
                     orientation="portrait"
                     device={device}
                     torch={cameraFlash}
-                    enableZoomGesture={true}
+                    enableZoomGesture={false}
                     hdr={cameraHDR}
+                    zoom={cameraZoomValue}
                     lowLightBoost={cameraNightMode}
                 />
+
                 <View style={styles.captionFrame}>
-                    <Image style={styles.imageStyleFrame} source={frameImgArray[route.params?.indexPos]} />
+                    <View style={{ flexDirection: 'row', width: wp('95%'), height: hp('5%') }}>
+                        {route.params?.indexPos === 5 ? <View style={{ alignItems: 'flex-start' }}>
+                            <TouchableOpacity onPress={() => { set_fullBodyFlip(!fullBodyFlip) }}>
+                                <Image style={styles.imageCloseStyle} source={require('./../../../../assets/images/bfiGuide/png/ic_flip.png')} />
+                            </TouchableOpacity>
+                        </View> : null}
+                        <View style={{ alignItems: 'flex-end', flex: 1 }}>
+                            <TouchableOpacity onPress={() => { navigation.pop() }}>
+                                <Image style={styles.imageCloseStyle} source={require('./../../../../assets/images/otherImages/svg/timerCloseIcon.svg')} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <Image style={styles.imageStyleFrame} source={fullBodyFlip ? require('./../../../../assets/images/bfiGuide/png/dog_frame_fullbody2.png') : frameImgArray[route.params?.indexPos]} />
                 </View>
 
                 <View style={styles.caption}>
                     <View style={[styles.cameraComponent]}>
-                        {supportsCameraFlipping && (
+                        {/* {supportsCameraFlipping && (
                             <TouchableOpacity onPress={() => { onFlipCameraPressed() }}>
-                                <Image style={styles.imageStyle} source={require('./../../../../assets/images/bfiGuide/png/ic_camera.png')} />
-                            </TouchableOpacity>)}
+                                <Image style={styles.imageStyle} source={require('./../../../../assets/images/bfiGuide/svg/ic_camera.svg')} />
+                            </TouchableOpacity>)} */}
 
-                        {supportsFlash && (
+                        {cameraFlip === 'back' && supportsFlash ?
                             <TouchableOpacity onPress={() => { onFlashPressed() }}>
-                                <Image style={styles.imageStyle} source={require('./../../../../assets/images/bfiGuide/png/flash.png')} />
-                            </TouchableOpacity>)}
+                                <Image style={styles.imageStyle} source={cameraFlash === "on" ? require('./../../../../assets/images/bfiGuide/svg/flash.svg') : require('./../../../../assets/images/bfiGuide/svg/flash_off.svg')} />
+                            </TouchableOpacity> : null}
 
                         <TouchableOpacity onPress={() => { set_CameraHDR((h) => !h) }}>
-                            <Image style={styles.imageStyle} source={require('./../../../../assets/images/bfiGuide/png/hdr.png')} />
+                            <Image style={styles.imageStyle} source={cameraHDR ? require('./../../../../assets/images/bfiGuide/svg/hdr.svg') : require('./../../../../assets/images/bfiGuide/svg/hdr_off.svg')} />
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={() => { set_cameraZoom(!cameraZoom) }}>
-                            <Image style={styles.imageStyle} source={require('./../../../../assets/images/bfiGuide/png/hands.png')} />
-                        </TouchableOpacity>
+                        {cameraZoomValue < 6 ? <TouchableOpacity onPress={() => { updateZoomValue(true) }}>
+                            <Image style={styles.imageStyle} source={require('./../../../../assets/images/bfiGuide/png/zoom_plus.png')} />
+                        </TouchableOpacity> : null}
+
+                        {cameraZoomValue > 1 ? <TouchableOpacity onPress={() => { updateZoomValue(false) }}>
+                            <Image style={styles.imageStyle} source={require('./../../../../assets/images/bfiGuide/png/zoom_minus.png')} />
+                        </TouchableOpacity> : null}
 
                         <TouchableOpacity onPress={() => { set_cameraNightMode(!cameraNightMode) }}>
-                            <Image style={styles.imageStyle} source={require('./../../../../assets/images/bfiGuide/png/night_mode.png')} />
+                            <Image style={styles.imageStyle} source={cameraNightMode ? require('./../../../../assets/images/bfiGuide/svg/moon.svg') : require('./../../../../assets/images/bfiGuide/svg/moon_off.svg')} />
                         </TouchableOpacity>
                     </View>
                     <Text style={styles.headerText}>Please place your pet in camera frame</Text>
@@ -148,7 +181,7 @@ const CameraComponent = ({ navigation, route, ...props }) => {
                         <Image style={styles.imageCameraDoneStyle} source={require('./../../../../assets/images/bfiGuide/png/camera_done.png')} />
                     </TouchableOpacity>
                 </View>
-            </View>
+            </View >
 
         )
     }
@@ -168,10 +201,10 @@ const styles = StyleSheet.create({
         width: wp('100%'),
         height: hp('15%'),
         position: 'absolute', //Here is the trick
-        bottom: hp('1%'), //Here is the trick
+        bottom: hp('0.2%'), //Here is the trick
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: hp('2%')
+        marginTop: hp('2%'),
     },
     headerText: {
         color: '#ffffff',
@@ -194,9 +227,9 @@ const styles = StyleSheet.create({
 
     imageStyleFrame: {
         width: wp('90%'),
-        height: hp('75%'),
+        height: hp('70%'),
         resizeMode: 'contain',
-        marginHorizontal: wp('10%'),
+        marginTop: hp('-3%')
     },
 
     textStyle: {
@@ -206,7 +239,8 @@ const styles = StyleSheet.create({
     },
 
     cameraComponent: {
-        flexDirection: "row"
+        flexDirection: "row",
+        marginBottom: hp('0.5%')
     },
 
     mainComponentStyle: {
@@ -261,10 +295,17 @@ const styles = StyleSheet.create({
     },
 
     imageStyle: {
-        width: wp('6%'),
-        height: hp('6%'),
+        aspectRatio: 1,
+        height: hp('3.5%'),
         resizeMode: 'contain',
-        marginHorizontal: wp('3%')
+        marginHorizontal: wp('3.5%'),
+        tintColor: 'white'
+    },
+
+    imageCloseStyle: {
+        aspectRatio: 1,
+        height: hp('4%'),
+        resizeMode: 'contain', paddingHorizontal: wp("7%")
     },
 
     imageCameraDoneStyle: {

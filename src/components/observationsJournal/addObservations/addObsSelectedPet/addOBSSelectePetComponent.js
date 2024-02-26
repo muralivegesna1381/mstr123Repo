@@ -25,6 +25,7 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
 
     let fromScreen1 = useRef(undefined);
 
+    // Initial the class. Gets the pets list
     React.useEffect(() => {
 
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick); 
@@ -48,6 +49,7 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
         };
       }, []);
 
+      // setting the values to local variables - Pets need to be shown
     useEffect(() => {
 
         if(route.params?.petsArray){
@@ -59,7 +61,7 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
                     if(duplicates[i].petID === route.params?.defaultPetObj.petID){
                         set_selectedPet(duplicates[i]);
                         set_selectedIndex(i);
-                        set_selectedPName(duplicates[i].petName);
+                        set_selectedPName(duplicates[i].petName)
                         set_nxtBtnEnable(true);                    
                     }
                 }
@@ -83,6 +85,7 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
         return uniqueArray;
     };
 
+    // Firebase traces
     const observationSelectPetStart = async () => {
         trace_inObservationsList = await perf().startTrace('t_inAddObservationSelectPet');
     };
@@ -91,6 +94,7 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
         await trace_inObservationsList.stop();
     };
 
+    // Navigation from. This screen is a common class for Quick and Observation flows
     const getObsDetails = async () => {
 
         let oJson = await DataStorageLocal.getDataFromAsync(Constant.OBSERVATION_DATA_OBJ);
@@ -102,6 +106,7 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
         }
       };
 
+      // Moves to next screen and checks Internet connectivity
     const submitAction = async () => {
 
         let internet = await internetCheck.internetCheck();
@@ -120,7 +125,11 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
                 let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0,15) : selectedPet.petName;
                 let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0,20) : selectedPet.studyName;
                 // fileName = pName +'_'+sName+'_'+selectedPet.devices[0].deviceNumber+'_'+obsObject.quickVideoDateFile;
-                fileName = pName.replace(/_/g, ' ') +'_'+sName.replace(/_/g, ' ')+'_'+selectedPet.devices[0].deviceNumber+'_'+obsObject.quickVideoDateFile;
+                if(selectedPet.devices && selectedPet.devices.length > 0) {
+                    fileName = pName.replace(/_/g, ' ') +'_'+sName.replace(/_/g, ' ')+'_'+selectedPet.devices[0].deviceNumber+'_'+obsObject.quickVideoDateFile;
+                } else {
+                    fileName = pName.replace(/_/g, ' ') +'_'+sName.replace(/_/g, ' ')+'_'+"NO_DEVICE"+'_'+obsObject.quickVideoDateFile;
+                }
                 obsObject.mediaArray[0].fileName = fileName;
                 obsObject.quickVideoFileName = fileName;
             }
@@ -145,11 +154,17 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
             }
 
             await DataStorageLocal.saveDataToAsync(Constant.OBSERVATION_DATA_OBJ,JSON.stringify(obsObject));
-            navigation.navigate('ObservationComponent');
+            if(fromScreen1.current === "quickVideo") {
+                navigation.navigate('ObservationComponent');
+            } else {
+                navigation.navigate('CategorySelectComponent');
+            }
+                        
         }
         
     }
 
+    // Navigates to previous screen
     const navigateToPrevious = () => {      
         
         if(fromScreen1.current==='quickVideo'){
@@ -160,11 +175,13 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
           
     }
 
+    // In search dropdown, After selecting the pet sets the pet to observation
     const selectPetAction = (item) => {
        set_selectedPet(item);
        set_nxtBtnEnable(true);
     };
 
+    // Popup Actions
     const popOkBtnAction = () => {
         set_popUpAlert(undefined);
         set_popUpMessage(undefined);
@@ -176,11 +193,11 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
             petsArray = {petsArray}
             nxtBtnEnable = {nxtBtnEnable}
             selectedIndex = {selectedIndex}
+            selectedPName = {selectedPName}
             popUpMessage = {popUpMessage}
             popUpAlert = {popUpAlert}
             isPopUp = {isPopUp}
             fromScreen = {fromScreen}
-            selectedPName = {selectedPName}
             navigateToPrevious = {navigateToPrevious}
             submitAction = {submitAction}
             selectPetAction = {selectPetAction}

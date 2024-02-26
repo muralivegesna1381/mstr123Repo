@@ -81,6 +81,7 @@ const SensorInitialPNQComponent = ({navigation, route, ...props }) => {
         set_isLoading(true);
         let defaultPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
         defaultPet = JSON.parse(defaultPet);
+        
         let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
         let sobPets = await DataStorageLocal.getDataFromAsync(Constant.SAVE_SOB_PETS); 
         sobPets = JSON.parse(sobPets);
@@ -153,9 +154,9 @@ return (
             <View style={styles.mainViewStyle}>
 
                 <View style={styles.topViewStyle}>
-                    <Text style={styles.headerStyle}>{'Allow Push Notifications'}</Text>
+                    <Text style={styles.headerStyle}>{'Allow Sensor Battery Notifications'}</Text>
                     <Text style={styles.subHeaderStyle}>{'Know about '}<Text style={styles.subHeaderStyle}>{petName}
-                    <Text style={styles.subHeaderStyle}>{"'s"}</Text><Text style={styles.subHeaderStyle}>{" health and activity with simple alerts"}</Text>
+                    <Text style={styles.subHeaderStyle}>{"'s"}</Text><Text style={styles.subHeaderStyle}>{" sensor battery related updates with simple alerts"}</Text>
                     </Text></Text>
                 </View>
 

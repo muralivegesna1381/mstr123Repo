@@ -84,11 +84,26 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
 
   }, []);
 
+  // useEffect(() => {
+
+  //   if (route.params?.defaultPetObj) {
+  //     set_defaultPetObj(route.params?.defaultPetObj);
+  //   }
+  //   if (route.params?.isFromScreen) {
+  //     isFromScreen.current = route.params?.isFromScreen;
+  //   }
+  //   if (route.params?.periId) {
+  //     peripharal.current = route.params?.periId;
+  //   };
+
+  //   if (route.params?.devNumber) {
+  //     devNumber.current = route.params?.devNumber;
+  //   };
+
+  // }, [route.params?.periId, route.params?.defaultPetObj, route.params?.isFromScreen,route.params?.devNumber]);
+
   useEffect(() => {
 
-    if (route.params?.defaultPetObj) {
-      set_defaultPetObj(route.params?.defaultPetObj);
-    }
     if (route.params?.isFromScreen) {
       isFromScreen.current = route.params?.isFromScreen;
     }
@@ -96,11 +111,7 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
       peripharal.current = route.params?.periId;
     };
 
-    if (route.params?.devNumber) {
-      devNumber.current = route.params?.devNumber;
-    };
-
-  }, [route.params?.periId, route.params?.defaultPetObj, route.params?.isFromScreen,route.params?.devNumber]);
+  }, [route.params?.periId, route.params?.isFromScreen]);
 
   const initialSessionStart = async () => {
     trace_inSensorsWIFIListcreen = await perf().startTrace('t_inSensorWIFIListScreen');
@@ -116,12 +127,16 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
   };
 
   const getSensorType = async () => {
-    let sensorType1 = await DataStorageLocal.getDataFromAsync(Constant.SENSOR_TYPE_CONFIGURATION);
-    if (sensorType1) {
-      firebaseHelper.logEvent(firebaseHelper.event_Sensor_type, firebaseHelper.screen_sensor_nearby_wifi, "Getting Device details : "+devNumber.current, 'Sensor Type : '+sensorType1);
-      sensorType.current = sensorType1;
+
+    let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+    configObj = JSON.parse(configObj);
+    if(configObj) {
+      sensorType.current = configObj.configDeviceModel;
+      devNumber.current = configObj.configDeviceNo;
+      firebaseHelper.logEvent(firebaseHelper.event_Sensor_type, firebaseHelper.screen_sensor_nearby_wifi, "Getting Device details : "+devNumber.current, 'Sensor Type : '+sensorType.current);
       connectSensor(peripharal.current);
     }
+
   };
 
   useInterval(() => {
@@ -164,11 +179,13 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
 
     let sensorType1 = await DataStorageLocal.getDataFromAsync(Constant.SENSOR_TYPE_CONFIGURATION);
     if (sensorType1 && sensorType1 === 'HPN1Sensor') {
+
       sensorType.current = sensorType1;
       set_isLoading(true);
       isLoadingdRef.current = 1;
       firebaseHelper.logEvent(firebaseHelper.event_sensor_hpn1_config_no_wifi, firebaseHelper.screen_sensor_nearby_wifi, "Initiating process to fetch the No of configured wifi SSIDs from the sensor : "+devNumber.current, 'Sensor Type : '+sensorType.current);
       SensorHandler.getInstance().readDataFromSensor(bleUUID.HPN1_WIFI_COMMAND_SERVICE, bleUUID.HPN1_WIFI_SYSTEM_STATUS, readWIFISystemStatusFromHPN1Sensor);
+
     } else {
       firebaseHelper.logEvent(firebaseHelper.event_sensor_wifi_command, firebaseHelper.screen_sensor_nearby_wifi, "Initiating Command to fetch Nearby WiFi details : "+devNumber.current, 'Sensor Type : '+sensorType.current);
       set_isLoading(true);
@@ -434,15 +451,32 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
 
   const navigateToPrevious = async () => {
 
-    if(isLoadingdRef.current === 0 && popIdRef.current === 0){
+    if(isLoadingdRef.current === 0 && popIdRef.current === 0) {
       await SensorHandler.getInstance().dissconnectSensor();
-      if (isFromScreen.current === 'configuredWifiScreen') {
-        firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User clicked on back button to navigate to WifiListHPN1Component", '');
-        navigation.navigate("WifiListHPN1Component");
+      
+      let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+      configObj = JSON.parse(configObj);
+      if(configObj.isReplaceSensor === 1) {
+
+        if(configObj.isForceSync === 0 || configObj.isForceSync === 2) {
+          navigation.navigate("FindSensorComponent");
+        } else {
+          navigation.navigate('NewReplaceSensorRequestComponent');
+        }
+        
+        
       } else {
-        firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User clicked on back button to navigate to FindSensorComponent", '');
-        navigation.navigate("FindSensorComponent");
+
+        if (isFromScreen.current === 'configuredWifiScreen') {
+          firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User clicked on back button to navigate to WifiListHPN1Component", '');
+          navigation.navigate("WifiListHPN1Component");
+        } else {
+          firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User clicked on back button to navigate to FindSensorComponent", '');
+          navigation.navigate("FindSensorComponent");
+        }
+        
       }
+      
     }
 
   };
@@ -584,7 +618,8 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
             BleManager.enableBluetooth().then(() => {
     
               firebaseHelper.logEvent(firebaseHelper.event_sensor_configure_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User entered the password and clicked on Submit to configure the Sensor : "+wifiName, 'Device Number : '+devNumber.current);
-              navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiName, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+              // navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiName, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+              navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiName, wifiPsd: wifiPsd,isFromScreen: isFromScreen.current,});
     
               }).catch((error) => {
     
@@ -626,7 +661,8 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
     
           } else {
             firebaseHelper.logEvent(firebaseHelper.event_sensor_configure_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User entered the password and clicked on Submit to configure the Sensor : "+wifiName, 'Device Number : '+devNumber.current);
-            navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiName, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+            // navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiName, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+            navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiName, wifiPsd: wifiPsd, isFromScreen: isFromScreen.current});
           }
     
         }
@@ -647,6 +683,8 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
   const popupCancelBtnAction = (value,) => {
 
     if (popupId === HPN1_WIFI_MAX_LIMIT) {
+      popIdRef.current = 0;
+      isLoadingdRef.current = 0;
       navigateToPrevious();
     }
     set_popuLeftBtnEnable(false);
@@ -671,14 +709,14 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
     let wifiNamee = wifiName;
 
     if(sensorType.current === 'HPN1Sensor'){
-       wifiNamee = wifiNamee.replace(/\0.*$/g,'');     
+      wifiNamee = wifiNamee.replace(/\0.*$/g,'');     
     }
-
-    if(sensorType.current === 'Sensor' && wifiNamee.length > 20){
+    // if(sensorType.current === 'Sensor' && wifiNamee.length > 20){
+    if((sensorType.current.includes("CMAS") || sensorType.current.includes("AGL2")|| sensorType.current .includes("AGL3")) && wifiNamee.length > 30){
       firebaseHelper.logEvent(firebaseHelper.event_sensor_select_max_ssid_length, firebaseHelper.screen_sensor_nearby_wifi, "User selected the SSID more than 20 characters in Length from the list : "+wifiNamee, 'Device Number : '+devNumber.current);
       set_popuLeftBtnEnable(false);
       set_leftpopupBtnTitle('');
-      set_popUpMessage("SSID length should not be more than 20 characters. Please select another SSID from the list.");
+      set_popUpMessage("SSID length should not be more than 30 characters. Please select another SSID from the list.");
       set_popUpTitle('Alert');
       set_rightpopupBtnTitle("OK");
       set_popupId(WIFI_SSID_LENGTH);
@@ -737,16 +775,19 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
         
                   } else {
                     firebaseHelper.logEvent(firebaseHelper.event_sensor_configure_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User entered the password and clicked on Submit to configure the Sensor : "+wifiNamee, 'Device Number : '+devNumber.current);
-                    navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+                    // navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+                    navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, isFromScreen: isFromScreen.current});
                   }
                 } else {
                   firebaseHelper.logEvent(firebaseHelper.event_sensor_configure_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User entered the password and clicked on Submit to configure the Sensor : "+wifiNamee, 'Device Number : '+devNumber.current);
-                  navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+                  // navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+                  navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, isFromScreen: isFromScreen.current});
                 }
         
               } else {
                 firebaseHelper.logEvent(firebaseHelper.event_sensor_configure_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User entered the password and clicked on Submit to configure the Sensor : "+wifiNamee, 'Device Number : '+devNumber.current);
-                navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+                // navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+                navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, isFromScreen: isFromScreen.current});
               }
     
               }).catch((error) => {
@@ -804,16 +845,19 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
       
                 } else {
                   firebaseHelper.logEvent(firebaseHelper.event_sensor_configure_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User entered the password and clicked on Submit to configure the Sensor : "+wifiNamee, 'Device Number : '+devNumber.current);
-                  navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+                  // navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+                  navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, isFromScreen: isFromScreen.current});
                 }
               } else {
                 firebaseHelper.logEvent(firebaseHelper.event_sensor_configure_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User entered the password and clicked on Submit to configure the Sensor : "+wifiNamee, 'Device Number : '+devNumber.current);
-                navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+                // navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+                navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, isFromScreen: isFromScreen.current});
               }
       
             } else {
               firebaseHelper.logEvent(firebaseHelper.event_sensor_configure_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User entered the password and clicked on Submit to configure the Sensor : "+wifiNamee, 'Device Number : '+devNumber.current);
-              navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+              // navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, defaultPetObj: defaultPetObj, isFromScreen: isFromScreen.current, devNumber:devNumber.current });
+              navigation.navigate('WriteDetailsToSensorComponent', { wifiName: wifiNamee, wifiPsd: wifiPsd, isFromScreen: isFromScreen.current});
             }
             
           }
@@ -844,7 +888,8 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
 
   const navigateToManualNetwork = () => {
     firebaseHelper.logEvent(firebaseHelper.event_sensor_add_manual_btn_action, firebaseHelper.screen_sensor_nearby_wifi, "User clicked on button to add SSID and Password manually", 'Device Number : '+devNumber.current);
-    navigation.navigate('ManualNetworkComponent', { defaultPetObj: defaultPetObj, deviceType:sensorType.current })
+    // navigation.navigate('ManualNetworkComponent', { defaultPetObj: defaultPetObj, deviceType:sensorType.current })
+    navigation.navigate('ManualNetworkComponent')
   };
 
   const saveHPN1SSIDCount = async (count) => {
@@ -854,27 +899,27 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
   return (
     <SensorWiFiListUI
 
-      isLoading={isLoading}
-      wifiList={wifiList}
-      loaderText={loaderText}
-      btnName={btnName}
-      defaultPetObj={defaultPetObj}
-      isPopUp={isPopUp}
-      popUpMessage={popUpMessage}
-      popUpTitle={popUpTitle}
-      popuLeftBtnEnable={popuLeftBtnEnable}
-      leftpopupBtnTitle={leftpopupBtnTitle}
-      rightpopupBtnTitle={rightpopupBtnTitle}
-      totalList={totalList}
-      fetchedList={fetchedList}
-      sensorType={sensorType.current}
-      updateSensorWIFIPSD={updateSensorWIFIPSD}
-      writeDetailsToSensor={writeDetailsToSensor}
-      popOkBtnAction={popOkBtnAction}
-      submitAction={submitAction}
-      navigateToPrevious={navigateToPrevious}
-      navigateToManualNetwork={navigateToManualNetwork}
-      popupCancelBtnAction={popupCancelBtnAction}
+      isLoading = {isLoading}
+      wifiList = {wifiList}
+      loaderText = {loaderText}
+      btnName = {btnName}
+      // defaultPetObj={defaultPetObj}
+      isPopUp = {isPopUp}
+      popUpMessage = {popUpMessage}
+      popUpTitle = {popUpTitle}
+      popuLeftBtnEnable = {popuLeftBtnEnable}
+      leftpopupBtnTitle = {leftpopupBtnTitle}
+      rightpopupBtnTitle ={ rightpopupBtnTitle}
+      totalList = {totalList}
+      fetchedList = {fetchedList}
+      sensorType = {sensorType.current}
+      updateSensorWIFIPSD = {updateSensorWIFIPSD}
+      writeDetailsToSensor = {writeDetailsToSensor}
+      popOkBtnAction = {popOkBtnAction}
+      submitAction = {submitAction}
+      navigateToPrevious = {navigateToPrevious}
+      navigateToManualNetwork = {navigateToManualNetwork}
+      popupCancelBtnAction = {popupCancelBtnAction}
 
     />
   );

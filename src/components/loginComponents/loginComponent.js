@@ -136,7 +136,17 @@ const LoginComponent = ({ navigation, route, ...props }) => {
     await DataStorageLocal.saveDataToAsync(Constant.USER_ID, userDetails.UserId.toString());
     
     if(userDetails && userDetails.RolePermissions && userDetails.RolePermissions.length > 0) {
+
+      
       let capturePermission = await userDetails.RolePermissions.filter(item => parseInt(item.menuId) === 67);
+      let questionnairPer = await userDetails.RolePermissions.filter(item => parseInt(item.mobileAppConfigId) === 3);
+
+      if (questionnairPer && questionnairPer.length > 0) {
+        await DataStorageLocal.saveDataToAsync(Constant.QUETIONNAIRE_PERMISSION,'available');
+      } else {
+        await DataStorageLocal.removeDataFromAsync(Constant.QUETIONNAIRE_PERMISSION);
+      }
+
       if(capturePermission && capturePermission.length > 0 && capturePermission[0].menuId === 67) {
         await DataStorageLocal.saveDataToAsync(Constant.USER_ROLE_CAPTURE_IMGS, capturePermission[0].menuId.toString());
       } else {
@@ -150,22 +160,54 @@ const LoginComponent = ({ navigation, route, ...props }) => {
     firebaseHelper.setUserId(userDetails.Email + "");
     firebaseHelper.setUserProperty(userDetails.Email + "", userDetails.ClientID + "");
 
-    if(userDetails.RoleId && userDetails.RoleId === 7) {
+    if(userDetails.ClientID > 0 ) {
       getLoginPets(userDetails.ClientID,userDetails.UserId);
-    } else if(userDetails.RoleId && userDetails.RoleId === 9) {
-      isLoadingdRef.current = 0;
-      set_isLoading(false);
-      navigation.navigate("BFIUserDashboardComponent");
-      Apolloclient.client.writeQuery({ query: Queries.LOG_OUT_APP, data: { data: { isLogOut: 'logOut', __typename: 'LogOutApp' } },});
-    } else if(userDetails.RoleId && userDetails.RoleId === 8) {
-      isLoadingdRef.current = 0;
-      set_isLoading(false);
-      navigation.navigate('PetListBFIScoringScreen');
     } else {
-      isLoadingdRef.current = 0;
-      set_isLoading(false);
-      navigation.navigate("DashBoardService");
-    } 
+
+      if(userDetails.RolePermissions) {
+
+        let hasBFIImgCapture = false;
+        let hasBFIScore = false;
+
+        for (let i = 0; i < userDetails.RolePermissions.length; i++) {
+
+          if(userDetails.RolePermissions[i].menuId === 67) {
+            hasBFIImgCapture = true;
+          }
+
+          if(userDetails.RolePermissions[i].menuId === 68) {
+            
+            await DataStorageLocal.saveDataToAsync(Constant.MENU_ID, userDetails.RolePermissions[i].menuId.toString());
+            hasBFIScore = true;
+          }
+
+        }
+        if(hasBFIScore && hasBFIImgCapture) {
+
+          if (userDetails.RoleName === "External Vet Technician" || userDetails.RoleName === "Hill's Vet Technician") {
+            getLoginPets(userDetails.ClientID,userDetails.UserId);
+            return;
+          }
+            // Representative Dashboard
+            isLoadingdRef.current = 0;
+            set_isLoading(false);
+            navigation.navigate("BFIUserDashboardComponent");
+            Apolloclient.client.writeQuery({ query: Queries.LOG_OUT_APP, data: { data: { isLogOut: 'logOut', __typename: 'LogOutApp' } },});
+
+        } else if(hasBFIScore) {
+          // Veterinerian
+          isLoadingdRef.current = 0;
+          set_isLoading(false);
+          navigation.navigate('PetListBFIScoringScreen');
+        } else if(hasBFIImgCapture) {
+          // Only Capture
+          isLoadingdRef.current = 0;
+          set_isLoading(false);
+          navigation.navigate('PetListComponent');
+        }
+      }
+
+    }
 
   };
 
@@ -181,6 +223,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
     set_isLoading(false);
     isLoadingdRef.current = 0;
     stopFBTraceGetPets();
+
     if(loginPetServiceCallsObj && loginPetServiceCallsObj.statusData){
 
       if(loginPetServiceCallsObj && loginPetServiceCallsObj.responseData){
@@ -193,14 +236,14 @@ const LoginComponent = ({ navigation, route, ...props }) => {
           saveFirstTimeUser(false,client,token,userId);
           set_isLoading(false);
           isLoadingdRef.current = 0;
-          saveUserLogStatus();
+          saveUserLogStatus(client,token,userId);
           saveDefaultPet(loginPetServiceCallsObj.responseData);
         } else {
           firebaseHelper.logEvent(firebaseHelper.event_login_getPets_success, firebaseHelper.screen_login, "Login Getpets Service Success", 'User Total Pets : ' + '0');
           isFirstTime.current = true;
           set_firstTimeUser(true);
           saveFirstTimeUser(true, client,token,userId);
-          saveUserLogStatus();        
+          saveUserLogStatus(client,token,userId);        
         }
       
       } else {
@@ -278,8 +321,9 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   }
 
   // Saves the User details
-  const saveUserLogStatus = async () => {
+  const saveUserLogStatus = async (client,token,userId) => {
     await DataStorageLocal.saveDataToAsync(Constant.IS_USER_LOGGED_INN, JSON.stringify(true));
+    getUserDetailsDB(client,token,userId);
   }
 
   // When user has no pets, saves the status as First time user
@@ -360,6 +404,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
     if (fcmToken) {
       await DataStorageLocal.saveDataToAsync(Constant.FCM_TOKEN, fcmToken);
     }
+
     set_isLoading(true);
     isLoadingdRef.current = 1;
     set_loaderMsg(Constant.LOGIN_LOADER_MSG);
@@ -462,7 +507,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
 
   };
 
-  const updateDashboardData = (petsArray) => {
+  const updateDashboardData = async (petsArray) => {
     navigation.navigate("DashBoardService", { loginPets: petsArray });
   };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image, ScrollView,Platform } from 'react-native';
 import BottomComponent from "../../utils/commonComponents/bottomComponent1";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from '../../utils/commonComponents/headerComponent';
@@ -84,7 +84,7 @@ const AccountInfoUi = ({ route, ...props }) => {
                 />
             </View>
 
-            <View style={{ alignItems: 'center', width: wp('100%'), height: hp('72%')}}>
+            <View style={{ alignItems: 'center', width: wp('100%'), height: hp('70%')}}>
                 
                 {props.bio_Enable ? <View style={[styles.renderBckView]}>
 
@@ -107,7 +107,7 @@ const AccountInfoUi = ({ route, ...props }) => {
                       
                  </View> : null}
 
-                <View style={{ marginTop: hp('2%'),height: props.bio_Enable ? hp('45%') : (props.userRole === '7' ? hp('60%') : hp('70%'))}}>
+                <View style={{ marginTop: hp('2%'),height: props.bio_Enable ? (Platform.OS === 'android' ? hp('50%') : hp('45%')) : ((props.clientId && props.clientId > 0 ) || (props.roleName && (props.roleName === "External Vet Technician" || props.roleName === "Hill's Vet Technician")) ? hp('60%') : hp('70%'))}}>
                     <ScrollView showsVerticalScrollIndicator={false}>
                         <TouchableOpacity onPress={() => btnAction("Name")}>
 
@@ -172,7 +172,7 @@ const AccountInfoUi = ({ route, ...props }) => {
 
                         </TouchableOpacity>
 
-                       {props.userRole === '7' ? <TouchableOpacity onPress={() => btnAction("PetParentAddress")}>
+                       {(props.clientId && props.clientId > 0) || (props.roleName === "External Vet Technician" || props.roleName === "Hill's Vet Technician") ? <TouchableOpacity onPress={() => btnAction("PetParentAddress")}>
 
                             <View style={{ flexDirection: 'row' }}>
                                 <View style={[styles.backViewStyle,{minHeight: hp('8%')}]}>
@@ -186,9 +186,33 @@ const AccountInfoUi = ({ route, ...props }) => {
 
                         </TouchableOpacity> : null}
 
+                        {(props.clientId && props.clientId > 0 ) || (props.roleName === "External Vet Technician" || props.roleName === "Hill's Vet Technician") ? <TouchableOpacity onPress={() => btnAction("PrefferedUnits")}>
+
+                            <View style={{ flexDirection: 'row' ,marginTop: hp('1%')}}>
+                                <View style={[styles.backViewStyle,{minHeight: hp('6%')}]}>
+                                    
+                                   <View style={{ flexDirection: 'row',justifyContent:'space-between'}}>
+                                        <Text style={styles.headerTextStyle}>{'Preferences'}</Text>
+                                        <View style={{ justifyContent: 'center' }}>
+                                            <Image source={require("./../../../assets/images/otherImages/svg/editImg.svg")} style={{ width: wp('5%'), height: hp('3%'), resizeMode: 'contain' }} />
+                                        </View>
+                                   </View>
+                                    <View style={{justifyContent:'space-between',marginTop: hp('0%')}}>
+                                        <Text style={styles.headerTextStyle}>{'Food Recommendation Unit   '}<Text style={[styles.subHeaderTextStyle,{textTransform:'capitalize'}]}>{props.preferredFoodRecUnit ? props.preferredFoodRecUnit : '--'}</Text></Text>
+                                        <Text style={styles.headerTextStyle}>{'Food Recommendation Time   '}<Text style={[styles.subHeaderTextStyle,{textTransform:'capitalize'}]}>{props.preferredFoodRecTime ? props.preferredFoodRecTime : 'N/A'}</Text></Text>
+                                        <Text style={[styles.headerTextStyle,{}]}>{'Pet Weight Unit  '}<Text style={[styles.subHeaderTextStyle,{textTransform:'capitalize'}]}>{props.preferredWeightUnit ? props.preferredWeightUnit : 'N/A'}</Text></Text>
+                                    </View>
+                                   
+                                </View>
+                                
+                            </View>
+
+                        </TouchableOpacity> : null}
+
                         <View style={{alignItems:'center',marginTop: hp("2%"),bottom:0,alignSelf:'center',justifyContent:'center'}}>
                         <Text style={styles.subHeaderTextStyle}>{props.versionNumber}</Text>
-                        <Text style={styles.subHeaderTextStyle}>{props.buildVersion}<Text style={styles.subHeaderTextStyle}>{props.enviName === 'tst' ? " (Testing)" : ""}</Text></Text>
+                        {/* <Text style={styles.subHeaderTextStyle}>{props.buildVersion}<Text style={styles.subHeaderTextStyle}>{props.enviName === 'tst' ? " (Testing)" : ""}</Text></Text> */}
+                        <Text style={styles.subHeaderTextStyle}>{props.buildVersion}<Text style={styles.subHeaderTextStyle}>{""}</Text></Text>
                     </View>
                 </ScrollView>
                     
@@ -208,12 +232,12 @@ const AccountInfoUi = ({ route, ...props }) => {
                 ></BottomComponent>
             </View> */}
 
-            <View style={[CommonStyles.bottomViewComponentStyle,{height: props.userRole && props.userRole === '7' ? hp('25%') : hp('13%')}]}>
+            <View style={[CommonStyles.bottomViewComponentStyle,{height: (props.clientId && props.clientId > 0 ) || (props.roleName === "External Vet Technician" || props.roleName === "Hill's Vet Technician") ? hp('25%') : hp('13%')}]}>
                 <BottomComponent
                     topBtnTitle={'LOG OUT'}
                     bottomBtnTitle={'DELETE ACCOUNT'}
                     isDelete = {true}
-                    bottomBtnEnable = {props.userRole && props.userRole === '7' ? true : false}
+                    bottomBtnEnable = {(props.clientId && props.clientId > 0) || (props.roleName === "External Vet Technician" || props.roleName === "Hill's Vet Technician") ? true : false}
                     topButtonAction={async () => rightButtonAction()}
                     bottomButtonAction={async () => deleteAccountAction()}
                 ></BottomComponent>

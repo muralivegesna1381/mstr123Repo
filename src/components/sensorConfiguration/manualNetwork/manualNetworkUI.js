@@ -60,7 +60,7 @@ const  ManualNetworkUI = ({route, ...props }) => {
                     isChatEnable={false}
                     isTImerEnable={false}
                     isTitleHeaderEnable={true}
-                    title={'Device Setup'}
+                    title={'Sensor Setup'}
                     backBtnAction = {() => backBtnAction()}
                 />
             </View>
@@ -84,7 +84,7 @@ const  ManualNetworkUI = ({route, ...props }) => {
                                 inputText = {ssidName} 
                                 labelText = {'Network Name'} 
                                 isEditable = {true}
-                                maxLengthVal={props.deviceType==='Sensor' ? 20 : 32}
+                                maxLengthVal={props.deviceType && (props.deviceType.includes("CMAS") || props.deviceType.includes("AGL2") || props.deviceType.includes("AGL3")) ? 30 : 32}
                                 autoCapitalize = {'none'}
                                 setValue={(textAnswer) => {validateSSIDPSWD(textAnswer,ssidPswd)}}
                             />
@@ -97,7 +97,7 @@ const  ManualNetworkUI = ({route, ...props }) => {
                                 placeholder="Password"
                                 placeholderTextColor="#7F7F81"
                                 autoCapitalize="none"
-                                maxLength={props.deviceType==='Sensor' ? 20 : 40}
+                                maxLength={props.deviceType && (props.deviceType.includes("CMAS") || props.deviceType.includes("AGL2")) || props.deviceType.includes("AGL3") ? 30 : 40}
                                 secureTextEntry={isHidePassword}
                                 value = {ssidPswd}
                                 onChangeText={(userPswd) => {validateSSIDPSWD(ssidName,userPswd)}}

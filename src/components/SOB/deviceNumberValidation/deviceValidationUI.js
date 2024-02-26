@@ -128,7 +128,7 @@ const  DeviceValidationUI = ({route, ...props }) => {
                         <View style={{width: wp('80%'),alignItems:'center',marginTop: hp('3%')}}>
                             <TextInputComponent 
                                 inputText = {deviceNo} 
-                                labelText = {"Device Number*"} 
+                                labelText = {"Sensor Number*"} 
                                 isEditable = {true}
                                 maxLengthVal = {deviceType && deviceType.includes('HPN1') ? 19 : 7}
                                 autoCapitalize = {'none'}
@@ -146,7 +146,7 @@ const  DeviceValidationUI = ({route, ...props }) => {
 
             <View style={CommonStyles.bottomViewComponentStyle}>
                 <BottomComponent
-                    rightBtnTitle = {'NEXT'}
+                    rightBtnTitle = {props.isFromType === "AddDevice" ? 'SUBMIT' : 'NEXT'}
                     leftBtnTitle = {'BACK'}
                     isLeftBtnEnable = {true}
                     rigthBtnState = {isDeviceValidated}

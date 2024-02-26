@@ -52,7 +52,14 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
   const [enabled, set_enabled] = useState(false);
   const [popupType, set_popupType] = useState(0);
   const [bio_Enable, set_bio_Enable] = useState(false);
-  const [userRole, set_userRole] = useState(undefined)
+  const [userRole, set_userRole] = useState(undefined);
+  const [roleName, set_roleName] = useState(undefined);
+  const [clientId, set_clientId] = useState(undefined);
+  const [preferredFoodRecUnit, set_preferredFoodRecUnit] = useState(undefined);
+  const [preferredFoodRecTime, set_preferredFoodRecTime] = useState(undefined);
+  const [preferredWeightUnit, set_preferredWeightUnit] = useState(undefined);
+  const [accntObj, set_accntObj] = useState(undefined);
+  const [isFeeding, set_isFeeding] = useState(false);
 
   let popIdRef = useRef(0);
   let isLoadingdRef = useRef(0);
@@ -67,9 +74,10 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
       set_Date(new Date());
       initialSessionStart();
       firebaseHelper.reportScreen(firebaseHelper.screen_account_main);
-      firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_dashboard, "User in Accounts Screen", '');
+      firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_account_main, "User in Accounts Screen", '');
       deviceAuthenticationType();
       getUserData();
+      getUserRoles();
     });
 
     const unsubscribe = navigation.addListener('blur', () => {
@@ -108,12 +116,34 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
     await trace_Account_API_Complete.stop();
   };
 
+  const getUserRoles = async () => {
+    
+    let userRoleDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
+    userRoleDetails = JSON.parse(userRoleDetails);
+
+    if(userRoleDetails){
+      set_roleName(userRoleDetails.RoleName)
+    }
+    
+    if(userRoleDetails && userRoleDetails.RolePermissions && userRoleDetails.RolePermissions.length > 0) {
+      let userFR = false
+      for (let role = 0; role < userRoleDetails.RolePermissions.length; role++) {
+        if(userRoleDetails.RolePermissions[role].menuId === 75){
+          userFR = true;
+          break;
+        } 
+      }
+      set_isFeeding(userFR);
+    }
+
+  }
+
   const deviceAuthenticationType = async () => {
 
     const rnBiometrics = new ReactNativeBiometrics();
     rnBiometrics.isSensorAvailable().then((resultObject) => {
 
-      const { available, biometryType } = resultObject
+    const { available, biometryType } = resultObject
       let type = undefined;
       if (available && biometryType === BiometryTypes.TouchID) {
         set_authenticationType('Touch ID');
@@ -151,6 +181,8 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
     set_isLoading(true);
     isLoadingdRef.current = 1;
     let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
+    set_clientId(clientIdTemp)
+    
     let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
     firebaseHelper.logEvent(firebaseHelper.event_account_main_api, firebaseHelper.screen_account_main, "Initiated the user details Api ", 'Client ID : ' + clientIdTemp);
 
@@ -167,6 +199,7 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
 
     if (userDetailsServiceObj && userDetailsServiceObj.logoutData) {
       AuthoriseCheck.authoriseCheck();
+      navigation.popToTop();
       navigation.navigate('WelcomeComponent');
       return;
     }
@@ -184,6 +217,7 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
     if (userDetailsServiceObj && userDetailsServiceObj.statusData) {
 
       if (userDetailsServiceObj.responseData) {
+        set_accntObj(userDetailsServiceObj.responseData);
         savePetParent(userDetailsServiceObj.responseData);
         set_email(userDetailsServiceObj.responseData.email);
         set_fullName(userDetailsServiceObj.responseData.fullName);
@@ -203,6 +237,10 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
             + userDetailsServiceObj.responseData.address.zipCode;
             set_pAddress(address);
         }
+
+        set_preferredFoodRecUnit(userDetailsServiceObj.responseData.preferredFoodRecUnit);
+        set_preferredWeightUnit(userDetailsServiceObj.responseData.preferredWeightUnit);
+        set_preferredFoodRecTime(userDetailsServiceObj.responseData.preferredFoodRecTime)
         
       }
 
@@ -331,7 +369,12 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
       } else if (value === "PetParentAddress") {
 
         firebaseHelper.logEvent(firebaseHelper.event_account_edit_action, firebaseHelper.screen_account_main, "User tried to edit Address", 'Email : ' + email);
-        navigation.navigate('UpdatePetParentAddressComponent', {fullName: fullName, firstName: firstName, secondName: secondName, phoneNo: phoneNo, secondaryEmail : secondaryEmail, isNotification:isNotification, petParentAddress : pAddressObj });
+        navigation.navigate('UpdatePetParentAddressComponent', {fullName: fullName, firstName: firstName, secondName: secondName, phoneNo: phoneNo, secondaryEmail : secondaryEmail, isNotification:isNotification, petParentAddress : pAddressObj});
+        
+      } else if (value === "PrefferedUnits") {
+
+        firebaseHelper.logEvent(firebaseHelper.event_account_edit_action, firebaseHelper.screen_account_main, "User tried to edit Address", 'Email : ' + email);
+        navigation.navigate('UpdateFoodUnitsComponent', {prefObj:accntObj});
         
       }
     }
@@ -347,9 +390,8 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
     const rnBiometrics = new ReactNativeBiometrics();
     set_isPopUp(false);
     popIdRef.current = 0;
-
+    
     if (popupType === POP_LOG_OUT) {
-
       set_isLoading(true);
       rnBiometrics.biometricKeysExist().then(async (resultObject) => {
         const { keysExist } = resultObject
@@ -365,7 +407,6 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
       })
 
       firebaseHelper.logEvent(firebaseHelper.event_account_logout, firebaseHelper.screen_account_main, "User logged out", 'Email : ' + email);
-      Apolloclient.client.writeQuery({ query: Queries.LOG_OUT_APP, data: { data: { isLogOut: 'logOut', __typename: 'LogOutApp' } }, });
       removeUserData();
       setTimeout(async () => {  
         
@@ -373,6 +414,7 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
         // navigation.navigate('WelcomeComponent');
         let user = await DataStorageLocal.getDataFromAsync(Constant.USER_EMAIL_LOGIN);
         let pd = await DataStorageLocal.getDataFromAsync(Constant.USER_PSD_LOGIN);
+        navigation.popToTop();
         if(user && pd && pd !== 'undefined') {
           navigation.navigate('LoginComponent',{"isAuthEnabled" : enabled}); 
         } else {
@@ -481,7 +523,16 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
       await DataStorageLocal.removeDataFromAsync(Constant.USER_ROLE_DETAILS);
       await DataStorageLocal.removeDataFromAsync(Constant.USER_ROLE_CAPTURE_IMGS);
       await DataStorageLocal.removeDataFromAsync(Constant.USER_ID);
-    
+      await DataStorageLocal.removeDataFromAsync(Constant.IMAGES_UPLOAD_PROCESS_STARTED);
+      await DataStorageLocal.removeDataFromAsync(Constant.IMAGE_UPLOAD_DATA);
+      await DataStorageLocal.removeDataFromAsync(Constant.QUETIONNAIRE_PERMISSION);
+      await DataStorageLocal.removeDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+      await DataStorageLocal.removeDataFromAsync(Constant.MENU_ID);
+      await DataStorageLocal.removeDataFromAsync(Constant.BFIINSTRUCTIONSDATA);
+      await DataStorageLocal.removeDataFromAsync(Constant.TIMER_DIMENTIONS);
+      await DataStorageLocal.removeDataFromAsync(Constant.TIMER_DIMENTIONS_DEVICE);
+      await DataStorageLocal.removeDataFromAsync(Constant.FH_SELECTED_PET);
+      await DataStorageLocal.removeDataFromAsync(Constant.FH_PETS_ARRAY);
   };
 
   // Popup cancel action
@@ -536,6 +587,7 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
 
     if (userDetailsServiceObj && userDetailsServiceObj.logoutData) {
       AuthoriseCheck.authoriseCheck();
+      navigation.popToTop();
       navigation.navigate('WelcomeComponent');
       return;
     }
@@ -559,7 +611,7 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
       await rnBiometrics.deleteKeys().then((resultObject) => {
         const { keysDeleted } = resultObject
       });
-
+      navigation.popToTop();
       navigation.navigate('LoginComponent',{"isAuthEnabled" : false}); 
 
     } else {
@@ -612,6 +664,12 @@ const AccountInfoService = ({ navigation, route, ...props }) => {
       isPopUpLeftTitle = {isPopUpLeftTitle}
       bio_Enable = {bio_Enable}
       userRole = {userRole}
+      clientId = {clientId}
+      preferredWeightUnit = {preferredWeightUnit}
+      preferredFoodRecUnit = {preferredFoodRecUnit}
+      preferredFoodRecTime = {preferredFoodRecTime}
+      isFeeding = {isFeeding}
+      roleName = {roleName}
       navigateToPrevious={navigateToPrevious}
       logOutAction={logOutAction}
       popOkBtnAction={popOkBtnAction}

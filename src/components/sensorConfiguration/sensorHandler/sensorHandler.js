@@ -146,21 +146,21 @@ class SensorHandler {
 
   checkForServerDevice(peripheral) {
     
-    if(this.sensorType==='HPN1Sensor'){
+    if(this.sensorType === 'HPN1Sensor'){
+
       if (peripheral.name.startsWith("HPN1")) {
-          this.setPeripharalId(peripheral.id);
-          this.scanningSuccess = true;
-          BleManager.stopScan().then(() => {});
+        this.setPeripharalId(peripheral.id);
+        this.scanningSuccess = true;
+        BleManager.stopScan().then(() => {});
       }
 
     } else {
 
-      if (peripheral.name.startsWith("AGL") && peripheral.name.length > 8) {
+      if (peripheral && peripheral.name.startsWith("AGL") && peripheral.name.length > 8) {
         const pnamewithAGL = peripheral.name.replace(/:/g, "");
         const pname = pnamewithAGL.substr(pnamewithAGL.length - 6).toLowerCase();
         this.setPeripharalId(peripheral.id);
         let dname = this.deviceNumber;
-  
         if (dname.length == 7) {
           dname = dname.substr(0, dname.length - 1);
         } else if (dname.length > 7) {
@@ -183,8 +183,7 @@ class SensorHandler {
 
   connectToSensor = async (perId,callback) => {   
 
-    this.sensorCallBack = callback;
-    
+    this.sensorCallBack = callback;    
     // this.peripheralId = perId;
     if (Platform.OS === "ios") {
       this.cancelConnectTimer = setTimeout(this.cancelConnection, 50000);

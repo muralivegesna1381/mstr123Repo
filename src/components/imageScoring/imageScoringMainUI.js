@@ -201,7 +201,7 @@ const ImageScoringMainUI = ({ route, ...props }) => {
                                         <Text style={[styles.bodyTxtStyle, { textTransform: 'uppercase' }]}>{item.imageLabel && item.imageLabel.length > 15 ? item.imageLabel.slice(0, 15) + '..' : item.imageLabel}</Text>
                                     </View>
             
-                                    <TouchableOpacity onPress={() => { imageViewBtnAction(index, item)}}>
+                                   {item && item.imagePath&& item.imagePath !== '' ? <TouchableOpacity onPress={() => { imageViewBtnAction(index, item)}}>
                                         <View style={[styles.cellSubViewStyle3]}>
                                             {imgLoader ? <View style={styles.scoringImgStyle}><ActivityIndicator size = "small" color = "red" /></View> :
                                                 <ImageBackground onLoadStart={() => set_imgLoader(false)} onLoadEnd={() => { set_imgLoader(false)}} style={styles.scoringImgStyle} imageStyle={{ borderRadius: 5 }} source={{ uri: item.imagePath }}>
@@ -210,7 +210,7 @@ const ImageScoringMainUI = ({ route, ...props }) => {
                                                     </View>
                                                 </ImageBackground>}
                                         </View>
-                                    </TouchableOpacity>
+                                    </TouchableOpacity> : null}
             
                                 </View>
             
@@ -259,7 +259,7 @@ const ImageScoringMainUI = ({ route, ...props }) => {
                 />
             </View>
 
-            <View style={{ width: wp('100%'), height: hp('70%'), alignItems: 'center'}}>
+            <View style={{ width: wp('100%'), height: hp('75%'), alignItems: 'center'}}>
 
                 <View style={{ marginTop: hp('2%'), width: wp('90%') }}>
                     <Text style={[styles.headerTextStyle]}>{scoringName}</Text>

@@ -35,7 +35,6 @@ const BFIUserDashboardComponent = ({ navigation, route, ...props }) => {
 
     useEffect(() => {
 
-        console.log("captureBFIData", captureBFIData)
         if (captureBFIData && captureBFIData.data.__typename === 'UploadCaptureBFIBackgroundStatus') {
             if (captureBFIData.data.stausType === 'Uploading Done') {
                 set_bfiUploadStatus(undefined);

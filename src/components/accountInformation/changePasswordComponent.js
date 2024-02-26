@@ -120,7 +120,7 @@ const ChangePasswordComponent = ({ navigation, route, ...props }) => {
           
         } else {
             firebaseHelper.logEvent(firebaseHelper.event_change_password_api_fail, firebaseHelper.screen_change_password, "Change Password Api Failed : ", 'Other_Info : Status : false');
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);              
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_UPDATE_ERROR_MSG,true);              
         }
           
         if(cPSWDServiceObj && cPSWDServiceObj.error) {

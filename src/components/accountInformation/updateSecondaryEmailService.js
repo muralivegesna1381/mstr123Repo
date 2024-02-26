@@ -176,7 +176,7 @@ const UpdateSecondaryEmailService = ({ navigation, route, ...props }) => {
 
         if (cNameServiceObj && cNameServiceObj.error) {
             firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_api_fail, firebaseHelper.screen_change_secondary_email, "Update Secondary email Api failed", 'error : Service Error');
-            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SECONDARY_EMAIL_ERROR_UPDATE, true, 'OK', false,0,1,false);
+            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true, 'OK', false,0,1,false);
         }
     };
 

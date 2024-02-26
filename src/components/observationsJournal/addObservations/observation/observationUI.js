@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {View,StyleSheet,Text,TextInput,Keyboard,TouchableOpacity,Image,FlatList} from 'react-native';
 import BottomComponent from "../../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
@@ -18,19 +18,15 @@ const  ObservationUI = ({route, ...props }) => {
     const [isPopUp, set_isPopUp] = useState(false);
     const [obsText, set_obsText] = useState(undefined);
     const [nxtBtnEnable, set_nxtBtnEnable] = useState(false);
-    const [isLoading, set_isLoading] = useState(false);
     const [behavioursData, set_behavioursData] = useState(undefined);
     const [obserItem, set_obserItem] = useState("");
     const [isSearchView, set_isSearchView] = useState(false);
     const [searchText, set_searchText] = useState(undefined);
-    const [behTypeArray, set_behTypeArray] = useState(['Most Common', 'Less Common']);
-    const [mostCommenArray, set_mostCommonArray] = useState(undefined);
-    const [lessCommenArray, set_lessCommonArray] = useState(undefined);
-    const [filetrMostCommenArray, set_filetrMostCommenArray] = useState(undefined);
-    const [filterLessCommenArray, set_filterLessCommenArray] = useState(undefined);
-    const [behTypeText, set_behTypeText] = useState('Most Common');
+    const [fileterArray, set_fileterArray] = useState(undefined);
     const [isBehTypeView, set_isBehTypeView] = useState(false);
     const [behaviorText, set_behaviorText] = useState(undefined);
+
+    let filterRef = useRef();
     
     useEffect(() => {
       set_isPopUp(props.isPopUp);
@@ -38,7 +34,6 @@ const  ObservationUI = ({route, ...props }) => {
 
     useEffect(() => {
 
-      set_isLoading(props.isLoading);
       set_behavioursData(props.behavioursData);
       set_obsText(props.obsText);
       set_behaviorText(props.behName);
@@ -46,40 +41,12 @@ const  ObservationUI = ({route, ...props }) => {
       set_obserItem(props.obserItem);
 
       if(props.behavioursData){
-        behavioursTypeData(props.behavioursData);
-      }
-
-      if(props.behType === 2){
-        set_behTypeText('Less Common');
-      } else {
-        set_behTypeText('Most Common');
+        set_behavioursData(props.behavioursData);
+        set_fileterArray(props.behavioursData);
+        filterRef.current = props.behavioursData
       }
       
-    }, [props.isLoading,props.behavioursData,props.obsText,props.behName,props.nxtBtnEnable,props.obserItem,props.behType]);
-
-    const behavioursTypeData = (arrayTemp) => {
-
-      let commonArray = [];
-      let unCommonArray = [];
-      for (let i=0; i < arrayTemp.length; i++){
-        if(arrayTemp[i].behaviorTypeId === 1){
-          commonArray.push(arrayTemp[i]);
-        } else {
-          unCommonArray.push(arrayTemp[i]);
-        }
-      }
-      set_lessCommonArray(unCommonArray);
-      set_mostCommonArray(commonArray);
-      set_filetrMostCommenArray(commonArray);
-      set_filterLessCommenArray(unCommonArray);
-
-      if(unCommonArray.length>0){
-        set_behTypeArray(['Most Common','Less Common']);
-      } else {
-        set_behTypeArray(['Most Common']);
-      }
-
-    };
+    }, [props.behavioursData,props.obsText,props.behName,props.nxtBtnEnable,props.obserItem,props.behType]);
 
     const nextButtonAction = () => {
       props.submitAction(obsText,obserItem);
@@ -100,20 +67,13 @@ const  ObservationUI = ({route, ...props }) => {
       Keyboard.dismiss();
     };
 
-    function selectBehTypeDrop() {
-      set_isBehTypeView(true);
-      set_isSearchView(false);
-      Keyboard.dismiss();
-    };
-
     const actionOnRow = (item) => {
       Keyboard.dismiss();
       set_isSearchView(!isSearchView);
       set_isBehTypeView(false);
       set_behaviorText(item.behaviorName);
       set_obserItem(item);
-      set_filetrMostCommenArray(mostCommenArray);
-      set_filterLessCommenArray(lessCommenArray);
+      set_fileterArray(behavioursData)
 
       if(obsText && obsText.length>0 && item.behaviorName){
         set_nxtBtnEnable(true);
@@ -147,58 +107,31 @@ const  ObservationUI = ({route, ...props }) => {
     const onCancelSearch = async () => {
       set_searchText(undefined);
       searchFilterFunction("");
-      if(behTypeText === 'Most Common'){
-        set_filetrMostCommenArray(mostCommenArray);
-      } else {
-          set_filterLessCommenArray(lessCommenArray);
-      }
-
+      set_fileterArray(behavioursData);
       Keyboard.dismiss();
     };
 
     const searchFilterFunction = (text) => {
 
-        set_searchText(text);
-        let newData;
+      set_searchText(text);
+      let newData;
+      newData = behavioursData.filter(function(item) {
+        const itemData = item ? item.behaviorName.toUpperCase() : "".toUpperCase();
+        const textData = text.toUpperCase();          
+        return itemData.indexOf(textData) > -1;
+      });
 
-        if(behTypeText === 'Most Common'){
-
-           newData = mostCommenArray.filter(function(item) {
-            const itemData = item ? item.behaviorName.toUpperCase() : "".toUpperCase();
-            const textData = text.toUpperCase();
-            set_filetrMostCommenArray(newData);
-            return itemData.indexOf(textData) > -1;
-          });
-
-        } else {
-
-          newData = lessCommenArray.filter(function(item) {
-            const itemData = item ? item.behaviorName.toUpperCase() : "".toUpperCase();
-            const textData = text.toUpperCase();
-            set_filterLessCommenArray(newData);
-            return itemData.indexOf(textData) > -1;
-          });
-
-        }
-
-        if(behTypeText === 'Most Common'){
-           set_filetrMostCommenArray(newData);
-       } else {
-           set_filterLessCommenArray(newData);
-       }
-
+      filterRef.current = newData;
+      set_fileterArray(newData);
     };
 
     const onCancel = () => {
-        Keyboard.dismiss();
-        set_searchText(undefined);
-        set_isSearchView(false);
-        set_isBehTypeView(false);
-        if(behTypeText === 'Most Common'){
-          set_filetrMostCommenArray(mostCommenArray);
-        } else {
-            set_filterLessCommenArray(lessCommenArray);
-        }
+
+      Keyboard.dismiss();
+      set_searchText(undefined);
+      set_isSearchView(false);
+      set_isBehTypeView(false);
+      set_fileterArray(behavioursData);
   
     };
     
@@ -234,28 +167,9 @@ const  ObservationUI = ({route, ...props }) => {
               />  
             </View> 
 
-            <View style={{width: wp('80%'),marginTop: hp('2%'),alignItems:'center'}}>
+            <View style={{width: wp('80%'),marginTop: hp('1%'),alignItems:'center'}}>
 
-              <TouchableOpacity style={{flexDirection:'row',borderWidth: 0.5,borderColor: "#D8D8D8",borderRadius: hp("0.5%"),width: wp("80%"),}} onPress={() => {selectBehTypeDrop();}}>
-
-                <View>
-                  <View style={[styles.SectionStyle1,{}]}>
-
-                    <View style={{flexDirection:'column',}}>
-                      <Text style={styles.dropTextLightStyle}>{'Select Behavior Type'}</Text>
-                      {behTypeText ? <Text style={[styles.dropTextStyle]}>{behTypeText}</Text> : null}
-                    </View>
-                              
-                  </View>
-                </View>
-
-                <View style={{justifyContent:'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-     
-              </TouchableOpacity>
-
-              <TouchableOpacity style={{flexDirection:'row',borderWidth: 0.5,borderColor: "#D8D8D8",borderRadius: hp("0.5%"),width: wp("80%"),marginTop: hp('2%')}} onPress={() => {selectBehaviourDrop();}}>
+              <TouchableOpacity style={{flexDirection:'row',borderWidth: 0.5,borderColor: "#D8D8D8",borderRadius: hp("0.5%"),width: wp("80%")}} onPress={() => {selectBehaviourDrop();}}>
 
                 <View>
                   <View style={[styles.SectionStyle1,{}]}>
@@ -328,7 +242,7 @@ const  ObservationUI = ({route, ...props }) => {
 
           <FlatList
             style={styles.flatcontainer}
-            data={behTypeText === 'Most Common' ? filetrMostCommenArray : filterLessCommenArray}
+            data={filterRef.current}
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => (
               <TouchableOpacity onPress={() => actionOnRow(item)}>
@@ -341,27 +255,7 @@ const  ObservationUI = ({route, ...props }) => {
           />
               
         </View> : null}
-
-        {isBehTypeView ? <View style={[styles.popSearchViewStyle,{height: hp("25%"),}]}>
-
-          <FlatList
-            style={styles.flatcontainer}
-            data={behTypeArray}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => (
-              <TouchableOpacity onPress={() => actionOnBehtype(item)}>
-                <View style={styles.flatview}>
-                  <Text numberOfLines={2} style={[styles.name]}>{item}</Text>
-                </View>
-              </TouchableOpacity>)}
-            enableEmptySections={true}
-            keyExtractor={(item) => item}
-          />
-    
-        </View> : null}
-
-        {isLoading === true ? <LoaderComponent isLoader={true} loaderText = {props.loaderMsg} isButtonEnable = {false} /> : null} 
-
+        {props.isLoading === true ? <LoaderComponent isLoader={true} loaderText = {props.loaderMsg} isButtonEnable = {false} /> : null} 
       </View>
     );
   }
@@ -449,7 +343,7 @@ const  ObservationUI = ({route, ...props }) => {
 
     popSearchViewStyle : {
       height: hp("80%"),
-      width: wp("95%"),
+      width: wp("100%"),
       backgroundColor:'#DCDCDC',
       bottom:0,
       position:'absolute',

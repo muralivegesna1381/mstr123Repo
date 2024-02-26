@@ -29,6 +29,7 @@ import AlertComponent from '../../utils/commonComponents/alertComponent';
 let searchImg = require("./../../../assets/images/otherImages/svg/searchIcon.svg");
 let defaultPetImg = require("./../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
 import RNExitApp from 'react-native-exit-app';
+import * as firebaseHelper from '../../utils/firebase/firebaseHelper';
 
 const PetListBFIScoringScreen = ({ route, navigation }) => {
   const [isLoading, set_isLoading] = useState(true);
@@ -55,9 +56,15 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
   var pageNum = useRef(1);
   var isScored = useRef(false);
   var searchText = useRef('')
+  let trace_pet_list_scoring_Screen;
+
 
   //Need to refresh screen when user wants to score another set of images from review screen
   useEffect(() => {
+    initialSessionStart();
+    firebaseHelper.reportScreen(firebaseHelper.screen_bfi_pet_list_scoring);
+    firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_pet_list_scoring, "User in Pet list scoring Screen", '');
+
     const focus = navigation.addListener("focus", () => {
       set_Date(new Date());
       clearData();
@@ -72,21 +79,32 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
   }, []);
 
   const getUserRole = async () => {
-    let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
+    let userRole = await DataStorageLocal.getDataFromAsync(Constant.MENU_ID);
     set_UserRole(userRole)
   }
+
+  const initialSessionStart = async () => {
+    trace_pet_list_scoring_Screen = await perf().startTrace('t_inPetListScoringScreen');
+  };
+
+  const initialSessionStop = async () => {
+    await trace_pet_list_scoring_Screen.stop();
+  };
 
   //Android Physical back button action
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     return () => {
+      initialSessionStop();
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
     };
   }, []);
 
   const backBtnAction = async () => {
-    let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
-    if (userRole === '8') {
+    
+    let userRole = await DataStorageLocal.getDataFromAsync(Constant.MENU_ID);
+
+    if (Platform.OS === "android" && userRole === '68') {
       set_popUpAlert('Exit App');
       set_popupMessage(Constant.ARE_YOU_SURE_YOU_WANT_EXIT);
       set_popUpRBtnTitle('YES');
@@ -192,10 +210,12 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
         else {
           set_isLoading(false);
           set_popupMessage('Unable to fetch the data, Please try again later')
+          firebaseHelper.logEvent(firebaseHelper.event_getPetBfiImages_api, firebaseHelper.screen_bfi_pet_list_scoring, "getPetBfiImages Service failed", 'Service error');
         }
       })
       .catch((error) => {
         //error block happens when there is something wring with the service
+        firebaseHelper.logEvent(firebaseHelper.event_getPetBfiImages_api, firebaseHelper.screen_bfi_pet_list_scoring, "getPetBfiImages Service failed", 'Service error'+ error.message);
         set_isLoading(false);
         set_popupMessage('Unable to fetch the records, Please try again later')
       });
@@ -260,12 +280,14 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
           setData(totalRecordsData.current);
           set_isLoading(false);
         } else {
+          firebaseHelper.logEvent(firebaseHelper.event_getBfiPets_api, firebaseHelper.screen_bfi_pet_list_scoring, "getBfiPets_api Service failed", 'Service error');
           if (totalRecordsData.current.length === 0)
             set_isRecords(true);
           set_isLoading(false);
         }
       })
       .catch((error) => {
+        firebaseHelper.logEvent(firebaseHelper.event_getBfiPets_api, firebaseHelper.screen_bfi_pet_list_scoring, "getBfiPets_api Service failed", 'Service error'+ error.message);
         set_popupMessage('Unable to fetch the records, Please try again later')
         set_isRecords(true);
         set_isLoading(false);
@@ -316,7 +338,7 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
                 </View>
                 <View
                   style={{ flex: 0.8, alignItems: "center", marginRight: wp("1.5%"), }}>
-                  <Text style={[styles.textStyle]}>{item.weight + " lbs"}</Text>
+                  <Text style={[styles.textStyle,]} >{item.weight ? item.weight + item.weightUnit : 'N/A'}</Text>
                 </View>
               </View>
             </View>
@@ -353,8 +375,8 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <View style={[CommonStyles.headerView, {}]}>
         <HeaderComponent
-          isBackBtnEnable={userRole === "8" ? false : true}
-          isSettingsEnable={userRole === "8" ? true : false}
+          isBackBtnEnable={userRole === "68" ? false : true}
+          isSettingsEnable={userRole === "68" ? true : false}
           isTitleHeaderEnable={true}
           isInfoEnable={true}
           title={"Score BFI"}

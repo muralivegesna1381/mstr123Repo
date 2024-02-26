@@ -7,6 +7,7 @@ import AlertComponent from './../../utils/commonComponents/alertComponent';
 import CommonStyles from './../../utils/commonStyles/commonStyles';
 import DeviceInfo from 'react-native-device-info';
 import * as Constant from "./../../utils/constants/constant";
+import DropdownComponent from '../../utils/commonComponents/dropDownComponent';
 
 let tickImg = require('./../../../assets/images/otherImages/png/tick.png');
 
@@ -67,11 +68,15 @@ const  AllDevicesUI = ({route, ...props }) => {
       props.addButtonAction();
     };
 
+    const actionOnOptiontype = (item) => {
+      props.actionOnOptiontype(item);
+    };
+
     const renderItem = ({item, index }) => {
 
       return (
 
-        <TouchableOpacity disabled = {true} key={index} onPress={() => {itemAction(item,index)}}>
+        <TouchableOpacity key={index} onPress={() => {itemAction(item,index)}}>
 
           {item.deviceNumber ? <View style={{alignItems:'center'}}>
 
@@ -79,41 +84,55 @@ const  AllDevicesUI = ({route, ...props }) => {
 
               {<View style={{flexDirection:'row',width:wp('80%'),marginTop: hp("1%"),marginBottom: hp("1%"),justifyContent:'center'}}>
 
-                {item && item.photoUrl && item.photoUrl !=='' ? <ImageBackground  onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => set_imgLoader(false)} 
-                source={{ uri: item.photoUrl }} borderRadius = {5} style={[styles.imgStyle,{flex:0.5,}]}>
+                {item && item.photoUrl && item.photoUrl !=='' ? <ImageBackground onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => set_imgLoader(false)} 
+                source={{ uri: item.photoUrl }} borderRadius = {100} resizeMode='cover' style={[styles.imgStyle,{width: Platform.isPad ? wp("10%") : wp("15%"),}]}>
 
                   {imgLoader === true && item && item.photoUrl ? (
                     <View style={CommonStyles.spinnerStyle}>
                       <ActivityIndicator size="small" color="#37B57C"/>
                     </View>
                   ) : null}
-                  </ImageBackground> : <ImageBackground source={require("./../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg")} style={styles.imgStyle}></ImageBackground>}
+
+                  </ImageBackground> : 
+                  <ImageBackground source={require("./../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg")} borderRadius = {100} resizeMode='cover' style={[styles.imgStyle,{width: Platform.isPad ? wp("10%") : wp("15%"),}]}></ImageBackground>}
+                  
                   <View style={{flexDirection:'column',flex:2}}>
+
                     {<Text style={[styles.deviceName,{ color: "black" },]}>{item.isDeviceSetupDone && item.battery && item.petName && item.petName.length > 15 ? item.petName.slice(0,15) + '...' : (item.petName && item.petName.length > 22 ? item.petName.slice(0,22) + '...' : item.petName)}</Text>}
                     <Text style={[styles.deviceName,{ color: "black" ,},]}>{item.deviceNumber}</Text>
                     {!item.isDeviceSetupDone ? <View style={{flexDirection:'column', }}>
                       <Text style={[styles.deviceName,{ color: "red" },]}>{'Setup Pending'}</Text>
                     </View> : (item.isFirmwareVersionUpdateRequired && item.isDeviceSetupDone ? (
-                                    <View style={{flexDirection: "row",alignItems: "center",}}>
-                                      <Image source={tickImg} style={styles.setupUpdateImgStyles}/>
-                                      <Text style={[styles.subHeaderStyle,{color: "#37B57C", marginRight: hp("1%"),}]}>{"Update Available "}</Text>
-                                    </View>
-                                  ) : null)}
-                  </View>  
-                  {item.isDeviceSetupDone && item.battery ? <View style={{height:50,width: DeviceInfo.isTablet()? wp("18%"): wp("25%"),backgroundColor: "#F5F7FB",alignItems: "center",
-                                      justifyContent: "center", borderRadius: 10,flexDirection: "row",alignSelf:'center'}}>
+                        <View style={{flexDirection: "row",alignItems: "center",}}>
+                          <Image source={tickImg} style={styles.setupUpdateImgStyles}/>
+                          <Text style={[styles.subHeaderStyle,{color: "#37B57C", marginRight: hp("1%"),}]}>{"Update Available "}</Text>
+                        </View>
+                        
+                      ) : null)}
+                      
 
-                    <ImageBackground style={{flexDirection: "row",flex: 1,marginLeft: hp("1%"),height:hp("2.5%"),}} resizeMode="stretch" source={require("../../../assets/images/otherImages/png/batterybg.png")}>
+                  </View>  
+
+                  {item.isDeviceSetupDone && item.battery ? <View style={{height:hp("4%"),width: DeviceInfo.isTablet()? wp("16%"): wp("25%"),backgroundColor: "#F5F7FB",alignItems: "center",
+                    justifyContent: "center", borderRadius: 10,flexDirection: "row",alignSelf:'center'}}>
+
+                    <ImageBackground style={{flexDirection: "row",marginLeft: hp("1%"),flex: 1,height:hp("2.5%"),}} resizeMode="stretch" source={require("../../../assets/images/otherImages/png/batterybg.png")}>
                       <View style={{backgroundColor: "gray",borderRadius: 2,flex: calculateBatteryPercentage(item.battery),margin: Platform.isPad ? 5 : 3,marginRight: 8,}}/>
                     </ImageBackground>
 
                     <Text style={[styles.batteryName,{marginRight:wp('1%'),marginLeft:wp('1%')}]}>{item.battery ? Math.round(Number(item.battery))  + '%'  : ''}</Text>
                                     
                   </View> : <View style = {{alignSelf:'center'}}><Text style={[styles.deviceName,{ color: "black" },]}>{'---'}</Text></View>}
-                      {/* <View style={{flex:0.3,justifyContent:'center',alignItems:'center'}}>
-                                <Image style={styles.moreImgStyels} source={require("./../../../assets/images/otherImages/svg/rightArrowLightImg.svg")}/>
-                            </View> */}
+                      <View style={{flex:0.15,justifyContent:'center',alignItems:'center',marginLeft: wp("2%"),width: wp("3.5%"),}}>
+                        <View style={{width: wp("1.5%"),aspectRatio:1,backgroundColor:'#707070',borderRadius:50}}></View>
+                        <View style={{width: wp("1.5%"),aspectRatio:1,backgroundColor:'#707070',borderRadius:50,marginTop: hp("0.2%")}}></View>
+                        <View style={{width: wp("1.5%"),aspectRatio:1,backgroundColor:'#707070',borderRadius:50,marginTop: hp("0.2%")}}></View>
+                      </View>
               </View>}
+
+              <View style={{width:wp('80%'),marginBottom:hp('1%')}}>
+                {item.lastSync ? <Text style={[styles.subHeaderStyle,{}]}>{"Last Sync: " + item.lastSync}</Text> : null}
+              </View>
 
             </View>
 
@@ -134,7 +153,7 @@ const  AllDevicesUI = ({route, ...props }) => {
               isChatEnable={false}
               isTImerEnable={false}
               isTitleHeaderEnable={true}
-              title={'List of Devices'}
+              title={'List of Sensors'}
               backBtnAction = {() => backBtnAction()}
             />
             </View>
@@ -156,14 +175,42 @@ const  AllDevicesUI = ({route, ...props }) => {
 
             {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
               <AlertComponent
-                header = {Constant.ALERT_NETWORK}
-                message={Constant.NETWORK_STATUS}
+                header = {Constant.ALERT_DEFAULT_TITLE}
+                message={Constant.FIRMWARE_UPTO_DATE}
                 isLeftBtnEnable = {false}
                 isRightBtnEnable = {true}
                 leftBtnTilte = {'NO'}
                 rightBtnTilte = {"OK"}
                 popUpRightBtnAction = {() => popOkBtnAction()}
               />
+            </View> : null}
+
+            {props.isListView ? <View style={[CommonStyles.customPopUpStyle]}>
+
+              <DropdownComponent
+                dataArray = {props.optionsArray}
+                headerText={'Select Action'}
+                actionOnOptiontype ={actionOnOptiontype}
+              />
+              
+
+              {/* <View style = {[CommonStyles.dropDownFlatview,{height: hp("5%"),}]}>
+                <Text style={[CommonStyles.dropDownHeaderTextStyle]}>{'Actions'}</Text>
+              </View>
+              <FlatList
+                style={CommonStyles.dropDownFlatcontainer}
+                data={props.optionsArray}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item, index }) => (
+                  <TouchableOpacity onPress={() => actionOnOptiontype(item)}>
+                    <View style={CommonStyles.dropDownFlatview}>
+                      <Text style={[CommonStyles.dropDownTextStyle]}>{item.name}</Text>
+                    </View>
+                  </TouchableOpacity>)}
+                enableEmptySections={true}
+                keyExtractor={(item) => item.name}
+              /> */}
+        
             </View> : null}
 
          </View>
@@ -191,14 +238,14 @@ const  AllDevicesUI = ({route, ...props }) => {
     },
 
     imgStyle: {
-      height: hp("5%"),
-      width: wp("11%"),
-      alignSelf: "center",
-      resizeMode: "contain",
-      borderRadius: 5,
+      // aspectRatio:1,
+      width: wp("10%"),
+      aspectRatio:1,
+      // alignSelf: "center",
+      // resizeMode: "contain",
+      // borderRadius: 100,
       overflow: "hidden",
       marginRight: hp("1%"),
-      borderColor:'red',
     },
 
     deviceName: {

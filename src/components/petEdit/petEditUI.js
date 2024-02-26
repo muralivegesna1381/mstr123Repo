@@ -145,6 +145,15 @@ const  PetEditUI = ({navigation,route, ...props }) => {
                                 </View>
                                 
                             </View>
+
+                            <View style={styles.dataViewStyle}>
+
+                                <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
+                                    <Text style={styles.labelTextStyles}>{'Feeding Time'}</Text>
+                                    <Text style={styles.selectedDataTextStyles}>{props.petObj && props.petObj.feedingPreferences ? props.petObj.feedingPreferences : '--'}</Text>
+                                </View>
+                                
+                            </View>
                             
                             <View style={styles.dataViewStyle}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
@@ -181,12 +190,12 @@ const  PetEditUI = ({navigation,route, ...props }) => {
                             <View style={styles.dataViewStyle}>
 
                                 <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
-                                    <Text style={styles.labelTextStyles}>{'Sensor No'}</Text>
-                                    {props.petObj && props.petObj.devices && props.petObj.devices.length > 0 && props.petObj.devices[0].deviceNumber.length < 10 ? <Text style={[styles.selectedDataTextStyles]}>{props.petObj.devices[0].deviceNumber}</Text> 
+                                    <Text style={styles.labelTextStyles}>{'Sensor Number'}</Text>
+                                    {props.petObj && props.petObj.devices && props.petObj.devices.length > 0 && props.petObj.devices[0].deviceNumber.length < 10 ? <Text style={[styles.selectedDataTextStyles]}>{props.petObj.devices[0].deviceNumber ? props.petObj.devices[0].deviceNumber : '--'}</Text> 
                                 : (props.petObj && props.petObj.devices && props.petObj.devices.length > 0 && props.petObj.devices[0].deviceNumber ? <View>
                                     <Text style={[styles.selectedDataTextStyles]}>{props.petObj.devices[0].deviceNumber.substring(0,9)}</Text>
                                     <Text style={[styles.selectedDataTextStyles]}>{props.petObj.devices[0].deviceNumber.substring(9,props.petObj.devices[0].deviceNumber.length)}</Text>
-                                </View> : null)}
+                                </View> : <Text style={[styles.selectedDataTextStyles]}>{"--"}</Text>)}
                                 </View>
                                 
                             </View>
@@ -194,7 +203,7 @@ const  PetEditUI = ({navigation,route, ...props }) => {
                             <View style={styles.dataViewStyle}>
 
                                 <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
-                                    <Text style={styles.labelTextStyles}>{'Device Type'}</Text>
+                                    <Text style={styles.labelTextStyles}>{'Sensor Type'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{props.petObj && props.petObj.devices.length > 0 && props.petObj.devices[0].deviceModel ? props.petObj.devices[0].deviceModel : '--'}</Text>
                                 </View>
                                 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useReducer } from 'react';
 import {Platform,Linking,BackHandler} from 'react-native';
 import ConnectSensorUI from './connectSensorUI';
 import { useNavigation } from "@react-navigation/native";
@@ -25,24 +25,30 @@ const  ConnectSensorComponent = ({ route, ...props }) => {
     const [btnTitle, set_btnTitle] = useState(undefined);
     const [date, set_Date] = useState(new Date());
     const [isFirstTime, set_isFirstTime] = useState(false);
+    const [deviceNumber, set_deviceNumber] = useState(undefined);
 
     let sensorType = useRef(undefined);
+    let deviceModal = useRef(undefined);
     let sensorNumber = useRef(undefined);
     let isLoadingdRef = useRef(0);
     let pheriId = useRef(undefined);
-    let sensorIndex = useRef(undefined);
+    let deviceNumberNew = useRef(undefined);
     let defaultPetObj = useRef(undefined);
+    let statusType = useRef(undefined);
+    let isFirmwareVersionUpdateRequired = useRef(false);
     let retryCount = useRef(0);
+    let actionType = useRef(0);
+
     const navigation = useNavigation();
 
     useEffect(() => {   
         
-        getDefaultPet();
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
 
         const focus = navigation.addListener("focus", () => {
             set_Date(new Date());
             initialSessionStart();
+            getDefaultPet();
             firebaseHelper.reportScreen(firebaseHelper.screen_connect_sensor);
             firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_connect_sensor, "User in Connect Sensor Screen", ''); 
         });
@@ -77,30 +83,55 @@ const  ConnectSensorComponent = ({ route, ...props }) => {
         
         set_isLoading(true);
         isLoadingdRef.current = 1;
-        let defaultObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT,);
-        defaultObj = JSON.parse(defaultObj);
-        defaultPetObj.current = defaultObj
 
-        sensorIndex.current = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
-        let devNumber = defaultObj.devices[parseInt(sensorIndex.current)].deviceNumber;
-        let deviceType =  defaultObj.devices[parseInt(sensorIndex.current)].deviceModel;
+        let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+        configObj = JSON.parse(configObj);
+        if(configObj && configObj.isReplaceSensor === 1 && (configObj.isForceSync === 0 || configObj.isForceSync === 2)) {
 
-        sensorType.current = deviceType;
-        sensorNumber.current = devNumber;
+            sensorType.current = configObj.configDeviceModel === 'HPN1' ? 'HPN1Sensor' : 'Sensor';
+            sensorNumber.current = configObj.configDeviceNo;
+            set_deviceNumber(configObj.configDeviceNo);
+            deviceModal.current = configObj.configDeviceModel;
+            statusType.current = false;
+            actionType.current = configObj.actionType;
 
+        } 
+        else if(configObj.isForceSync === 1) {
+
+            sensorType.current = configObj.syncDeviceModel === 'HPN1' ? 'HPN1Sensor' : 'Sensor';
+            sensorNumber.current = configObj.syncDeviceNo;
+            set_deviceNumber(configObj.syncDeviceNo);
+            deviceModal.current = configObj.syncDeviceModel;
+            statusType.current = false;
+            actionType.current = configObj.actionType;
+
+        } 
+        else {
+
+            sensorType.current = configObj.configDeviceModel === 'HPN1' ? 'HPN1Sensor' : 'Sensor';
+            sensorNumber.current = configObj.configDeviceNo;
+            set_deviceNumber(configObj.configDeviceNo);
+            deviceModal.current = configObj.configDeviceModel;
+            statusType.current = configObj.isDeviceSetupDone;
+            actionType.current = configObj.actionType;
+            isFirmwareVersionUpdateRequired.current = configObj.isFirmwareReq;
+
+        }
+        
+        await DataStorageLocal.saveDataToAsync(Constant.SENSOR_TYPE_CONFIGURATION,sensorType.current);
         firebaseHelper.logEvent(firebaseHelper.event_sensor_connection_status, firebaseHelper.screen_connect_sensor, "Connection with Sensor - No of Attemts : "+retryCount.current+1, 'Device Number : '+sensorNumber.current);
-        firebaseHelper.logEvent(firebaseHelper.event_Sensor_type, firebaseHelper.screen_connect_sensor, "Device Number : "+devNumber, 'Device Type : '+deviceType);
-
+        firebaseHelper.logEvent(firebaseHelper.event_Sensor_type, firebaseHelper.screen_connect_sensor, "Device Number : "+sensorNumber.current, 'Device Type : '+deviceModal.current);
         SensorHandler.getInstance();
         await SensorHandler.getInstance().getSensorType();
         await SensorHandler.getInstance().clearPeriID();
         if(Platform.OS==='ios'){
             setTimeout(() => {  
-                SensorHandler.getInstance().startScan(devNumber,handleSensorCallback); 
+                SensorHandler.getInstance().startScan(sensorNumber.current,handleSensorCallback); 
             }, 1000)
         } else {
-            SensorHandler.getInstance().startScan(devNumber,handleSensorCallback); 
+            SensorHandler.getInstance().startScan(sensorNumber.current,handleSensorCallback); 
         }
+
     };
 
     const handleSensorCallback = async ({ data, error }) => {
@@ -111,9 +142,27 @@ const  ConnectSensorComponent = ({ route, ...props }) => {
         if(data && data.status === 200){
 
             firebaseHelper.logEvent(firebaseHelper.event_sensor_connection_status, firebaseHelper.screen_connect_sensor, "Connection with Sensor sucess", 'Device Number : '+sensorNumber.current);
-            if(defaultPetObj.current){
 
-                if(!defaultPetObj.current.devices[parseInt(sensorIndex.current)].isDeviceSetupDone && (defaultPetObj.current.devices[parseInt(sensorIndex.current)].deviceModel==='CMAS' || defaultPetObj.current.devices[parseInt(sensorIndex.current)].deviceModel==='AGL2')){
+            if(actionType.current === Constant.SENSOR_CHANGE_WIFI || actionType.current === Constant.SENSOR_ADD_WIFI) {
+
+                // if(!statusType.current && (deviceModal.current === 'CMAS' || deviceModal.current === 'AGL2')){
+                    
+                //     set_isFirstTime(true);
+                //     setTimeout(() => {  
+                //         set_isLoading(false);
+                //         set_isFirstTime(true);
+                //         isLoadingdRef.current = 0;
+                //         navigation.navigate('SensorWiFiListComponent',{periId:pheriId.current,defaultPetObj:defaultPetObj.current,isFromScreen:'connectSensor',devNumber:sensorNumber.current});
+                //     }, 3000);
+
+                // } else {
+                //     set_isLoading(false);
+                //     set_isFirstTime(false);
+                //     isLoadingdRef.current = 0;
+                //     navigation.navigate('SensorWiFiListComponent',{periId:data.peripheralId,isFromScreen:'connectSensor'});
+                // }
+
+                if(!statusType.current && (deviceModal.current === 'CMAS' || deviceModal.current === 'AGL2')){
                     set_isFirstTime(true);
                     pheriId.current = data.peripheralId;
                     const writeVal = [3];
@@ -122,12 +171,58 @@ const  ConnectSensorComponent = ({ route, ...props }) => {
                     set_isLoading(false);
                     set_isFirstTime(false);
                     isLoadingdRef.current = 0;
-                    navigation.navigate('SensorWiFiListComponent',{periId:data.peripheralId,defaultPetObj:defaultPetObj.current,isFromScreen:'connectSensor',devNumber:sensorNumber.current});
+                    navigation.navigate('SensorWiFiListComponent',{periId:data.peripheralId,isFromScreen:'connectSensor'});
+                }
+
+            } else if(actionType.current === Constant.SENSOR_FSYNC) {
+                navigation.navigate('SensorCommandComponent',{commandType:'Force Sync',naviType:'ForceSync', deviceType:sensorType.current});
+            } else if(actionType.current === Constant.SENSOR_ERASE) {
+                navigation.navigate('SensorCommandComponent',{commandType:'Erase Data',naviType:'EraseData'});
+            } else if(actionType.current === Constant.SENSOR_FIRMWARE) {
+                navigation.navigate('SensorFirmwareComponent',{commandType:'SensorFirmware',naviType:'SensorFirmware'});
+            } else if(actionType.current === Constant.SENSOR_RESTORE) {
+                navigation.navigate('SensorCommandComponent',{commandType:'Restore',navType:'Restore'});
+            } else if(actionType.current === Constant.SENSOR_WIFI_LIST) {
+                navigation.navigate('WifiListHPN1Component');
+            } else if(actionType.current === Constant.SENSOR_FIRMWARE) {
+                navigation.navigate('ConnectSensorCommonComponent',{commandType:'Firmware',navType:'SensorFirmware'});
+            } else if(actionType.current === Constant.SENSOR_REPLACE) {
+
+                let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+                configObj = JSON.parse(configObj);
+                if(configObj.isForceSync === 1) {
+                    navigation.navigate('SensorCommandComponent',{commandType:'Force Sync',naviType:'ForceSync', deviceType:sensorType.current});
+                } else {
+
+                    
+
+                    if(!statusType.current && (deviceModal.current === 'CMAS' || deviceModal.current === 'AGL2')){
+                        set_isFirstTime(true);
+                        setTimeout(() => {  
+                            isLoadingdRef.current = 0;
+                            set_isLoading(false);
+                            navigation.navigate('SensorWiFiListComponent',{periId:pheriId.current,defaultPetObj:defaultPetObj.current,isFromScreen:'connectSensor',devNumber:sensorNumber.current});
+                        }, 3000);
+                    } else {
+                        set_isLoading(false);
+                        set_isFirstTime(false);
+                        isLoadingdRef.current = 0;
+                        navigation.navigate('SensorWiFiListComponent',{periId:data.peripheralId,isFromScreen:'connectSensor'});
+                    }
+                        
+                    // if(!statusType.current && (deviceModal.current === 'CMAS' || deviceModal.current === 'AGL2')){
+                    //     set_isFirstTime(true);
+                    //     pheriId.current = data.peripheralId;
+                    //     const writeVal = [3];
+                    //     writeData(writeVal);
+                    // } else {
+                    //     set_isLoading(false);
+                    //     set_isFirstTime(false);
+                    //     isLoadingdRef.current = 0;
+                    //     navigation.navigate('SensorWiFiListComponent',{periId:data.peripheralId,isFromScreen:'connectSensor'});
+                    // }
                 }
                 
-            } else {
-                set_isFirstTime(false);
-                retryConnecting();
             }
 
         } else {
@@ -168,12 +263,15 @@ const  ConnectSensorComponent = ({ route, ...props }) => {
 
     };
 
-    const writeData = (command) => {
+    const writeData = async (command) => {
 
-        SensorHandler.getInstance().writeDataToSensor(bleUUID.COMM_SERVICE,bleUUID.COMMAND_CHAR,command,
-          ({ data, error }) => {
+        await SensorHandler.getInstance().stopScanProcess(false);
+        await SensorHandler.getInstance().dissconnectSensor(); 
+
+        SensorHandler.getInstance().writeDataToSensor(bleUUID.COMM_SERVICE,bleUUID.COMMAND_CHAR,command,({ data, error }) => {
 
             if (data) {  
+                
                 setTimeout(() => {  
                     set_isLoading(false);
                     isLoadingdRef.current = 0;  
@@ -198,18 +296,18 @@ const  ConnectSensorComponent = ({ route, ...props }) => {
             let androidPer = await CheckPermissionsAndroid.checkBLEPermissions();
             if(androidPer) {
 
-                    BleManager.enableBluetooth().then(() => {
-                        set_btnTitle(undefined);
-                        getDefaultPet();
-                    }).catch((error) => {
-                        let high = <Highlighter highlightStyle={{ fontWeight: "bold",}}
-                        searchWords={[Constant.BLE_PERMISSIONS_ENABLED_HIGH]}
-                        textToHighlight={
-                            Constant.BLE_PERMISSIONS_ENABLED
-                        }/>
-                        set_popUpMessage(high);
-                        set_isPopUp(true);
-                    });
+                BleManager.enableBluetooth().then(() => {
+                    set_btnTitle(undefined);
+                    getDefaultPet();
+                }).catch((error) => {
+                    let high = <Highlighter highlightStyle={{ fontWeight: "bold",}}
+                    searchWords={[Constant.BLE_PERMISSIONS_ENABLED_HIGH]}
+                    textToHighlight={
+                        Constant.BLE_PERMISSIONS_ENABLED
+                    }/>
+                    set_popUpMessage(high);
+                    set_isPopUp(true);
+                });
 
             } else {
               
@@ -249,12 +347,14 @@ const  ConnectSensorComponent = ({ route, ...props }) => {
 
         if(isLoadingdRef.current === 0){
             SensorHandler.getInstance().dissconnectSensor();     
-            navigation.navigate("FindSensorComponent");  
+            // navigation.navigate("FindSensorComponent"); 
+            navigation.pop(); 
         }
            
     }
 
     const popOkBtnAction = (value,) => {
+
         if(popUpMessage === Constant.SENSOR_RETRY_MESSAGE_3){
             retryCount.current = 0;
             mailToHPN();
@@ -278,6 +378,8 @@ const  ConnectSensorComponent = ({ route, ...props }) => {
             isLoading = {isLoading}
             btnTitle = {btnTitle}
             isFirstTime = {isFirstTime}
+            sensorNumber = {sensorNumber.current}
+            deviceNumber = {deviceNumber}
             popOkBtnAction = {popOkBtnAction}
             nextBtnAction = {nextBtnAction}
             navigateToPrevious = {navigateToPrevious}

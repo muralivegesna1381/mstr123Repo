@@ -70,13 +70,21 @@ const  EnterWeightComponent = ({route, ...props }) => {
         }
 
         if(route.params?.value){
+            
             if(route.params?.value==='edit'){
                 set_isEditWeight(true);
+                if(route.params?.petWeightUnit==='Kgs'){
+                    set_weightType('Kgs');
+                    set_btnValue(1);
+                } else {
+                    set_weightType('lbs');
+                    set_btnValue(0);
+                }
             } else {
 
                 if(route.params?.petWeightUnit){
 
-                    if(route.params?.petWeightUnit==='kgs'){
+                    if(route.params?.petWeightUnit==='Kgs'){
                         set_weightType('Kgs');
                         set_btnValue(1);
                     } else {
@@ -172,7 +180,6 @@ const  EnterWeightComponent = ({route, ...props }) => {
             "weightUnit": weightType,
             "addDate":  "" + moment(new Date()).format("YYYY-MM-DD")
         }
-
         let enterUpdatePetWeight = await ServiceCalls.addEditPetWeight(weightJson,token,mtype);
         stopFBTrace();
 

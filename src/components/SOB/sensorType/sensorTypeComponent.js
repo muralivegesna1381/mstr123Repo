@@ -10,6 +10,7 @@ import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 
+let arrowIcon = require('./../../../../assets/images/dashBoardImages/svg/right-arrow.svg')
 let trace_inSensorTypeScreen;
 
 const SensorTypeComponent = ({ navigation, route, ...props }) => {
@@ -90,6 +91,9 @@ const SensorTypeComponent = ({ navigation, route, ...props }) => {
             navigation.navigate('DeviceValidationComponent', { value: isFromType, sensorType: sensorType });
         } else {
 
+            if(sJosnObj.current.deviceType !== sensorType) {
+                sJosnObj.current.deviceNo = ''
+            }
             sJosnObj.current.deviceType = sensorType;
             await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));
             firebaseHelper.logEvent(firebaseHelper.event_SOB_sensorType_submit, firebaseHelper.screen_SOB_sensorType, "User selected the Sensor Type", 'Device Type : ' + sensorType);
@@ -100,13 +104,14 @@ const SensorTypeComponent = ({ navigation, route, ...props }) => {
 
     const backBtnAction = () => {
 
-        if (isFromType === 'AddDevice') {
-            navigation.navigate('DashBoardService');
-        } else if (isFromType === 'Devices') {
-            navigation.navigate('MultipleDevicesComponent');
-        } else {
-            navigation.navigate('PetAddressComponent');
-        }
+        navigation.pop();
+        // if (isFromType === 'AddDevice') {
+        //     navigation.navigate('DashBoardService');
+        // } else if (isFromType === 'Devices') {
+        //     navigation.navigate('MultipleDevicesComponent');
+        // } else {
+        //     navigation.navigate('PetAddressComponent');
+        // }
 
     };
 
@@ -114,7 +119,17 @@ const SensorTypeComponent = ({ navigation, route, ...props }) => {
         set_selectedIndex(index);
         set_isActionSelected(true);
         set_sensorType(sType);
-    }
+    };
+
+    const withoutSensorAction = async () => {
+        sJosnObj.current.isWithourDevice = true;
+        sJosnObj.current.deviceNo = ''
+        sJosnObj.current.deviceType = '';
+        set_selectedIndex(undefined)
+        set_isActionSelected(false);
+        await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));
+        navigation.navigate('PetReviewComponent');
+    };
 
     return (
         <View style={[styles.mainComponentStyle]}>
@@ -130,66 +145,82 @@ const SensorTypeComponent = ({ navigation, route, ...props }) => {
                 />
             </View>
 
-            <View style={{ alignSelf: 'center', justifyContent: 'space-between' }}>
+            <View style={{ height: hp('70%'), alignItems:'center'}}>
 
                 <View style={{ width: wp('80%'), marginTop: hp('8%') }}>
                     <Text style={CommonStyles.headerTextStyle}>{'Please select the sensor type ' + petName + " will be wearing:"}</Text>
                 </View>
 
-                <View style={{ flexDirection: 'row', marginTop: hp('3%') }}>
+                <View style={{ height: hp('70%'),marginTop: hp('3%')}}>
 
-                    <TouchableOpacity onPress={() => selectSensorAction('AGL2', 0)}>
-                        <View style={selectedIndex === 0 ? [styles.activityBckView] : [styles.unActivityBckView]}>
+                    <View style={{ flexDirection: 'row', height: hp('15%')}}>
 
-                            <View style={styles.imgBckViewStyle}>
-                                <ImageBackground
-                                    source={require("./../../../../assets/images/sensorImages/svg/sensorTypeLogo.svg")}
-                                    style={Platform.isPad ? [styles.petImgStyle, {width: wp("7%"),}] : [styles.petImgStyle]}
-                                    resizeMode='contain'
-                                >
-                                </ImageBackground>
+                        <TouchableOpacity onPress={() => selectSensorAction('AGL2', 0)}>
+                            <View style={selectedIndex === 0 ? [styles.activityBckView] : [styles.unActivityBckView]}>
+
+                                <View style={styles.imgBckViewStyle}>
+                                    <ImageBackground
+                                        source={require("./../../../../assets/images/sensorImages/svg/sensorTypeLogo.svg")}
+                                        style={Platform.isPad ? [styles.petImgStyle, {width: wp("7%"),}] : [styles.petImgStyle]}
+                                        resizeMode='contain'
+                                    >
+                                    </ImageBackground>
+                                </View>
+
+                                <Text style={[styles.name]}>{'AGL 2'}</Text>
                             </View>
+                        </TouchableOpacity>
 
-                            <Text style={[styles.name]}>{'AGL 2'}</Text>
-                        </View>
-                    </TouchableOpacity>
+                        <TouchableOpacity onPress={() => selectSensorAction('CMAS', 1)}>
+                            <View style={selectedIndex === 1 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
-                    <TouchableOpacity onPress={() => selectSensorAction('CMAS', 1)}>
-                        <View style={selectedIndex === 1 ? [styles.activityBckView] : [styles.unActivityBckView]}>
+                                <View style={styles.imgBckViewStyle}>
+                                    <ImageBackground
+                                        source={require("./../../../../assets/images/sensorImages/svg/sensorTypeLogo.svg")}
+                                        style={Platform.isPad ? [styles.petImgStyle, {width: wp("7%"),}] : [styles.petImgStyle]}
+                                        resizeMode='contain'
+                                    >
+                                    </ImageBackground>
+                                </View>
 
-                            <View style={styles.imgBckViewStyle}>
-                                <ImageBackground
-                                    source={require("./../../../../assets/images/sensorImages/svg/sensorTypeLogo.svg")}
-                                    style={Platform.isPad ? [styles.petImgStyle, {width: wp("7%"),}] : [styles.petImgStyle]}
-                                    resizeMode='contain'
-                                >
-                                </ImageBackground>
+                                <Text style={[styles.name]}>{'CMAS'}</Text>
                             </View>
+                        </TouchableOpacity>
 
-                            <Text style={[styles.name]}>{'CMAS'}</Text>
-                        </View>
-                    </TouchableOpacity>
+                    </View>
+
+                    <View style={{ width: wp('35%'),height: hp('15%'),marginTop: hp('3%')  }}>
+                        <TouchableOpacity onPress={() => selectSensorAction('HPN1', 2)}>
+                            <View style={selectedIndex === 2 ? [styles.activityBckView] : [styles.unActivityBckView]}>
+
+                                <View style={styles.imgBckViewStyle}>
+                                    <ImageBackground
+                                        source={require("./../../../../assets/images/sensorImages/svg/sensorIcon.svg")}
+                                        style={[styles.petImgStyle, { width: Platform.isPad ? wp("9%") : wp("15%") }]}
+                                        resizeMode='contain'
+                                    >
+                                    </ImageBackground>
+                                </View>
+
+                                <Text style={[styles.name]}>{'HPN1'}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
 
                 </View>
 
-                <View style={{ width: wp('35%'), }}>
-                    <TouchableOpacity onPress={() => selectSensorAction('HPN1', 2)}>
-                        <View style={selectedIndex === 2 ? [styles.activityBckView] : [styles.unActivityBckView]}>
-
-                            <View style={styles.imgBckViewStyle}>
-                                <ImageBackground
-                                    source={require("./../../../../assets/images/sensorImages/svg/sensorIcon.svg")}
-                                    style={[styles.petImgStyle, { width: Platform.isPad ? wp("9%") : wp("15%") }]}
-                                    resizeMode='contain'
-                                >
-                                </ImageBackground>
-                            </View>
-
-                            <Text style={[styles.name]}>{'HPN1'}</Text>
-                        </View>
-                    </TouchableOpacity>
-                </View>
             </View>
+
+            {isFromType === 'AddDevice' ? null : <View style={{ alignSelf: 'center', justifyContent: 'space-between',}}>
+                <View style={{ height: hp('5%'), bottom:15}}>
+                    <TouchableOpacity style = {{flexDirection:'row',justifyContent:'center', alignItems:'center'}} onPress={() => withoutSensorAction()}>
+                        <Text style={[styles.withOutDevTextStyle]}>{'Continue without sensor'}</Text>
+                        <ImageBackground source={arrowIcon} style={[styles.arrowImgStyle, {}]} resizeMode='contain'></ImageBackground>
+                    </TouchableOpacity>
+                </View>
+            </View>}
+
+            
 
             <View style={CommonStyles.bottomViewComponentStyle}>
                 <BottomComponent
@@ -252,10 +283,25 @@ const styles = StyleSheet.create({
         marginTop: hp("1%"),
     },
 
+    withOutDevTextStyle: {
+        ...CommonStyles.textStyleBold,
+        fontSize: fonts.fontMedium,
+        textAlign: "center",
+        color: '#6BC100',
+        // marginTop: hp("1%"),
+    },
+
     petImgStyle: {
         width: wp("8%"),
         aspectRatio: 1,
         resizeMode: 'contain'
+    },
+
+    arrowImgStyle: {
+        width: wp("6%"),
+        aspectRatio: 1,
+        resizeMode: 'contain',
+        marginLeft: hp("1%"),
     },
 
     imgBckViewStyle: {

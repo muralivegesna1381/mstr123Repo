@@ -7,12 +7,11 @@ import * as DataStorageLocal from "../../../utils/storage/dataStorageLocal";
 import { View } from 'react-native';
 import AlertComponent from "../../../utils/commonComponents/alertComponent";
 import CommonStyles from "../../../utils/commonStyles/commonStyles";
-import * as ImageProgress from "../../../utils/imageProcessComponent/imageProcessComponent";
-import * as VideoProcessingComponent from "../../../utils/VideoProcessingComponent/videoProcessingComponent";
 import * as Apolloclient from './../../../config/apollo/apolloConfig';
 import * as ServiceCalls from "../../../utils/getServicesData/getServicesData.js";
 import * as AuthoriseCheck from "../../../utils/authorisedComponent/authorisedComponent";
 import storage from '@react-native-firebase/storage';
+import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
 // import  * as QestionnaireDataObj from "./../../components/questionnaire/questionnaireCustomComponents/questionnaireData/questionnaireSaveGetData";
 
 var RNFS = require('react-native-fs');
@@ -29,6 +28,7 @@ const CaptureBFIUpload = ({ navigation, route, ...props }) => {
 
     let totalImages = useRef(0)
     let completedImages = useRef(0)
+    let displayCompletedImages = useRef(0)
 
     useEffect(() => {
         if (captureBFIUploadData && captureBFIUploadData.data.__typename === 'UploadCaptureBFIBackground') {
@@ -50,6 +50,10 @@ const CaptureBFIUpload = ({ navigation, route, ...props }) => {
                     jsonArrayMedia.push({ localFileURL: mediaData['petBfiImages'][i].localthmbURl, position: i, type: "THUMB" })
                 }
             }
+
+            //default set as 1
+            displayCompletedImages.current = displayCompletedImages.current + 1
+
             totalImages.current = jsonArrayMedia.length
 
             Apolloclient.client.writeQuery({
@@ -110,13 +114,12 @@ const CaptureBFIUpload = ({ navigation, route, ...props }) => {
         task.on('state_changed', taskSnapshot => {
             let progress = Math.round((taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100);
             if (progress === 0) progress = 1
-
             Apolloclient.client.writeQuery({
                 query: Queries.UPLOAD_CAPTURE_BFI_BACKGROUND_STATUS, data: {
                     data: {
                         questName: "",
-                        statusUpload: 'Uploading media to cloud',
-                        fileName: fileName,
+                        statusUpload: 'Uploading BFI Photos is in-progress',
+                        fileName: "....",
                         uploadProgress: progress + '%',
                         progressTxt: 'Completed',
                         stausType: 'Uploading',
@@ -132,6 +135,7 @@ const CaptureBFIUpload = ({ navigation, route, ...props }) => {
         await task.then(() => {
             storage().ref(fileName).getDownloadURL().then(async (downloadURL) => {
                 if (type === "ORIGINAL") {
+                    displayCompletedImages.current = displayCompletedImages.current + 1
                     mediaData['petBfiImages'][pos].fbFileURL = downloadURL
                 }
                 else {
@@ -197,11 +201,16 @@ const CaptureBFIUpload = ({ navigation, route, ...props }) => {
                         UpdateApolloQuery()
 
                         createPopup(Constant.ALERT_INFO, Constant.CAPTURED_SUBMIT_IMAGES_SUCCESS, 'OK', true);
-                        //remove local data
-                        //navigation.navigate("ReviewComponent", { isFromScreen: 'capture_image' });
+
                     } else {
                         UpdateApolloQuery()
                         createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.CAPTURED_SUBMIT_IMAGES_FAIL, 'OK', true);
+                        firebaseHelper.logEvent(firebaseHelper.event_capture_bfi_submit_api, firebaseHelper.screen_capture_bfi, "Capture BFI Service failed", "Service Status:");
+                    }
+
+                    if (serviceCallsObj && serviceCallsObj.error) {
+                        let errors = serviceCallsObj.error.length > 0 ? serviceCallsObj.error[0].code : ''
+                        firebaseHelper.logEvent(firebaseHelper.event_capture_bfi_submit_api, firebaseHelper.screen_capture_bfi, "Capture BFI Service failed", 'Service error : ' + errors);
                     }
                 }
 

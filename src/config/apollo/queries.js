@@ -478,6 +478,22 @@ export const UPLOAD_QUESTIONNAIRE_VIDEO_BACKGROUND = gql`
   }
 `;
 
+export const UPLOAD_IMAGE_BACKGROUND = gql`
+  query UploadImageBackground {
+    data {
+      imageData
+    }
+  }
+`;
+
+export const UPLOAD_VIDEOS_BACKGROUND = gql`
+  query UploadVideosBackground {
+    data {
+      videoData
+    }
+  }
+`;
+
 export const UPDATE_PETS_PERMISSIONS = gql`
   query UpdatePetPermissions {
     data {
@@ -493,6 +509,38 @@ export const UPLOAD_QUESTIONNAIRE_VIDEO_BACKGROUND_STATUS = gql`
       stausType
       mediaTYpe
       questName
+      fileName
+      uploadProgress
+      progressTxt
+      internetType
+      uploadMode
+    }
+  }
+`;
+
+export const IMAGE_UPLOAD_BACKGROUND_STATUS = gql`
+  query imageUploadBackgroundStatus {
+    data {
+      statusUpload
+      stausType
+      mediaTYpe
+      obsImgName
+      fileName
+      uploadProgress
+      progressTxt
+      internetType
+      uploadMode
+    }
+  }
+`;
+
+export const VIDEO_UPLOAD_BACKGROUND_STATUS = gql`
+  query videoUploadBackgroundStatus {
+    data {
+      statusUpload
+      stausType
+      mediaTYpe
+      obsVidName
       fileName
       uploadProgress
       progressTxt

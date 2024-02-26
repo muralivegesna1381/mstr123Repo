@@ -156,7 +156,7 @@ const UpdatePhoneService = ({ navigation, route, ...props }) => {
           
         } else {
             firebaseHelper.logEvent(firebaseHelper.event_change_phone_api_fail, firebaseHelper.screen_change_phone, "Chanhe Phone Api Failed ", 'Responce Status : false');
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);              
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_UPDATE_ERROR_MSG,true);              
         }
           
         if(cPhNoServiceObj && cPhNoServiceObj.error) {

@@ -39,13 +39,38 @@ class ObjectDetection: NSObject {
   
   func getLabelText (labelsData :[ImageLabel]) -> Bool{
     var objectDataMatched = false;
+    var catConfidenceVal:Float = 0;
+    var toyConfidenceVal:Float = 0;
+    
     for label in labelsData {
-      //print("-----LABELS--------",label.text,label.confidence)
-      if(label.text.contains("Dog")){
-        objectDataMatched = true;
-        //print("-----VALUE1--------",objectDataMatched)
+      if(label.text.contains("Toy") && label.confidence>0.85){
+        toyConfidenceVal = label.confidence
+        objectDataMatched = false;
       }
+      if(label.text.contains("Cat") && label.confidence>0.85){
+        catConfidenceVal = label.confidence
+        objectDataMatched = false;
+      }
+      if(label.text.contains("Dog")){
+        if(label.confidence>0.95){
+          objectDataMatched = true;
+        }
+        else if(catConfidenceVal>0.95){
+          objectDataMatched = false;
+        }
+        else if(catConfidenceVal>0.85 && label.confidence<0.75){
+          objectDataMatched = false;
+        }
+        else if(toyConfidenceVal>0.85 && label.confidence<0.75){
+          objectDataMatched = false;
+        }
+        else if(label.confidence>0.60){
+          objectDataMatched = true;
+        }
+      }
+      
     }
+
     newCallBack!([objectDataMatched])
     return objectDataMatched;
   }

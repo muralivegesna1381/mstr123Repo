@@ -65,7 +65,7 @@ const  ObservationsListUI = ({route, ...props }) => {
     set_activeSlide(index);
   };
 
-    // Next btn action 
+    //button action 
   const nextButtonAction = () => {
     props.submitAction();
   };
@@ -78,6 +78,7 @@ const  ObservationsListUI = ({route, ...props }) => {
     props.popOkBtnAction();
   };
 
+  // Swipe pet action from Pets caraousal
   const observationsPetSelection = async (pObject) => {
     await DataStorageLocal.saveDataToAsync(Constant.OBS_SELECTED_PET, JSON.stringify(pObject));
     props.observationsPetSelection(pObject);
@@ -85,6 +86,12 @@ const  ObservationsListUI = ({route, ...props }) => {
 
   const selectObservationAction = (item) => {
     props.selectObservationAction(item);
+  };
+
+  // Removes the typeahead list after selecting the pet in search
+  const selectedSearchPetAction = async (item) => {
+      await DataStorageLocal.saveDataToAsync(Constant.OBS_SELECTED_PET, JSON.stringify(item));
+      props.selectedSearchPetAction(item);
   };
 
   const _renderObservations = (item) => {
@@ -143,17 +150,19 @@ const  ObservationsListUI = ({route, ...props }) => {
         />
       </View>
 
-      <View style={[CommonStyles.petsSelViewHeaderStyle]}>
+      <View style={[CommonStyles.petsSelViewHeaderStyle,{zIndex : isLoading ? 0 : 999}]}>
         {defaultPetObj ? <PetsSelectionCarousel
           petsArray={petsArray}
           isSwipeEnable = {true}
           defaultPet = {defaultPetObj}
           activeSlides = {activeSlide}
+          dismissSearch = {props.isSearchDropdown}
           setValue={(pObject) => {observationsPetSelection(pObject);}}
+          selectedPetAction={(pObject) => {selectedSearchPetAction(pObject);}}
         /> : null}
       </View>
 
-      <View style={{height:hp('66%')}}>
+      <View style={{height:hp('60%')}}>
 
         {observationsArray && observationsArray.length > 0 ? <View style={{height:hp('5%'),width:wp('100%'),flexDirection:'row',justifyContent:'center',alignSelf:'center',alignItems:'center'}}>
           <Text style={[styles.hTextextStyle,{flex:1.2,textAlign:'center'}]}>{''}</Text>
@@ -179,10 +188,12 @@ const  ObservationsListUI = ({route, ...props }) => {
       <View style={CommonStyles.bottomViewComponentStyle}>
         <BottomComponent
           rightBtnTitle = {'NEW OBSERVATION'}
-          isLeftBtnEnable = {false}
+          leftBtnTitle = {'BACK'}
+          isLeftBtnEnable = {true}
           rigthBtnState = {petsArray && petsArray.length > 0 ? true : false}
           isRightBtnEnable = {true}
           rightButtonAction = {async () => nextButtonAction()}
+          leftButtonAction = {async () => backBtnAction()}
         />
       </View>   
 
@@ -236,6 +247,7 @@ const  ObservationsListUI = ({route, ...props }) => {
 
     flatcontainer: {
       width: "100%",
+      backgroundColor: "white",
     },
 
     obsTextStyle : {

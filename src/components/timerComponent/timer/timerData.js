@@ -233,6 +233,9 @@ const TimerData = ({route, ...props }) => {
     };
 
     const minmizeBtnAction = () => {
+        if(timer){
+            clearInterval(timer);
+        }
         props.minmizeBtnAction();
     };
 
@@ -356,7 +359,6 @@ const TimerData = ({route, ...props }) => {
         set_isLoading(true);
         let serviceCallsObj = await ServiceCalls.managePetTimerLog(jsonValue,token);
         set_isLoading(false);
-
         if(serviceCallsObj && serviceCallsObj.logoutData){
             AuthoriseCheck.authoriseCheck();
             navigation.navigate('WelcomeComponent');

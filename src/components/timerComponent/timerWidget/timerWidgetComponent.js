@@ -358,7 +358,6 @@ const TimerWidgetComponent = ({navigation,route, ...props }) => {
 
         let serviceCallsObj = await ServiceCalls.managePetTimerLog(json,token);
         set_isLoading(false);
-
         if(serviceCallsObj && serviceCallsObj.logoutData){
             AuthoriseCheck.authoriseCheck();
             navigation.navigate('WelcomeComponent');

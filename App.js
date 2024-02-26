@@ -5,8 +5,9 @@
  * @format
  * @flow strict-local
  */
+
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Alert, StatusBar, Platform } from 'react-native';
+import { View, Alert, StatusBar, Platform, Text, TextInput} from 'react-native';
 import { ApolloProvider } from '@apollo/react-hooks';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -20,6 +21,8 @@ import messaging from '@react-native-firebase/messaging';
 import VideoUploadComponent from './src/utils/videoUploadBackground/videoUploadBackground.component';
 import PushNotification, { Importance } from 'react-native-push-notification';
 import QuestionnaireMediaUpload from './src/utils/questionnaireMediaUpload/questionnaireMediaUpload';
+import ImageBackgrounUpload from './src/utils/mediaProcessingComponents/imageBackgroundUpload/imageBackgroundUpload';
+import VideoBackgroundUpload from './src/utils/mediaProcessingComponents/videoBackgroundUpload/videoBackgroundUpload';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 import CaptureBFIUpload from './src/bfiComponents/captureImages/imageCapture/captureBFIUpload';
 
@@ -35,6 +38,7 @@ import "./ignoreWarnings";
 const App = () => {
 
   useEffect(() => {
+
     checkPermission();
     onAppBootstrap();
     messageListener();
@@ -43,6 +47,14 @@ const App = () => {
 
     if (Platform.OS === 'android') {
       crateChannelPushNotifications();;
+    }
+
+    if (Text.defaultProps == null) {
+      Text.defaultProps = {};    Text.defaultProps.allowFontScaling = false;
+    }
+    if (TextInput.defaultProps == null) {
+        TextInput.defaultProps = {};
+        TextInput.defaultProps.allowFontScaling = false;
     }
 
   }, []);
@@ -156,8 +168,9 @@ const App = () => {
       <View style={{ flex: 1 }}>
         <AppNavigator style={{ flex: 1 }} />
         <TimerWidgetComponent />
-        <VideoUploadComponent />
+        <VideoBackgroundUpload />
         <QuestionnaireMediaUpload />
+        <ImageBackgrounUpload />
         <CaptureBFIUpload />
       </View>
     </ApolloProvider>

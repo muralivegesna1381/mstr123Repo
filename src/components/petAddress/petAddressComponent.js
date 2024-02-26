@@ -13,7 +13,7 @@ let trace_inPetAddressScreen;
 const PetAddressComponent = ({ navigation, route, ...props }) => {
 
     const [date, set_Date] = useState(new Date());
-    const [isNxtBtnEnable, set_isNxtBtnEnable] = useState(true);
+    const [isNxtBtnEnable, set_isNxtBtnEnable] = useState(false);
     const [addLine1, set_addLine1] = useState('');
     const [addLine2, set_addLine2] = useState('');
     const [city, set_city] = useState(undefined);
@@ -29,15 +29,16 @@ const PetAddressComponent = ({ navigation, route, ...props }) => {
     const [popUpMessage, set_popUpMessage] = useState(undefined);
     const [isPopUp, set_isPopUp] = useState(false);
     const [popUpAlert, set_popUpAlert] = useState('Alert');
+    const [addressMOBJ, set_addressMOBJ] = useState(false);
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
     let sJosnObj = useRef({});
 
     React.useEffect(() => {
-        
+
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
-        
+
         const focus = navigation.addListener("focus", () => {
             set_Date(new Date());
             initialSessionStart();
@@ -56,7 +57,7 @@ const PetAddressComponent = ({ navigation, route, ...props }) => {
             unsubscribe();
             BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
         };
-        
+
     }, []);
 
     useEffect(() => {
@@ -64,8 +65,8 @@ const PetAddressComponent = ({ navigation, route, ...props }) => {
         if (route.params?.isFrom) {
             set_isFromScreen(route.params?.isFrom);
         }
-    
-      }, [route.params?.isFrom]);
+
+    }, [route.params?.isFrom]);
 
     const handleBackButtonClick = () => {
         navigateToPrevious();
@@ -82,7 +83,7 @@ const PetAddressComponent = ({ navigation, route, ...props }) => {
 
     const getSOBDetails = async () => {
 
-        if(isFromScreen === 'editPet'){
+        if (isFromScreen === 'editPet') {
 
         } else {
 
@@ -92,8 +93,8 @@ const PetAddressComponent = ({ navigation, route, ...props }) => {
             if (sJson) {
                 // set_sobJson(sJson);
                 sJosnObj.current = sJson;
-                if (((sJson.petLocation && sJson.isSameAddress === 'same'))) {                    
-                    set_allAnswered(true);
+                if (((sJson.petLocation && sJson.isSameAddress === 'same'))) {
+                    set_isNxtBtnEnable(true);
                     set_addLine1(sJson.petLocation.address1);
                     set_addLine2(sJson.petLocation.address2);
                     set_city(sJson.petLocation.city);
@@ -101,8 +102,8 @@ const PetAddressComponent = ({ navigation, route, ...props }) => {
                     set_zipCode(sJson.petLocation.zipCode);
                     set_country(sJson.petLocation.country);
                     set_isPetParentAddress(sJson.isPetParentAddress);
-                } else if(sJson.petLocationNew && sJson.isSameAddress === 'notSame' && Object.keys(sJson.petLocationNew).length !== 0 ) {
-                    set_allAnswered(true);
+                } else if (sJson.petLocationNew && sJson.isSameAddress === 'notSame' && Object.keys(sJson.petLocationNew).length !== 0) {
+                    set_isNxtBtnEnable(true);
                     set_addLine1(sJson.petLocationNew.address1);
                     set_addLine2(sJson.petLocationNew.address2);
                     set_city(sJson.petLocationNew.city);
@@ -110,22 +111,25 @@ const PetAddressComponent = ({ navigation, route, ...props }) => {
                     set_zipCode(sJson.petLocationNew.zipCode);
                     set_country(sJson.petLocationNew.country);
                     set_isPetParentAddress(sJson.isPetParentAddress);
+                    set_addressMOBJ(sJson.petLocationNew);
                 }
             }
         }
 
     };
 
-    const validatePetParentAddress = async (addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef) => {
+    const validatePetParentAddress = async (address) => {
 
+        let obj = {
+            'address': address
+        }
         set_isLoading(true);
         isLoadingdRef.current = 1;
-        let seviceString = 'address1='+addLine1Ref+'&'+'address2='+addLine2Ref+'&'+'city='+cityRef+'&'+'state='+stateRef+'&'+'country='+countryRef+'&'+'zipCode='+zipCodeRef;
 
-        let addressServiceObj = await ServiceCalls.validateAddress(seviceString);
+        let addressServiceObj = await ServiceCalls.validateAddress(obj);
         set_isLoading(false);
         isLoadingdRef.current = 0;
- 
+
         if (addressServiceObj && addressServiceObj.logoutData) {
             firebaseHelper.logEvent(firebaseHelper.event_Pet_Parent_Address_api_fail, firebaseHelper.screen_petParent_address, "Validate Address Failed", 'User Loged Out - Multiple login');
             AuthoriseCheck.authoriseCheck();
@@ -135,78 +139,92 @@ const PetAddressComponent = ({ navigation, route, ...props }) => {
 
         if (addressServiceObj && addressServiceObj.invalidData) {
             createPopup(Constant.ALERT_DEFAULT_TITLE, 'Invalid Address', true);
+            set_isNxtBtnEnable(false);
             firebaseHelper.logEvent(firebaseHelper.event_Pet_Parent_Address_api_fail, firebaseHelper.screen_petParent_address, "Validate Address Failed", 'Entered Invalid Address');
             return;
         }
 
         if (addressServiceObj && !addressServiceObj.isInternet) {
             createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
+            set_isNxtBtnEnable(false);
             firebaseHelper.logEvent(firebaseHelper.event_Pet_Parent_Address_api_fail, firebaseHelper.screen_petParent_address, "Validate Address Failed", 'No Internet');
             return;
         }
 
         if (addressServiceObj && addressServiceObj.statusData) {
-            
-            let addObj = {
-                 "addressId" : null,
-                 "address1" : addLine1Ref,
-                 "address2" : addLine2Ref,
-                 "city" : cityRef,
-                 "state" : stateRef,
-                 "country" : countryRef,
-                 "zipCode" : zipCodeRef,
-                 "timeZoneId" : addressServiceObj.responseData.address.timeZone.timeZoneId,
-                 "timeZone" : addressServiceObj.responseData.address.timeZone.timeZoneName,
-                 "addressType" : 1,
-                 "isPreludeAddress" : 0
+
+            if (addressServiceObj.responseData && addressServiceObj.responseData.isValidAddress === 1) {
+
+                let addObj = {
+                    "addressId" : null,
+                    "address1" : addressServiceObj.responseData.address.address1,
+                    "address2" : '',
+                    "city" : addressServiceObj.responseData.address.city,
+                    "state" : addressServiceObj.responseData.address.state,
+                    "country" : addressServiceObj.responseData.address.country,
+                    "zipCode" : addressServiceObj.responseData.address.zipCode,
+                    "timeZoneId" : addressServiceObj.responseData.address.timeZone.timeZoneId,
+                    "timeZone" : addressServiceObj.responseData.address.timeZone.timeZoneName,
+                    "addressType" : 1,
+                    "isPreludeAddress" : 0
+               }
+
+                set_addLine1(addressServiceObj.responseData.address.address1);
+                set_addLine2('');
+                set_city(addressServiceObj.responseData.address.city);
+                set_state(addressServiceObj.responseData.address.state);
+                set_zipCode(addressServiceObj.responseData.address.zipCode);
+                set_country(addressServiceObj.responseData.address.country);
+                set_addressMOBJ(addObj);
+                set_allAnswered(true);
+                set_isNxtBtnEnable(true);
+
+            } else {
+                set_isNxtBtnEnable(false);
+                firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'error : Invalid Address');
+                createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
             }
-            updateLocalData(addObj);
+
         } else {
+            set_isNxtBtnEnable(false);
             firebaseHelper.logEvent(firebaseHelper.event_Pet_Parent_Address_api_fail, firebaseHelper.screen_petParent_address, "Validate Address Failed", 'Service Status : false');
             createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
         }
 
         if (addressServiceObj && addressServiceObj.error) {
+            set_isNxtBtnEnable(false);
             createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
             let errors = addressServiceObj.error.length > 0 ? addressServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_Pet_Parent_Address_api_fail, firebaseHelper.screen_petParent_address, "Validate Address Failed", 'error : '+errors);
+            firebaseHelper.logEvent(firebaseHelper.event_Pet_Parent_Address_api_fail, firebaseHelper.screen_petParent_address, "Validate Address Failed", 'error : ' + errors);
         }
 
     };
 
     const navigateToPrevious = () => {
-        if(isFromScreen === 'feedingPrefs') {
+        if (isFromScreen === 'feedingPrefs') {
             firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_petParent_address, "User clicked on Back button : PetFeedingPreferencesComponentUI", '');
-            navigation.navigate('PetFeedingPreferencesComponentUI');
-        } else if(isFromScreen === 'pLocation') {
+            navigation.navigate('PetFoodInfoComponent');
+        } else if (isFromScreen === 'pLocation') {
             firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_petParent_address, "User clicked on Back button : PetLocationComponent", '');
             navigation.navigate('PetLocationComponent');
         }
- 
+
     };
 
-    const submitAction = async (addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef,isAddressChange) => {
+    const submitAction = async () => {
 
-        let line1 = addLine1Ref.replace(/(^[,\s]+)|([,\s]+$)/g, '');
-        let line2 = '';
-        if(addLine2Ref && addLine2Ref !== '') {
-            line2 = addLine2Ref.replace(/(^[,\s]+)|([,\s]+$)/g, '');
-        }
-
-        if(isFromScreen === 'petEdit'){
+        if (isFromScreen === 'petEdit') {
             //// Update Pet address here
         } else {
-            if(addLine1Ref && cityRef && stateRef && zipCodeRef && countryRef){
-                if(sobJson && sobJson.isSameAddress === 'same') {                   
-                    updateLocalData(sobJson.petParentObj.petParentAddress);
-                } else {
-                    validatePetParentAddress(line1,line2,cityRef,stateRef,zipCodeRef,countryRef);
-                }
- 
-            }          
-            
+
+            if (sobJson && sobJson.isSameAddress === 'same') {
+                updateLocalData(sobJson.petParentObj.petParentAddress);
+            } else {
+                updateLocalData(addressMOBJ);
+                // validatePetParentAddress();
+            }
         }
-        
+
     };
 
     const createPopup = (title, msg, isPop) => {
@@ -224,39 +242,38 @@ const PetAddressComponent = ({ navigation, route, ...props }) => {
     };
 
     const updateLocalData = async (addChangeObj) => {
+
         sJosnObj.current.petLocation = sJosnObj.current.petParentObj && sJosnObj.current.petParentObj.petParentAddress ? sJosnObj.current.petParentObj.petParentAddress : undefined;
         sJosnObj.current.petLocationNew = sJosnObj.current.isSameAddress === 'notSame' ? addChangeObj : sJosnObj.current.petLocationNew;
         await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));
-        
-        //Skip Sensor part if navigation is from PET BFI
-        let type = await DataStorageLocal.getDataFromAsync(Constant.ONBOARDING_PET_BFI);
-        if (type === Constant.IS_FROM_PET_BFI) {
-            navigation.navigate('PetReviewComponent');
-        } else {
-            navigation.navigate('SensorTypeComponent', { isFrom: 'petAddress' });
-        }
-    }
+        navigation.navigate('SensorTypeComponent', { isFrom: 'petAddress' });
+    };
+
+    const getAddress = (address) => {
+        validatePetParentAddress(address);
+    };
 
     return (
         <PetAddressUI
-            isNxtBtnEnable = {isNxtBtnEnable}
-            addLine1 = {addLine1}
-            addLine2 = {addLine2}
-            state = {state}
-            city = {city}
-            zipCode = {zipCode}
-            country = {country}
-            isAddressChange = {isAddressChange}
-            isFromScreen = {isFromScreen}
-            isPetParentAddress = {isPetParentAddress}
-            allAnswered = {allAnswered}
-            isLoading = {isLoading}
-            isPopUp = {isPopUp}
-            popUpMessage = {popUpMessage}
-            popUpAlert = {popUpAlert}
+            isNxtBtnEnable={isNxtBtnEnable}
+            addLine1={addLine1}
+            addLine2={addLine2}
+            state={state}
+            city={city}
+            zipCode={zipCode}
+            country={country}
+            isAddressChange={isAddressChange}
+            isFromScreen={isFromScreen}
+            isPetParentAddress={isPetParentAddress}
+            addressMOBJ={addressMOBJ}
+            isLoading={isLoading}
+            isPopUp={isPopUp}
+            popUpMessage={popUpMessage}
+            popUpAlert={popUpAlert}
             submitAction={submitAction}
             navigateToPrevious={navigateToPrevious}
-            popOkBtnAction = {popOkBtnAction}
+            popOkBtnAction={popOkBtnAction}
+            getAddress={getAddress}
         />
     );
 

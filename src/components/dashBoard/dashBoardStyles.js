@@ -149,7 +149,7 @@ const DashBoardStyles = StyleSheet.create({
 
     quickselctionViewStyle : {
         width:wp('93.5%'),
-        height:hp('6%'),
+        height:hp('7%'),
         borderRadius:5,
         alignSelf:'center',
         justifyContent:'center',
@@ -165,13 +165,19 @@ const DashBoardStyles = StyleSheet.create({
     },
 
     quickbtnInnerImgStyle : {
+        width:wp('5%'),
+        height:hp('3%'),
+        resizeMode:'contain',
+    },
+
+    upDownImgStyle : {
         width:wp('4%'),
-        height:hp('2.5%'),
+        height:hp('1.5%'),
         resizeMode:'contain',
     },
 
     quickbtnInnerTextStyle : {
-        fontSize: fonts.fontXTiny,
+        fontSize: 11,
         ...CommonStyles.textStyleBold,
         color: 'black', 
         alignSelf:'center',
@@ -237,7 +243,15 @@ const DashBoardStyles = StyleSheet.create({
     },
 
     questCountTextStyle : {
-        fontSize: fonts.fontLarge,
+        fontSize: 28,
+        ...CommonStyles.textStyleBold,
+        color: '#6BC100', 
+        marginBottom:hp('0.5%'), 
+        marginLeft:hp('0.5%'), 
+    },
+
+    questCountTextStyleiPad : {
+        fontSize: 40,
         ...CommonStyles.textStyleBold,
         color: '#6BC100', 
         marginBottom:hp('0.5%'), 
@@ -316,16 +330,22 @@ const DashBoardStyles = StyleSheet.create({
     },
 
     questSubHeaderTextStyle : {
-        fontSize: fonts.fontSmall,
+        fontSize: 16,
         ...CommonStyles.textStyleSemiBold,
         color: 'black', 
     },
 
-    questCountTextStyle : {
-        fontSize: fonts.fontXLarge,
-        ...CommonStyles.textStyleBold,
-        color: '#6BC100', 
+    questSubHeaderTextStyleiPad : {
+        fontSize: 24,
+        ...CommonStyles.textStyleSemiBold,
+        color: 'black', 
     },
+
+    // questCountTextStyle : {
+    //     fontSize: fonts.fontXLarge,
+    //     ...CommonStyles.textStyleBold,
+    //     color: '#6BC100', 
+    // },
 
     sliderTextStyle : {
         fontSize: fonts.fontXSmall,
@@ -334,20 +354,23 @@ const DashBoardStyles = StyleSheet.create({
     },
 
     tyleActivityStyle : {
-        height: hp("15%"),
-        width: wp("43.5%"),
-        shadowColor: 'grey',
-        shadowOffset: { width: 2, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 1, 
+        // height: hp("12%"),
+        width: wp("91%"),
+        // shadowColor: "#627e92",
+        // shadowOffset: { width: 0, height: 7},
+        // shadowOpacity:  0.21,
+        // shadowRadius: 7.68,
+        // elevation: 10,
         backgroundColor:'white',
-        borderRadius:10
+        borderRadius:5,
+        alignItems:'center'
     },
 
     activityHeaderTextStyle : {
-        fontSize: fonts.fontXSmall,
+        fontSize: 16,
         ...CommonStyles.textStyleSemiBold,
         color: 'black', 
+        marginLeft: wp("2%")
     },
 
     foodImgImgStyle : {
@@ -365,12 +388,12 @@ const DashBoardStyles = StyleSheet.create({
 
     activityFoodTextStyle1 : {
         fontSize: fonts.fontXSmall,
-        ...CommonStyles.textStyleLight,
+        ...CommonStyles.textStyleRegular,
         color: 'black', 
     },
 
     uploadTextStyle : {
-        fontSize: fonts.fontXSmall,
+        fontSize: fonts.fontTiny,
         ...CommonStyles.textStyleSemiBold,
         color: 'white', 
     },
@@ -381,6 +404,185 @@ const DashBoardStyles = StyleSheet.create({
         color: 'white', 
     },
 
+    tabViewStyle : {
+        width:wp('94%'),
+        height:hp('4.5%'),
+        backgroundColor:'#7676801F',
+        alignSelf:'center',
+        borderRadius:5,
+        alignItems:'center',
+        justifyContent:'center',
+    },
+
+    tabViewEnableBtnStyle : {
+        width:wp('45%'),
+        height:hp('3.5%'),
+        backgroundColor:'white',
+        // marginLeft:hp('0.2%'),
+        justifyContent:'center',
+        alignSelf:'center',
+        alignItems:'center',
+    },
+
+    tabViewBtnStyle : {
+        width:wp('45%'),
+        height:hp('3.5%'),
+        backgroundColor:'transparent',
+        // marginLeft:hp('0.2%'),
+        justifyContent:'center',
+        alignItems:'center',
+        alignSelf:'center',
+    },
+
+    tabBtnTextStyle : {
+        fontSize: 16,
+        ...CommonStyles.textStyleMedium,
+        color: 'black',         
+    },
+
+    tabBtnTextStyleiPad : {
+        fontSize: 24,
+        ...CommonStyles.textStyleMedium,
+        color: 'black',         
+    },
+
+    timeTextStyle : {
+        fontSize: 14,
+        ...CommonStyles.textStyleLight,
+        color: 'black', 
+    },
+
+    timeTextStyleiPad : {
+        fontSize: 18,
+        ...CommonStyles.textStyleLight,
+        color: 'black', 
+    },
+    
+    timeTextStyle1 : {
+        fontSize: 16.5,
+        ...CommonStyles.textStyleRegular,
+        color: 'black', 
+    },
+
+    timeTextStyle1iPad : {
+        fontSize: fonts.fontMedium,
+        ...CommonStyles.textStyleRegular,
+        color: 'black', 
+    },
+
+    timeTextStyle2 : {
+        fontSize: fonts.fontXSmall,
+        ...CommonStyles.textStyleSemiBold,
+        color: '#6BC100', 
+    },
+
+    timeTextStyle2iPad : {
+        fontSize: fonts.fontXSmall,
+        ...CommonStyles.textStyleSemiBold,
+        color: '#6BC100', 
+    },
+
+    tryLaterTextStyle : {
+        fontSize: fonts.fontXSmall,
+        ...CommonStyles.textStyleRegular,
+        color: '#7F7F81', 
+    },
+
+    timeCenterTextStyle : {
+        fontSize: fonts.fontTiny,
+        ...CommonStyles.textStyleSemiBold,
+        color: 'black', 
+    },
+
+    fMCenterTextStyle : {
+        fontSize: fonts.fontXMedium,
+        ...CommonStyles.textStyleSemiBold,
+        color: 'black', 
+    },
+
+    weightLabelTextStyle : {
+        fontSize: fonts.fontTiny,
+        ...CommonStyles.textStyleSemiBold,
+        color: 'black', 
+    },
+
+    circleViewStyle : {
+        justifyContent:'center',
+        alignItems:'center',
+        width:wp('12%'),
+        aspectRatio:1,
+        borderRadius:100,
+        borderWidth:1,
+        borderColor:'#6BC100',
+        marginBottom:hp('1%'),
+    },
+
+    circleViewStyleiPad : {
+        justifyContent:'center',
+        alignItems:'center',
+        width:wp('8%'),
+        aspectRatio:1,
+        borderRadius:100,
+        borderWidth:1,
+        borderColor:'#6BC100',
+        marginBottom:hp('1%'),
+        alignSelf:'center',
+    },
+
+    plusTextStyle2 : {
+        fontSize: fonts.fontXXXXLarge0,
+        ...CommonStyles.textStyleLight,
+        color: '#6BC100',   
+        marginTop:hp('-0.5%'),    
+    },
+
+    setGoalTextStyle : {
+        fontSize: fonts.fontSmall,
+        ...CommonStyles.textStyleRegular,
+        color: 'black', 
+    },
+
+    wgtTyleActivityStyle : {
+        // height: hp("5%"),
+        width: wp("24.5%"),
+        shadowColor: '#132533',
+        shadowOffset: { width: 3, height: 3 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2, 
+        elevation: 5,
+        backgroundColor:'white',
+        borderRadius:10,
+        alignItems:'center'
+    },
+    
+    wgtTabViewStyle : {
+        width:wp('50%'),
+        // height:hp('4%'),
+        backgroundColor:'#7676801F',
+        alignSelf:'center',
+        borderRadius:5,
+        alignItems:'center',
+        justifyContent:'center',
+    },
+
+    devTextStyle : {
+        fontSize: fonts.fontSmall,
+        ...CommonStyles.textStyleBold,
+        color: 'black',      
+    },
+
+    devTextStyle1 : {
+        fontSize: fonts.fontTiny,
+        ...CommonStyles.textStyleBold,
+        color: 'black',      
+    },
+
+    devMissImgStyle : {
+        width:wp('8%'),
+        // height:hp('5%'),
+        resizeMode:'contain',
+    },
+    
 });
 
 export default DashBoardStyles;

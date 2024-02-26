@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,TouchableOpacity,Text,TextInput,Image} from 'react-native';
+import {View,StyleSheet,TouchableOpacity,Text,TextInput,Image,Platform} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import BottomComponent from "../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
@@ -36,6 +36,7 @@ const  LoginUI = ({route, ...props }) => {
     const [date, set_Date] = useState(new Date());
 
     // Setting the values from login COmponent to local variables
+
     useEffect(() => {
 
       set_isLoading(props.isLoading);
@@ -44,6 +45,8 @@ const  LoginUI = ({route, ...props }) => {
       set_isPopUp(props.isPopUp);
 
     }, [props.isLoading,props.isPopUp,props.popUpMessage,props.popUpAlert,props.popUpRgtBtnTitle,props.popUpisRgtBtn,props.popUpisLftBtn]);
+
+    
 
     React.useEffect(() => {
       const focus = navigation.addListener("focus", () => {
@@ -196,7 +199,7 @@ const  LoginUI = ({route, ...props }) => {
                 />
 
                 <TouchableOpacity  onPress={() => {set_isHidePassword(!isHidePassword);}}>
-                  <Image source={isHidePassword ? hideImg : openImg } style={CommonStyles.hideOpenIconStyle}/>
+                  <Image source={isHidePassword ? hideImg : openImg } style={[CommonStyles.hideOpenIconStyle,{width: Platform.isPad ? wp('4%') : wp('6%'),}]}/>
                 </TouchableOpacity>
 
               </View> 

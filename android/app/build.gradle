@@ -1,7 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: 'com.google.firebase.firebase-perf'
 apply plugin: "kotlin-android"
-apply plugin: "kotlin-android-extensions"
+//apply plugin: "kotlin-android-extensions"
 
 
 import com.android.build.OutputFile
@@ -146,14 +146,19 @@ android {
         pickFirst '**/*.so'
     }
 
+    lintOptions {
+        checkReleaseBuilds false
+    }
+
+
     defaultConfig {
         applicationId "com.ctepl.wearablesclinicaltrialsdev"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
         aaptOptions { cruncherEnabled = false }
-        versionCode 34
-        versionName "3.2"
+        versionCode 9
+        versionName "4.0"
         missingDimensionStrategy 'react-native-camera', 'general'
     }
     splits {
@@ -233,6 +238,7 @@ dependencies {
     implementation project(path: ':openCVLibrary343')
     //implementation 'com.github.a914-gowtham:android-video-trimmer:1.7.3'
     implementation "zendesk.messaging:messaging-android:2.13.0"
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group: 'com.facebook.fbjni'
     }

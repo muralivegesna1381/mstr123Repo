@@ -14,7 +14,8 @@ const  SelectDateComponent = ({navigation, route, ...props }) => {
   const [date, set_Date] = useState(new Date());
   const [obsObject, set_obsObject] = useState(undefined);
   const [selectedDate, set_selectedDate] = useState(new Date());
-
+  const [mediaType, set_mediaType] = useState(undefined);
+  
   React.useEffect(() => {
 
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
@@ -56,7 +57,8 @@ const  SelectDateComponent = ({navigation, route, ...props }) => {
     oJson = JSON.parse(oJson);
     if(oJson){
       set_obsObject(oJson);
-      set_fromScreen(oJson.fromScreen); 
+      set_fromScreen(oJson.fromScreen);
+      set_mediaType(oJson.ctgNameId); 
       if(oJson.selectedDate && oJson.selectedDate!==''){
         set_selectedDate(new Date(oJson.selectedDate));
       }
@@ -67,7 +69,6 @@ const  SelectDateComponent = ({navigation, route, ...props }) => {
     let oJson = await DataStorageLocal.getDataFromAsync(Constant.OBSERVATION_DATA_OBJ);
     oJson = JSON.parse(oJson);
     set_selectedDate(selDate);
-
     var hours = new Date().getHours();
     var min = new Date().getMinutes();
     var sec = new Date().getSeconds();
@@ -78,16 +79,23 @@ const  SelectDateComponent = ({navigation, route, ...props }) => {
     }
     await DataStorageLocal.saveDataToAsync(Constant.OBSERVATION_DATA_OBJ,JSON.stringify(oJson));
     firebaseHelper.logEvent(firebaseHelper.event_add_observations_date_submit, firebaseHelper.screen_add_observations_date, "User Selected Date for Observation", 'Date : '+selDate);
-    navigation.navigate("UploadObsVideoComponent"); 
+    if(fromScreen === 'quickVideo') {
+      navigation.navigate("ObsReviewComponent"); 
+    } else {
+      navigation.navigate("UploadObsVideoComponent"); 
+    }
+    
   };
 
   const navigateToPrevious = () => {        
-    navigation.navigate("ObservationComponent");     
+    navigation.navigate("ObservationComponent");  
+    
   };
 
   return (
     <SelectDateUI 
       selectedDate = {selectedDate}
+      mediaType = {mediaType}
       navigateToPrevious = {navigateToPrevious}
       submitAction = {submitAction}
     />

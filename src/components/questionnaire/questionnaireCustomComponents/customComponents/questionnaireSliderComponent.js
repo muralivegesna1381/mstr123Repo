@@ -40,20 +40,12 @@ import ImageView from "react-native-image-viewing";
           set_valueSlider(parseInt(minValue));
         }
         
-      },[]);
+      },[value]);
 
       const selectAction = (value) => {
 
         set_valueSlider(value);
         setValue(value)  
-
-        // if(actionType === 'SUBMIT') {
-        //   set_valueSlider(value);
-        //   setValue(value)         
-        // } else {
-        //   set_valueSlider(parseInt(minValue));
-        //   setValue("");
-        // }
         
       }
     /**
@@ -86,11 +78,11 @@ import ImageView from "react-native-image-viewing";
               {<Text style={[styles.valuesTextStyle]}>{maxValue}</Text>}
             </View> : null}
 
-            <View style={{width: wp('80%'), alignItems:'center'}}>
+            <View style={{width: wp('80%'), alignItems:'center',alignSelf:'center'}}>
 
             <GestureHandlerRootView style={styles.container}>
 
-              {Platform.OS === 'ios' ? <SliderSmooth style = {styles.track1}
+              {Platform.OS === 'ios' ? <SliderSmooth style = {[styles.track1,{width:wp('80%')}]}
                     value={valueSlider}
                     disabled={status_QID === 'Submitted' ? true : false}
                     useNativeDriver={true}
@@ -107,7 +99,7 @@ import ImageView from "react-native-image-viewing";
                     onSlidingComplete={value => {selectAction(value)}}
               /> : 
                <Slider
-                  style={{width: wp('70%')}}
+                  style={{}}
                   value={valueSlider}
                   onValueChange={value => {selectAction(value)}}
                   minimumValue = {minValue}
@@ -119,7 +111,7 @@ import ImageView from "react-native-image-viewing";
                   animationType = {'spring'}
                   thumbTintColor ={'#37B57C'}
                   thumbStyle={styles.thumb}
-                  trackStyle={styles.track}
+                  trackStyle={[styles.track,{width:wp('80%')}]}
                   disabled = {status_QID === 'Submitted' ? true : false}
                   
               /> 
@@ -140,19 +132,8 @@ import ImageView from "react-native-image-viewing";
             </View>
             
             <View style = {{alignItems:'center'}}>
-                {<Text style={[styles.descTextStyle,{marginBottom: hp('1%'),}]}>{desc}</Text>}
+              {<Text style={[styles.descTextStyle,{marginBottom: hp('1%'),}]}>{desc}</Text>}
             </View> 
-
-            {/* {status_QID === 'Submitted' ? null : <View style={{flexDirection:'row', justifyContent:'flex-end',width: wp('75%'),marginTop: hp('2%')}}>
-              <TouchableOpacity style={CommonStyles.tilesBtnLftStyle} onPress={() => selectAction('REVERT')}>
-                  <ImageBackground source={require("./../../../../../assets/images/otherImages/png/wrong.png")} style={CommonStyles.tilesBtnImgStyle} resizeMode='contain'></ImageBackground>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={CommonStyles.tilesBtnStyle} onPress={() => selectAction('SUBMIT')}>
-                  <ImageBackground source={require("./../../../../../assets/images/otherImages/png/right.png")} style={CommonStyles.tilesBtnImgStyle} resizeMode='contain'></ImageBackground>
-              </TouchableOpacity>
-
-              </View>} */}
               
               </View>}
 
@@ -180,6 +161,7 @@ const styles = StyleSheet.create({
         width:wp('80%'),
         minHeight:hp('10%'),
         marginBottom: hp('1%'),
+        alignSelf:'center'
     },
 
     thumb: {
@@ -191,7 +173,7 @@ const styles = StyleSheet.create({
 
     track1:{
       height:10,
-      width : 300,
+      // width : 325,
     },
 
     track:{

@@ -18,11 +18,11 @@ import * as CheckPermissionsAndroid from './../../utils/permissionsComponents/pe
 const  DasBoardComponent = ({route, ...props }) => {
 
     const { loading:timerWidgetNavigationLoad, data : timerWidgetNavigationData } = useQuery(Queries.DASHBOARD_TIMER_WIDGET, { fetchPolicy: "cache-only" });
-    const { loading:logOutLoading, data:logOutdata } = useQuery(Queries.LOG_OUT_APP, { fetchPolicy: "cache-only" });
     const { loading:logoutNaviLoading, data:logoutNaviData } = useQuery(Queries.LOG_OUT_APP_NAVI, { fetchPolicy: "cache-only" });
     const { loading:loadingData, data:uploadDashboardData } = useQuery(Queries.UPDATE_DASHBOARD_DATA, { fetchPolicy: "cache-only" });
-    const { loading:vbackgrndloading, data:uploadMediaData } = useQuery(Queries.UPLOAD_VIDEO_BACKGROUND_STATUS, { fetchPolicy: "cache-only" });
     const { loading:loadingQst, data:uploadQstMediaData } = useQuery(Queries.UPLOAD_QUESTIONNAIRE_VIDEO_BACKGROUND_STATUS, { fetchPolicy: "cache-only" });
+    const { loading:loadingImgs, data:uploadImgMediaData } = useQuery(Queries.IMAGE_UPLOAD_BACKGROUND_STATUS, { fetchPolicy: "cache-only" });
+    const { loading:loadingVids, data:uploadVideosData } = useQuery(Queries.VIDEO_UPLOAD_BACKGROUND_STATUS, { fetchPolicy: "cache-only" });
     const { loading: captureBFILoading, data: captureBFIData } = useQuery(Queries.UPLOAD_CAPTURE_BFI_BACKGROUND_STATUS, { fetchPolicy: "cache-only" });
   
     const [uploadStatus, set_uploadStatus] = useState(undefined);
@@ -37,8 +37,20 @@ const  DasBoardComponent = ({route, ...props }) => {
     const [questUploadProgress, set_questUploadProgress] = useState(undefined);
     const [questProgressTxt, set_questProgressTxt] = useState(undefined);
     const [questInternetType, set_questInternetType] = useState(undefined);
+    const [obsImgText, set_obsImgText] = useState(undefined);
+    const [obsImgUploadStatus, set_obsImgUploadStatus] = useState(undefined);
+    const [obsImgFileName, set_obsImgFileName] = useState(undefined);
+    const [obsImgUploadProgress, set_obsImgUploadProgress] = useState(undefined);
+    const [obsImgProgressTxt, set_obsImgProgressTxt] = useState(undefined);
+    const [obsImgInternetType, set_obsImgInternetType] = useState(undefined);
+    const [obsVideoText, set_obsVideoText] = useState(undefined);
+    const [obsVideoUploadStatus, set_obsVideoUploadStatus] = useState(undefined);
+    const [obsVideoFileName, set_obsVideoFileName] = useState(undefined);
+    const [obsVideoUploadProgress, set_obsVideoUploadProgress] = useState(undefined);
+    const [obsVideoProgressTxt, set_obsVideoProgressTxt] = useState(undefined);
+    const [obsVideoInternetType, set_obsVideoInternetType] = useState(undefined);
     const [isPTDropdown, set_isPTDropdown] = useState(undefined)
-  
+    const [isSearchDropdown, set_isSearchDropdown] = useState(undefined);
     const [bfiUploadStatus, set_bfiUploadStatus] = useState(undefined);
     const [bfiFileName, set_bfiFileName] = useState(undefined);
     const [bfiUploadProgress, set_bfiUploadProgress] = useState(undefined);
@@ -82,13 +94,6 @@ const  DasBoardComponent = ({route, ...props }) => {
     }, [timerWidgetNavigationData]);
 
     useEffect(() => {
-      if (logOutdata && logOutdata.data.__typename === 'LogOutApp' && logOutdata.data.isLogOut === 'logOut') {
-        props.removeItems();
-        props.clearObjects();       
-      }
-    }, [logOutdata]);
-
-    useEffect(() => {
 
       if (logoutNaviData && logoutNaviData.data.__typename === 'LogOutAppNavi' && logoutNaviData.data.isLogOutNavi === 'logOutNavi') {
         props.removeItems();
@@ -109,79 +114,40 @@ const  DasBoardComponent = ({route, ...props }) => {
 
     useEffect(() => {
 
-      if(uploadMediaData && uploadMediaData.data.__typename === 'UploadVideoBackgroundStatus'){
-
-        if(uploadMediaData.data.stausType==='Uploading Done'){
-            set_uploadStatus(undefined);
-        } else {
-            set_uploadStatus(uploadMediaData.data.statusUpload);
-        }
-
-        if(uploadMediaData.data.observationName){
-            set_observationText(uploadMediaData.data.observationName);
-        } else {
-            set_observationText('');
-        }
-
-        if(uploadMediaData.data.fileName){
-            set_fileName(uploadMediaData.data.fileName);
-        } else {
-            set_fileName('');
-        }
-
-        if(uploadMediaData.data.uploadProgress){
-            set_uploadProgress(uploadMediaData.data.uploadProgress);
-        }
-
-        if(uploadMediaData.data.progressTxt){
-            set_progressTxt(uploadMediaData.data.progressTxt);
-        }
-
-        if(uploadMediaData.data.internetType==='notWi-Fi'){
-            set_internetType('cellular');
-        } else {
-            set_internetType('Wi-Fi');
-        }
-    }
-        
-    }, [uploadMediaData]);
-
-    useEffect(() => {
-
       if(uploadQstMediaData && uploadQstMediaData.data.uploadMode === 'backGround' && uploadQstMediaData.data.__typename === 'UploadQuestionnaireVideoBackgroundStatus'){
 
         if(uploadQstMediaData.data.statusUpload==='Uploading Done'){
           updateQuestionnareCount()
           set_questUploadStatus(undefined);
         } else {
-            set_questUploadStatus(uploadQstMediaData.data.statusUpload);
+          set_questUploadStatus(uploadQstMediaData.data.statusUpload);
         }
 
-        if(uploadQstMediaData.data.questName){
-            set_questText(uploadQstMediaData.data.questName);
+        if(uploadQstMediaData.data.obsVidName){
+          set_questText(uploadQstMediaData.data.obsVidName);
         } else {
-            set_questText('');
+          set_questText('');
         }
 
         if(uploadQstMediaData.data.fileName){
-            let tempName = uploadQstMediaData.data.fileName.length > 9 ? uploadQstMediaData.data.fileName.replace('/r','/').slice(0, 9)+"..." : uploadQstMediaData.data.fileName;
-            set_questFileName(tempName);
+          let tempName = uploadQstMediaData.data.fileName.length > 9 ? uploadQstMediaData.data.fileName.replace('/r','/').slice(0, 9)+"..." : uploadQstMediaData.data.fileName;
+          set_questFileName(tempName);
         } else {
-            set_questFileName('');
+          set_questFileName('');
         }
 
         if(uploadQstMediaData.data.uploadProgress){
-            set_questUploadProgress(uploadQstMediaData.data.uploadProgress);
+          set_questUploadProgress(uploadQstMediaData.data.uploadProgress);
         }
 
         if(uploadQstMediaData.data.progressTxt){
-            set_questProgressTxt(uploadQstMediaData.data.progressTxt);
+          set_questProgressTxt(uploadQstMediaData.data.progressTxt);
         }
 
         if(uploadQstMediaData.data.internetType==='notWi-Fi'){
-            set_questInternetType('cellular');
+          set_questInternetType('cellular');
         } else {
-            set_questInternetType('Wi-Fi');
+          set_questInternetType('Wi-Fi');
         }
     }
         
@@ -189,7 +155,6 @@ const  DasBoardComponent = ({route, ...props }) => {
   
     useEffect(() => {
 
-      console.log("captureBFIData",captureBFIData)
       if(captureBFIData && captureBFIData.data.__typename === 'UploadCaptureBFIBackgroundStatus'){
         if(captureBFIData.data.stausType==='Uploading Done'){
           set_bfiUploadStatus(undefined);
@@ -210,6 +175,96 @@ const  DasBoardComponent = ({route, ...props }) => {
     }
         
     }, [captureBFIData]);
+
+    useEffect(() => {
+
+      if(uploadVideosData && uploadVideosData.data.uploadMode === 'backGround' && uploadVideosData.data.__typename === 'videoUploadBackgroundStatus'){
+
+        if(uploadVideosData.data.statusUpload==='Uploading Done'){
+          set_obsVideoUploadStatus(undefined);
+        } else {
+          set_obsVideoUploadStatus(uploadVideosData.data.statusUpload);
+        }
+
+        if(uploadVideosData.data.obsVidName){
+          set_obsVideoText(uploadVideosData.data.obsVidName);
+        } else {
+          set_obsVideoText('');
+        }
+
+        if(uploadVideosData.data.fileName){
+          let tempName = uploadVideosData.data.fileName.length > 9 ? uploadVideosData.data.fileName.replace('/r','/').slice(0, 9)+"..." : uploadVideosData.data.fileName;
+          set_obsVideoFileName(tempName);
+        } else {
+          set_obsVideoFileName('');
+        }
+
+        if(uploadVideosData.data.uploadProgress && uploadVideosData.data.uploadProgress !== ''){
+          set_obsVideoUploadProgress(uploadVideosData.data.uploadProgress);
+        } else {
+          set_obsVideoUploadProgress('');
+        }
+
+        if(uploadVideosData.data.progressTxt){
+          set_obsVideoProgressTxt(uploadVideosData.data.progressTxt);
+        } else {
+          set_obsVideoProgressTxt('');
+        }
+
+        if(uploadVideosData.data.internetType==='notWi-Fi'){
+          set_obsVideoInternetType('cellular');
+        } else {
+          set_obsVideoInternetType('Wi-Fi');
+        }
+    }
+        
+    }, [uploadVideosData]);
+
+    useEffect(() => {
+
+      if(uploadImgMediaData && uploadImgMediaData.data.uploadMode === 'backGround' && uploadImgMediaData.data.__typename === 'imageUploadBackgroundStatus'){
+
+        if(uploadImgMediaData.data.statusUpload==='Uploading Done'){
+          updateQuestionnareCount()
+          set_obsImgUploadStatus(undefined);
+        } else {
+          set_obsImgUploadStatus(uploadImgMediaData.data.statusUpload);
+        }
+
+        if(uploadImgMediaData.data.obsImgName){
+          set_obsImgText(uploadImgMediaData.data.obsImgName);
+          
+        } else {
+          set_obsImgText('');
+        }
+
+        if(uploadImgMediaData.data.fileName){
+          let tempName = uploadImgMediaData.data.fileName.length > 9 ? uploadImgMediaData.data.fileName.replace('/r','/').slice(0, 9)+"..." : uploadQstMediaData.data.fileName;
+          set_obsImgFileName(tempName);
+        } else {
+          set_obsImgFileName('');
+        }
+
+        if(uploadImgMediaData.data.uploadProgress){
+          set_obsImgUploadProgress(uploadImgMediaData.data.uploadProgress);
+        } else {
+          set_obsImgUploadProgress('');
+        }
+
+        if(uploadImgMediaData.data.progressTxt){
+          set_obsImgProgressTxt(uploadImgMediaData.data.progressTxt);
+        } else {
+          set_obsImgProgressTxt('');
+        }
+
+        if(uploadImgMediaData.data.internetType==='notWi-Fi'){
+          set_obsImgInternetType('cellular');
+        } else {
+          set_obsImgInternetType('Wi-Fi');
+        }
+    }
+        
+    }, [uploadImgMediaData]);
 
     const requestStoragePermission = async () => {
       try {
@@ -543,14 +598,14 @@ const  DasBoardComponent = ({route, ...props }) => {
       ptDropAction();
       let internet = await internetCheck.internetCheck();
       firebaseHelper.logEvent(firebaseHelper.event_dashboard_Questionnaire, firebaseHelper.screen_dashboard, "Questionnaires button clicked", "Internet Status: " + internet.toString());
-        if(!internet){
-          createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true); 
-        } else {
-          updateTimer('Questionnaire','Continue');
-          props.clearObjects();
-          await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(props.defaultPetObj));
-          navigation.navigate('QuestionnaireStudyComponent',{isFrom:'Dashboard'});
-        }
+      if(!internet){
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true); 
+      } else {
+        updateTimer('Questionnaire','Continue');
+        props.clearObjects();
+        await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(props.defaultPetObj));
+        navigation.navigate('QuestionnaireStudyComponent',{isFrom:'Dashboard'});
+      }
 
     };
 
@@ -579,10 +634,10 @@ const  DasBoardComponent = ({route, ...props }) => {
         updateTimer('Settings','Continue');
         props.clearObjects();
 
-        if(value==='ADD A DEVICE?'){
+        if(value === 17){
           firebaseHelper.logEvent(firebaseHelper.event_dashboard_sensor_setup, firebaseHelper.screen_dashboard, "Adding a Device button clicked", "Device Missing");
-          navigation.navigate('SensorTypeComponent',{value:'AddDevice', petName : props.defaultPetObj.petName});
-        }else if(value==='COMPLETE SENSOR SETUP'){
+          navigation.navigate('DeviceTutorialComponent',{value:'AddDevice', petName : props.defaultPetObj.petName,id:value});
+        }else if(value === 16){
           firebaseHelper.logEvent(firebaseHelper.event_dashboard_sensor_setup, firebaseHelper.screen_dashboard, "Complete Setup button clicked", "Setup Pending");
           let objTemp = undefined;
           let index=0;
@@ -620,13 +675,32 @@ const  DasBoardComponent = ({route, ...props }) => {
               await DataStorageLocal.saveDataToAsync(Constant.SENSOR_TYPE_CONFIGURATION,'Sensor');
             }
           }
-          navigation.navigate('MultipleDevicesComponent',{petObject:props.defaultPetObj, isFrom:'Dashboard'});
-            // navigation.navigate('SensorInitialComponent',{defaultPetObj:props.defaultPetObj});
+
+            let devObj = {
+              pObj : props.defaultPetObj, 
+              petItemObj : props.defaultPetObj.devices[0],
+              actionType : 2,
+              isReplaceSensor : 0,
+              isForceSync : 0,
+              syncDeviceNo : '',
+              syncDeviceModel : '',
+              configDeviceNo: props.defaultPetObj.devices[0].deviceNumber,
+              configDeviceModel : props.defaultPetObj.devices[0].deviceModel,
+              reasonId : '',
+              petName : props.defaultPetObj.petName,
+              deviceNo : props.defaultPetObj.devices[0].deviceNumber,
+              isDeviceSetupDone : props.defaultPetObj.devices[0].isDeviceSetupDone,
+              petID: props.defaultPetObj.petID,
+              isFirmwareReq : props.defaultPetObj.devices[0].isFirmwareVersionUpdateRequired
+            }
+        
+            await DataStorageLocal.saveDataToAsync(Constant.CONFIG_SENSOR_OBJ, JSON.stringify(devObj));
+            navigation.navigate('DeviceTutorialComponent', { value:'SetupPending',defaultPetObj: props.defaultPetObj,id:value });
 
         } else if(value==='ONBOARD YOUR PET'){
-            firebaseHelper.logEvent(firebaseHelper.event_dashboard_onBoaring, firebaseHelper.screen_dashboard, "Onboard your Pet button clicked", "New User");
-            await DataStorageLocal.removeDataFromAsync(Constant.ONBOARDING_OBJ);
-            navigation.navigate('PetNameComponent',{isFrom:'Dashboard'});
+          firebaseHelper.logEvent(firebaseHelper.event_dashboard_onBoaring, firebaseHelper.screen_dashboard, "Onboard your Pet button clicked", "New User");
+          await DataStorageLocal.removeDataFromAsync(Constant.ONBOARDING_OBJ);
+          navigation.navigate('PetNameComponent',{isFrom:'Dashboard'});
         }
       }
 
@@ -638,14 +712,14 @@ const  DasBoardComponent = ({route, ...props }) => {
       ptDropAction();
       if(item.urlOrAnswer){
 
-          if(item.materialTypeId === 3){
-              updateTimer('PDFViewerComponent','Continue');
-              navigation.navigate('PDFViewerComponent',{'pdfUrl' : item.urlOrAnswer,'title':item.titleOrQuestion})
-          } else {
-              Linking.openURL(item.urlOrAnswer);
-          }
-          
+        if(item.materialTypeId === 3){
+          updateTimer('PDFViewerComponent','Continue');
+          navigation.navigate('PDFViewerComponent',{'pdfUrl' : item.urlOrAnswer,'title':item.titleOrQuestion})
+        } else {
+          Linking.openURL(item.urlOrAnswer);
         }
+          
+      }
 
     };
 
@@ -657,7 +731,6 @@ const  DasBoardComponent = ({route, ...props }) => {
     const internetQuestBtnAction = async () => {
       await DataStorageLocal.removeDataFromAsync(Constant.QUEST_VIDEO_UPLOAD_PROCESS_STARTED);
       Apolloclient.client.writeQuery({query: Queries.UPLOAD_QUESTIONNAIRE_VIDEO_BACKGROUND,data: {data: { questData:'checkForQstUploads',__typename: 'UploadQuestionnaireVideoBackground'}},})
-
     };
 
     // Navigates to List of device availble for the selected pet from Dashboard Sensor Widget
@@ -665,13 +738,32 @@ const  DasBoardComponent = ({route, ...props }) => {
 
       ptDropAction();
       let internet = await internetCheck.internetCheck();
-      firebaseHelper.logEvent(firebaseHelper.event_dashboard_devices_selection, firebaseHelper.screen_dashboard, "Devices button clicked", "Internet Status: " + internet.toString());
       if(!internet){
         createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
       } else {
         updateTimer('Settings','Continue');
         props.clearObjects();
-        navigation.navigate('MultipleDevicesComponent',{petObject:props.defaultPetObj});
+
+        let devObj = {
+          pObj : defaultPetObj, 
+          petItemObj : defaultPetObj.devices[0],
+          actionType : 2,
+          isReplaceSensor : 0,
+          isForceSync : 0,
+          syncDeviceNo : '',
+          syncDeviceModel : '',
+          configDeviceNo: defaultPetObj.devices[0].deviceNumber,
+          configDeviceModel : defaultPetObj.devices[0].deviceModel,
+          reasonId : '',
+          petName : defaultPetObj.petName,
+          deviceNo : defaultPetObj.devices[0].deviceNumber,
+          isDeviceSetupDone : defaultPetObj.devices[0].isDeviceSetupDone,
+          petID: defaultPetObj.petID,
+          isFirmwareReq : defaultPetObj.devices[0].isFirmwareVersionUpdateRequired
+        }
+        firebaseHelper.logEvent(firebaseHelper.event_dashboard_devices_selection, firebaseHelper.screen_dashboard, "Devices button clicked", "Device No : " + defaultPetObj.devices[0].deviceNumber.toString());
+        await DataStorageLocal.saveDataToAsync(Constant.CONFIG_SENSOR_OBJ, JSON.stringify(devObj));
+        navigation.navigate('SensorInitialComponent', { defaultPetObj: defaultPetObj });
       }
       
     };
@@ -692,6 +784,21 @@ const  DasBoardComponent = ({route, ...props }) => {
       props.updateQuestionnareCount();
     };
 
+    // Default pet selection function
+    const selectedPetAction = async (item) => {
+      await DataStorageLocal.saveDataToAsync(Constant.DEFAULT_PET_OBJECT,JSON.stringify(item));
+      props.selectedPetAction(item);
+    };
+
+    // Removeval dropdown when navigating to other screens
+    const searchDropAction = () => {
+      if(isSearchDropdown === false) {
+        set_isSearchDropdown(undefined);
+      } else {
+        set_isSearchDropdown(false);
+      }
+    };
+
     const captureImages = async () => {
 
       ptDropAction();
@@ -710,7 +817,7 @@ const  DasBoardComponent = ({route, ...props }) => {
 
       ptDropAction();
       let internet = await internetCheck.internetCheck();
-      firebaseHelper.logEvent(firebaseHelper.event_dashboard_CaptureImages_selection, firebaseHelper.screen_dashboard, "Score Images button clicked", "Internet Status: " + internet.toString());
+      firebaseHelper.logEvent(firebaseHelper.event_dashboard_Features_selection, firebaseHelper.screen_dashboard, "Features button clicked : " + item.action, "Internet Status: " + internet.toString());
       if(!internet){
         createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
       } else {
@@ -744,14 +851,49 @@ const  DasBoardComponent = ({route, ...props }) => {
 
       ptDropAction();
       let internet = await internetCheck.internetCheck();
-      firebaseHelper.logEvent(firebaseHelper.event_dashboard_CaptureImages_selection, firebaseHelper.screen_dashboard, "Score Images button clicked", "Internet Status: " + internet.toString());
+      firebaseHelper.logEvent(firebaseHelper.event_dashboard_Food_Rec, firebaseHelper.screen_dashboard, "Food Recommendation button clicked : ", "Internet Status: " + internet.toString());
       if(!internet){
         createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
       } else {
-        updateTimer('Settings','Continue');
+        updateTimer('foodRecommand','Continue');
         props.clearObjects();
+        let fhPets = await DataStorageLocal.getDataFromAsync(Constant.FH_PETS_ARRAY);
+        fhPets = JSON.parse(fhPets);
+        navigation.navigate("FoodHistoryPetSelectionComponent",{petsArray:fhPets,defaultPetObj:props.defaultPetObj});
+      }
+    };
+
+    const goalSetAction = async (value) => {
+      
+      ptDropAction();
+      let internet = await internetCheck.internetCheck();
+      firebaseHelper.logEvent(firebaseHelper.event_dashboard_Goal_Set, firebaseHelper.screen_dashboard, "Goal Setting button clicked : ", "Internet Status: " + internet.toString());
+      if(!internet){
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
+      } else {
+        updateTimer('GoalSetComponent','Continue');
+        props.clearObjects();
+        navigation.navigate('GoalSetComponent',{goalSetValue: props.defaultPetObj.goalDurationInMins === 0 ? 30 : props.defaultPetObj.goalDurationInMins,petObject:props.defaultPetObj});
       }
 
+    };
+
+    const goalVisualizationAction = async (value) => {
+
+      ptDropAction();
+      let internet = await internetCheck.internetCheck();
+      firebaseHelper.logEvent(firebaseHelper.event_dashboard_Goal_Vis, firebaseHelper.screen_dashboard, "Goal Visualization button clicked : ", "Internet Status: " + internet.toString());
+      if(!internet){
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
+      } else {
+        updateTimer('GoalSetComponent','Continue');
+        props.clearObjects();
+        navigation.navigate('BehaviorVisualizationComponent',{petObject:props.defaultPetObj, behData:props.behVisualData, value:value});
+      }
+    };
+
+    const deviceSetupMissingActions = (value) => {
+      setupDeviceAction(value);
     };
 
     return (
@@ -822,6 +964,29 @@ const  DasBoardComponent = ({route, ...props }) => {
             ptActivityLimits = {props.ptActivityLimits}
             questSubmitLength = {props.questSubmitLength}
             isPTDropdown = {isPTDropdown}
+            isSearchDropdown = {isSearchDropdown}
+            behVisualData = {props.behVisualData}
+            weightHistoryData = {props.weightHistoryData}
+            obsImgText = {obsImgText}
+            obsImgFileName = {obsImgFileName}
+            obsImgUploadProgress = {obsImgUploadProgress}
+            obsImgProgressTxt = {obsImgProgressTxt}
+            obsImgInternetType = {obsImgInternetType}
+            obsImgUploadStatus = {obsImgUploadStatus}
+            obsVideoText = {obsVideoText}
+            obsVideoUploadStatus = {obsVideoUploadStatus}
+            obsVideoFileName = {obsVideoFileName}
+            obsVideoUploadProgress = {obsVideoUploadProgress}
+            obsVideoProgressTxt = {obsVideoProgressTxt}
+            obsVideoInternetType = {obsVideoInternetType}
+            devModel = {props.devModel}
+            isFmGoalSet = {props.isFmGoalSet}
+            isFmGraph = {props.isFmGraph}
+            isWeightPer = {props.isWeightPer}
+            isFoodHistory = {props.isFoodHistory}
+            isFeedingReq = {props.isFeedingReq}
+            isSleepGraph = {props.isSleepGraph}
+            foodHistoryObj = {props.foodHistoryObj}
             refreshDashBoardDetails = {refreshDashBoardDetails}
             popOkBtnAction = {popOkBtnAction}
             popCancelBtnAction = {popCancelBtnAction}
@@ -840,15 +1005,18 @@ const  DasBoardComponent = ({route, ...props }) => {
             internetQuestBtnAction = {internetQuestBtnAction}
             devicesSelectionAction = {devicesSelectionAction}
             updateQuestionnareCount = {updateQuestionnareCount}
+            selectedPetAction = {selectedPetAction}
             captureImages ={captureImages}
             foodRecommand = {foodRecommand}
             featureActions = {featureActions}
-            
+            goalSetAction = {goalSetAction}
+            goalVisualizationAction = {goalVisualizationAction}
+            deviceSetupMissingActions = {deviceSetupMissingActions}
           />
       </>
        
     );
 
   }
-  
+
   export default DasBoardComponent;

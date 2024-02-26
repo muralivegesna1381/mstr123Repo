@@ -163,17 +163,21 @@ const PetFeedingPreferencesComponentUI = ({ navigation, route, ...props }) => {
 
     const nextButtonAction = async () => {
 
+        tempAnswersArray.current= tempAnswersArray.current.filter((value, index, self) =>
+        index === self.findIndex((t) => (
+            t.feedingPreferenceId === value.feedingPreferenceId
+        )))
         sJosnObj.current.eatTimeArray = tempAnswersArray.current;
         sJosnObj.current.isSkip = sJosnObj.current && sJosnObj.current.petParentObj && sJosnObj.current.petParentObj.address && Object.keys(sJosnObj.current.petParentObj.address).length > 0 ? false : true;
         sJosnObj.current.isSameAddress = sJosnObj.current.isSkip ? 'notSame' : sJosnObj.current.isSameAddress;
         sJosnObj.current.isPetWithPetParent = 0;
         await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));
-
-        if(sJosnObj.current && !sJosnObj.current.isSkip) {
-            navigation.navigate('PetLocationComponent',{isFrom : 'pLocation'}); 
-        } else {
-            navigation.navigate('PetAddressComponent',{isFrom : 'feedingPrefs'});
-        }
+        navigation.navigate('PetFoodInfoComponent');
+        // if(sJosnObj.current && !sJosnObj.current.isSkip) {
+        //     navigation.navigate('PetLocationComponent',{isFrom : 'pLocation'}); 
+        // } else {
+        //     navigation.navigate('PetAddressComponent',{isFrom : 'feedingPrefs'});
+        // }
         
     };
 
@@ -242,11 +246,17 @@ const PetFeedingPreferencesComponentUI = ({ navigation, route, ...props }) => {
                                 if (selectedItems.current.includes(item.feedingPreferenceId)) {
 
                                     selectedItems.current = selectedItems.current.filter(item1 => item1 !== item.feedingPreferenceId);
-                                    var index = tempAnswersArray.current.findIndex(e => e.feedingPreferenceId === item.feedingPreferenceId);
+                                    // var index = tempAnswersArray.current.findIndex(e => e.feedingPreferenceId === item.feedingPreferenceId);
 
-                                    if (index != -1) {
-                                        tempAnswersArray.current.splice(index, 1);
-                                    } 
+                                    // if (index != -1) {
+                                    //     tempAnswersArray.current.splice(index, 1);
+                                    // } 
+
+                                    for (var i = tempAnswersArray.current.length - 1; i >= 0; i--) {
+                                        if (tempAnswersArray.current[i].feedingPreferenceId === item.feedingPreferenceId) {
+                                            tempAnswersArray.current.splice(i, 1);
+                                        }
+                                       }
 
                                     index = tempAnswersArray.current.findIndex(e => e.feedingPreferenceId === 6);
                                     selectedItems.current = selectedItems.current.filter(item1 => item1 !== 6);
@@ -260,11 +270,13 @@ const PetFeedingPreferencesComponentUI = ({ navigation, route, ...props }) => {
                                         tempAnswersArray.current = [];
                                         selectedItems.current = [];
                                     } else {
-                                        var index = tempAnswersArray.current.findIndex(e => e.feedingPreferenceId === 6);
+                                        // var index = tempAnswersArray.current.findIndex(e => e.feedingPreferenceId === 6);
                                         selectedItems.current = selectedItems.current.filter(item1 => item1 !== 6);
-                                        if (index != -1) {
-                                            tempAnswersArray.current.splice(index, 1);
-                                        } 
+                                        for (var i = tempAnswersArray.current.length - 1; i >= 0; i--) {
+                                            if (tempAnswersArray.current[i].feedingPreferenceId === 6) {
+                                                tempAnswersArray.current.splice(i, 1);
+                                            }
+                                           }
                                     }
                                     tempAnswersArray.current.push(item);
                                     selectedItems.current.push(item.feedingPreferenceId);

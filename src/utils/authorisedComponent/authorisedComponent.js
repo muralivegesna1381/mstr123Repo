@@ -78,5 +78,7 @@ export async function clearData () {
     await DataStorageLocal.removeDataFromAsync(Constant.USER_ROLE_DETAILS);
     await DataStorageLocal.removeDataFromAsync(Constant.USER_ROLE_CAPTURE_IMGS);
     await DataStorageLocal.removeDataFromAsync(Constant.USER_ID);
-
+    await DataStorageLocal.removeDataFromAsync(Constant.IMAGES_UPLOAD_PROCESS_STARTED);
+    await DataStorageLocal.removeDataFromAsync(Constant.IMAGE_UPLOAD_DATA);
+    await DataStorageLocal.removeDataFromAsync(Constant.QUETIONNAIRE_PERMISSION);
 }

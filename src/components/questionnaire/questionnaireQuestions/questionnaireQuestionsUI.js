@@ -185,7 +185,7 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
     };
 
     const calculateQuestionsPercentage = (item) =>{
-        let _questionsflex = props.totalSection ? props.sectionAnswered/props.totalSection :100/100;
+        let _questionsflex = props.totalSection ? props.sectionsAnswered/props.totalSection :100/100;
         return _questionsflex;
     };
 
@@ -707,12 +707,12 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
                 </View>
             
                 <View style={{marginTop:hp('1.1%'), marginLeft:wp('18%'), position:'absolute',}}>
-                    <Text style={[progressAnswered]}>{props.sectionAnswered + " of " + props.totalSection + " Sections Answered"}</Text>
+                    <Text style={[progressAnswered]}>{props.sectionsAnswered + " of " + props.totalSection + " Sections Answered"}</Text>
                 </View>
            
             </View>
             
-            {isFiterEmpty === false ? <View style={{alignItems:'center',height: status === 'Submitted' && props.totalSection && props.totalSection < 2 ? hp('70%') : hp('55%')}}>
+            {isFiterEmpty === false ? <View style={{alignItems:'center',height: status === 'Submitted' && props.totalSection && props.totalSection < 2 ? hp('70%') : hp('60%')}}>
 
             {status === 'Submitted' ? null : <TouchableOpacity style={saveBtnStyle} onPress={() => saveQuestionnaire('saveAction')}>
                 <Text style={[progressAnswered,{color:'white'}]}>{'SAVE'}</Text>

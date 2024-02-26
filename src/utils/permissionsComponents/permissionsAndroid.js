@@ -17,26 +17,7 @@ export async function checkCameraPermissions () {
           }
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-
           return 'Camera granted'
-        //   try {
-        //     const granted = await PermissionsAndroid.request(
-        //       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        //       {
-        //         title: "App Camera Permission",
-        //         message:"App needs access to your camera ",
-        //         buttonNeutral: "Ask Me Later",
-        //         buttonNegative: "Cancel",
-        //         buttonPositive: "OK"
-        //       }
-        //     );
-        //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        //       return 'External Storage granted'
-        //     } else {
-        //       return 'External Storage not granted'
-        //     }
-        //   } catch (err) {}
-          
         } else {
           return 'Camera not granted'
         }

@@ -34,6 +34,8 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
   const [petAddress, set_petAddress] = useState(undefined);
   const [petAddressObj, set_petAddressObj] = useState(undefined);
   const [date, set_Date] = useState(new Date());
+  const [isWithoutDevice, set_isWithoutDevice] = useState(false);
+  const [feedingText, set_feedingText] = useState('--');
 
   let petIdRef = useRef();
   let petParentIDRef = useRef();
@@ -88,12 +90,29 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
     sJson = JSON.parse(sJson);
     if (sJson) {
       set_sobJson(sJson);
-      if (sJson.petParentObj) {
+      if(sJson.isWithourDevice) {
+        set_isWithoutDevice(sJson.isWithourDevice);
+      }
+      
+      if(sJson.petParentObj) {
         set_name(sJson.petParentObj.fullName);
         set_firstName(sJson.petParentObj.firstName);
         set_lastName(sJson.petParentObj.lastName);
         set_email(sJson.petParentObj.email);
         set_phNo(sJson.petParentObj.phoneNumber);
+      }
+
+      if(sJson.eatTimeArray) {
+        let temp = ''
+        for (let i = 0; i < sJson.eatTimeArray.length; i++) {
+          if(i === sJson.eatTimeArray.length-1) {
+            temp = temp + sJson.eatTimeArray[i].feedingPreference
+          } else {
+            temp = temp + sJson.eatTimeArray[i].feedingPreference+', '
+          }
+          
+        }
+      set_feedingText(temp)
       }
 
       let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
@@ -108,9 +127,7 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
         set_phNo(petParentData.phoneNumber);
       }
 
-      console.log("coming to same before: ",sJson.petParentObj)
       if (sJson.isSameAddress === 'same') {
-        console.log("coming to same",sJson.petParentObj.address)
         set_petAddressObj(sJson.petParentObj.address);
         let tempLine2 = sJson.petParentObj.address.address2 && sJson.petParentObj.address.address2 !== '' ? sJson.petParentObj.address.address2 + ', ' : '';
         let address = sJson.petParentObj.address.address1 + ', '
@@ -264,10 +281,10 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
 
         Device: {
           SensorAssigned: false,
-          SensorNumber: deviceNo,
+          SensorNumber: sobJson.deviceNo ? sobJson.deviceNo : '',
           BasestationNumber: null,
           DeviceAddDate: todayDate.toString(),
-          DeviceType: "Sensor" + "###" + sensorType,
+          DeviceType: sensorType ? "Sensor" + "###" + sensorType : '',
         },
 
         Client: {
@@ -371,7 +388,6 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
     let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 
     let onBoardPetServiceObj = await ServiceCalls.completeOnboardingInfo(finalJson.current, token);
-    console.log("onBoardPetServiceObj prblm-->",onBoardPetServiceObj)
     set_isLoading(false);
     isLoadingdRef.current = 0;
     stopFBTrace();
@@ -395,8 +411,6 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
         set_petId(onBoardPetServiceObj.responseData.petID);
         petIdRef.current = onBoardPetServiceObj.responseData.petID;
         petParentIDRef.current = onBoardPetServiceObj.responseData.petParentId;
-        console.log("onBoardPetServiceObj",onBoardPetServiceObj)
-        console.log("petParentIDRef.current",petParentIDRef.current)
         saveFirstTimeUser(false);
         set_isSOBSubmitted(true);
         getUserPets();
@@ -479,20 +493,11 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
 
   };
 
-  const navigateToPrevious = async () => {
-    navigation.pop()
-    // if (isLoadingdRef.current === 0 && popIdRef.current === 0) {
-    //   firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_SOB_Review, "User clicked on back button to navigate to DeviceValidationComponent", '');
-    //   navigation.navigate('DeviceValidationComponent');
-
-    //   //redirect to address screen/Device validation based on condition
-    //   let type = await DataStorageLocal.getDataFromAsync(Constant.ONBOARDING_PET_BFI);
-    //   if (type === Constant.IS_FROM_PET_BFI) {
-    //     navigation.navigate('PetAddressComponent');
-    //   } else {
-    //     navigation.navigate('DeviceValidationComponent');
-    //   }
-    // }
+  const navigateToPrevious = () => {
+    if (isLoadingdRef.current === 0 && popIdRef.current === 0) {
+      firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_SOB_Review, "User clicked on back button to navigate to DeviceValidationComponent", '');
+      navigation.pop();
+    }
   };
 
   const createPopup = (title, msg, isPop, popId, pLftTitle, pRgtTitle, isLeftBtn) => {
@@ -516,9 +521,15 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
     }
 
     if (popUpMessage === Constant.PET_CREATE_SUCCESS_MSG) {
-      createPopup('Thank You', 'Would you like to setup your pet now?', true, 1, 'LATER', 'YES', true);
-    }
-    else if (popUpMessage === 'Would you like to setup your pet now?') {
+
+      if(isWithoutDevice) {
+        updateDashboardData(petsArray);
+      } else {
+        createPopup('Thank You','Would you like to setup your pet now?',true,1,'LATER','YES',true); 
+      }
+      
+    } else if (popUpMessage === 'Would you like to setup your pet now?') {
+
       if (popRightTitle === 'YES') {
         savePetsForDashBoardAfterNotiSetting(petsArray);
       } else {
@@ -568,7 +579,28 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
       await DataStorageLocal.saveDataToAsync(Constant.SENSOR_TYPE_CONFIGURATION, 'Sensor');
     }
     await DataStorageLocal.saveDataToAsync(Constant.SAVE_SOB_PETS, JSON.stringify(arrayPet));
+
+    let devObj = {
+      pObj : defaultPet, 
+      petItemObj : defaultPet.devices[0],
+      actionType : 1,
+      isReplaceSensor : 0,
+      isForceSync : 0,
+      syncDeviceNo : '',
+      syncDeviceModel : '',
+      configDeviceNo: defaultPet.devices[0].deviceNumber,
+      configDeviceModel : defaultPet.devices[0].deviceModel,
+      reasonId : '',
+      petName : defaultPet.petName,
+      deviceNo : defaultPet.devices[0].deviceNumber,
+      isDeviceSetupDone : defaultPet.devices[0].isDeviceSetupDone,
+      petID: defaultPet.petID,
+      isFirmwareReq : defaultPet.devices[0].isFirmwareVersionUpdateRequired
+    }
+
+    await DataStorageLocal.saveDataToAsync(Constant.CONFIG_SENSOR_OBJ, JSON.stringify(devObj));
     navigation.navigate('SensorInitialComponent', { defaultPetObj: defaultPet });
+
   };
 
   const removeOnboardData = async () => {
@@ -590,6 +622,7 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
       isSOBSubmitted={isSOBSubmitted}
       isLftBtnEnable={isLftBtnEnable}
       petAddress={petAddress}
+      feedingText = {feedingText}
       popOkBtnAction={popOkBtnAction}
       popCancelBtnAction={popCancelBtnAction}
       navigateToPrevious={navigateToPrevious}

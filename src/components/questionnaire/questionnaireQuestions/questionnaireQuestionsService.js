@@ -10,7 +10,7 @@ import * as Queries from "./../../../config/apollo/queries";
 import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
 import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
-import * as ImageProgress from './../../../utils/imageProcessComponent/imageProcessComponent';
+import * as ImageProgress from './../../../utils/questionnaireMediaUpload/imageProcessComponent/questImageProcessComponent.js';
 import moment from 'moment/moment';
 import { useQuery} from "@apollo/react-hooks";
 import * as internetCheck from "./../../../utils/internetCheck/internetCheck";

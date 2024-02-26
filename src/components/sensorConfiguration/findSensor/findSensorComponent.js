@@ -30,11 +30,10 @@ const FindSensorComponent = ({navigation, route, ...props }) => {
 
     useEffect(() => {
 
-      getDevice();
-
       const focus = navigation.addListener("focus", () => {
         set_Date(new Date());
         initialSessionStart();
+        getDevice();
         firebaseHelper.reportScreen(firebaseHelper.screen_find_sensor);
         firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_find_sensor, "User in Find Sensor Screen", ''); 
       });
@@ -102,15 +101,25 @@ const FindSensorComponent = ({navigation, route, ...props }) => {
 
     const getDevice = async () => {
 
-      let defaultObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-      defaultObj = JSON.parse(defaultObj);
-      let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
-      let devNumber = defaultObj.devices[parseInt(sensorIndex)].deviceNumber;
-      let petName = defaultObj.petName;
+      let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+      configObj = JSON.parse(configObj);
+
+      if(configObj){
+
+        set_petName(configObj.petName);
+        if(configObj && configObj.isReplaceSensor === 1 && (configObj.isForceSync === 0 || configObj.isForceSync === 2)) {
+          set_deviceNumber(configObj.configDeviceNo);
+        } 
+        else if(configObj.isForceSync === 1) {
+          set_deviceNumber(configObj.syncDeviceNo);
+        } 
+        else {
+          set_deviceNumber(configObj.configDeviceNo);
+          
+        } 
         
-      firebaseHelper.logEvent(firebaseHelper.event_Sensor_type, firebaseHelper.screen_find_sensor, "Device Number : "+devNumber, 'Pet Name : '+petName);
-      set_deviceNumber(devNumber);
-      set_petName(petName);
+      }
+
     }
 
     const nextButtonAction = async () => {
@@ -135,18 +144,20 @@ const FindSensorComponent = ({navigation, route, ...props }) => {
       
   };
 
-    const backBtnAction = () => {
+  const backBtnAction = () => {
 
-      if(popIdRef.current === 0){
-        if(fromScreen==='configured'){
-          navigation.navigate('WifiListHPN1Component');
-        } else {
-          navigation.navigate('SelectSensorActionComponent');
-        }
-      }
+    navigation.pop();
+
+    // if(popIdRef.current === 0){
+    //   if(fromScreen==='configured'){
+    //     navigation.navigate('WifiListHPN1Component');
+    //   } else {
+    //     navigation.navigate('SensorChargeConfirmationComponent');
+    //   }
+    // }
   
-    }
-
+  }
+  
     const popOkBtnAction = () => {
         set_isPopUp(false);
         popIdRef.current = 0;
@@ -169,7 +180,7 @@ return (
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Device Setup'}
+          title={'Sensor Setup'}
           backBtnAction = {() => backBtnAction()}
         />
       </View>
@@ -177,7 +188,7 @@ return (
       <View style={styles.mainViewStyle}>
 
         <View style={[styles.topViewStyle]}>
-          <Text style={styles.txtStyle}>{'Device Number : '}<Text style={[styles.txtStyle1]}>{deviceNumber}</Text></Text>
+          <Text style={styles.txtStyle}>{'Sensor Number : '}<Text style={[styles.txtStyle1]}>{deviceNumber}</Text></Text>
           <Text style={styles.txtStyle}>{'Pet Name : '}<Text style={[styles.txtStyle1]}>{petName}</Text></Text>
         </View>
 
@@ -190,10 +201,13 @@ return (
       <View style={CommonStyles.bottomViewComponentStyle}>
         <BottomComponent
           rightBtnTitle = {'FIND SENSOR'}
-          isLeftBtnEnable = {false}
+          leftBtnTitle={'BACK'}
+          isLeftBtnEnable = {true}
           rigthBtnState = {true}
           isRightBtnEnable = {true}
-          rightButtonAction = {async () => nextButtonAction()}>
+          rightButtonAction = {async () => nextButtonAction()}
+          leftButtonAction = {async () => backBtnAction()}
+          >
         </BottomComponent>
       </View>
 

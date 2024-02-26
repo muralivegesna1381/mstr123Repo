@@ -1,12 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { BackHandler, FlatList, Image, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View, Keyboard, ActivityIndicator } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, BackHandler, FlatList, Image, ImageBackground, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
+import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import fonts from '../../../utils/commonStyles/fonts';
 import * as Constant from "../../../utils/constants/constant";
-import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
+import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
 
 let searchImg = require('./../../../../assets/images/otherImages/svg/searchIcon.svg');
 let defaultPetImg = require("./../../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
@@ -20,19 +21,43 @@ const PetListUI = ({ route, ...props }) => {
   const [imgLoader, set_imgLoader] = useState(true);
   const [searchTextEff, set_searchTextEff] = useState('');
   const [onEndReached, setOnEndReachedCalled] = useState(false);
+  const [hideSearch, setHideSearch] = useState(false)
   var pageNum = useRef(1);
+
+  let trace_pet_list_Screen;
 
   //Android Physical back button action
   useEffect(() => {
+    initialSessionStart();
+    firebaseHelper.reportScreen(firebaseHelper.screen_bfi_pet_information);
+    firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_pet_information, "User in BFI Pet List Screen", '');
+
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     return () => {
+      initialSessionStop();
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
     };
   }, []);
 
+  const initialSessionStart = async () => {
+    trace_pet_list_Screen = await perf().startTrace('t_inBFIPetListScreen');
+  };
+
+  const initialSessionStop = async () => {
+    await trace_pet_list_Screen.stop();
+  };
+
   useEffect(() => {
+    
     if (props.devices) {
       set_filterArray(props.devices);
+      if (props.devices.length > 0) {
+        setHideSearch(false)
+      }
+      else {
+        setHideSearch(false)
+
+      }
       if (props.devices.length > 0) {
         set_isRecords(true);
       } else {
@@ -81,7 +106,7 @@ const PetListUI = ({ route, ...props }) => {
           <View style={styles.item}>
             <View style={{ flex: 3 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={{ fontSize: fonts.fontMedium, fontFamily: 'Barlow-SemiBold', color: 'black' }}>{item.petName}</Text>
+                <Text style={{ fontSize: 18, fontFamily: 'Barlow-SemiBold', color: 'black' }}>{item.petName}</Text>
               </View>
 
               <View style={styles.listItemView}>
@@ -92,7 +117,7 @@ const PetListUI = ({ route, ...props }) => {
                   <Text style={[styles.textStyle, { marginLeft: hp('1%'), }]}>{item.petBreed ? (item.petBreed.length > 14 ? item.petBreed.slice(0, 14) + "..." : item.petBreed) : ""}</Text>
                 </View>
                 <View style={{ flex: 0.8, alignItems: 'center' }}>
-                  <Text style={[styles.textStyle,]} >{item.weight ? item.weight + 'lbs' : 'N/A'}</Text>
+                  <Text style={[styles.textStyle,]} >{item.weight ? item.weight + item.weightUnit : 'N/A'}</Text>
                 </View>
               </View>
 
@@ -131,7 +156,7 @@ const PetListUI = ({ route, ...props }) => {
         />
       </View>
 
-      <View style={CommonStyles.searchBarStyle}>
+      {!hideSearch ? <View style={CommonStyles.searchBarStyle}>
         <View style={[CommonStyles.searchInputContainerStyle]}>
           <Image source={searchImg} style={CommonStyles.searchImageStyle} />
           <TextInput
@@ -156,7 +181,7 @@ const PetListUI = ({ route, ...props }) => {
             }}
           />
         </View>
-      </View>
+      </View> : null}
 
       <View style={{ flex: 1, marginBottom: hp('15%'), marginTop: hp('2%'), alignSelf: 'center' }}>
         {isRecords ?

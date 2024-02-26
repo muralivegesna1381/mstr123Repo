@@ -67,7 +67,7 @@ const VideoUploadComponent = ({navigation, route,...props }) => {
                 }
             } else {
                 await DataStorageLocal.removeDataFromAsync(Constant.UPLOAD_PROCESS_STARTED);  
-                Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:'', statusUpload:'Please Wait... ',fileName:'', uploadProgress:'',progressTxt:'' ,stausType:'Uploading',mediaTYpe:'',internetType:'notWi-Fi',__typename: 'UploadVideoBackgroundStatus'}},})
+                // Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:'', statusUpload:'Please Wait... ',fileName:'', uploadProgress:'',progressTxt:'' ,stausType:'Uploading',mediaTYpe:'',internetType:'notWi-Fi',__typename: 'UploadVideoBackgroundStatus'}},})
             }
 
         }
@@ -239,7 +239,7 @@ const VideoUploadComponent = ({navigation, route,...props }) => {
         obsDataArray = JSON.parse(obsDataArray);
         let pathExists = await RNFS.exists(obsDataArray[0].videos[fbVideoLength.current].localPath);
 
-            Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsDataArray[0].obsText, statusUpload:'Preparing Video ',fileName:'', uploadProgress:'0%',progressTxt:'Awaiting',stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
+            // Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsDataArray[0].obsText, statusUpload:'Preparing Video ',fileName:'', uploadProgress:'0%',progressTxt:'Awaiting',stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
 
             if(Platform.OS==='android'){
                 compressAndroidVideoFile();
@@ -253,7 +253,7 @@ const VideoUploadComponent = ({navigation, route,...props }) => {
                             compressionMethod: 'auto',
                         },
                         (progress) => {
-                            Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsDataArray[0].obsText, statusUpload:'Preparing Video ',fileName:obsDataArray[0].videos[fbVideoLength.current].fileName.replace('/r','/').slice(0, 9)+"...", uploadProgress:(Math.floor(progress * 100))+'%',progressTxt:'Completed' ,stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
+                            // Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsDataArray[0].obsText, statusUpload:'Preparing Video ',fileName:obsDataArray[0].videos[fbVideoLength.current].fileName.replace('/r','/').slice(0, 9)+"...", uploadProgress:(Math.floor(progress * 100))+'%',progressTxt:'Completed' ,stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
     
                         });
     
@@ -299,7 +299,7 @@ const VideoUploadComponent = ({navigation, route,...props }) => {
     const onRecieveCompressedFile = async (event) => {
         let obsDataArray = await DataStorageLocal.getDataFromAsync(Constant.OBSERVATION_UPLOAD_DATA);
         obsDataArray = JSON.parse(obsDataArray);
-        Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsDataArray[0].obsText, statusUpload:'Preparing Video ',fileName:obsDataArray[0].videos[fbVideoLength.current].fileName.replace('/r','/').slice(0, 9)+"...", uploadProgress:parseInt(JSON.parse(event.eventProperty))+'%',progressTxt:'Completed' ,stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})        
+        // Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsDataArray[0].obsText, statusUpload:'Preparing Video ',fileName:obsDataArray[0].videos[fbVideoLength.current].fileName.replace('/r','/').slice(0, 9)+"...", uploadProgress:parseInt(JSON.parse(event.eventProperty))+'%',progressTxt:'Completed' ,stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})        
     };
 
     const getThumbNail = async (result) => {
@@ -349,7 +349,7 @@ const VideoUploadComponent = ({navigation, route,...props }) => {
 
         let task = reference.putFile(fileUrl);
             task.on('state_changed', taskSnapshot => {
-                Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsData[0].obsText, statusUpload:'Uploading Image ',fileName:obsData[0].photos[fbImageLength.current].fileName.replace('/r','/').slice(0, 10)+"...", uploadProgress:(Math.round(`${taskSnapshot.bytesTransferred}` / `${taskSnapshot.totalBytes}` * 100) ) +'%' ,progressTxt:'Completed',stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
+                // Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsData[0].obsText, statusUpload:'Uploading Image ',fileName:obsData[0].photos[fbImageLength.current].fileName.replace('/r','/').slice(0, 10)+"...", uploadProgress:(Math.round(`${taskSnapshot.bytesTransferred}` / `${taskSnapshot.totalBytes}` * 100) ) +'%' ,progressTxt:'Completed',stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
             });
 
             task.then(() => {
@@ -378,7 +378,7 @@ const VideoUploadComponent = ({navigation, route,...props }) => {
         let reference = storage().ref(filename); // 2
         let task = reference.putFile(fileUrl); // 3
             task.on('state_changed', taskSnapshot => {
-                Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsData[0].obsText, statusUpload:'Please wait..',fileName:'', uploadProgress:"100%" ,progressTxt:'Validating',stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
+                // Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsData[0].obsText, statusUpload:'Please wait..',fileName:'', uploadProgress:"100%" ,progressTxt:'Validating',stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
             });
 
             task.then(() => {
@@ -398,7 +398,7 @@ const VideoUploadComponent = ({navigation, route,...props }) => {
         let reference = storage().ref(filename);
         let task = reference.putFile(fileUrl);
             task.on('state_changed', taskSnapshot => {
-                Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsData[0].obsText, statusUpload:'Uploading Video ',fileName:obsData[0].videos[fbVideoLength.current].fileName.replace('/r','/').slice(0, 10)+"...", uploadProgress:(Math.round(`${taskSnapshot.bytesTransferred}` / `${taskSnapshot.totalBytes}` * 100) )+'%' ,progressTxt:'Completed',stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
+                // Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obsData[0].obsText, statusUpload:'Uploading Video ',fileName:obsData[0].videos[fbVideoLength.current].fileName.replace('/r','/').slice(0, 10)+"...", uploadProgress:(Math.round(`${taskSnapshot.bytesTransferred}` / `${taskSnapshot.totalBytes}` * 100) )+'%' ,progressTxt:'Completed',stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
             });
 
             task.then(() => {
@@ -714,7 +714,7 @@ const VideoUploadComponent = ({navigation, route,...props }) => {
             
         }
         
-        Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obj.obsText, statusUpload:'Please wait..',fileName:'', uploadProgress:"done",progressTxt:'Finishing',stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
+        // Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:obj.obsText, statusUpload:'Please wait..',fileName:'', uploadProgress:"done",progressTxt:'Finishing',stausType:'Uploading',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
         serviceCall(finalObj,token,obj,totalFilesFound,totalFilesNotfound);
         
       };
@@ -811,7 +811,7 @@ const VideoUploadComponent = ({navigation, route,...props }) => {
             checkUploadData();
         } else {
             
-            Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:'', statusUpload:'',fileName:'', uploadProgress:'', progressTxt:'',stausType:'Uploading Done',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
+            // Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEO_BACKGROUND_STATUS,data: {data: {observationName:'', statusUpload:'',fileName:'', uploadProgress:'', progressTxt:'',stausType:'Uploading Done',mediaTYpe:'Image',internetType:'wifi',__typename: 'UploadVideoBackgroundStatus'}},})
             await DataStorageLocal.removeDataFromAsync(Constant.UPLOAD_PROCESS_STARTED);   
         }
 

@@ -20,6 +20,7 @@ import LoaderComponent from "../../utils/commonComponents/loaderComponent";
 import ImageView from "react-native-image-viewing";
 import moment from "moment";
 import fonts from "../../utils/commonStyles/fonts";
+import * as firebaseHelper from '../../utils/firebase/firebaseHelper';
 
 
 const PetSubmittedImagesScreen = ({ route, navigation }) => {
@@ -39,6 +40,7 @@ const PetSubmittedImagesScreen = ({ route, navigation }) => {
   var imgPos = useRef();
   let icScrollStartReach = require('./../../../assets/images/bfiGuide/svg/left_indicater.svg');
   let icScrollEndReach = require('./../../../assets/images/bfiGuide/svg/right_indicater.svg');
+  let trace_submitted_images_Screen;
 
   //Screen to show the subumitted images of the pet of there are multiple sets
   const viewImage = (position) => {
@@ -55,6 +57,9 @@ const PetSubmittedImagesScreen = ({ route, navigation }) => {
     set_isImageView(true);
   }
   useEffect(() => {
+    initialSessionStart();
+    firebaseHelper.reportScreen(firebaseHelper.screen_bfi_submitted_images);
+    firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_submitted_images, "User in submitted images Screen", '');
     if (route.params?.petName) {
       setPetName(route.params?.petName)
     }
@@ -85,6 +90,7 @@ const PetSubmittedImagesScreen = ({ route, navigation }) => {
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     return () => {
+      initialSessionStop();
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
     };
   }, []);
@@ -104,6 +110,14 @@ const PetSubmittedImagesScreen = ({ route, navigation }) => {
     navigation.navigate("InstructionsPage", {
       instructionType: 2,
     });
+  };
+
+  const initialSessionStart = async () => {
+    trace_submitted_images_Screen = await perf().startTrace('t_inSubmittedImagesScreen');
+  };
+
+  const initialSessionStop = async () => {
+    await trace_submitted_images_Screen.stop();
   };
 
   //flat list start listener

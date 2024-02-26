@@ -1,135 +1,246 @@
-import React, { useState, useEffect,useRef } from 'react';
-import {View,StyleSheet,TouchableOpacity,ImageBackground,Image,Text,ActivityIndicator,Platform} from 'react-native';
-import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
- import Carousel, {Pagination} from 'react-native-snap-carousel';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, TouchableOpacity, ImageBackground, Image, Text, ActivityIndicator, TextInput, FlatList, Keyboard, Platform } from 'react-native';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
+import * as Constant from "../../utils/constants/constant";
+import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
 
-let defaultPetImg = require( "./../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
-let defaultCatImg = require( "./../../../assets/images/otherImages/svg/defaultCatIcon.svg");
+let defaultPetImg = require("./../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
+let searchImg = require('./../../../assets/images/otherImages/svg/searchIcon.svg');
+let noLogsDogImg = require("./../../../assets/images/dogImages/noRecordsDog.svg");
 
-const  PetsSelectionCarousel = ({route,petsArray,setValue,setSlideValue,isSwipeEnable,defaultPet,activeSlides,isFromScreen, ...props }) => {
+const PetsSelectionCarousel = ({ route, petsArray, setValue, setSlideValue, isSwipeEnable, defaultPet, activeSlides, isFromScreen, selectedPetAction, dismissSearch, ...props }) => {
 
-    const [ndexValue,set_indexValue] = useState(0);
-    const [petsArrayLocal, set_petsArrayLocal] = useState([]);
-    const [imgLoader, set_imgLoader] = useState(true);
-    const [indexCount, set_indexCount] = useState(0);
-	  const carouselRef = useRef(null);
+  const [ndexValue, set_indexValue] = useState(0);
+  const [imgLoader, set_imgLoader] = useState(true);
+  const [indexCount, set_indexCount] = useState(0);
+  const carouselRef = useRef(null);
+  const [petName, set_petName] = useState(undefined);
+  const [isListOpen, set_ListOpen] = useState(false);
+  const [filterArray, set_filterArray] = useState(undefined);
+  const [showSearch, set_showSearch] = useState(false);
+  let isKeyboard = useRef(false);
 
-    React.useLayoutEffect(() => {
-      if(defaultPet){
+  React.useLayoutEffect(() => {
 
-        let ind = getIndex(petsArray,defaultPet.petID);
-        set_indexValue(ind);
+    if (defaultPet) {
+      let ind = getIndex(petsArray, defaultPet.petID);
+      set_indexValue(ind);
+    }
 
-      }
-      
-    }, [defaultPet,petsArray]);
+    if(petsArray && petsArray.length > 5) {
+      checkForSearchAvailable();
+    }
 
-    useEffect(() => {
+  }, [defaultPet, petsArray]);
 
-    }, [activeSlides]);
+  useEffect(() => {
+  }, [activeSlides]);
 
-    const renderScrollItem = (item) => {
+  useEffect(() => {
 
-      let ind = getIndex(petsArray,carouselRef.current.props.data[item].petID);
-      if(activeSlides === ind && petsArray.length > 1){
+    // if(dismissSearch) {
+    removeSearch()
+    // }
 
+  }, [dismissSearch]);
+
+  const checkForSearchAvailable = async () => {
+
+    let userRoleDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
+    userRoleDetails = JSON.parse(userRoleDetails);
+
+    if(userRoleDetails && (userRoleDetails.RoleName === "Hill's Vet Technician" || userRoleDetails.RoleName === "External Vet Technician")) {
+      set_showSearch(true)
+    } else {
+      set_showSearch(false)
+    }
+
+  }
+
+  const renderScrollItem = (item) => {
+
+    let ind = getIndex(petsArray, carouselRef.current.props.data[item].petID);
+    if (activeSlides === ind && petsArray.length > 1) { } else {
+      setValue(carouselRef.current.props.data[item]);
+      carouselRef.current.snapToItem(ind);
+    }
+    set_indexCount(ind);
+
+  };
+
+  const editPetAction = (item) => {
+    props.editPetAction(item);
+  };
+
+  function getIndex(arr, petID) {
+    return arr.findIndex(obj => obj.petID === petID);
+  };
+
+  // Filters the pet records from Array
+  const filterPets = (pName) => {
+
+    if (isKeyboard.current === true) {
+      set_petName(pName)
+      if (pName && pName.length > 0) {
+        set_ListOpen(true);
       } else {
-        setValue(carouselRef.current.props.data[item]);
-        carouselRef.current.snapToItem(ind);
+        set_ListOpen(false);
       }
-      set_indexCount(ind);
-    };
 
-    const editPetAction = (item) => {
-      props.editPetAction(item);
-    };
+      let newData = petsArray.filter(function (item) {
+        const itemData = item ? item.petName.toUpperCase() : "".toUpperCase();
+        const textData = pName.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
 
-    function getIndex(arr,petID) {
-      return arr.findIndex(obj => obj.petID === petID);
-    };
+      if (newData && newData.length > 0) {
+        set_filterArray(newData)
+      } else {
+        set_filterArray(undefined)
+      }
+    }
+  };
 
-    const renderItem = ({item, index}) => {
+  // Removes the typeahead list after selecting the pet in search
+  const selectedPetAction1 = (item) => {
+    set_ListOpen(false);
+    set_filterArray(undefined);
+    set_petName('');
+    isKeyboard.current = false;
+    Keyboard.dismiss();
+    selectedPetAction(item);
+  };
 
-      return (
+  const removeSearch = () => {
+    set_ListOpen(false);
+    set_filterArray(undefined);
+    set_petName('');
+    isKeyboard.current = false;
+    Keyboard.dismiss();
+  }
 
-        <TouchableOpacity disabled = {!isSwipeEnable} style={styles.petComponentStyle} onPress={() => { renderScrollItem(index) }}>
-          {index === activeSlides ? 
-            <ImageBackground source={require("./../../../assets/images/otherImages/png/ActiveSlider.png")} style={styles.gradientImgStyle} imageStyle={{ borderRadius: Platform.isPad ? 10 : 5, borderColor:'white', borderWidth:0.5 }}>
+  const renderSearchItems = ({ item, index }) => {
+    return (
 
-              <ImageBackground source={defaultPetImg} style={[styles.backdrop,{}]} imageStyle={{ borderRadius: 8, borderColor:'white', borderWidth:0.5 }}>
-                
-                {item.photoUrl && item.photoUrl !== "" ?
-                  <ImageBackground source={{ uri: item.photoUrl }} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => {
-                  set_imgLoader(false)}} style={[styles.backdrop,{}]} imageStyle={{ borderRadius: 5 }}>
-                  {imgLoader ? <ActivityIndicator size='small' color="grey"/> : null}
-                </ImageBackground> : 
-                <ImageBackground source={defaultPetImg} style={[styles.backdrop,{}]} imageStyle={{ borderRadius: 5 }}></ImageBackground>}
+      <View style={CommonStyles.searchCellBackViewStyle}>
+
+        {<TouchableOpacity style={{ width: wp('90%'), height: hp('5%'), justifyContent: 'center' }} onPress={() => { selectedPetAction1(item) }}>
+          <View style={{ flexDirection: 'row', height: hp("6%"), alignItems: 'center' }}>
+            <View>
+              {item && item.photoUrl ? <ImageBackground resizeMode='stretch' style={CommonStyles.searchIconStyle} imageStyle={{ borderRadius: 5 }} source={{ uri: item.photoUrl }} ></ImageBackground>
+                : <ImageBackground imageStyle={{ borderRadius: 5 }} resizeMode='contain' style={CommonStyles.searchIconStyle} source={defaultPetImg} ></ImageBackground>}
+            </View>
+            <View style={{ marginLeft: hp('1%') }}>
+              <Text style={CommonStyles.searchTexStyle} >{item.petName}</Text>
+              <Text style={CommonStyles.searchSubTexStyle} >{item.petBreed}</Text>
+            </View>
+          </View>
+
+        </TouchableOpacity>}
+
+      </View>
+    );
+  };
+
+  const renderItem = ({ item, index }) => {
+
+    return (
+
+      <TouchableOpacity disabled={!isSwipeEnable} style={styles.petComponentStyle} onPress={() => { renderScrollItem(index) }}>
+        {index === activeSlides ?
+          <ImageBackground source={require("./../../../assets/images/otherImages/png/ActiveSlider.png")} style={styles.gradientImgStyle} imageStyle={{ borderRadius: Platform.isPad ? 10 : 5, borderColor: 'white', borderWidth: 0.5 }}>
+
+            <ImageBackground source={defaultPetImg} style={[styles.backdrop, {}]} imageStyle={{ borderRadius: 8, borderColor: 'white', borderWidth: 0.5 }}>
+              {item.photoUrl && item.photoUrl !== "" ? <ImageBackground source={{ uri: item.photoUrl }} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => {
+                set_imgLoader(false)
+              }} style={[styles.backdrop, {}]} imageStyle={{ borderRadius: 5 }}>
+                {imgLoader ? <ActivityIndicator size='small' color="grey" /> : null}
+              </ImageBackground> :
+                <ImageBackground source={defaultPetImg} style={[styles.backdrop, {}]} imageStyle={{ borderRadius: 5 }}></ImageBackground>}
+            </ImageBackground>
+
+            <View style={{ height: hp("8%"), alignSelf: 'center', flex: 2, justifyContent: 'center' }}>
+
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text numberOfLines={1} style={[styles.petTitle]}>{item.petName && item.petName.length > 15 ? (Platform.isPad ? item.petName.slice(0, 25).toUpperCase() + "..." : item.petName.slice(0, 15).toUpperCase() + "...")  : item.petName.toUpperCase()}</Text>
+              </View>
+
+              <View>
+                {item.petBreed ? <Text numberOfLines={1} style={[styles.petSubTitle]}>{item.petBreed && item.petBreed.length > 20 ? item.petBreed.slice(0, 20) + "..." : item.petBreed}</Text> : null}
+                <Text style={[styles.genderTitle,]}>{item.speciesId === '1' ? 'Dog ' : 'Cat '}<Text>{item.gender ? '- ' + item.gender : item.gender}</Text></Text>
+              </View>
+
+            </View>
+
+            {index === activeSlides && isFromScreen === "Dashboard" ?
+              <TouchableOpacity style={styles.editPetBtnStyle} onPress={() => { editPetAction(item) }}>
+                <Image source={require("./../../../assets/images/otherImages/svg/petEditCarasoul.svg")} style={[styles.editImgStyle, { width: Platform.isPad ? wp("4%") : wp("6%"), marginTop: Platform.isPad ? hp("-1%") : hp("0%") }]}></Image>
+              </TouchableOpacity> : null}
+
+          </ImageBackground> :
+
+          <View style={{ flexDirection: 'row', flex: 1 }}>
+
+            <ImageBackground source={require("./../../../assets/images/otherImages/png/unActiveSlider.png")} style={[styles.gradientImgStyle, { height: hp('7.6%'), marginTop: hp('-0.3%') }]} imageStyle={{ borderRadius: Platform.isPad ? 10 : 5 }}>
+
+              <ImageBackground source={defaultPetImg} style={[styles.backdrop, {}]} imageStyle={{ borderRadius: 8, borderColor: 'white', borderWidth: 0.5 }}>
+                {item.photoUrl && item.photoUrl !== "" ? <ImageBackground source={{ uri: item.photoUrl }} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => {
+                  set_imgLoader(false)
+                }} style={index === activeSlides ? [styles.backdrop, {}] : [styles.backdrop]} imageStyle={{ borderRadius: 5 }}>
+                  {imgLoader ? <ActivityIndicator size="small" color="grey" /> : null}
+                </ImageBackground> :
+                  <ImageBackground source={defaultPetImg} style={index === activeSlides ? [styles.backdrop, {}] : [styles.backdrop]} imageStyle={{ borderRadius: 5 }}></ImageBackground>}
+
               </ImageBackground>
 
-              <View style={{height: hp("8%"),alignSelf:'center',flex:2,justifyContent:'center'}}>
-                          
-                <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                  <Text numberOfLines={1} style={[styles.petTitle]}>{ item.petName && item.petName.length> 12 ? item.petName.slice(0, 12)+"..."  : item.petName }</Text>
-                </View>
+              <View style={{ height: hp("9%"), alignSelf: 'center', flex: 2, justifyContent: 'center' }}>
 
-                <View>
-                  {item.petBreed ? <Text numberOfLines={1} style={[styles.petSubTitle]}>{item.petBreed && item.petBreed.length > 12 ? item.petBreed.slice(0, 12)+"..." : item.petBreed}</Text> : null}
-                  <Text style={[styles.genderTitle,]}>{ item.speciesId === '1' ? 'Dog ' : 'Cat '}<Text>{item.gender ? '- ' +item.gender : item.gender}</Text></Text>
+                <Text style={[styles.petTitle]}>{item.petName && item.petName.length > 15 ? item.petName.slice(0, 15).toUpperCase() + "..." : item.petName.toUpperCase()}</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+
+                  <View>
+                    <Text numberOfLines={1} style={[styles.petSubTitle]}>{item.petBreed && item.petBreed.length > 20 ? item.petBreed.slice(0, 20) + "..." : item.petBreed}</Text>
+                    <Text style={[styles.genderTitle,]}>{item.speciesId === '1' ? 'Dog ' : 'Cat '}<Text style={[styles.genderTitle,]}>{item.gender ? '- ' + item.gender : item.gender}</Text></Text>
+                  </View>
+
                 </View>
 
               </View>
+            </ImageBackground>
 
-              {index === activeSlides && isFromScreen === "Dashboard" ? 
-                <TouchableOpacity style={styles.editPetBtnStyle} onPress={() => {editPetAction(item)}}>
-                  <Image source={require("./../../../assets/images/otherImages/svg/petEditCarasoul.svg")} style={Platform.isPad ? [styles.editImgStyle,{width: wp("3.9%"),height: hp("3%"),}] : [styles.editImgStyle]}></Image>
-                </TouchableOpacity> : null}
-             
-            </ImageBackground> : 
+          </View>}
 
-            // <View style={{flexDirection:'row',flex:1}}>
+      </TouchableOpacity>
+    );
+  };
 
-              <ImageBackground source={require("./../../../assets/images/otherImages/png/unActiveSlider.png")} style={[styles.gradientImgStyle,{height:hp('7.6%'),marginTop:hp('-0.3%')}]} imageStyle={{ borderRadius: Platform.isPad ? 10 : 5}}>
+  return (
 
-                <ImageBackground source={defaultPetImg} style={[styles.backdrop,{}]} imageStyle={{ borderRadius: 8, borderColor:'white', borderWidth:0.5 }}>
-                  {item.photoUrl && item.photoUrl !=="" ? 
-                    <ImageBackground source={{uri:item.photoUrl}} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => {
-                                    set_imgLoader(false)}} style={index=== activeSlides ? [styles.backdrop,{}] : [styles.backdrop]} imageStyle={{ borderRadius: 5 }}>
-                                      {imgLoader ? <ActivityIndicator size="small" color="grey"/> : null}
-                    </ImageBackground> : 
+    <View style={{ justifyContent: 'center' }}>
+      {petsArray && petsArray.length > Constant.NO_OF_PETS && showSearch ? <View style={Platform.isPad ? [CommonStyles.searchBarStyle, { borderRadius: 10 }] : [CommonStyles.searchBarStyle]}>
 
-                    <ImageBackground source={defaultPetImg} style={index=== activeSlides ? [styles.backdrop,{}] : [styles.backdrop]} imageStyle={{ borderRadius: 5 }}></ImageBackground>}
+        <View style={[CommonStyles.searchInputContainerStyle]}>
+          <Image source={searchImg} style={Platform.isPad ? [CommonStyles.searchImageStyle, { width: wp("3%"), }] : [CommonStyles.searchImageStyle]} />
+          <TextInput style={CommonStyles.searchTextInputStyle}
+            underlineColorAndroid="transparent"
+            placeholder="Search a pet"
+            placeholderTextColor="#7F7F81"
+            autoCapitalize="none"
+            value={petName}
+            onFocus={() => isKeyboard.current = true}
+            onChangeText={(name) => { filterPets(name) }}
+          />
+        </View>
 
-                </ImageBackground>
+      </View> : null}
 
-                <View style={{height: hp("9%"),alignSelf:'center',flex:2,justifyContent:'center'}}>
+      <View style={styles.mainComponentStyle}>
 
-                  <Text style={[styles.petTitle]}>{ item.petName && item.petName.length > 12 ? item.petName.slice(0, 12)+"..."  : item.petName }</Text>
-
-                    <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-
-                      <View>
-                        <Text numberOfLines={1} style={[styles.petSubTitle]}>{item.petBreed && item.petBreed.length > 12 ? item.petBreed.slice(0, 12)+"..." : item.petBreed}</Text>
-                        <Text style={[styles.genderTitle,]}>{ item.speciesId === '1' ? 'Dog ' : 'Cat '}<Text style={[styles.genderTitle,]}>{item.gender ? '- ' +item.gender : item.gender}</Text></Text>
-                      </View>
-
-                  </View>
-                                        
-                </View>
-              </ImageBackground>
-
-          // </View>
-          } 
-
-        </TouchableOpacity>
-      );
-    }
-
-    return (
-      <View style={styles.mainComponentStyle}> 
-
-        {isFromScreen !== 'Dashboard' ? <ImageBackground style={[styles.backViewGradientStyle]} source={require("./../../../assets/images/otherImages/png/petCarasoulBck.png")}>
+        {/* {isFromScreen !== 'Dashboard' ? <ImageBackground style={[styles.backViewGradientStyle]} imageStyle={{ borderRadius: 5 }} source={require("./../../../assets/images/otherImages/png/petCarasoulBck.png")}>
 
           <View style={[styles.imageViewStyle]}>
             <Carousel
@@ -137,134 +248,156 @@ const  PetsSelectionCarousel = ({route,petsArray,setValue,setSlideValue,isSwipeE
               data={petsArray}
               renderItem={renderItem}
               sliderWidth={wp('100%')}
-              itemWidth={wp('48%')} 
+              itemWidth={wp('48%')}
               layout={'default'}
-              activeSlideAlignment = {'start'}
+              activeSlideAlignment={'start'}
               firstItem={activeSlides}
               asParallaxImages={true}
               onSnapToItem={data => renderScrollItem(data)}
-              scrollEnabled = {isSwipeEnable}
-              inactiveSlideOpacity = {1}
+              scrollEnabled={isSwipeEnable}
+              inactiveSlideOpacity={1}
               useScrollView={true}
-              enableSnap = {true}
+              enableSnap={true}
             />
-                    {/* {getPagination()}  */}
           </View>
-          
-        </ImageBackground> : 
-              
-        <View style={[styles.imageViewStyle]}>
-          <Carousel
-            ref={carouselRef}
-            data={petsArray}
-            renderItem={renderItem}
-            sliderWidth={wp('100%')}
-            itemWidth={wp('48%')} 
-            layout={'default'}
-            activeSlideAlignment = {'start'}
-            firstItem={activeSlides}
-            hasParallaxImages={true}
-            onSnapToItem={data => renderScrollItem(data)}
-            scrollEnabled = {isSwipeEnable}
-            inactiveSlideOpacity = {1}
-            useScrollView={true}
-            enableSnap = {true}
-          />
-                    {/* {getPagination()}  */}
-        </View>}
+
+        </ImageBackground> : */}
+
+          <View style={[styles.imageViewStyle]}>
+            <Carousel
+              ref={carouselRef}
+              data={petsArray}
+              renderItem={renderItem}
+              sliderWidth={wp('100%')}
+              itemWidth={wp('48%')}
+              layout={'default'}
+              activeSlideAlignment={'start'}
+              firstItem={activeSlides}
+              hasParallaxImages={true}
+              onSnapToItem={data => renderScrollItem(data)}
+              scrollEnabled={isSwipeEnable}
+              inactiveSlideOpacity={1}
+              useScrollView={true}
+              enableSnap={true}
+            />
+            {/* {getPagination()}  */}
+          </View>
 
       </View>
-    );
-  }
-  
-  export default PetsSelectionCarousel;
 
-  const styles = StyleSheet.create({
-    
-    mainComponentStyle : {
-      justifyContent:'center',
-      minHeight:hp('8%'),
-      marginLeft:wp('1%'),
-      // backgroundColor:'grey',
-    },
+      {isListOpen ? <View style={Platform.isPad ? [CommonStyles.searchFilterListStyle, { top: Platform.isPad ? 65 : 80, ...CommonStyles.searchDropShadowStyle}] : [CommonStyles.searchFilterListStyle, {...CommonStyles.searchDropShadowStyle}]}>
+        {filterArray && filterArray.length > 0 ?
+          <FlatList
+            data={filterArray}
+            renderItem={renderSearchItems}
+            keyExtractor={(item, index) => "" + index}
+          /> :
+          <View style={{ flexDirection: 'row', alignItems: 'center', width: wp("90%"), }}>
+            <Image style={[CommonStyles.searchNologsDogStyle]} source={noLogsDogImg}></Image>
+            <View>
+              <Text style={CommonStyles.noRecTexStyle} >{Constant.NO_RECORDS_LOGS}</Text>
+              <Text style={CommonStyles.noRecSubTextStyle} >{Constant.NO_RECORDS_LOGS1}</Text>
+            </View>
+          </View>}
+      </View> : null}
 
-    petComponentStyle : {
-      flexDirection:'row',
-      height:hp('8%'), 
-    },
+    </View>
 
-    backdrop: {
-      resizeMode: 'contain',
-      marginLeft:hp('1%'),
-      marginRight:hp('1%'),
-      aspectRatio:1,
-      height:hp('5%'),
-      alignSelf:'center',  
-      justifyContent:'center'      
-    },
+  );
 
-    genderTitle : {
-      ...CommonStyles.textStyleSemiBold,
-      fontSize: fonts.fontTiny,
-      color: 'white', 
-    },
 
-    petTitle : {
-      ...CommonStyles.textStyleBold,
-      fontSize: fonts.fontSmall,
-      color: 'white', 
-      // marginBottom:hp('0.3%'),
-    },
+}
 
-    petSubTitle : {
-      ...CommonStyles.textStyleSemiBold,
-      fontSize: fonts.fontTiny,
-      color: 'white', 
-      // marginBottom:hp('0.3%'),
-    },
+export default PetsSelectionCarousel;
 
-    imageViewStyle : {
-      width:wp('100%'),
-      alignSelf:'flex-start',
-      marginLeft:wp('2%'),
-      marginTop:hp('0.5%'),
-      
-    },
+const styles = StyleSheet.create({
 
-    imageViewStyle1 : {
-      width:wp('100%'),
-      alignSelf:'flex-start',
-      marginRight:wp('2%'),     
-    },
+  mainComponentStyle: {
+    justifyContent: 'center',
+    minHeight: hp('12%'),
+    width: wp('100%'),
+    minHeight: hp('8%'),
+    marginLeft: wp('1%'),
+    // backgroundColor:'grey',
+  },
 
-    editPetBtnStyle : {
-      width: wp("8%"),
-      aspectRatio:1,
-    },
+  petComponentStyle: {
+    flexDirection: 'row',
+    height: hp('8%'),
+  },
 
-    editImgStyle : {
-      width: wp("6%"),
-      height: wp("6%"),
-      resizeMode:'contain',
-      overflow:'hidden',
-      alignSelf: 'flex-end',
-      // marginRight: -1,
-      // marginTop: 0.8,        
-    },
+  backdrop: {
+    resizeMode: 'contain',
+    marginLeft: hp('1%'),
+    marginRight: hp('1%'),
+    aspectRatio: 1,
+    height: hp('5%'),
+    alignSelf: 'center',
+    justifyContent: 'center'
+  },
 
-    backViewGradientStyle: {
-      resizeMode: 'contain',
-      flex:1,
-      height: hp("8%"),
-      justifyContent:'center', 
-      marginLeft: -3,  
-    },
+  genderTitle: {
+    ...CommonStyles.textStyleSemiBold,
+    fontSize: fonts.fontTiny,
+    color: 'white',
+  },
 
-    gradientImgStyle : {
-      resizeMode:'contain',
-      height:hp('7%'),
-      width:wp('49%'),
-      flexDirection:'row',       
-    },
+  petTitle: {
+    ...CommonStyles.textStyleExtraBold,
+    fontSize: fonts.fontSmall,
+    color: 'white',
+    // marginBottom:hp('0.3%'),
+  },
 
-  });
+  petSubTitle: {
+    ...CommonStyles.textStyleSemiBold,
+    fontSize: fonts.fontTiny,
+    color: 'white',
+    // marginBottom:hp('0.3%'),
+  },
+
+  imageViewStyle: {
+    width: wp('100%'),
+    alignSelf: 'flex-start',
+    marginLeft: wp('2%'),
+    marginTop: hp('0.5%'),
+
+  },
+
+  imageViewStyle1: {
+    width: wp('100%'),
+    alignSelf: 'flex-start',
+    marginRight: wp('2%'),
+  },
+
+  editPetBtnStyle: {
+    width: wp("8%"),
+    aspectRatio: 1,
+  },
+
+  editImgStyle: {
+    width: wp("6%"),
+    height: wp("6%"),
+    resizeMode: 'contain',
+    overflow: 'hidden',
+    alignSelf: 'flex-end',
+    // marginRight: -1,
+    // marginTop: 0.8,        
+  },
+
+  backViewGradientStyle: {
+    resizeMode: 'contain',
+    flex: 1,
+    height: hp("8%"),
+    justifyContent: 'center',
+    marginLeft: -3,
+  },
+
+  gradientImgStyle: {
+    resizeMode: 'contain',
+    height: hp('7%'),
+    width: wp('49%'),
+    flexDirection: 'row',
+  },
+
+});

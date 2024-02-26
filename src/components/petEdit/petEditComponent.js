@@ -61,14 +61,14 @@ const PetEditComponent = ({navigation, route, ...props }) => {
      useEffect(() => {
 
         if(route.params?.petObject){
-            set_imagePathNew(route.params?.petObject.photoUrl);
-            set_petObj(route.params?.petObject);
-            if(route.params?.petObject && route.params?.petObject.isPetWithPetParent) {
-              getPetParentAddressAsync(); 
-            } else if(route.params?.petObject.petAddress && Object.keys(route.params?.petObject.petAddress).length !== 0) {
-              
-              set_addressObj(route.params?.petObject.petAddress);
-              let tempLine2 = route.params?.petObject.petAddress.address2 && route.params?.petObject.petAddress.address2 !== '' ? route.params?.petObject.petAddress.address2 + ', ' : '';
+
+          set_imagePathNew(route.params?.petObject.photoUrl);
+          set_petObj(route.params?.petObject);
+          if(route.params?.petObject.petAddress && Object.keys(route.params?.petObject.petAddress).length !== 0) {
+
+            set_addressObj(route.params?.petObject.petAddress);
+
+            let tempLine2 = route.params?.petObject.petAddress.address2 && route.params?.petObject.petAddress.address2 !== '' ? route.params?.petObject.petAddress.address2+", "  : '';
               let tempAdd = route.params?.petObject.petAddress.address1 + ', ' 
               + tempLine2
               + route.params?.petObject.petAddress.city + ', ' 
@@ -76,7 +76,10 @@ const PetEditComponent = ({navigation, route, ...props }) => {
               + route.params?.petObject.petAddress.country+ ', '
               + route.params?.petObject.petAddress.zipCode;
               set_address(tempAdd);
-            }
+
+          } else if(route.params?.petObject && route.params?.petObject.isPetWithPetParent) {
+            getPetParentAddressAsync(); 
+          }  
             
         }
 
@@ -475,8 +478,7 @@ const PetEditComponent = ({navigation, route, ...props }) => {
 
       let pParentObj = await DataStorageLocal.getDataFromAsync(Constant.PET_PARENT_OBJ);
       pParentObj = JSON.parse(pParentObj);
-
-      if(pParentObj && pParentObj.petParentAddress && Object.keys(pParentObj.petParentAddress).length !==0){
+      if(pParentObj && pParentObj.address && Object.keys(pParentObj.address).length !==0){
         navigation.navigate('PetAddressEditConfirmComponent',{petObject : petObj, petParentObj:pParentObj});
       } 
       // else if( petObj && petObj.isPetWithPetParent ){

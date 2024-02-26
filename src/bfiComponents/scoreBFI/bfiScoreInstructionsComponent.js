@@ -44,12 +44,18 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
   const [flatListData, set_FlatListData] = useState([])
   const [isLoading, set_isLoading] = useState(false);
   var instructionArray = useRef([]);
-  
+  let trace_instructions_Screen;
+
   //Android Physical back button action
   useEffect(() => {
+    initialSessionStart();
+    firebaseHelper.reportScreen(firebaseHelper.screen_bfi_scoring_Instructions);
+    firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_scoring_Instructions, "User in scoring instructions Screen", '');
+
    getBFIInstructionsDataFromLocal();
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     return () => {
+      initialSessionStop();
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
     };
 
@@ -59,7 +65,6 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
     let data = await DataStorageLocal.getDataFromAsync(Constant.BFIINSTRUCTIONSDATA);
     data = JSON.parse(data)
     if(data === undefined || data === ''|| data === null){
-      console.log('data is null call service')
       getBfiImageScoresData(1);
     }
     else{
@@ -89,10 +94,17 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
     set_isPopUp(isPop);
   };
 
+  const initialSessionStart = async () => {
+    trace_instructions_Screen = await perf().startTrace('t_inScoreInstructionsScreen');
+  };
+
+  const initialSessionStop = async () => {
+    await trace_instructions_Screen.stop();
+  };
+
   //Getting instructions values from backend
   const getBfiImageScoresData = async (speciesId) => {
     //setting array based on instruction type recieved
-    console.log('serviec callled')
     set_isLoading(true);
     let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
     let serviceCallsObj = await ServiceCalls.getBfiImageScores(token);
@@ -109,7 +121,6 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
     if (serviceCallsObj && serviceCallsObj.statusData) {
       set_isLoading(false);
       if (serviceCallsObj.responseData.bfiImageScores.length > 0) {
-        console.log('got service res',serviceCallsObj.responseData)
         await DataStorageLocal.saveDataToAsync(Constant.BFIINSTRUCTIONSDATA, JSON.stringify(serviceCallsObj.responseData));
         let obj;
         for(let i=0;i<serviceCallsObj.responseData.bfiImageScores.length; i++){
@@ -118,23 +129,20 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
          else{
            obj = serviceCallsObj.responseData.bfiImageScores[i];
            mainData.current.push(obj)
-           console.log('obj val',obj)
          }
         }
-        console.log('main data is here',mainData.current)
         set_FlatListData(mainData.current)
-        console.log('set flat list data',flatListData)
       }
       } else {
       set_isLoading(false);
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.CAPTURED_SUBMIT_IMAGES_FAIL, 'OK', false, true);
-      firebaseHelper.logEvent(firebaseHelper.event_getscore_ids_api, firebaseHelper.screen_submit_bfiScore, "savePetBfiImages Service failed", 'Service Status : false');
+      firebaseHelper.logEvent(firebaseHelper.event_score_instructions_api, firebaseHelper.screen_bfi_scoring_Instructions, "getBfiImageScores_api Service failed", 'Service Status : false');
     }
 
     if (serviceCallsObj && serviceCallsObj.error) {
       let errors = serviceCallsObj.error.length > 0 ? serviceCallsObj.error[0].code : ''
       set_isLoading(false);
-      firebaseHelper.logEvent(firebaseHelper.event_getscore_ids_api, firebaseHelper.screen_submit_bfiScore, "savePetBfiImages Service failed", 'Service error : ' + errors);
+      firebaseHelper.logEvent(firebaseHelper.event_score_instructions_api , firebaseHelper.screen_bfi_scoring_Instructions, "getBfiImageScores_api Service failed", 'Service error : ' + errors);
     }
   };
 

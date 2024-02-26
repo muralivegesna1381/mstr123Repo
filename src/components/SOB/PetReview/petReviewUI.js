@@ -90,42 +90,40 @@ const PetReviewUI = ({ route, ...props }) => {
                 />
             </View>
 
-            <View style={{ width: wp('90%'), height: hp('75%'), alignSelf: 'center' }}>
+            <View style={{ width: wp('90%'), height: hp('73%'), alignSelf: 'center' }}>
+
                 <KeyboardAwareScrollView>
                     <View style={styles.backSOBDataViewStyle}>
 
-                        {!isFromPetBFI ?
-                            <View style={{ justifyContent: 'center' }}>
+                        {sobJson && sobJson.deviceNo ? <View style={{ justifyContent: 'center' }}>
 
-                                <Text style={styles.subHeaderTextStyles}>{'Device Info'}</Text>
+                            <Text style={styles.subHeaderTextStyles}>{'Sensor Information'}</Text>
 
-                                <View style={styles.dataViewStyle}>
+                            <View style={styles.dataViewStyle}>
 
-                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
-                                        <Text style={styles.labelTextStyles}>{'Device Number'}</Text>
-                                        {sobJson && sobJson.deviceNo && sobJson.deviceNo.length < 10 ? <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo}</Text>
-                                            : (sobJson && sobJson.deviceNo ? <View>
-                                                <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo.substring(0, 9)}</Text>
-                                                <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo.substring(9, sobJson.deviceNo.length)}</Text>
-                                            </View> : null)}
-                                    </View>
-
+                                <View style={{ flexDirection: 'row',justifyContent: 'space-between', width: wp('80%'),alignItems:'center'}}>
+                                    <Text style={styles.labelTextStyles}>{'Sensor Number'}</Text>
+                                    {sobJson && sobJson.deviceNo && sobJson.deviceNo.length < 10 ? <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo}</Text>
+                                        : (sobJson && sobJson.deviceNo ? <View>
+                                            <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo.substring(0, 9)}</Text>
+                                            <Text style={[styles.selectedDataTextStyles]}>{sobJson.deviceNo.substring(9, sobJson.deviceNo.length)}</Text>
+                                        </View> : null)}
                                 </View>
 
-                                <View style={styles.dataViewStyle}>
+                            </View>
 
-                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
+                            <View style={styles.dataViewStyle}>
+                                    <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
                                         <Text style={styles.labelTextStyles}>{'Sensor Type'}</Text>
                                         <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.deviceType : ''}</Text>
                                     </View>
-
                                 </View>
 
-                            </View> : undefined}
+                        </View> : null}
 
                         <View style={{ justifyContent: 'center' }}>
 
-                            <Text style={styles.subHeaderTextStyles}>{'Pet Info'}</Text>
+                            <Text style={styles.subHeaderTextStyles}>{'Pet Information'}</Text>
 
                             <View style={styles.dataViewStyle}>
 
@@ -184,6 +182,15 @@ const PetReviewUI = ({ route, ...props }) => {
                             <View style={styles.dataViewStyle}>
 
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
+                                    <Text style={styles.labelTextStyles}>{'Feeding Time'}</Text>
+                                    <Text style={styles.selectedDataTextStyles}>{props.feedingText ? props.feedingText : ''}</Text>
+                                </View>
+
+                            </View>
+
+                            <View style={styles.dataViewStyle}>
+
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                     <Text style={styles.labelTextStyles}>{sobJson && sobJson.gender === 'Male' ? 'Neutered' : 'Spayed'}</Text>
                                     <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.isNeutered : ''}</Text>
                                 </View>
@@ -191,22 +198,37 @@ const PetReviewUI = ({ route, ...props }) => {
                             </View>
 
                             <View style={styles.dataViewStyle}>
+ 
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
+                                <Text style={styles.labelTextStyles}>{'Food Brand'}</Text>
+                                <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.dietName : ''}</Text>
+                            </View>
+ 
+                        </View>
+ 
+                        <View style={styles.dataViewStyle}>
+ 
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
+                            <Text style={styles.labelTextStyles}>{'Quantity'}</Text>
+                            <Text style={styles.selectedDataTextStyles}>{sobJson ? sobJson.foodIntake+ ' ' + (sobJson.dietAmountType === 1? 'Cups' : 'Grams'): ''}</Text>
+                        </View>
+ 
+                        </View>
 
-                                {props.petAddress ? <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
-                                    <Text style={styles.labelTextStyles}>{'Pet Address'}</Text>
-                                    <Text style={styles.selectedDataTextStyles}>{props.petAddress}</Text>
-                                </View> : <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
-                                    <Text style={styles.labelTextStyles}>{'Pet Address'}</Text>
-                                    <Text style={styles.selectedDataTextStyles}>{'--'}</Text>
+                            {props.petAddress ? <View style={styles.dataViewStyle}>
+
+                                {<View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
+                                    <Text style={[styles.labelTextStyles,]}>{'Pet Address'}</Text>
+                                    <Text style={[styles.selectedDataTextStyles,{marginTop: hp('1%'),marginBottom: hp('1%')}]}>{props.petAddress}</Text>
                                 </View>}
 
-                            </View>
+                            </View> : null}
 
                         </View>
 
                         <View style={{ justifyContent: 'center' }}>
 
-                            <Text style={styles.subHeaderTextStyles}>{'Your Info'}</Text>
+                            <Text style={styles.subHeaderTextStyles}>{'Your Information'}</Text>
 
                             <View style={styles.dataViewStyle}>
 

@@ -112,7 +112,7 @@ return (
                     isChatEnable={false}
                     isTImerEnable={false}
                     isTitleHeaderEnable={true}
-                    title={'Device Setup'}
+                    title={'Sensor Setup'}
                     backBtnAction = {() => backBtnAction()}
                 />
             </View>

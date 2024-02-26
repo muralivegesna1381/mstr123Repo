@@ -193,7 +193,7 @@ const  ViewObservationsUi = ({route, ...props }) => {
                 <BottomComponent
                     rightBtnTitle = {'DELETE'}
                     leftBtnTitle = {'EDIT'}
-                    isLeftBtnEnable = {true}
+                    isLeftBtnEnable = {props.isEdit ? true : false}
                     rigthBtnState = {true}
                     isRightBtnEnable = {true}
                     rightButtonAction = {async () => deleteButtonAction()}

@@ -56,6 +56,7 @@ const  ViewObservationComponent = ({navigation, route, ...props }) => {
             popUpMessage = {props.popUpMessage}
             popUpAlert = {props.popUpAlert}
             isPopUp = {props.isPopUp}
+            isEdit = {props.isEdit}
             navigateToPrevious = {navigateToPrevious}
             deleteButtonAction = {deleteButtonAction}
             viewAction = {viewAction}

@@ -67,7 +67,7 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
     let completeQuestionsSet = useRef();
     let questionnaireDictSet = useRef();
     let isUpdateSecNum = useRef(true);
-    let questArray = useRef();
+    let sectionsAnsweredRef = useRef(0);
 
     const [answeredQuestions, set_answeredQuestions] = useState(0);
     const [questionnaireDict, set_questionnaireDict] = useState(undefined);
@@ -214,28 +214,33 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                 set_questionsArrayInitial(questionaArray);
                 set_secDesc(questionaArray[0].sectionDescription);
                 let isAnswered = false;
+
                 if(questionaArray && questionaArray.length > 0) {
+                    
                     let dict = await QestionnaireDataObj.getAnswer(questionsObject.questionnaireId,props.petId);
                     if(dict) {
                         set_questionnaireDict(dict);
                         questionnaireDictSet.current = dict;
                         props.updateQstServiceDict(dict, completeQuestionsSet.current);
                         isAnswered = await saveSectionsAnswered(questionaArray,dict,props.petId);
-    
                         if(isAnswered) {
                             set_sectionsAnswered(1);
                         }
                     } else {
-                        if(status === 'Submitted') {
+                        if(questionsObject.status === 'Submitted') {
                             set_sectionsAnswered(1);
                         }
                     }
+
+                    
                     
                 }
                 
                 return;
 
             } 
+
+            
             // set_completeQuestions(questionaArray);
             // completeQuestionsSet.current = questionaArray;
             prepareQuestionsData(questionaArray,noOfSections.current[sectionIndex.current-1],noOfSections.current,questionsObject.questionnaireId,questionsObject.status);           
@@ -1001,7 +1006,7 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                 filterName = {filterName.current}
                 sectionIndex = {sectionIndex.current}
                 indexArray = {indexArray.current}
-                sectionAnswered = {sectionsAnswered}
+                sectionsAnswered = {sectionsAnswered}
                 sectionArray = {sectionArray.current}
                 totalSection = {totalSections}
                 secDesc = {secDesc}

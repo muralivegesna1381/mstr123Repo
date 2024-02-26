@@ -45,11 +45,11 @@ const WriteDetailsToSensorUI = ({navigation, route, ...props }) => {
         set_isPopUp(props.isPopUp);
         set_popUpMessage(props.popUpMessage);
         set_popUpTitle(props.popUpTitle);
-        set_defaultPet(props.defaultpet);
+        // set_defaultPet(props.defaultpet);
         set_sensorType(props.sensorType);
         set_hpn1ConfigWIFICount(props.hpn1ConfigWIFICount);
 
-    }, [props.isPopUp,props.popUpMessage,props.popUpTitle,props.defaultpet,props.sensorType,props.hpn1ConfigWIFICount]);
+    }, [props.isPopUp,props.popUpMessage,props.popUpTitle,props.sensorType,props.hpn1ConfigWIFICount]);
 
     useEffect(() => {
 
@@ -87,7 +87,7 @@ return (
                     isChatEnable={false}
                     isTImerEnable={false}
                     isTitleHeaderEnable={true}
-                    title={'Device Setup'}
+                    title={'Sensor Setup'}
                     backBtnAction = {() => backBtnAction()}
                 />
             </View>
@@ -95,7 +95,7 @@ return (
             <View style={styles.mainViewStyle}>
 
                 <View style={styles.topViewStyle}>
-                    <Text style={styles.headerStyle}>{'Network '}<Text style={[styles.headerStyle,{...CommonStyles.textStyleBold}]}>{'Setup'}</Text></Text>
+                    <Text style={styles.headerStyle}>{'Network Setup : '}<Text style={[styles.headerStyle1]}>{props.sensorNumber}</Text></Text>
                 </View>
 
                 <View style = {styles.videoViewStyle}>
@@ -123,7 +123,8 @@ return (
             {setupSuccess === "success" || setupSuccess === "failed" ? <View style={styles.bottomViewComponentStyle}>
                 <BottomComponent
                     rightBtnTitle = {setupSuccess === "failed" ? 'TRY AGAIN' : 'CONTINUE'}
-                    isLeftBtnEnable = {sensorType === "HPN1Sensor" && hpn1ConfigWIFICount < 8 ? true : false}
+                    // isLeftBtnEnable = {sensorType === "HPN1Sensor" && hpn1ConfigWIFICount < 8 ? true : false}
+                    isLeftBtnEnable = {false}
                     leftBtnTitle = {'Configure another SSID?'}
                     rigthBtnState = {true}
                     isRightBtnEnable = {true}
@@ -206,17 +207,25 @@ const styles = StyleSheet.create({
     },
 
     topViewStyle : {
-        width:wp('80%'),
+        width:wp('90%'),
         height:hp('8%'),
         justifyContent:'center',
-        alignSelf:'center'        
+        alignSelf:'center',
+        alignItems:'center'       
     },
 
     headerStyle : {
         color: 'black',
         fontSize: fonts.fontNormal,
         ...CommonStyles.textStyleRegular,
-        marginLeft:wp('8%')
+        // marginLeft:wp('8%')
+    },
+
+    headerStyle1 : {
+        color: 'black',
+        fontSize: fonts.fontNormal,
+        ...CommonStyles.textStyleSemiBold,
+        // marginLeft:wp('8%')
     }
 
 });

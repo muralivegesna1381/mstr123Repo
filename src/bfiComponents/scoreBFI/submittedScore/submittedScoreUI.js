@@ -5,20 +5,16 @@ import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import fonts from '../../../utils/commonStyles/fonts';
 import * as Constant from "../../../utils/constants/constant";
+import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
 
 const SubmittedScoreUI = ({ route, ...props }) => {
   const [isRecords, set_isRecords] = useState(true);
   const [dataArray, set_dataArray] = useState(undefined);
 
   var screenName = useRef('Scores');
+  let trace_submitted_scores_Screen;
 
-  //Android Physical back button action
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
-    };
-  }, []);
+  
 
   // Setting the instructions data to the UI
   useEffect(() => {
@@ -29,6 +25,17 @@ const SubmittedScoreUI = ({ route, ...props }) => {
       screenName.current = props.petName + '\'s Scores';
     }
   }, [props.instructions, props.petName]);
+
+
+  //Android Physical back button action
+  useEffect(() => {
+    initialSessionStart();
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+      initialSessionStop();
+      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };
+  }, []);
 
   const backBtnAction = () => {
     props.navigateToPrevious();
@@ -46,6 +53,15 @@ const SubmittedScoreUI = ({ route, ...props }) => {
   const navigateToScorePage = (item, index) => {
     props.navigateToScorePage(item, index);
   }
+
+
+  const initialSessionStart = async () => {
+    trace_submitted_scores_Screen = await perf().startTrace('t_insubmittedScoresScreen');
+  };
+
+  const initialSessionStop = async () => {
+    await trace_submitted_scores_Screen.stop();
+  };
 
   const renderItem = ({ item, index }) => {
     return (

@@ -3,6 +3,8 @@ import * as Constant from "../../../utils/constants/constant";
 import * as DataStorageLocal from '../../../utils/storage/dataStorageLocal';
 import BuildEnv from './../../../config/environment/environmentConfig';
 import InstructionsUI from './instructionsUI';
+import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
+
 
 const InstructionsPage = ({ navigation, route, ...props }) => {
 
@@ -10,14 +12,17 @@ const InstructionsPage = ({ navigation, route, ...props }) => {
   const [instructionType, set_instructionType] = useState(0);
   let imgsRef = useRef([])
   const Environment = JSON.parse(BuildEnv.Environment());
-
   useEffect(() => {
     //setting instruction type based on screen instructions is triggered from
     // 1 is from camera related sceens and 2 is from scoring related screens
+    firebaseHelper.reportScreen(firebaseHelper.screen_bfi_instrutions);
+    firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_instrutions, "User in instructions Screen", '');
     if (route.params?.instructionType) {
       set_instructionType(route.params?.instructionType)
     }
     getInstructionsData(route.params?.instructionType);
+    //Android Physical back button action
+    
   }, [route.params?.instructionType]);
 
   const navigateToPrevious = () => {
@@ -55,12 +60,16 @@ const InstructionsPage = ({ navigation, route, ...props }) => {
           }
           set_instructions(tempArray);
         }
+        else{
+          firebaseHelper.logEvent(firebaseHelper.event_instructions_api, firebaseHelper.screen_bfi_instrutions, "Instructions Service failed", 'Service error');
+        }
       })
       .catch((error) => {
         //error block happens when there is something wring with the service
+        firebaseHelper.logEvent(firebaseHelper.event_instructions_api, firebaseHelper.screen_bfi_instrutions, "Instructions Service failed", 'Service error : error');
+
       });
   };
-
 
   return (
     <InstructionsUI

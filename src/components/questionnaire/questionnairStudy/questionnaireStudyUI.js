@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TouchableOpacity,ScrollView,Image} from 'react-native';
+import {View,StyleSheet,Text,TouchableOpacity,ScrollView,Image,FlatList,ImageBackground,TextInput,Keyboard} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import fonts from '../../../utils/commonStyles/fonts'
@@ -16,137 +16,145 @@ let noLogsCatImg = require("./../../../../assets/images/dogImages/noRecordsCat.s
 
 const  QuestionnaireStudyUI = ({route, ...props }) => {
 
-    const [isPopUp, set_isPopUp] = useState(false);
-    const [defaultPetObj, set_defaultPetObj] = useState(undefined);
-    const [petsArray, set_petsArray] = useState(undefined);
-    const [isLoading, set_isLoading] = useState(true);
-    const [questionnaireData, set_questionnaireData] = useState(undefined);
-    const [activeSlide, set_activeSlide] = useState(0);
+  const [isPopUp, set_isPopUp] = useState(false);
+  const [defaultPetObj, set_defaultPetObj] = useState(undefined);
+  const [petsArray, set_petsArray] = useState(undefined);
+  const [isLoading, set_isLoading] = useState(true);
+  const [questionnaireData, set_questionnaireData] = useState(undefined);
+  const [activeSlide, set_activeSlide] = useState(0);
 
-    useEffect(() => {
+  useEffect(() => {
       
-      set_petsArray(props.petsArray);
-      set_defaultPetObj(props.defaultPetObj);
+    set_petsArray(props.petsArray);
+    set_defaultPetObj(props.defaultPetObj);
 
-      if(props.defaultPetObj && props.petsArray){
-        let index = 0;
-        for(var i = 0; i < props.petsArray.length; i++) {
-            if (props.petsArray[i].petID == props.defaultPetObj.petID) {
-              index = i;
-                break;
-            }
+    if(props.defaultPetObj && props.petsArray){
+      let index = 0;
+      for(var i = 0; i < props.petsArray.length; i++) {
+        if (props.petsArray[i].petID == props.defaultPetObj.petID) {
+          index = i;
+          break;
         }
+      }
 
-        set_activeSlide(index);
-      } 
+      set_activeSlide(index);
+    } 
 
-    }, [props.petsArray, props.defaultPetObj]);
+  }, [props.petsArray, props.defaultPetObj]);
 
-    useEffect(() => {
-      set_isPopUp(props.isPopUp);
-      set_isLoading(props.isLoading);
-      set_questionnaireData(props.questionnaireData);
-    }, [props.isLoading,props.questionnaireData,props.isPopUp]);
+  useEffect(() => {
+    set_isPopUp(props.isPopUp);
+    set_isLoading(props.isLoading);
+    set_questionnaireData(props.questionnaireData);
+  }, [props.isLoading,props.questionnaireData,props.isPopUp]);
 
-    const backBtnAction = () => {
-        props.navigateToPrevious();
-    };
+  // Button Actions
+  const backBtnAction = () => {
+    props.navigateToPrevious();
+  };
 
-    const popOkBtnAction = () => {
-        props.popOkBtnAction(false);
-    }
+  const popOkBtnAction = () => {
+    props.popOkBtnAction(false);
+  }
 
   const questPetSelection = async (pObject) => {
     await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(pObject));
-      props.questPetSelection(pObject);
-  }
+    props.questPetSelection(pObject);
+  };
 
   const selectQuetionnaireAction = (item) => {
     props.selectQuetionnaireAction(item);
-  }
+  };
+
+  // Removes the typeahead list after selecting the pet in search
+  const selectedSearchPetAction = async (item) => {
+    await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(item));
+    props.selectedSearchPetAction(item);
+  };
 
   // Renders the Questionnaires in the list
   const _renderStudyItems = () => {
     if(questionnaireData) {
-        return questionnaireData.map((item,index) => {
-            return (
-               <>
-               <View>
-               <TouchableOpacity onPress={() => selectQuetionnaireAction(item)}>
-               <View style={styles.cellBackView}>
-                        <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-                            <Text style={styles.indexName}>{index+1}</Text>
-                        </View>
-                        <View style={{flex:4,marginRight:wp('1%'),justifyContent:'center',marginBottom:wp('2%'),marginTop:wp('2%')}}>
-                            <Text style={styles.QuestionnaireName}>{item.questionnaireName}</Text>
-                            <Text style={styles.QuestionnaireSubName}>{"Due by: "+moment(new Date(item.endDate)).format("MM-DD-YYYY")}</Text>
-                        </View>
+      return questionnaireData.map((item,index) => {
+        return (
+          <View>
+            <TouchableOpacity onPress={() => selectQuetionnaireAction(item)}>
+              <View style={styles.cellBackView}>
 
-                        <View style={{flex:2,justifyContent:'center',alignItems:'center',marginRight:hp('2%')}}>
-                            <View style={item.status === "Submitted" ? styles.cellStatusViewSubmitted : item.status === "Open" ? styles.cellStatusViewPending : styles.cellStatusViewElapsed}>
-                            <Text style={item.status === "Submitted" ? [styles.cellStatusText,{color:'#6BC105'}] : item.status === "Open" ? [styles.cellStatusText] : [styles.cellStatusText,{color:'#FF2323'}]}>{item.status}</Text>
-                            </View>
-                        </View>
+                <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+                  <Text style={styles.indexName}>{index+1}</Text>
+                </View>
+
+                <View style={{flex:4,marginRight:wp('1%'),justifyContent:'center',marginBottom:wp('2%'),marginTop:wp('2%')}}>
+                  <Text style={styles.QuestionnaireName}>{item.questionnaireName}</Text>
+                  <Text style={styles.QuestionnaireSubName}>{"Due by: "+moment(new Date(item.endDate)).format("MM-DD-YYYY")}</Text>
+                </View>
+
+                <View style={{flex:2,justifyContent:'center',alignItems:'center',marginRight:hp('2%')}}>
+                  <View style={item.status === "Submitted" ? styles.cellStatusViewSubmitted : item.status === "Open" ? styles.cellStatusViewPending : styles.cellStatusViewElapsed}>
+                    <Text style={item.status === "Submitted" ? [styles.cellStatusText,{color:'#6BC105'}] : item.status === "Open" ? [styles.cellStatusText] : [styles.cellStatusText,{color:'#FF2323'}]}>{item.status}</Text>
                   </View>
-               </TouchableOpacity>
-               </View>
-               </>
-             )
-        });
+                </View>
+
+              </View>
+            </TouchableOpacity>
+          </View>
+        )
+      });
     }
    };
 
-    return (
-        <View style={[CommonStyles.mainComponentStyle]}>
-          <View style={[CommonStyles.headerView,{}]}>
-                <HeaderComponent
-                    isBackBtnEnable={true}
-                    isSettingsEnable={false}
-                    isChatEnable={false}
-                    isTImerEnable={false}
-                    isTitleHeaderEnable={true}
-                    title={'Questionnaire'}
-                    backBtnAction = {() => backBtnAction()}
-                />
-            </View>
-            <View style={[CommonStyles.petsSelViewHeaderStyle]}>
-                {defaultPetObj ? <PetsSelectionCarousel
-                    petsArray={petsArray}
-                    isSwipeEnable = {true}
-                    defaultPet = {defaultPetObj}
-                    activeSlides = {activeSlide}
-                    setValue={(pObject) => {
-                        questPetSelection(pObject);
-                    }}
-                /> : null}
+  return (
+    <View style={[CommonStyles.mainComponentStyle]}>
+      <View style={[CommonStyles.headerView,{}]}>
+        <HeaderComponent
+          isBackBtnEnable={true}
+          isSettingsEnable={false}
+          isChatEnable={false}
+          isTImerEnable={false}
+          isTitleHeaderEnable={true}
+          title={'Questionnaire'}
+          backBtnAction = {() => backBtnAction()}
+        />
+      </View>
 
-            </View>
+      <View style={[CommonStyles.petsSelViewHeaderStyle,{zIndex : isLoading ? 0 : 999}]}>
+        {defaultPetObj ? <PetsSelectionCarousel
+          petsArray={petsArray}
+          isSwipeEnable = {true}
+          defaultPet = {defaultPetObj}
+          activeSlides = {activeSlide}
+          dismissSearch = {props.isSearchDropdown}
+          setValue={(pObject) => { questPetSelection(pObject)}}
+          selectedPetAction={(pObject) => {selectedSearchPetAction(pObject);}}
+        /> : null}
 
-            <ScrollView>
-              {questionnaireData && questionnaireData.length > 0 ? <View style={{alignItems:'center', marginTop:hp('3')}}>               
-                {_renderStudyItems()}
-              </View> : 
-              (!isLoading && !questionnaireData  ? <View style={{justifyContent:'center', alignItems:'center',marginTop: hp("15%"),}}>
-                <Image style= {[CommonStyles.nologsDogStyle]} source={defaultPetObj && defaultPetObj.speciesId && parseInt(defaultPetObj.speciesId) === 1 ? noLogsDogImg : noLogsCatImg}></Image>
-                <Text style={[CommonStyles.noRecordsTextStyle,{marginTop: hp("2%")}]}>{Constant.NO_RECORDS_LOGS}</Text>
-                <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
-              </View> : null)
-              }
-            </ScrollView>
+      </View>
 
-            {isPopUp ? <View style={CommonStyles.customPopUpStyle}>
-                <AlertComponent
-                    header = {props.popUpTitle}
-                    message={props.popUpMessage}
-                    isLeftBtnEnable = {false}
-                    isRightBtnEnable = {true}
-                    leftBtnTilte = {'Cancel'}
-                    rightBtnTilte = {'OK'}
-                    popUpRightBtnAction = {() => popOkBtnAction()}
-                />
-            </View> : null}
-            {isLoading === true ? <LoaderComponent isLoader={true} loaderText = {Constant.QUESTIONNAIRE_LOADING_MSG} isButtonEnable = {false} /> : null} 
-         </View>
+      <ScrollView>
+        {questionnaireData && questionnaireData.length > 0 ? <View style={{alignItems:'center', marginTop:hp('3')}}>               
+          {_renderStudyItems()}
+        </View> : 
+        (!isLoading && !questionnaireData  ? <View style={{justifyContent:'center', alignItems:'center',marginTop: hp("15%"),}}>
+          <Image style= {[CommonStyles.nologsDogStyle]} source={defaultPetObj && defaultPetObj.speciesId && parseInt(defaultPetObj.speciesId) === 1 ? noLogsDogImg : noLogsCatImg}></Image>
+          <Text style={[CommonStyles.noRecordsTextStyle,{marginTop: hp("2%")}]}>{Constant.NO_RECORDS_LOGS}</Text>
+          <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
+        </View> : null)}
+      </ScrollView>
+
+      {isPopUp ? <View style={[CommonStyles.customPopUpStyle,{zIndex:999}]}>
+        <AlertComponent
+          header = {props.popUpTitle}
+          message={props.popUpMessage}
+          isLeftBtnEnable = {false}
+          isRightBtnEnable = {true}
+          leftBtnTilte = {'Cancel'}
+          rightBtnTilte = {'OK'}
+          popUpRightBtnAction = {() => popOkBtnAction()}
+        />
+      </View> : null}
+      {isLoading === true ? <LoaderComponent isLoader={true} loaderText = {Constant.QUESTIONNAIRE_LOADING_MSG} isButtonEnable = {false} /> : null} 
+      </View>
     );
   }
   
@@ -170,8 +178,7 @@ const  QuestionnaireStudyUI = ({route, ...props }) => {
       flexDirection:'row',
       marginBottom:hp('1%'),
       borderWidth:0.5,
-      borderColor:'#EAEAEA'
-      
+      borderColor:'#EAEAEA'     
     },
 
     QuestionnaireName: {

@@ -116,11 +116,15 @@ const AppOrientationComponent = ({navigation, route, ...props }) => {
             setImage(imgArray[pageNo.current]);
             break;
             case 12:
-              set_nxtBtnText("FINISH");
+             // set_nxtBtnText("FINISH");
             setImage(imgArray[pageNo.current]);
             break;
             case 13:
+              set_nxtBtnText("FINISH");
             setImage(imgArray[pageNo.current]);
+            break;
+            case 14:
+            setImage(imgArray[0]);
             setModalVisibility(true);
             setButtonVisibility(false);
             firebaseHelper.logEvent(firebaseHelper.event_app_orientation_finish, firebaseHelper.screen_app_orientation, "User finished app orientation", '');
@@ -178,7 +182,7 @@ const AppOrientationComponent = ({navigation, route, ...props }) => {
   
           {pageNo.current == 0 ? ( <Text style={styles.textStyleGreenHeader} > WEARABLES CLINICAL TRIALS APP</Text> ) : null}
   
-            {pageNo.current ==13 ? (
+            {pageNo.current ==14 ? (
               <Text style={styles.textStyle}>
                 <Highlighter
                   highlightStyle={{
@@ -236,7 +240,7 @@ const AppOrientationComponent = ({navigation, route, ...props }) => {
               <View style={styles.gradiantButtonStyle}>
                 <TouchableOpacity
                   onPress={() => {
-                    if (pageNo.current < 14) {
+                    if (pageNo.current < 15) {
                       pageNo.current = pageNo.current + 1;
                       updateStyles();
                     } else {

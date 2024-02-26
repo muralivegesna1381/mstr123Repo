@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Image} from 'react-native';
+import {View,StyleSheet,Image,Platform} from 'react-native';
 import BottomComponent from "../../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../../../utils/commonComponents/headerComponent';
@@ -14,6 +14,7 @@ const  AddOBSSelectPetUI = ({route, ...props }) => {
     const [popUpMessage, set_popUpMessage] = useState(undefined);
     const [popUpAlert, set_popUpAlert] = useState(undefined);
 
+    // Setting local variables
     useEffect(() => {
         set_petsArray(props.petsArray);
     }, [props.petsArray, props.selectedIndex,props.fromScreen]);
@@ -25,6 +26,7 @@ const  AddOBSSelectPetUI = ({route, ...props }) => {
 
     }, [props.isPopUp,props.popUpMessage,props.popUpAlert]);
 
+    // Button actions
     const nextButtonAction = () => {
       props.submitAction();
     };
@@ -64,15 +66,15 @@ const  AddOBSSelectPetUI = ({route, ...props }) => {
                 />
             </View>
 
-            <View style={styles.petImgStyle}>
+            {petsArray && petsArray.length > 6 ? null : <View style={[styles.petImgStyle]}>
                 <Image source={require("./../../../../../assets/images/dogImages/petobsImg.svg")} style={styles.dogImgStyle}/>
-            </View>
+            </View>}
 
             <View style={CommonStyles.bottomViewComponentStyle}>
                 <BottomComponent
                     rightBtnTitle = {'NEXT'}
                     leftBtnTitle = {'BACK'}
-                    isLeftBtnEnable = {props.fromScreen === "quickVideo" ? true : false}
+                    isLeftBtnEnable = {true}
                     rigthBtnState = {props.nxtBtnEnable}
                     isRightBtnEnable = {true}
                     rightButtonAction = {async () => nextButtonAction()}
@@ -109,13 +111,16 @@ const  AddOBSSelectPetUI = ({route, ...props }) => {
         height:hp('18%'),
         width:wp('100%'),
         justifyContent:'center',
-        alignItems:'center'
+        alignItems:'center',
+        bottom:90,
+        position:'absolute'
     },
 
     dogImgStyle : {
-        width:wp('70%'),
-        // height:hp('15%'),
         resizeMode:'contain',
+        width:Platform.isPad ? wp('50%') : wp('60%'),
+        height:Platform.isPad ? hp('25%') : hp('20%'),
+        bottom: Platform.OS === 'ios' ? (Platform.isPad ? 100 : 15) : 5,
     }
 
   });

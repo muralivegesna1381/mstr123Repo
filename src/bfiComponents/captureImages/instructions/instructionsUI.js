@@ -6,6 +6,7 @@ import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import fonts from '../../../utils/commonStyles/fonts';
 import * as Constant from "../../../utils/constants/constant";
 import ImageView from "react-native-image-viewing";
+import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
 
 
 const InstructionsUI = ({ route, ...props }) => {
@@ -16,14 +17,13 @@ const InstructionsUI = ({ route, ...props }) => {
   const [images, set_images] = useState([]);
   const [currentImageViewPos, set_CurrentImageViewPos] = useState(0);
   let urlArr = []
-
-
-
-
+  let trace_instructions_Screen;
   //Android Physical back button action
   useEffect(() => {
+    initialSessionStart();
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     return () => {
+      initialSessionStop();
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
     };
   }, []);
@@ -39,6 +39,14 @@ const InstructionsUI = ({ route, ...props }) => {
       }
     }
   }, [props.instructions]);
+
+  const initialSessionStart = async () => {
+    trace_instructions_Screen = await perf().startTrace('t_inBFIInstructionsScreen');
+  };
+
+  const initialSessionStop = async () => {
+    await trace_instructions_Screen.stop();
+  };
 
 
   //Preview screen to show the instructions images

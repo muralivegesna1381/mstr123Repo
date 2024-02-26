@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Image} from 'react-native';
+import {View,StyleSheet,Image,Platform} from 'react-native';
 import BottomComponent from "./../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
@@ -45,21 +45,22 @@ const  TimerPetSelectionUI = ({route, ...props }) => {
                     backBtnAction = {() => backBtnAction()}
                 />
             </View>
-            <View style={styles.petSelViewComponentStyle}>
+            <View style={[styles.petSelViewComponentStyle,{backgroundColor:'red',height: petsArray && petsArray.length < 9 ? hp('60%') : hp('75%')}]}>
                 <SelectPetComponent 
-                petsArray = {petsArray}
-                defaultPetObj = {defaultPetObj}
-                selectedIndex = {selectedIndex}
-                selectedPName = {props.selectedPName}
-                selectPetAction = {selectPetAction}
+                    petsArray = {petsArray}
+                    defaultPetObj = {defaultPetObj}
+                    selectedIndex = {selectedIndex}
+                    selectedPName = {props.selectedPName}
+                    isKeboard = {props.isKeboard}
+                    selectPetAction = {selectPetAction}
                 />
             </View>
 
-            <View style={styles.petImgStyle}>
+            {petsArray && petsArray.length < 9 ? <View style={[styles.petImgStyle,{bottom:hp('14%'),position:'absolute'}]}>
                 <Image source={require("./../../../../assets/images/dogImages/dogImgCat.svg")} style={styles.dogImgStyle}/>               
-            </View>
+            </View> : null}
 
-            <View style={CommonStyles.bottomViewComponentStyle}>
+            <View style={[CommonStyles.bottomViewComponentStyle,{}]}>
                 <BottomComponent
                     rightBtnTitle = {'NEXT'}
                     leftBtnTitle = {'BACK'}
@@ -82,19 +83,20 @@ const  TimerPetSelectionUI = ({route, ...props }) => {
     petSelViewComponentStyle : {
         height:hp('54%'),
         width:wp('100%'),
+        backgroundColor:'red'
     },
 
     petImgStyle : {
-        height:hp('18%'),
+        height:hp('15%'),
         width:wp('100%'),
         justifyContent:'center',
-        alignItems:'center'
+        alignItems:'center',
     },
 
     dogImgStyle : {
-        width:wp('70%'),
-        // height:hp('70%'),
         resizeMode:'contain',
-    }
+        width:Platform.isPad ? wp('50%') : wp('70%'),
+        height: hp('20%'),
+    },
 
   });

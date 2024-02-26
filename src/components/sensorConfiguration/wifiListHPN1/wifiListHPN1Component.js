@@ -40,6 +40,7 @@ const WifiListHPN1Component = ({ navigation, route, ...props }) => {
     let wifiTotalCount = useRef(0);
     let popIdRef = useRef(0);
     let isLoadingRef = useRef(0);
+    let configWififList = useRef(undefined)
 
     useEffect(() => {
 
@@ -156,9 +157,12 @@ const WifiListHPN1Component = ({ navigation, route, ...props }) => {
           let subCount = undefined;
           if(data.wifiListNames){
             subCount = data.wifiListNames.length;
+            configWififList.current = data.wifiList;
+            set_congiguredWIFIArray(data.wifiList);
           }
     
-          set_congiguredWIFIArray(data.wifiList);
+          
+          
           set_loaderText('Remaining Configured Wi-Fi SSIDS : '+(mainCount-subCount).toString());
 
           if(data.completionMsg && (data.completionMsg==='Completed'|| data.completionMsg==='InComplete')){
@@ -250,10 +254,10 @@ const WifiListHPN1Component = ({ navigation, route, ...props }) => {
     
     if (data) {
 
-      const items = congiguredWIFIArray;
+      const items = configWififList.current;
       const i = deleteIndexValue-1;
       const filteredItems = items.slice(0, i).concat(items.slice(i + 1, items.length));
-
+      configWififList.current = filteredItems;
       set_congiguredWIFIArray(filteredItems);
       set_isLoading(false);
       isLoadingRef.current = 0;
@@ -312,11 +316,11 @@ const WifiListHPN1Component = ({ navigation, route, ...props }) => {
 
     const navigateToPrevious = async () => {
       
-      if(isLoadingRef.current === 0 && popIdRef.current === 0){
+      if(isLoadingRef.current === 0 && popIdRef.current === 0) {
 
         await SensorHandler.getInstance().dissconnectSensor();
         firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_sensor_HPN1_WiFi, "User clicked on back button to navigate to Select Sensor Action Page", '');
-        navigation.navigate('SelectSensorActionComponent');
+        navigation.navigate('AllDevicesListComponent');
 
       }
         
@@ -395,6 +399,10 @@ const WifiListHPN1Component = ({ navigation, route, ...props }) => {
 
     const rightBtnActions = async () => {
       await SensorHandler.getInstance().dissconnectHPN1Sensor();
+      let configurePet = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+      configurePet = JSON.parse(configurePet);
+      configurePet.actionType = 2,
+      await DataStorageLocal.saveDataToAsync(Constant.CONFIG_SENSOR_OBJ, JSON.stringify(configurePet));
       navigation.navigate('FindSensorComponent',{fromScreen:'configured'});
     }
 
@@ -414,6 +422,7 @@ const WifiListHPN1Component = ({ navigation, route, ...props }) => {
             popupLeftBtnTitle = {popupLeftBtnTitle}
             isLoading={isLoading}
             loaderText = {loaderText}
+            configureWifiL = {configWififList.current}
             congiguredWIFIArray={congiguredWIFIArray}
             btnTitle = {btnTitle}
             addBtnEnable = {addBtnEnable}

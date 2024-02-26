@@ -140,10 +140,12 @@ const PetWeightHistoryComponent = ({navigation, route, ...props }) => {
       set_noLogsShow(false);
       if(value==='edit'){
         firebaseHelper.logEvent(firebaseHelper.event_pet_weight_history_button_trigger, firebaseHelper.screen_pet_history_weight, "User clicked on Edit Weight Button", 'Previous Weight : '+item.weight);
+        navigation.navigate('EnterWeightComponent',{selectedPet:selectedPet,value:value,weightitem:item,petWeightUnit:item.weightUnit});
       } else {
         firebaseHelper.logEvent(firebaseHelper.event_pet_weight_history_button_trigger, firebaseHelper.screen_pet_history_weight, "User clicked on Add Weight Button", 'Pet Id : '+selectedPet.petID);
+        navigation.navigate('EnterWeightComponent',{selectedPet:selectedPet,value:value,weightitem:item,petWeightUnit:petWeightUnit});
       }
-      navigation.navigate('EnterWeightComponent',{selectedPet:selectedPet,value:value,weightitem:item,petWeightUnit:petWeightUnit});
+      
 
     };
 

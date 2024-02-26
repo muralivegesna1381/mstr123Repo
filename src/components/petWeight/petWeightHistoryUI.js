@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TouchableOpacity,Image,FlatList,ImageBackground} from 'react-native';
-import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
+import { View, StyleSheet, Text, TouchableOpacity, Image, FlatList, ImageBackground } from 'react-native';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from './../../utils/commonComponents/headerComponent';
 import fonts from './../../utils/commonStyles/fonts'
 import AlertComponent from './../../utils/commonComponents/alertComponent';
@@ -14,10 +14,10 @@ import DatePicker from 'react-native-date-picker';
 let noLogsDogImg = require("./../../../assets/images/dogImages/noRecordsDog.svg");
 let noLogsCatImg = require("./../../../assets/images/dogImages/noRecordsCat.svg");
 
-const  PetWeightHistoryUI = ({route, ...props }) => {
+const PetWeightHistoryUI = ({ route, ...props }) => {
 
     const [weightHistoryArray, set_weightHistoryArray] = useState([]);
-    const [dropDownPostion, set_DropDownPostion] = useState({x: 0,y: 0,width: 0,height: 0});
+    const [dropDownPostion, set_DropDownPostion] = useState({ x: 0, y: 0, width: 0, height: 0 });
     const [isListOpen, set_ListOpen] = useState(false);
     const [isFromDate, set_isFromDate] = useState(false);
     const [isToDate, set_isToDate] = useState(false);
@@ -32,14 +32,14 @@ const  PetWeightHistoryUI = ({route, ...props }) => {
         set_weightHistoryArray(props.weightHistoryArray);
         set_filterLogsArray(props.weightHistoryArray);
         set_noLogsShow(props.noLogsShow);
-    }, [props.weightHistoryArray,props.isLoading,props.noLogsShow]);
+    }, [props.weightHistoryArray, props.isLoading, props.noLogsShow]);
 
     const backBtnAction = () => {
         props.navigateToPrevious();
     };
 
-    const enterWeightAction = (value,item) => {
-        props.enterWeightAction(value,item);
+    const enterWeightAction = (value, item) => {
+        props.enterWeightAction(value, item);
     };
 
     const popOkBtnAction = () => {
@@ -47,38 +47,35 @@ const  PetWeightHistoryUI = ({route, ...props }) => {
     };
 
     const filterData = async () => {
-      
         var upperLimit;
         var lowerLimit;
         let data = [];
-
         if (toDate && fromDate) {
+            var parts = fromDate.split('-');
+            var mydate = parts[2] + "-" + parts[0] + "-" + parts[1] + "T00:00:00";
+            lowerLimit = new Date(moment.utc(mydate).toDate()).getTime();
 
-              var parts = fromDate.split('-');
-      
-              var mydate = parts[2] + "-" + parts[0] + "-" + parts[1] + "T00:00:00.000Z";
-      
-              lowerLimit = Date.parse(mydate);
-      
-              var toDateparts = toDate.split('-');
-      
-              var toDateString = toDateparts[2] + "-" + toDateparts[0] + "-" + toDateparts[1] + "T23:59:00.000Z";
-      
-              upperLimit = Date.parse(toDateString);
-      
-              data = weightHistoryArray.filter((item) => lowerLimit <= Date.parse(item.createdDate) && Date.parse(item.createdDate, "toUTC") <= upperLimit)
-              .map(({ createdDate, weight, weightUnit, petWeightId }) => ({ createdDate, weight, weightUnit, petWeightId }));
+            var toDateparts = toDate.split('-');
+            var toDateString = toDateparts[2] + "-" + toDateparts[0] + "-" + toDateparts[1] + "T23:59:00";
+            upperLimit = new Date(moment.utc(toDateString).toDate()).getTime();
 
-          } 
+            const filteredTimerLogs = weightHistoryArray.filter(item => {
+                var newCreated = new Date(moment.utc(item.addDate).toDate()).getTime();
+                if (lowerLimit <= newCreated &&
+                    upperLimit >= newCreated) return item;
+
+            })
+            data = filteredTimerLogs.map(({ addDate, weight, weightUnit, petWeightId }) => ({ addDate, weight, weightUnit, petWeightId }));
+        }
 
         set_ListOpen(false);
-    
-        if(data.length<1){
+
+        if (data.length < 1) {
             set_noLogsShow(true);
         } else {
             set_noLogsShow(false);
         }
-        
+
         set_filterLogsArray(data);
         set_isFromDate(false);
         set_isToDate(false);
@@ -97,9 +94,9 @@ const  PetWeightHistoryUI = ({route, ...props }) => {
 
     const doneAction = (value) => {
 
-        if(value==='From'){
+        if (value === 'From') {
             datePickerDate ? set_fromDate(moment(datePickerDate).format('MM-DD-YYYY')) : moment(new Date()).format('MM-DD-YYYY');
-        } else if(value==='To'){
+        } else if (value === 'To') {
             datePickerDateTo ? set_toDate(moment(datePickerDateTo).format('MM-DD-YYYY')) : moment(new Date()).format('MM-DD-YYYY');
         }
 
@@ -110,11 +107,11 @@ const  PetWeightHistoryUI = ({route, ...props }) => {
 
     const cancelAction = () => {
 
-        if(!fromDate){
+        if (!fromDate) {
             set_fromDate(undefined);
         }
 
-        if(!toDate){
+        if (!toDate) {
             set_toDate(undefined);
         }
         set_isFromDate(false);
@@ -126,31 +123,31 @@ const  PetWeightHistoryUI = ({route, ...props }) => {
         set_ListOpen(!isListOpen)
         set_isToDate(false);
         set_isFromDate(false);
-      }
+    }
 
     const renderItem = ({ item, index }) => {
 
         return (
 
             <View style={styles.cellBackViewStyle}>
-                
-                <Text style={[styles.tdTextextStyle,{flex:1}]}>{index+1}</Text>
-                <Text style={[styles.tdTextextStyle,{flex:2}]}>{item.createdDate ? moment(moment.utc(item.createdDate).toDate()).local().format('MM-DD-YYYY') : ''}</Text>
-                <View style= {{flexDirection:'row',flex:1.5}}>
-                    <Text style={[styles.tdTextextStyle]}>{item.weight}<Text>{item.weightUnit ? ' '+item.weightUnit : ''}</Text></Text> 
+
+                <Text style={[styles.tdTextextStyle, { flex: 1 }]}>{index + 1}</Text>
+                <Text style={[styles.tdTextextStyle, { flex: 2 }]}>{item.addDate ? moment(moment.utc(item.addDate).toDate()).local().format('MM-DD-YYYY') : ''}</Text>
+                <View style={{ flexDirection: 'row', flex: 1.5 }}>
+                    <Text style={[styles.tdTextextStyle]}>{item.weight}<Text>{item.weightUnit ? ' ' + item.weightUnit : ''}</Text></Text>
                 </View>
-                
-                <TouchableOpacity style={{width:wp('5%'),height:hp('5%'),flex:0.5,}} disabled = {index===0 ? false : true} key={index} onPress={() => {enterWeightAction('edit',item)}}>
-                    {props.weightDflt && props.weightDflt.petWeightId === item.petWeightId ? <Image style={[styles.editImgStyle]} source={require("../../../assets/images/otherImages/svg/weightEdit.svg")}></Image> : <View style={{flex:1}}></View>}
-                </TouchableOpacity>     
+
+                <TouchableOpacity style={{ width: wp('5%'), height: hp('5%'), flex: 0.5, }} disabled={index === 0 ? false : true} key={index} onPress={() => { enterWeightAction('edit', item) }}>
+                    {props.weightDflt && props.weightDflt.petWeightId === item.petWeightId ? <Image style={[styles.editImgStyle]} source={require("../../../assets/images/otherImages/svg/weightEdit.svg")}></Image> : <View style={{ flex: 1 }}></View>}
+                </TouchableOpacity>
 
             </View>
         );
     };
 
     return (
-        <View style={[CommonStyles.mainComponentStyle,{alignItems:'center'}]}>
-          <View style={[CommonStyles.headerView,{}]}>
+        <View style={[CommonStyles.mainComponentStyle, { alignItems: 'center' }]}>
+            <View style={[CommonStyles.headerView, {}]}>
                 <HeaderComponent
                     isBackBtnEnable={true}
                     isSettingsEnable={false}
@@ -158,8 +155,8 @@ const  PetWeightHistoryUI = ({route, ...props }) => {
                     isTImerEnable={false}
                     isTitleHeaderEnable={true}
                     title={'Weight'}
-                    headerColor = {'#F5F7F9'}
-                    backBtnAction = {() => backBtnAction()}
+                    headerColor={'#F5F7F9'}
+                    backBtnAction={() => backBtnAction()}
                 />
             </View>
 
@@ -167,76 +164,77 @@ const  PetWeightHistoryUI = ({route, ...props }) => {
 
                 {!noLogsShow || weightHistoryArray.length > 0 ? <View style={styles.mainViewStyle}>
 
-                <ImageBackground style={[styles.filterBtnStyle]} imageStyle={{ borderRadius: 5 }} source={require("./../../../assets/images/otherImages/svg/filterGradientImg.svg")}>
+                    <ImageBackground style={[styles.filterBtnStyle]} imageStyle={{ borderRadius: 5 }} source={require("./../../../assets/images/otherImages/svg/filterGradientImg.svg")}>
 
-                    <TouchableOpacity style={styles.filterBtnStyle} onPress={() => {set_ListOpen(!isListOpen)}}>
-                        <View>
-                            
-                            <View onLayout={(event) => {const layout = event.nativeEvent.layout;
-                                const postionDetails = {x: layout.x,y: layout.y,width: layout.width,height: layout.height,};
-                                set_DropDownPostion(postionDetails);
+                        <TouchableOpacity style={styles.filterBtnStyle} onPress={() => { set_ListOpen(!isListOpen) }}>
+                            <View>
+
+                                <View onLayout={(event) => {
+                                    const layout = event.nativeEvent.layout;
+                                    const postionDetails = { x: layout.x, y: layout.y, width: layout.width, height: layout.height, };
+                                    set_DropDownPostion(postionDetails);
                                 }} style={[styles.SectionStyle]}>
-                                
-                                {<Text style = {styles.hTextextStyle}>{'Filter'}</Text>}
-                                <Image style={[styles.filterIconStyle]} imageStyle={{ borderRadius: 5 }} source={require("./../../../assets/images/otherImages/svg/filterIcon.svg")}></Image>
-                                
-                            </View>
-                        </View>
-                    </TouchableOpacity>
 
-                </ImageBackground>
+                                    {<Text style={styles.hTextextStyle}>{'Filter'}</Text>}
+                                    <Image style={[styles.filterIconStyle]} imageStyle={{ borderRadius: 5 }} source={require("./../../../assets/images/otherImages/svg/filterIcon.svg")}></Image>
+
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+
+                    </ImageBackground>
 
                 </View> : null}
-                
+
                 {!noLogsShow ? <View style={styles.headingView}>
 
-                        <Text style={[styles.hTextextStyle,{flex:1}]}>{'S.NO'}</Text>
-                        <Text style={[styles.hTextextStyle,{flex:2}]}>{'DATE'}</Text>
-                        <Text style={[styles.hTextextStyle,{flex:1}]}>{'WEIGHT'}</Text>
-                        <Text style={[styles.hTextextStyle,{flex:0.5}]}>{''}</Text>
+                    <Text style={[styles.hTextextStyle, { flex: 1 }]}>{'S.NO'}</Text>
+                    <Text style={[styles.hTextextStyle, { flex: 2 }]}>{'DATE'}</Text>
+                    <Text style={[styles.hTextextStyle, { flex: 1 }]}>{'WEIGHT'}</Text>
+                    <Text style={[styles.hTextextStyle, { flex: 0.5 }]}>{''}</Text>
 
                 </View> : null}
 
-                {!noLogsShow ? <View style={[styles.recordListStyle,{height: hp("55%")}]}>
-                        <FlatList
-                            data={filterLogsArray}
-                            renderItem={renderItem}
-                            keyExtractor={(item, index) => "" + index}
-                        />
-                    </View> : (!props.isLoading ? <View style={{width: wp("90%"),height: hp("60%"),justifyContent:'center', alignItems:'center',}}>
-                        <Image style= {[CommonStyles.nologsDogStyle]} source={props.selectedPet && props.selectedPet.speciesId && parseInt(props.selectedPet.speciesId) === 1 ? noLogsDogImg : noLogsCatImg}></Image>
-                        <Text style={[CommonStyles.noRecordsTextStyle]}>{Constant.NO_RECORDS_LOGS}</Text>
-                        <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
-                        </View> : null)}
+                {!noLogsShow ? <View style={[styles.recordListStyle, { height: hp("55%") }]}>
+                    <FlatList
+                        data={filterLogsArray}
+                        renderItem={renderItem}
+                        keyExtractor={(item, index) => "" + index}
+                    />
+                </View> : (!props.isLoading ? <View style={{ width: wp("90%"), height: hp("60%"), justifyContent: 'center', alignItems: 'center', }}>
+                    <Image style={[CommonStyles.nologsDogStyle]} source={props.selectedPet && props.selectedPet.speciesId && parseInt(props.selectedPet.speciesId) === 1 ? noLogsDogImg : noLogsCatImg}></Image>
+                    <Text style={[CommonStyles.noRecordsTextStyle]}>{Constant.NO_RECORDS_LOGS}</Text>
+                    <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
+                </View> : null)}
 
-                    {isListOpen ? <View style={[styles.timerFilterListStyle,{ top: dropDownPostion.y + dropDownPostion.height },]}>
+                {isListOpen ? <View style={[styles.timerFilterListStyle, { top: dropDownPostion.y + dropDownPostion.height },]}>
 
-                    <ImageBackground style={{alignItems: "center",justifyContent : "center",}} imageStyle={{ borderRadius: 25 }} source={require("./../../../assets/images/otherImages/svg/bgTimerFilter.svg")}>
+                    <ImageBackground style={{ alignItems: "center", justifyContent: "center", }} imageStyle={{ borderRadius: 25 }} source={require("./../../../assets/images/otherImages/svg/bgTimerFilter.svg")}>
 
-                        <TouchableOpacity style={styles.filterViewBtnStyle} onPress={() => { set_isFromDate(!isFromDate); set_isToDate(false);}}>
-                            <Text style = {fromDate ? [styles.dropTextStyle,{color:'black'}] : [styles.dropTextStyle]}>{fromDate ? fromDate.toString() : 'From Date'}</Text>
+                        <TouchableOpacity style={styles.filterViewBtnStyle} onPress={() => { set_isFromDate(!isFromDate); set_isToDate(false); }}>
+                            <Text style={fromDate ? [styles.dropTextStyle, { color: 'black' }] : [styles.dropTextStyle]}>{fromDate ? fromDate.toString() : 'From Date'}</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity disabled = {fromDate ? false : true} style={styles.filterViewBtnStyle} onPress={() => {set_isFromDate(false);set_isToDate(!isToDate);}}>
-                            <Text style = {toDate ? [styles.dropTextStyle,{color:'black'}] : [styles.dropTextStyle]}>{toDate ? toDate.toString() : 'To Date'}</Text>
+                        <TouchableOpacity disabled={fromDate ? false : true} style={styles.filterViewBtnStyle} onPress={() => { set_isFromDate(false); set_isToDate(!isToDate); }}>
+                            <Text style={toDate ? [styles.dropTextStyle, { color: 'black' }] : [styles.dropTextStyle]}>{toDate ? toDate.toString() : 'To Date'}</Text>
                         </TouchableOpacity>
 
-                        <View style={{flexDirection:'row',width: wp("80%"),justifyContent:'space-between'}}>
+                        <View style={{ flexDirection: 'row', width: wp("80%"), justifyContent: 'space-between' }}>
 
-                            <TouchableOpacity style={styles.filterRestBtnStyle} onPress={() => {restFilter()}}>
-                                <Text style = {styles.dropBtnTextextStyle}>{'RESET'}</Text>
+                            <TouchableOpacity style={styles.filterRestBtnStyle} onPress={() => { restFilter() }}>
+                                <Text style={styles.dropBtnTextextStyle}>{'RESET'}</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.filterSubmitBtnStyle} disabled={(fromDate && toDate) ? false : true} onPress={() => {filterData()}}>
-                                <Text style = {styles.dropBtnTextextStyle}>{'SUBMIT'}</Text>
+                            <TouchableOpacity style={styles.filterSubmitBtnStyle} disabled={(fromDate && toDate) ? false : true} onPress={() => { filterData() }}>
+                                <Text style={styles.dropBtnTextextStyle}>{'SUBMIT'}</Text>
                             </TouchableOpacity>
 
                         </View>
 
                         <View style={[styles.dropCloseImgStyle]}>
 
-                            <TouchableOpacity  onPress={() => closeAction()}>
-                                <Image style= {[styles.closeIconStyle]} source={require("./../../../assets/images/otherImages/svg/timerCloseIcon.svg")}></Image>
+                            <TouchableOpacity onPress={() => closeAction()}>
+                                <Image style={[styles.closeIconStyle]} source={require("./../../../assets/images/otherImages/svg/timerCloseIcon.svg")}></Image>
                             </TouchableOpacity>
 
                         </View>
@@ -244,157 +242,157 @@ const  PetWeightHistoryUI = ({route, ...props }) => {
                     </ImageBackground>
 
                 </View> : null}
-            </View>  
+            </View>
 
             {!isFromDate && !isToDate ? <View style={CommonStyles.bottomViewComponentStyle}>
                 <BottomComponent
-                    rightBtnTitle = {'ENTER NEW WEIGHT'}
-                    isLeftBtnEnable = {false}
-                    rigthBtnState = {true}
-                    isRightBtnEnable = {true}
-                    rightButtonAction = {async () => enterWeightAction('new')}
+                    rightBtnTitle={'ENTER NEW WEIGHT'}
+                    isLeftBtnEnable={false}
+                    rigthBtnState={true}
+                    isRightBtnEnable={true}
+                    rightButtonAction={async () => enterWeightAction('new')}
                 />
             </View> : null}
 
             {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
                 <AlertComponent
-                    header = {props.popupAlert}
+                    header={props.popupAlert}
                     message={props.popupMessage}
-                    isLeftBtnEnable = {false}
-                    isRightBtnEnable = {true}
-                    leftBtnTilte = {'Cancel'}
-                    rightBtnTilte = {'OK'}
-                    popUpRightBtnAction = {() => popOkBtnAction()}
-                    // popUpLeftBtnAction = {() => popCancelBtnAction()}
+                    isLeftBtnEnable={false}
+                    isRightBtnEnable={true}
+                    leftBtnTilte={'Cancel'}
+                    rightBtnTilte={'OK'}
+                    popUpRightBtnAction={() => popOkBtnAction()}
+                // popUpLeftBtnAction = {() => popCancelBtnAction()}
                 />
             </View> : null}
 
-            {isFromDate ? <View style={[styles.popSearchViewStyle,{height:hp('45%'),justifyContent:'center'}]}>
+            {isFromDate ? <View style={[styles.popSearchViewStyle, { height: hp('45%'), justifyContent: 'center' }]}>
 
-                    <View style={styles.datePickerMViewStyle}>
+                <View style={styles.datePickerMViewStyle}>
 
-                        <View style={{flexDirection:"row",justifyContent:'space-between',marginBottom:hp('2%')}}>
-                            <TouchableOpacity style={{backgroundColor:'white',height: hp('4%'),width: wp('35%'),borderRadius:5,alignItems:'center',justifyContent:'center'}} onPress={() => cancelAction()}>
+                    <View style={{ flexDirection: "row", justifyContent: 'space-between', marginBottom: hp('2%') }}>
+                        <TouchableOpacity style={{ backgroundColor: 'white', height: hp('4%'), width: wp('35%'), borderRadius: 5, alignItems: 'center', justifyContent: 'center' }} onPress={() => cancelAction()}>
                             <Text style={styles.doneTexStyle}>{'Cancel'}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{backgroundColor:'white',height: hp('4%'),width: wp('35%'),borderRadius:5,alignItems:'center',justifyContent:'center'}} onPress={() => doneAction('From')}>
-                                <Text style={styles.doneTexStyle}>{'Done'}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.datePickerSubViewStyle}>
-                            <DatePicker 
-                                date={datePickerDate} 
-                                onDateChange={(date) => set_datePickerDate(date)} 
-                                mode = {"date"} 
-                                textColor = {'black'} 
-                                // minimumDate = {toDate ? datePickerDateTo : new Date('1900:01:01')}
-                                maximumDate = {datePickerDateTo}
-                                style={styles.datePickeStyle}
-                            />
-                        </View>                               
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ backgroundColor: 'white', height: hp('4%'), width: wp('35%'), borderRadius: 5, alignItems: 'center', justifyContent: 'center' }} onPress={() => doneAction('From')}>
+                            <Text style={styles.doneTexStyle}>{'Done'}</Text>
+                        </TouchableOpacity>
                     </View>
-                            
-                </View> : null}
+                    <View style={styles.datePickerSubViewStyle}>
+                        <DatePicker
+                            date={datePickerDate}
+                            onDateChange={(date) => set_datePickerDate(date)}
+                            mode={"date"}
+                            textColor={'black'}
+                            // minimumDate = {toDate ? datePickerDateTo : new Date('1900:01:01')}
+                            maximumDate={datePickerDateTo}
+                            style={styles.datePickeStyle}
+                        />
+                    </View>
+                </View>
 
-                {isToDate ? <View style={[styles.popSearchViewStyle,{height:hp('45%'),justifyContent:'center'}]}>
+            </View> : null}
 
-                    <View style={styles.datePickerMViewStyle}>
+            {isToDate ? <View style={[styles.popSearchViewStyle, { height: hp('45%'), justifyContent: 'center' }]}>
 
-                        <View style={{flexDirection:"row",justifyContent:'space-between',marginBottom:hp('2%')}}>
-                            <TouchableOpacity style={{backgroundColor:'white',height: hp('4%'),width: wp('35%'),borderRadius:5,alignItems:'center',justifyContent:'center'}} onPress={() => cancelAction()}>
+                <View style={styles.datePickerMViewStyle}>
+
+                    <View style={{ flexDirection: "row", justifyContent: 'space-between', marginBottom: hp('2%') }}>
+                        <TouchableOpacity style={{ backgroundColor: 'white', height: hp('4%'), width: wp('35%'), borderRadius: 5, alignItems: 'center', justifyContent: 'center' }} onPress={() => cancelAction()}>
                             <Text style={styles.doneTexStyle}>{'Cancel'}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{backgroundColor:'white',height: hp('4%'),width: wp('35%'),borderRadius:5,alignItems:'center',justifyContent:'center'}} onPress={() => doneAction('To')}>
-                                <Text style={styles.doneTexStyle}>{'Done'}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.datePickerSubViewStyle}>
-                            <DatePicker 
-                                date={datePickerDateTo} 
-                                onDateChange={(date) => set_datePickerDateTo(date)} 
-                                mode = {"date"} 
-                                textColor = {'black'} 
-                                maximumDate = {new Date()}
-                                minimumDate = {fromDate && datePickerDate ? datePickerDate : new Date('1900:01:01')}
-                                style={styles.datePickeStyle}
-                            />
-                        </View>                               
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ backgroundColor: 'white', height: hp('4%'), width: wp('35%'), borderRadius: 5, alignItems: 'center', justifyContent: 'center' }} onPress={() => doneAction('To')}>
+                            <Text style={styles.doneTexStyle}>{'Done'}</Text>
+                        </TouchableOpacity>
                     </View>
-                            
-                </View> : null}
+                    <View style={styles.datePickerSubViewStyle}>
+                        <DatePicker
+                            date={datePickerDateTo}
+                            onDateChange={(date) => set_datePickerDateTo(date)}
+                            mode={"date"}
+                            textColor={'black'}
+                            maximumDate={new Date()}
+                            minimumDate={fromDate && datePickerDate ? datePickerDate : new Date('1900:01:01')}
+                            style={styles.datePickeStyle}
+                        />
+                    </View>
+                </View>
 
-            {props.isLoading ? <LoaderComponent isLoader={true} loaderText = {'Please wait..'} isButtonEnable = {false} /> : null} 
+            </View> : null}
 
-         </View>
+            {props.isLoading ? <LoaderComponent isLoader={true} loaderText={'Please wait..'} isButtonEnable={false} /> : null}
+
+        </View>
     );
-  }
-  
-  export default PetWeightHistoryUI;
+}
 
-  const styles = StyleSheet.create({
+export default PetWeightHistoryUI;
 
-    headingView : {
-        width:wp('85%'),
-        height:hp('6%'),
-        flexDirection:'row',
-        alignItems : 'center',
+const styles = StyleSheet.create({
+
+    headingView: {
+        width: wp('85%'),
+        height: hp('6%'),
+        flexDirection: 'row',
+        alignItems: 'center',
         // marginTop:hp('2%'),
     },
 
-    hTextextStyle : {
+    hTextextStyle: {
         fontSize: fonts.fontXSmall,
         ...CommonStyles.textStyleSemiBold,
-        color: 'black', 
-        margin:hp('1%'),
+        color: 'black',
+        margin: hp('1%'),
     },
 
-    tdTextextStyle : {
+    tdTextextStyle: {
         fontSize: fonts.fontXSmall,
         ...CommonStyles.textStyleMedium,
-        color: 'black',     
-        margin:hp('1%'), 
+        color: 'black',
+        margin: hp('1%'),
     },
 
-    recordListStyle : {
-        width:wp('85%'),
-        height:hp('75%'),
+    recordListStyle: {
+        width: wp('85%'),
+        height: hp('75%'),
     },
 
-    cellBackViewStyle : {
-        flexDirection:'row',
-        marginBottom:wp('1%'),
-        marginTop:wp('1%'), 
-        borderWidth:1,
-        borderColor:'#EAEAEA',
-        borderRadius:5,
-        backgroundColor:'white',
+    cellBackViewStyle: {
+        flexDirection: 'row',
+        marginBottom: wp('1%'),
+        marginTop: wp('1%'),
+        borderWidth: 1,
+        borderColor: '#EAEAEA',
+        borderRadius: 5,
+        backgroundColor: 'white',
         height: wp("10%"),
-        alignItems:'center',
-        justifyContent:'center',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 
-    editImgStyle : {
-        resizeMode:'contain',          
-        width:wp('5%'),
-        height:hp('5%'),
+    editImgStyle: {
+        resizeMode: 'contain',
+        width: wp('5%'),
+        height: hp('5%'),
     },
 
-    mainViewStyle : {
-        width:wp('85%'),
-        height:hp('8%'),
-        justifyContent:'center',
-        alignItems:'center',
-        marginTop:wp('5%')
+    mainViewStyle: {
+        width: wp('85%'),
+        height: hp('8%'),
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: wp('5%')
     },
 
-    filterBtnStyle : {
-        width:wp('85%'),
-        height:hp('5%'),
-        borderRadius:5,
-        borderColor:'#dedede',
-        borderWidth:0.5,
-        alignItems:'center',
-        justifyContent:'center'
+    filterBtnStyle: {
+        width: wp('85%'),
+        height: hp('5%'),
+        borderRadius: 5,
+        borderColor: '#dedede',
+        borderWidth: 0.5,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
 
     SectionStyle: {
@@ -407,10 +405,10 @@ const  PetWeightHistoryUI = ({route, ...props }) => {
         alignSelf: "center",
     },
 
-    filterIconStyle : {
-        width:wp('4%'),
-        height:hp('4%'),
-        resizeMode:'contain',
+    filterIconStyle: {
+        width: wp('4%'),
+        height: hp('4%'),
+        resizeMode: 'contain',
         marginLeft: hp('2%'),
     },
 
@@ -418,94 +416,94 @@ const  PetWeightHistoryUI = ({route, ...props }) => {
         position: "absolute",
         width: wp("100%"),
         minHeight: hp("40%"),
-        borderRadius : 15,
-        alignSelf:'center'
+        borderRadius: 15,
+        alignSelf: 'center'
     },
 
-    filterViewBtnStyle : {
+    filterViewBtnStyle: {
         width: wp("80%"),
         height: wp("10%"),
-        backgroundColor : 'white',
-        margin : wp("2%"),
-        borderRadius : 5,
-        justifyContent : "center",
-        borderColor:'#EAEAEA',
-        borderWidth:0.5
+        backgroundColor: 'white',
+        margin: wp("2%"),
+        borderRadius: 5,
+        justifyContent: "center",
+        borderColor: '#EAEAEA',
+        borderWidth: 0.5
     },
 
-    filterSubmitBtnStyle : {
+    filterSubmitBtnStyle: {
         width: wp("35%"),
         height: wp("10%"),
-        backgroundColor : '#CCE8B0',
-        marginTop : wp("2%"),
-        borderRadius : 5,
-        alignItems:'center',
-        justifyContent : "center",
-        borderWidth:0.5,
-        borderColor:'#6BC100'
+        backgroundColor: '#CCE8B0',
+        marginTop: wp("2%"),
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: "center",
+        borderWidth: 0.5,
+        borderColor: '#6BC100'
     },
 
-    filterRestBtnStyle : {
+    filterRestBtnStyle: {
         width: wp("35%"),
         height: wp("10%"),
-        backgroundColor : '#E7E7E9',
-        marginTop : wp("2%"),
-        borderRadius : 5,
-        alignItems:'center',
-        justifyContent : "center",
-        borderWidth:0.5,
-        borderColor:'#323232'
+        backgroundColor: '#E7E7E9',
+        marginTop: wp("2%"),
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: "center",
+        borderWidth: 0.5,
+        borderColor: '#323232'
     },
 
-    dropBtnTextextStyle : {
+    dropBtnTextextStyle: {
         fontSize: fonts.fontXSmall,
         ...CommonStyles.textStyleBold,
-        color: 'black',               
+        color: 'black',
     },
 
-    dropTextStyle : {
+    dropTextStyle: {
         fontSize: fonts.fontXSmall,
         ...CommonStyles.textStyleSemiBold,
-        color: '#7F7F81', 
-        marginLeft: wp('3%'),       
+        color: '#7F7F81',
+        marginLeft: wp('3%'),
     },
 
-    dropCloseImgStyle : {
-        width:wp('10%'),
-        height:hp('5%'),
-        bottom:-10, 
-        alignItems:'flex-end',
-        justifyContent:'flex-end'
+    dropCloseImgStyle: {
+        width: wp('10%'),
+        height: hp('5%'),
+        bottom: -10,
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end'
     },
 
-    popSearchViewStyle : {
+    popSearchViewStyle: {
         height: hp("30%"),
         width: wp("95%"),
-        backgroundColor:'#DCDCDC',
-        bottom:0,
-        position:'absolute',
-        alignSelf:'center',
-        borderTopRightRadius:15,
-        borderTopLeftRadius:15,  
+        backgroundColor: '#DCDCDC',
+        bottom: 0,
+        position: 'absolute',
+        alignSelf: 'center',
+        borderTopRightRadius: 15,
+        borderTopLeftRadius: 15,
     },
 
-    datePickerMViewStyle : {
-        alignSelf:'center',
-        borderRadius:5,
-        marginBottom:hp('2%')
+    datePickerMViewStyle: {
+        alignSelf: 'center',
+        borderRadius: 5,
+        marginBottom: hp('2%')
     },
-  
-    datePickerSubViewStyle : {
+
+    datePickerSubViewStyle: {
         width: wp('80%'),
         height: hp('30%'),
-        alignSelf:'center',
-        backgroundColor:'#f9f9f9',
-        alignItems:'center',
-        justifyContent:'center',       
+        alignSelf: 'center',
+        backgroundColor: '#f9f9f9',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-  
-    datePickeStyle : {
-        backgroundColor:'white',
+
+    datePickeStyle: {
+        backgroundColor: 'white',
         width: wp('70%'),
         height: hp('25%'),
         shadowColor: '#000',
@@ -515,4 +513,4 @@ const  PetWeightHistoryUI = ({route, ...props }) => {
         elevation: 1,
     },
 
-  });
+});

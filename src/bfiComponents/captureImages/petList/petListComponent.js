@@ -7,7 +7,7 @@ import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
 
 const PetListComponent = ({ navigation, route, ...props }) => {
     const [petObj, set_petObj] = useState(undefined);
-    const [devices, set_devices] = useState(undefined);
+    const [devices, set_devices] = useState([]);
     const [isLoading, set_isLoading] = useState(false);
     var pageNum = useRef(1);
     var searchText = useRef('');
@@ -22,13 +22,16 @@ const PetListComponent = ({ navigation, route, ...props }) => {
      * Service call to fetch the Pet details from the backend.
      */
     const getDashBoardPets = async () => {
-        if (pageNum.current === 1)
-            stopPagination.current = false
 
+        if (pageNum.current === 1) {
+            stopPagination.current = false
+        }
+            
         set_isLoading(true);
         let clientID = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
         let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
         let serviceCallsObj = await ServiceCalls.getPetsToCaptureBfiImages(clientID, token, pageNum.current, searchText.current);
+
         if (serviceCallsObj && serviceCallsObj.statusData) {
             set_isLoading(false);
             if (serviceCallsObj && serviceCallsObj.responseData && serviceCallsObj.responseData.length > 0) {
@@ -38,8 +41,10 @@ const PetListComponent = ({ navigation, route, ...props }) => {
                 set_devices(totalRecordsData.current)
             } else {
                 //set empty for intial page
-                if (totalRecordsData.current.length === 0)
+                if (totalRecordsData.current.length === 0){
                     set_devices([])
+                }
+                    
                 else {
                     //stop pagination if no more records coming
                     stopPagination.current = true
@@ -50,7 +55,7 @@ const PetListComponent = ({ navigation, route, ...props }) => {
         if (serviceCallsObj && serviceCallsObj.error) {
             let errors = serviceCallsObj.error.length > 0 ? serviceCallsObj.error[0].code : ''
             set_isLoading(false);
-            firebaseHelper.logEvent(firebaseHelper.event_get_pets_api, firebaseHelper.screen_capture_bfi, "CaptureBFI Getpets Service failed", 'Service error : ' + errors);
+            firebaseHelper.logEvent(firebaseHelper.event_get_pets_api, firebaseHelper.screen_bfi_pet_list, "CaptureBFI Getpets Service failed", 'Service error : ' + errors);
         }
     };
 
@@ -66,7 +71,7 @@ const PetListComponent = ({ navigation, route, ...props }) => {
         //add flag as coming from pet BFI
         await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_PET_BFI, Constant.IS_FROM_PET_BFI);
 
-        firebaseHelper.logEvent(firebaseHelper.screen_capture_bfi, firebaseHelper.event_add_pet_click, "CaptureBFI Add pet clicked", '');
+        firebaseHelper.logEvent(firebaseHelper.event_add_pet_click, firebaseHelper.screen_bfi_pet_list, "CaptureBFI Add pet clicked", '');
 
         //Ask Pet Parent Profile Info if login as representative
         if (userRole === '9')
@@ -77,7 +82,7 @@ const PetListComponent = ({ navigation, route, ...props }) => {
     };
 
     const navigateToCapture = (item, index) => {
-        firebaseHelper.logEvent(firebaseHelper.event_add_pet_click, firebaseHelper.screen_capture_bfi, "CaptureBFI existing pet clicked", '');
+        firebaseHelper.logEvent(firebaseHelper.event_existing_pet_click, firebaseHelper.screen_bfi_pet_list, "CaptureBFI existing pet clicked", '');
         navigation.navigate('PetInformationComponent', {
             petData: item
         });

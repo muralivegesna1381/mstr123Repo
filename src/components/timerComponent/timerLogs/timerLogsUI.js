@@ -50,17 +50,17 @@ const TimerLogsUI = ({ route, ...props }) => {
         let data = [];
         if (toDate && fromDate) {
             var fromDateParts = fromDate.split('-');
-            var fromDateFormat = fromDateParts[2] + "-" + fromDateParts[0] + "-" + fromDateParts[1] + "T00:00:00.000Z";
-            var fromDateParse = Date.parse(moment(fromDateFormat).format('MM/DD/YYYY'))
+            var fromDateFormat = fromDateParts[2] + "-" + fromDateParts[0] + "-" + fromDateParts[1] + "T00:00:00";;
+            var fromDateParse = new Date(moment.utc(fromDateFormat).toDate()).getTime();
 
             var toDateparts = toDate.split('-');
-            var toDateFormate = toDateparts[2] + "-" + toDateparts[0] + "-" + toDateparts[1] + "T23:59:00.000Z";
-            var toDateParse = Date.parse(moment(toDateFormate).format('MM/DD/YYYY'))
+            var toDateFormate = toDateparts[2] + "-" + toDateparts[0] + "-" + toDateparts[1] + "T23:59:00";;
+            var toDateParse = new Date(moment.utc(toDateFormate).toDate()).getTime();
         }
 
         if (toDate && fromDate && categoryText && petNameText) {
             const filteredTimerLogs = timerLogsArray.filter(item => {
-                var timerCreatedDate = Date.parse(moment(item.timerDate).format('MM/DD/YYYY'))
+                var timerCreatedDate = new Date(moment.utc(item.timerDate).toDate()).getTime();
                 if (item.category == categoryText &&
                     item.petName == petNameText &&
                     fromDateParse <= timerCreatedDate &&
@@ -71,7 +71,7 @@ const TimerLogsUI = ({ route, ...props }) => {
 
         } else if (toDate && fromDate && petNameText) {
             const filteredTimerLogs = timerLogsArray.filter(item => {
-                var timerCreatedDate = Date.parse(moment(item.timerDate).format('MM/DD/YYYY'))
+                var timerCreatedDate = new Date(moment.utc(item.timerDate).toDate()).getTime();
                 if (item.petName == petNameText &&
                     fromDateParse <= timerCreatedDate &&
                     toDateParse >= timerCreatedDate) return item;
@@ -81,7 +81,7 @@ const TimerLogsUI = ({ route, ...props }) => {
 
         } else if (toDate && fromDate && categoryText) {
             const filteredTimerLogs = timerLogsArray.filter(item => {
-                var timerCreatedDate = Date.parse(moment(item.timerDate).format('MM/DD/YYYY'))
+                var timerCreatedDate = new Date(moment.utc(item.timerDate).toDate()).getTime();
                 if (item.category == categoryText &&
                     fromDateParse <= timerCreatedDate &&
                     toDateParse >= timerCreatedDate) return item;
@@ -91,7 +91,7 @@ const TimerLogsUI = ({ route, ...props }) => {
 
         } else if (toDate && fromDate) {
             const filteredTimerLogs = timerLogsArray.filter(item => {
-                var timerCreatedDate = Date.parse(moment(item.timerDate).format('MM/DD/YYYY'))
+                var timerCreatedDate = new Date(moment.utc(item.timerDate).toDate()).getTime();
                 if (fromDateParse <= timerCreatedDate &&
                     toDateParse >= timerCreatedDate) return item;
 
@@ -285,7 +285,7 @@ const TimerLogsUI = ({ route, ...props }) => {
                             keyExtractor={(item, index) => "" + index}
                         />
                     </View> : (props.isLoading === false ? <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("15%"), }}>
-                        <Image style={[CommonStyles.nologsDogStyle,{width: wp("45%"), height: hp("25%"), resizeMode:'contain'}]} source={require("./../../../../assets/images/dogImages/dogCatImg.svg")}></Image>
+                        <Image style={[CommonStyles.nologsDogStyle, { width: wp("45%"), height: hp("25%"), resizeMode: 'contain' }]} source={require("./../../../../assets/images/dogImages/dogCatImg.svg")}></Image>
                         <Text style={[CommonStyles.noRecordsTextStyle]}>{Constant.NO_RECORDS_LOGS}</Text>
                         <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
                     </View> : null)}
@@ -400,7 +400,8 @@ const TimerLogsUI = ({ route, ...props }) => {
                             onDateChange={(date) => setDateselected(date)}
                             mode={"date"}
                             textColor={'black'}
-                            maximumDate={datePickerDateTo}
+                            maximumDate={new Date()}
+                            minimumDate={fromDate && datePickerDate ? datePickerDate : new Date('1900-01-01')}
                             style={styles.datePickeStyle}
                         />
                     </View>
@@ -427,7 +428,7 @@ const TimerLogsUI = ({ route, ...props }) => {
                             mode={"date"}
                             textColor={'black'}
                             maximumDate={new Date()}
-                            minimumDate={fromDate && datePickerDate ? datePickerDate : new Date('1900:01:01')}
+                            minimumDate={fromDate && datePickerDate ? datePickerDate : new Date('1900-01-01')}
                             style={styles.datePickeStyle}
                         />
                     </View>

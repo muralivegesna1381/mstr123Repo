@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as Queries from "./../../config/apollo/queries";
 import { useQuery } from "@apollo/react-hooks";
-import * as Constant from "./../../utils/constants/constant";
-import * as internetCheck from "./../../utils/internetCheck/internetCheck";
-import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
+import * as Constant from "./../constants/constant";
+import * as internetCheck from "./../internetCheck/internetCheck";
+import * as DataStorageLocal from "./../storage/dataStorageLocal";
 import {View} from 'react-native';
-import AlertComponent from './../../utils/commonComponents/alertComponent';
-import CommonStyles from './../../utils/commonStyles/commonStyles';
-import * as ImageProgress from './../../utils/imageProcessComponent/imageProcessComponent';
-import * as VideoProcessingComponent from './../../utils/VideoProcessingComponent/videoProcessingComponent';
+import AlertComponent from './../commonComponents/alertComponent';
+import CommonStyles from './../commonStyles/commonStyles';
+import * as ImageProgress from './../../utils/questionnaireMediaUpload/imageProcessComponent/questImageProcessComponent.js';
+import * as VideoProcessingComponent from './../../utils/questionnaireMediaUpload/videoProcessingComponent/questVideoProcessingComponent.js';
 import * as Apolloclient from './../../config/apollo/apolloConfig';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
+import * as ServiceCalls from './../getServicesData/getServicesData.js';
+import * as AuthoriseCheck from './..//authorisedComponent/authorisedComponent';
 import  * as QestionnaireDataObj from "./../../components/questionnaire/questionnaireCustomComponents/questionnaireData/questionnaireSaveGetData";
 
 var RNFS = require('react-native-fs');
@@ -45,7 +45,6 @@ const QuestionnaireMediaUpload = ({navigation, route,...props }) => {
 
         let qstData = await DataStorageLocal.getDataFromAsync(Constant.QUEST_UPLOAD_DATA);
         qstData = JSON.parse(qstData);
-
         if(qstData){
 
             let internetType = await internetCheck.internetTypeCheck();

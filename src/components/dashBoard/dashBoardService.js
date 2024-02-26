@@ -10,6 +10,7 @@ import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js'
 import * as Apolloclient from './../../config/apollo/apolloConfig';
 import perf from '@react-native-firebase/perf';
 import RNExitApp from 'react-native-exit-app';
+import moment from 'moment/moment';
 
 const PERMISSION_OBSERVATIONS = 1;
 const PERMISSION_QUESTIONNAIRE = 2;
@@ -18,6 +19,12 @@ const PERMISSION_TIMER = 5;
 const PERMISSION_PETWEIGHT = 7;
 const Permission_EatingEnthusiasm = 8;
 const PERMISSION_IMAGESCORING = 9;
+const PERMISSION_FM_GOAL_SET = 12;
+const PERMISSION_IDEAL_BODY_WHT = 13;
+const PERMISSION_FM_CHAT = 14;
+const PERMISSION_FEEDING_REQ = 10;
+const PERMISSION_FOOD_HISTORY = 11;
+const PERMISSION_SLEEP_CHART = 15;
 
 let trace_inDashBoard;
 
@@ -70,6 +77,16 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   const [supportDMissingArray, set_supportDMissingArray] = useState([]);
   const [supportID,set_supportID] = useState(undefined);
   const [ptActivityLimits, set_ptActivityLimits] = useState(undefined);
+  const [behVisualData, set_behVisualData] = useState(undefined);
+  const [weightHistoryData, set_weightHistoryData] = useState(undefined);
+  const [devModel, set_devModel] = useState(undefined);
+  const [isFmGoalSet, set_isFmGoalSet] = useState(false);
+  const [isFmGraph, set_isFmGraph] = useState(false);
+  const [isSleepGraph, set_isSleepGraph] = useState(false);
+  const [isWeightPer, set_isWeightPer] = useState(false);
+  const [isFoodHistory, set_isFoodHistory] = useState(false);
+  const [foodHistoryObj, set_foodHistoryObj] = useState(undefined);
+  const [isFeedingReq, set_isFeedingReq] = useState(undefined)
 
   var setupDonePetsRef = useRef([]);
   var setupDonePetsLength = useRef(0);
@@ -83,6 +100,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   var isDefaultModularity = useRef(false);
   var currentCampaignPet = useRef(undefined);
   var petArrayRef = useRef(undefined);
+  var isFmDataService = useRef(false)
 
   React.useEffect(() => {
 
@@ -204,16 +222,19 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     }
 
     if(serviceCallsObj && serviceCallsObj.statusData) {
+
       if(serviceCallsObj && serviceCallsObj.responseData && serviceCallsObj.responseData.length > 0){
-        // let tempArray = [];
-        // let tempArray1 = [];
+
         if (serviceCallsObj.responseData.length > 0) {
           set_isFirstUser(false);
           set_petsArray(serviceCallsObj.responseData);
           petArrayRef.current = serviceCallsObj.responseData;
           await Storage.saveDataToAsync(Constant.ALL_PETS_ARRAY, JSON.stringify(serviceCallsObj.responseData));
           setDefaultSlide(serviceCallsObj.responseData);
-        } 
+
+        } else {
+          await Storage.removeDataFromAsync(Constant.ALL_PETS_ARRAY);
+        }
       
       } else {
         set_isLoading(false);
@@ -282,7 +303,6 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
       set_weight(defaultPet.weight);
       set_weightUnit(defaultPet.weightUnit);
-
       if(parseInt(defaultPet.petStatus) === 3 || parseInt(defaultPet.petStatus) === 4){
         set_isDeceased(true);
       } else {
@@ -290,50 +310,23 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       }
 
     }
+
+    if(defaultPet.devices.length > 0) {
+      set_isDeviceMissing(false);
+    } else {
+      set_isDeviceMissing(true);
+    }
     
     if(defaultPet.devices.length > 0){
-
-      if((defaultPet.devices[0].deviceNumber || defaultPet.devices[0].deviceNumber != "")){
-
-        set_isDeviceMissing(false);
-
-        if(defaultPet.devices[0].isDeviceSetupDone){
-
-          set_isDeviceSetupDone(true);
-          await getPetModularity(defaultPet.petID);
-
-        } else {
-
-          set_isLoading(false);
-          set_isDeviceSetupDone(false);
-          checkModularPermissions([],defaultPet.petID);
-          set_buttonTitle('COMPLETE SENSOR SETUP');
-          getsupportMeterials(16);
-          set_deviceStatusText(Constant.DEVICE_PENDING_DASHBAORD); 
-
-        }
-
-      } else {
-
-        set_isLoading(false);
-        set_isDeviceMissing(true);
-        checkModularPermissions([],defaultPet.petID);
-        set_buttonTitle('ADD A DEVICE?');
-        getsupportMeterials(17);
-        set_deviceStatusText(Constant.DEVICE_MISSING_DASHBOARD);
-
-      }
-
-      set_devicesCount(defaultPet.devices.length);
-
+      set_isDeviceMissing(false);
+      set_isDeviceSetupDone(defaultPet.devices[0].isDeviceSetupDone);
+      set_devModel(defaultPet.devices[0].deviceModel);
     } else {
-      set_isLoading(false);
       set_isDeviceMissing(true);
-      checkModularPermissions([],defaultPet.petID);
-      set_buttonTitle('ADD A DEVICE?');
-      getsupportMeterials(17);
-      set_deviceStatusText(Constant.DEVICE_MISSING_DASHBOARD);
+      set_isDeviceSetupDone(false);
     }
+    
+    await getPetModularity(defaultPet.petID);
 
   };
 
@@ -346,7 +339,6 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     modularityServiceCount.current = 0;
     setupDonePetsLength.current = 1;
     setDefaultSlide(petsArray);
-    // getDashBoardPets();
 
   };
 
@@ -359,7 +351,6 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     let obj = {"petIds":[petId]}
     let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
     let modularServiceObj = await ServiceCalls.getModularityPermission(obj,token);
-
     if(modularServiceObj && modularServiceObj.logoutData){
       AuthoriseCheck.authoriseCheck();
       navigation.navigate('WelcomeComponent');
@@ -373,8 +364,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     }
 
     if(modularServiceObj && modularServiceObj.statusData) {
-      if(modularServiceObj && modularServiceObj.responseData){
-        // await updatePermissionsArrays(modularServiceObj.responseData);
+      if(modularServiceObj && modularServiceObj.responseData){        
         await checkModularPermissions(modularServiceObj.responseData, petId);
       } else {
         firebaseHelper.logEvent(firebaseHelper.event_dashboard_getModularity_fail, firebaseHelper.screen_dashboard, "Dashboard Modularity Service", 'Getting Modularity in Dashboard : No Datafound');
@@ -390,9 +380,87 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
   };
 
-  const saveModularityAsync = async (moduleArray,petId) => {
-    // firebaseHelper.logEvent(firebaseHelper.event_dashboard_defaultPet_modularity, firebaseHelper.screen_dashboard, "Dashboard Modularity Permissions Pet Id : "+petId, 'Permissions : ' + JSON.stringify(moduleArray));
-    // await Storage.saveDataToAsync(Constant.MODULATITY_OBJECT, JSON.stringify(moduleArray));
+  // App Visualisation Service API
+  const getPetBehaviorVisualization = async (petId) => {
+
+    let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
+    let behVisServiceObj = await ServiceCalls.getPetBehaviorVisualization(petId,token);
+    set_isLoading(false);
+    isFmDataService.current = false;
+
+    if(behVisServiceObj && behVisServiceObj.logoutData){
+      AuthoriseCheck.authoriseCheck();
+      navigation.navigate('WelcomeComponent');
+      return;
+    }
+
+    if(behVisServiceObj && !behVisServiceObj.isInternet){
+      set_isLoading(false);
+      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK', false,true);
+      return;
+    }
+
+    if(behVisServiceObj && behVisServiceObj.statusData) {
+      if(behVisServiceObj && behVisServiceObj.responseData){
+        set_behVisualData(behVisServiceObj.responseData);
+      } else {
+        set_behVisualData(undefined)
+      }
+
+    } else {
+      firebaseHelper.logEvent(firebaseHelper.event_dBoard_getVisual_fail, firebaseHelper.screen_dashboard, "Dashboard Get Visualization Service failed", 'Service Status : false');
+    }
+
+    if(behVisServiceObj && behVisServiceObj.error) {
+      let errors = behVisServiceObj.error.length > 0 ? behVisServiceObj.error[0].code : '';
+      firebaseHelper.logEvent(firebaseHelper.event_dBoard_getVisual_fail, firebaseHelper.screen_dashboard, "Dashboard Get Visualization Service failed", 'errors : ' + errors);
+      set_isLoading(false);
+    }
+
+  };
+
+  // App Visualisation Service API
+  const getPetWeightHistory = async (petId) => {
+
+    let toDate =  moment(new Date()).format("YYYY-MM-DD")
+    let fromDate =  new Date();
+    fromDate.setDate(fromDate.getDate() - 6);
+    fromDate = moment(fromDate).format("YYYY-MM-DD");
+    let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
+    let phServiceObj = await ServiceCalls.getPetWeightHistory(petId,token,toDate,fromDate);
+    // set_isLoading(false);
+    if (!isFmDataService.current) {
+      set_isLoading(false);
+    }  
+    if(phServiceObj && phServiceObj.logoutData){
+      AuthoriseCheck.authoriseCheck();
+      navigation.navigate('WelcomeComponent');
+      return;
+    }
+
+    if(phServiceObj && !phServiceObj.isInternet){
+      set_isLoading(false);
+      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK', false,true);
+      return;
+    }
+
+    if(phServiceObj && phServiceObj.statusData) {
+      if(phServiceObj && phServiceObj.responseData){
+        set_weightHistoryData(phServiceObj.responseData);
+      } else {
+        set_weightHistoryData(undefined);
+      }
+
+    } else {
+      firebaseHelper.logEvent(firebaseHelper.event_dBoard_getPet_Wgt_History_fail, firebaseHelper.screen_dashboard, "Dashboard Get Pet Weight History Service failed", 'Service Status : false');
+    }
+
+    if(phServiceObj && phServiceObj.error) {
+      let errors = phServiceObj.error.length > 0 ? phServiceObj.error[0].code : '';
+      firebaseHelper.logEvent(firebaseHelper.event_dBoard_getPet_Wgt_History_fail, firebaseHelper.screen_dashboard, "Dashboard Get Pet Weight History Service failed", 'error : ' + errors);
+      set_isLoading(false);
+    }
+
   };
 
   /**
@@ -403,10 +471,26 @@ const DasBoardService = ({ navigation, route, ...props }) => {
    const savePetsForTImer = async (timerPets) => {
 
     if (timerPets && timerPets.length > 0) {
-      let timerPetsTemp = await getsetupFeaturePets(timerPets);
-      await Storage.saveDataToAsync(Constant.TIMER_PETS_ARRAY, JSON.stringify(timerPetsTemp));
+      // let timerPetsTemp = await getsetupFeaturePets(timerPets);
+      await Storage.saveDataToAsync(Constant.TIMER_PETS_ARRAY, JSON.stringify(timerPets));
     } else {
       await Storage.removeDataFromAsync(Constant.TIMER_PETS_ARRAY);
+    }
+
+  };
+
+  /**
+   * Saves the Timer permission enabled pets.
+   * Used while initiating the timer.
+   * @param {*} setupDonePet 
+   */
+  const savePetsForFH = async (fhPets) => {
+
+    if (fhPets && fhPets.length > 0) {
+      // let timerPetsTemp = await getsetupFeaturePets(timerPets);
+      await Storage.saveDataToAsync(Constant.FH_PETS_ARRAY, JSON.stringify(fhPets));
+    } else {
+      await Storage.removeDataFromAsync(Constant.FH_PETS_ARRAY);
     }
 
   };
@@ -434,9 +518,10 @@ const DasBoardService = ({ navigation, route, ...props }) => {
    * @param {*} questPets 
    */
   const savePetsForQuestionnaire = async (questPets) => {
+
     if (questPets && questPets.length > 0) {
-      let qstPetsTemp = await getsetupFeaturePets(questPets);
-      await Storage.saveDataToAsync(Constant.QUESTIONNAIR_PETS_ARRAY, JSON.stringify(qstPetsTemp));
+      // let qstPetsTemp = await getsetupFeaturePets(questPets);
+      await Storage.saveDataToAsync(Constant.QUESTIONNAIR_PETS_ARRAY, JSON.stringify(questPets));
     } else {
       await Storage.removeDataFromAsync(Constant.QUESTIONNAIR_PETS_ARRAY);
     }
@@ -449,9 +534,9 @@ const DasBoardService = ({ navigation, route, ...props }) => {
    */
 
   const savePetsForObservations = async (obsPets) => {
+
     if (obsPets && obsPets.length > 0) {
-      let obsPetsTemp = await getsetupFeaturePets(obsPets);
-      await Storage.saveDataToAsync(Constant.ADD_OBSERVATIONS_PETS_ARRAY, JSON.stringify(obsPetsTemp));
+      await Storage.saveDataToAsync(Constant.ADD_OBSERVATIONS_PETS_ARRAY, JSON.stringify(obsPets));
     } else {
       await Storage.removeDataFromAsync(Constant.ADD_OBSERVATIONS_PETS_ARRAY);
     }
@@ -476,6 +561,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       if(newValue) {
         updateModularity(newValue[0]);
       } else {
+        set_isLoading(false)
         updateModularity([]);
       }
     }
@@ -484,6 +570,8 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
   const updateModularity = async (modularArray1) => {
 
+    let defaultPet = await Storage.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
+    defaultPet = JSON.parse(defaultPet);
     let tempArray = [];
     let modularArray = [];
 
@@ -496,40 +584,29 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
     modularArray = tempArray;
     firebaseHelper.logEvent(firebaseHelper.event_dashboard_defaultPet_modularity, firebaseHelper.screen_dashboard, "DBoard Default Pet Permissions", 'P Set : '+JSON.stringify(modularArray));
-    if (modularArray.includes(PERMISSION_OBSERVATIONS)) {
-      set_isObsEnable(true);
-      await permissionPetsAPI(56);
+    
+    if (modularArray.includes(PERMISSION_FM_CHAT) && defaultPet.showFmChart) {
+      set_isFmGraph(true);
+      isFmDataService.current = true;    
     } else {
-      set_isObsEnable(false);
+      isFmDataService.current = false;
+      set_isFmGraph(false);
     }
 
-    if (modularArray.includes(PERMISSION_POINTTRACKING)) {
-
-      if(enableLoader.current){
-        ptExists.current = true;
-        await getCampaignListByPet();
-      } else {
-        ptExists.current = false;
-      }
-      
+    if (modularArray.includes(PERMISSION_FM_GOAL_SET) && defaultPet.showFmGoalSetting) {
+      set_isFmGoalSet(true);
+      isFmDataService.current = true; 
     } else {
-      ptExists.current = false;
-      set_isPTEnable(false);
+      isFmDataService.current = false;
+      set_isFmGoalSet(false);
     }
 
-    if (modularArray.includes(PERMISSION_QUESTIONNAIRE)) {
-      set_isQuestionnaireEnable(true);
-      await permissionPetsAPI(54);
-      await getQuestionnaireData();
+    if (modularArray.includes(PERMISSION_SLEEP_CHART) && defaultPet.showSleepChart) {
+      isFmDataService.current = true;
+      set_isSleepGraph(true);
     } else {
-      set_isQuestionnaireEnable(false);    
-    }
-
-    if (modularArray.includes(PERMISSION_TIMER)) {
-      set_isTimerEnable(true);
-      await permissionPetsAPI(60);
-    } else {
-      set_isTimerEnable(false);
+      isFmDataService.current = false;
+      set_isSleepGraph(false);
     }
 
     if (modularArray.includes(PERMISSION_PETWEIGHT)) {
@@ -550,9 +627,77 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       set_isImageScoring(false);
     }
 
+    if (modularArray.includes(PERMISSION_POINTTRACKING)) {
+
+      if(enableLoader.current){
+        ptExists.current = true;
+         getCampaignListByPet();
+      } else {
+        ptExists.current = false;
+      }
+      
+    } else {
+      ptExists.current = false;
+      set_isPTEnable(false);
+    }
+
+    if (modularArray.includes(PERMISSION_IDEAL_BODY_WHT)) {
+      await getPetWeightHistory(defaultPet.petID);
+      set_isWeightPer(true);
+    } else {
+      set_isWeightPer(false);
+    }
+
+    if (modularArray.includes(PERMISSION_QUESTIONNAIRE)) {
+      set_isQuestionnaireEnable(true);
+      permissionPetsAPI(2);
+      getQuestionnaireData();
+    } else {
+
+      let questPeri = await Storage.getDataFromAsync(Constant.QUETIONNAIRE_PERMISSION,);
+      if(questPeri && questPeri === 'available' || defaultPet.petSpecQuesCount > 0) {
+        set_isQuestionnaireEnable(true);
+        permissionPetsAPI(2);
+        getQuestionnaireData();
+      } 
+      
+    }
+
+    if (modularArray.includes(PERMISSION_OBSERVATIONS)) {
+      set_isObsEnable(true);
+      permissionPetsAPI(1);
+    } else {
+      set_isObsEnable(false);
+    }
+
+    if (modularArray.includes(PERMISSION_TIMER)) {
+      set_isTimerEnable(true);
+      permissionPetsAPI(5);
+    } else {
+      set_isTimerEnable(false);
+    }
+
+    if (modularArray.includes(PERMISSION_FOOD_HISTORY)) {
+      permissionPetsAPI(11);
+      getFoodIntakeConfigDataApi(defaultPet.petID);
+      set_isFoodHistory(true);
+    } else {
+      set_isFoodHistory(false);
+    }
+
+    if (modularArray.includes(PERMISSION_FEEDING_REQ)) {
+      set_isFeedingReq(true);
+    } else {
+      set_isFeedingReq(true);
+    }
+
+    if (isFmDataService.current) {  
+      await getPetBehaviorVisualization(defaultPet.petID);
+    }    
+
     set_isModularityService(false);
 
-    if(modularArray.includes(PERMISSION_POINTTRACKING) || modularArray.includes(PERMISSION_QUESTIONNAIRE) || modularArray.includes(PERMISSION_POINTTRACKING)) {
+    if(modularArray.includes(PERMISSION_POINTTRACKING) || modularArray.includes(PERMISSION_QUESTIONNAIRE) || modularArray.includes(PERMISSION_POINTTRACKING) || (modularArray.includes(PERMISSION_SLEEP_CHART) && defaultPet.showSleepChart) || (modularArray.includes(PERMISSION_FM_GOAL_SET && defaultPet.showFmGoalSetting)) || (modularArray.includes(PERMISSION_FM_CHAT) && defaultPet.showFmChart) || modularArray.includes(PERMISSION_IDEAL_BODY_WHT)) {
 
     } else {
       // if(modularityServiceCount.current+1 === setupDonePetsLength.current){
@@ -573,10 +718,11 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     defaultPet = JSON.parse(defaultPet);
     let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
     let questServiceObj = await ServiceCalls.getQuestionnaireData(defaultPet.petID,token);
-
     set_isQuestLoading(false);
     // if(!ptExists.current){
-      set_isLoading(false);
+      if (!isFmDataService.current) {
+        set_isLoading(false);
+      }  
     // }
     
     if(questServiceObj && questServiceObj.logoutData){
@@ -649,7 +795,9 @@ const DasBoardService = ({ navigation, route, ...props }) => {
         }
           
       } else {
-        set_isLoading(false);
+        if (!isFmDataService.current) {
+          set_isLoading(false);
+        }  
         set_isPTEnable(false);
         set_isPTLoading(false);
       }
@@ -712,60 +860,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
   };
 
-  /**
-   * When default pet is having setup Pending or device missing,
-   * Dashboard shows the pdf or videos related to abouve status.
-   * This service call fetches the required meterials and loads the data in the dashboard.
-   * Setup Pending id = 16 and Device missing id = 17
-   * @param {*} id 
-   */
-   const getsupportMeterials = async (id) => {
-
-    let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
-    set_supportID(id);
-    if(enableLoader.current) {
-      set_isLoading(true);
-    }
-    set_loaderMsg(Constant.DASHBOARD_LOADING_MSG);
-    let supportMetObj = await ServiceCalls.getAppSupportDocs(id,token);
-    set_isLoading(false);
-    set_isPTLoading(false);
-
-    if(supportMetObj && supportMetObj.logoutData){
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
-
-    if(supportMetObj && !supportMetObj.isInternet){
-      set_isLoading(false);
-      firebaseHelper.logEvent(firebaseHelper.event_dashboard_getMeterials_fail, firebaseHelper.screen_dashboard, "Dashboard Support Meterials Failed", 'No Internet : ');
-      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK', false,true);
-      return;
-    }
-
-    if(supportMetObj && supportMetObj.statusData){
-      if(supportMetObj.responseData && supportMetObj.responseData.length > 0){
-          set_supportMetialsArray(supportMetObj.responseData);
-          if(id === 16){
-            set_supportSPendingArray(supportMetObj.responseData);
-          } else {
-            set_supportDMissingArray(supportMetObj.responseData);
-          }
-      } else {
-        set_supportMetialsArray([]);
-      }
-    }
-
-    if(supportMetObj && supportMetObj.error) {
-      set_isLoading(false);
-      let errors = supportMetObj.error.length > 0 ? supportMetObj.error[0].code : '';
-      firebaseHelper.logEvent(firebaseHelper.event_dashboard_getMeterials_fail, firebaseHelper.screen_dashboard, "Dashboard Support Meterials Failed", 'error : ', errors);
-    }
-
-  };
-
-  const permissionPetsAPI = async (mId) => {
+  const permissionPetsAPI = async (mId,isNavigate) => {
 
     let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
     let clientId = await Storage.getDataFromAsync(Constant.CLIENT_ID);
@@ -773,7 +868,9 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     userRoleDetails = JSON.parse(userRoleDetails);
 
     let permissionServiceObj = await ServiceCalls.configPermissionAPI(clientId,mId,token);
-
+    // if (!isFmDataService.current) {
+    //   set_isLoading(false);
+    // }  
     if(permissionServiceObj && permissionServiceObj.logoutData){
       AuthoriseCheck.authoriseCheck();
       navigation.navigate('WelcomeComponent');
@@ -789,22 +886,27 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
       if (permissionServiceObj.responseData) {
 
-        if(mId === 60){
+        if(mId === 5){
           savePetsForTImer(permissionServiceObj.responseData);
-        } else if(mId === 56){
-          savePetsForObservations(permissionServiceObj.responseData);
-        }else if(mId === 54){
+        } else if(mId === 1){
+          await savePetsForObservations(permissionServiceObj.responseData);
+        }else if(mId === 2){
           savePetsForQuestionnaire(permissionServiceObj.responseData);
+        }
+        if(mId === 11){
+          savePetsForFH(permissionServiceObj.responseData);
         }
         // return permissionServiceObj.responseData
       }
 
     } else {
-      createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+      // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+      firebaseHelper.logEvent(firebaseHelper.event_dBoard_Get_Permi_Pets_fail, firebaseHelper.screen_dashboard, "Dashboard Get Pet Permissions Service failed", 'Service Status : false');
     }
 
     if(permissionServiceObj && permissionServiceObj.error) {
-      createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+      // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+      firebaseHelper.logEvent(firebaseHelper.event_dBoard_Get_Permi_Pets_fail, firebaseHelper.screen_dashboard, "Dashboard Get Pet Permissions Service failed", 'error : ' + errors);
     }
 
   };
@@ -834,6 +936,48 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     } else {
       set_questionnaireDataLength(undefined);
       set_questionnaireData(undefined);
+    }
+
+  };
+
+  const getFoodIntakeConfigDataApi = async (petId) => {
+
+    let dataValue = moment(new Date()).format('YYYY-MM-DD').toString();
+
+    let token = await Storage.getDataFromAsync(Constant.APP_TOKEN);
+    let client = await Storage.getDataFromAsync(Constant.CLIENT_ID);
+    let fIntakeListServiceObj = await ServiceCalls.getFoodIntakeConfigDataApi(petId, client, dataValue, token);
+
+    if (fIntakeListServiceObj && fIntakeListServiceObj.logoutData) {
+      AuthoriseCheck.authoriseCheck();
+      navigation.navigate('WelcomeComponent');
+      return;
+    }
+
+    if (fIntakeListServiceObj && !fIntakeListServiceObj.isInternet) {
+      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 0);
+      return;
+    }
+
+    if (fIntakeListServiceObj && fIntakeListServiceObj.statusData) {
+      if (fIntakeListServiceObj.responseData && fIntakeListServiceObj.responseData) {
+
+        if(fIntakeListServiceObj.responseData.recommondedDiet && fIntakeListServiceObj.responseData.recommondedDiet.length > 0) {
+          set_isFoodHistory(true);
+          set_foodHistoryObj(fIntakeListServiceObj.responseData.recommondedDiet[0])
+        } else {
+          set_foodHistoryObj(undefined)
+        }
+
+      } 
+
+    } else {
+      firebaseHelper.logEvent(firebaseHelper.event_dBoard_Food_Intake_fail, firebaseHelper.screen_dashboard, "Dashboard Get Food Intake Service failed", 'Service Status : false');
+    }
+
+    if (fIntakeListServiceObj && fIntakeListServiceObj.error) {
+      let errors = getfeedbackServiceObj.error.length > 0 ? getfeedbackServiceObj.error[0].code : '';
+      firebaseHelper.logEvent(firebaseHelper.event_dBoard_Food_Intake_fail, firebaseHelper.screen_dashboard, "Dashboard Get Food Intake Service failed", 'error : ' + errors);
     }
 
   };
@@ -945,6 +1089,14 @@ const DasBoardService = ({ navigation, route, ...props }) => {
   const updateModularitySetupDone = () => {
     isDefaultModularity.current = false;
     enableLoader.current = true;
+  };
+
+  const selectedPetAction = () => {
+    refreshDashBoardDetails();
+  };
+
+  const quickObservationAction = async () => {
+    permissionPetsAPI(1,true)
   }
 
   return (
@@ -998,6 +1150,16 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       supportSPendingArray = {supportSPendingArray}
       ptActivityLimits = {ptActivityLimits}
       questSubmitLength = {questSubmitLength}
+      behVisualData = {behVisualData}
+      weightHistoryData = {weightHistoryData}
+      devModel = {devModel}
+      isFmGoalSet = {isFmGoalSet}
+      isFmGraph = {isFmGraph}
+      isWeightPer = {isWeightPer}
+      isFoodHistory = {isFoodHistory}
+      isFeedingReq = {isFeedingReq}
+      isSleepGraph = {isSleepGraph}
+      foodHistoryObj = {foodHistoryObj}
       popOkBtnAction = {popOkBtnAction}
       popCancelBtnAction = {popCancelBtnAction}
       refreshDashBoardDetails = {refreshDashBoardDetails}
@@ -1008,6 +1170,8 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       updateQuestionnareCount = {updateQuestionnareCount}
       refreshPT = {refreshPT}
       updateModularitySetupDone = {updateModularitySetupDone}
+      selectedPetAction = {selectedPetAction}
+      quickObservationAction = {quickObservationAction}
     />
   );
 

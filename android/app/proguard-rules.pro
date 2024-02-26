@@ -9,6 +9,7 @@
 
 # Add any project specific keep options here:
 -keep class wseemann.media.**{ *; }
+-keep public class com.horcrux.svg.** {*;}
 -keep class wseemann.media.FFmpegMediaMetadataRetriever {
 *** mNativeContext;
 }

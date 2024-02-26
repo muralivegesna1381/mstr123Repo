@@ -73,8 +73,9 @@ const styles = StyleSheet.create({
     },
 
     textInputStyle: {
-        fontWeight: "normal",
+        ...CommonStyles.textStyleRegular,
         fontSize: fonts.fontMedium,
+        color:'grey',
         flex: 1,
         height: hp('8%'),
         // marginLeft: wp('2%'),

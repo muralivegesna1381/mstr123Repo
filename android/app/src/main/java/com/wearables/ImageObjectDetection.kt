@@ -47,18 +47,44 @@ class ImageObjectDetection : ReactContextBaseJavaModule {
             .addOnSuccessListener { labels ->
                 // Task completed successfully
                 var isDataMatch = false
+                var catConfidenceValue = 0F
+                var toyConfidenceValue = 0F
+
                 for (label in labels) {
-                    if (label.text.contains("Dog")) {
-                        isDataMatch = true
-                    }
                     Log.v(
                         "ImageObjectDetection",
                         String.format("Label %s, confidence %f", label.text, label.confidence)
                     )
+                    if (label.text.contains("Toy") && label.confidence > 0.85) {
+                        toyConfidenceValue = label.confidence
+                        isDataMatch = false
+                    }
+                    if (label.text.contains("Cat") && label.confidence > 0.85) {
+                        catConfidenceValue = label.confidence
+                        isDataMatch = false
+                    }
+                    if (label.text.contains("Dog")) {
+                        if (label.confidence > 0.95) {
+                            isDataMatch = true
+                        }
+                        else if (catConfidenceValue > 0.95) {
+                            isDataMatch = false
+                        }
+                        else if (catConfidenceValue > 0.85 && label.confidence < 0.75) {
+                            isDataMatch = false
+                        }
+                        else if (toyConfidenceValue > 0.85 && label.confidence < 0.75) {
+                            isDataMatch = false
+                        }
+                        else if (label.confidence > 0.60) {
+                            isDataMatch = true
+                        }
+                    }
                 }
+
                 Handler().postDelayed({
                     cb.invoke(isDataMatch)
-                }, 500)
+                }, 600)
             }
             .addOnFailureListener { e ->
                 e.printStackTrace()

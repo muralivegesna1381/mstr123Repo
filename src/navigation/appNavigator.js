@@ -100,6 +100,13 @@ import PetAddressEditConfirmComponent from '../components/petEdit/petAddressEdit
 import PetAddressEditComponent from '../components/petEdit/petAddressEditComponent';
 import PTActivityLimitsComponent from '../components/pointTracking/ptActivityLimits/ptActivityLimitsComponent';
 import AllDevicesListComponent from '../components/multipleDevices/allDevicesListComponent';
+import CategorySelectComponent from '../components/observationsJournal/addObservations/categoryComponents/categorySelectComponent';
+import BFIUserDashboardComponent from '../components/bfiUserDashboard/bfiUserDashbaordComponent';
+import GoalSetComponent from '../components/goalSetComponents/goalSetComponent';
+import ReplaceSensorComponent from '../components/sensorConfiguration/replaceSensor/replaceSensorComponent';
+import ReplaceSyncRequestComponent from '../components/sensorConfiguration/replaceSensor/replaceSyncRequestComponent';
+import NewReplaceSensorRequestComponent from '../components/sensorConfiguration/replaceSensor/newReplaceSensorRequestComponent';
+import BehaviorVisualizationComponent from '../components/behaviorVisualizationComponents/behaviorVisualizationComponent';
 import PetListBFIScoringScreen from './../bfiComponents/scoreBFI/petListBFIScoringScreen'
 import PetSubmittedImagesScreen from './../bfiComponents/scoreBFI/petSubmittedImagesScreen'
 import PetImageCaptureComponent from '../bfiComponents/captureImages/petImageCaptureComponent';
@@ -112,8 +119,14 @@ import ReviewComponent from '../bfiComponents/reviewScreen/reviewScreen';
 import PetFoodInfoComponent from '../components/SOB/petProfiles/petFoodInfoComponent';
 import SubmittedScoreComponent from '../bfiComponents/scoreBFI/submittedScore/submittedScoreComponent';
 import BFIScoreInstructions from '../bfiComponents/scoreBFI/bfiScoreInstructionsComponent';
-import BFIUserDashboardComponent from '../components/bfiUserDashboard/bfiUserDashbaordComponent';
 import ParentProfileComponent from '../components/SOB/petParentProfile/ParentProfileComponent';
+import DeviceTutorialComponent from '../components/deviceTutorialComponents/deviceTutorialComponent';
+import FoodIntakeComponent from '../components/foodHistoryComponents/foodIntakeComponents/foodIntakeComponent';
+import FoodIntakeMainComponent from '../components/foodHistoryComponents/foodIntakeMainComponents/foddIntakeMainComponent';
+import UpdateFoodUnitsComponent from '../components/accountInformation/updateFoodUnitsComponent';
+import ReviewSubmissionComponent from '../components/foodHistoryComponents/reviewSubmissionScreen/reviewSubmissionScreen';
+import FoodHistoryPetSelectionComponent from '../components/foodHistoryComponents/foodHistoryPetSelection/foodHistoryPetSelectionComponent';
+import GoalInstructionsComponent from '../components/goalSetComponents/goalInstructionsComponent';
 
 const Stack = createNativeStackNavigator();
 
@@ -319,6 +332,20 @@ const AppStack = () => {
 
       <Stack.Screen name="AllDevicesListComponent" component={AllDevicesListComponent} options={{ headerShown: false, }} />
 
+      <Stack.Screen name="CategorySelectComponent" component={CategorySelectComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="BFIUserDashboardComponent" component={BFIUserDashboardComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="GoalSetComponent" component={GoalSetComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="ReplaceSensorComponent" component={ReplaceSensorComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="ReplaceSyncRequestComponent" component={ReplaceSyncRequestComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="NewReplaceSensorRequestComponent" component={NewReplaceSensorRequestComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="BehaviorVisualizationComponent" component={BehaviorVisualizationComponent} options={{ headerShown: false, }} />
+
       <Stack.Screen name="PetListBFIScoringScreen" component={PetListBFIScoringScreen} options={{ headerShown: false, }} />
 
       <Stack.Screen name="PetSubmittedImagesScreen" component={PetSubmittedImagesScreen} options={{ headerShown: false, }} />
@@ -343,10 +370,21 @@ const AppStack = () => {
 
       <Stack.Screen name="BFIScoreInstructions" component={BFIScoreInstructions} options={{ headerShown: false, }} />
 
-      <Stack.Screen name="BFIUserDashboardComponent" component={BFIUserDashboardComponent} options={{ headerShown: false, }} />
-
       <Stack.Screen name="ParentProfileComponent" component={ParentProfileComponent} options={{ headerShown: false, }} />
 
+      <Stack.Screen name="DeviceTutorialComponent" component={DeviceTutorialComponent} options={{ headerShown: false, }} />
+      <Stack.Screen name="FoodIntakeComponent" component={FoodIntakeComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="FoodIntakeMainComponent" component={FoodIntakeMainComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="UpdateFoodUnitsComponent" component={UpdateFoodUnitsComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="ReviewSubmissionComponent" component={ReviewSubmissionComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="FoodHistoryPetSelectionComponent" component={FoodHistoryPetSelectionComponent} options={{ headerShown: false, }} />
+
+      <Stack.Screen name="GoalInstructionsComponent" component={GoalInstructionsComponent} options={{ headerShown: false, }}/>
+      
     </Stack.Navigator>
 
   );

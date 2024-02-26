@@ -94,7 +94,7 @@ const WifiListHPN1UI = ({ route, ...props }) => {
                 <View style={{ alignItems: 'center', justifyContent: 'space-between' }}>
                     <View style={{ marginTop: hp('3%'),marginBottom: addBtnEnable ? hp('10%') : hp('1%') }}>
                        <FlatList
-                            data={congiguredWIFIArray}
+                            data={props.configureWifiL}
                             renderItem={renderItem}
                             keyExtractor={(item, index) => "" + index}
                         /> 

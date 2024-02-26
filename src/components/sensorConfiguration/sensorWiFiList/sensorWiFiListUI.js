@@ -27,7 +27,6 @@ const SensorWiFiListUI = ({ navigation, route, ...props }) => {
     const [btnName, set_btnName] = useState(undefined);
     const [isBckBtnEnable, set_isBckBtnEnable] = useState(true);
     const [isHidePassword, set_isHidePassword] = useState(true);
-    const [defaultPetObj, set_defaultPetObj] = useState(undefined);
     const [fetchedList, set_fetchedList] = useState(0);
     const [totalList, set_totalList] = useState(0);
     const [sensorType, set_sensorType] = useState(undefined);
@@ -46,9 +45,8 @@ const SensorWiFiListUI = ({ navigation, route, ...props }) => {
             set_sensorType(props.sensorType);
         }
         set_wifiList(tempWifiList);
-        set_defaultPetObj(props.defaultPetObj,props.sensorType);
 
-    }, [props.wifiList, props.defaultPetObj]);
+    }, [props.wifiList]);
 
     useEffect(() => {
 
@@ -156,7 +154,7 @@ const SensorWiFiListUI = ({ navigation, route, ...props }) => {
                                                 placeholder="Password"
                                                 placeholderTextColor="#7F7F81"
                                                 autoCapitalize="none"
-                                                maxLength={sensorType==='Sensor' ? 20 : 40}
+                                                maxLength={sensorType && (sensorType.includes("CMAS") || sensorType.includes("AGL2") || sensorType.includes("AGL3")) ? 30 : 40}
                                                 secureTextEntry={isHidePassword}
                                                 // value = {getSSIDValues(item)}
                                                 value={expandedIndex === index ? wifiPsd : null}
@@ -197,7 +195,7 @@ const SensorWiFiListUI = ({ navigation, route, ...props }) => {
                     isChatEnable={false}
                     isTImerEnable={false}
                     isTitleHeaderEnable={true}
-                    title={'Device Setup'}
+                    title={'Sensor Setup'}
                     backBtnAction={() => backBtnAction()}
                 />
             </View>

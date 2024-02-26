@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-community/async-storage";
 import CameraRoll from "@react-native-community/cameraroll";
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, ImageBackground, NativeModules, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, BackHandler } from 'react-native';
+import { Alert, ImageBackground, NativeModules, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, BackHandler, FlatList } from 'react-native';
 import RNFS from 'react-native-fs';
 import ImageView from "react-native-image-viewing";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
@@ -24,6 +24,9 @@ import * as ServiceCalls from '../../utils/getServicesData/getServicesData.js';
 import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import * as Apolloclient from './../../config/apollo/apolloConfig';
 import * as Queries from "./../../config/apollo/queries";
+import * as ImagePicker from 'react-native-image-picker';
+import Highlighter from "react-native-highlight-words";
+import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 
 let retakeIcon = require("./../../../assets/images/bfiGuide/svg/re-take.svg");
 
@@ -39,6 +42,13 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
   const [isFromOnBoarding, set_isFromOnBoarding] = useState(false);
 
   const [petCurrentImage, setPetCurrentImage] = useState(undefined);
+
+  const [petFrontCropImage, setPetFrontCropImage] = useState(undefined);
+  const [petBackCropImage, setPetBackCropImage] = useState(undefined);
+  const [petTopCropImage, setPetTopCropImage] = useState(undefined);
+  const [petRightSideCropImage, setPetRightSideCropImage] = useState(undefined);
+  const [petLeftSideCropImage, setPetLeftSideCropImage] = useState(undefined);
+  const [petFullCropBody, setPetFullCropBody] = useState(undefined);
 
   const [petFrontImage, setPetFrontImage] = useState(undefined);
   const [petBackImage, setPetBackImage] = useState(undefined);
@@ -70,6 +80,8 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
   const [statusTitle, set_StatusTitle] = useState(undefined);
   const [statusSubject, set_StatusSubject] = useState(undefined);
 
+  const [isOpenMediaOptions, set_openMediaOptions] = useState(false);
+
   const [isPopUp, set_isPopUp] = useState(false);
   var rotation = 0;
   let isLoadingdRef = useRef(0);
@@ -91,6 +103,10 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
   let isFirebaseUploadDone = useRef([])
   let hashmapImageSigmentationStatus = useRef(new Map())
 
+  let refImagePath = useRef(undefined)
+  let refImageBase64 = useRef(undefined)
+  let refImageCroppedPath = useRef(undefined)
+
   let status_inprogress = "IN_PROGRESS"
   let status_match = "MATCH"
   let status_not_mtach = "NOT_MATCH"
@@ -104,6 +120,8 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
     { id: 6, title: 'Full Body' },
   ]);
 
+  let trace_bfi_capture_Screen;
+
   useEffect(() => {
     //Update when coming from camera component
     if (route.params?.indexPos) {
@@ -112,43 +130,38 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
     }
     if (route.params?.imagePath) {
       //Rotate Top,Left and Right Side image
-      //set_isLoading(true);
       set_loaderText(Constant.LOADING_MSG_IMAGE_PROCESSING)
       if (route.params?.indexPos === 2 || route.params?.indexPos === 3 || route.params?.indexPos === 4 || route.params?.indexPos === 5) {
-        rotateImage(route.params?.imagePath)
+        rotateImage(route.params?.imagePath, route.params?.imageCroppedPath)
       } else {
-        savePhotoInLocalGallery(route.params?.imagePath)
+        savePhotoInLocalGallery(route.params?.imagePath, route.params?.imageCroppedPath)
       }
     }
-  }, [route.params?.indexPos, route.params?.imagePath]);
+  }, [route.params?.indexPos, route.params?.imagePath, route.params?.imageCroppedPath]);
 
   useEffect(() => {
+    initialSessionStart();
+    firebaseHelper.reportScreen(firebaseHelper.screen_capture_bfi);
+    firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_capture_bfi, "User in Capture BFI Screen", '');
+
     checkCameraPermissions();
-
-    set_popUpAlert("Information")
-    set_popupMessage(Constant.CAMERA_SCREEN_INFO_MSG)
-    set_popRightTitle('Ok');
-    set_isPopUp(true);
-    set_popupLftBtnEnable(false)
-
-    // hashmapImageSigmentationStatus.current.set(instArray[5].title, status_not_mtach)
-    // hashmapImageSigmentationStatus.current.set(instArray[4].title, status_not_mtach)
-    // hashmapImageSigmentationStatus.current.set(instArray[3].title, status_not_mtach)
-    // hashmapImageSigmentationStatus.current.set(instArray[2].title, status_not_mtach)
-
-    // updateWidgetData()
-
-    // if (totalRecordsData.current.length === 0)
-    //   getPetImagePositions()
-
 
     updateParentID()
 
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     return () => {
+      initialSessionStop();
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
     };
   }, []);
+
+  const initialSessionStart = async () => {
+    trace_bfi_capture_Screen = await perf().startTrace('t_inCaptureBFIScreen');
+  };
+
+  const initialSessionStop = async () => {
+    await trace_bfi_capture_Screen.stop();
+  };
 
   const updateParentID = async () => {
     let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
@@ -163,24 +176,25 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
     return true;
   };
 
-  const rotateImage = (sourceImage) => {
-    RotatePhoto.createRotatedPhoto(sourceImage, 2000, 2000, "JPEG", 100, 270, null)
+  const rotateImage = async (sourceImage, croppedPath) => {
+    let rotateCroppedPath = undefined
+    await RotatePhoto.createRotatedPhoto(croppedPath, 2000, 2000, "JPEG", 100, 270, null)
       .then(response => {
-        savePhotoInLocalGallery(response.uri)
+        rotateCroppedPath = response.uri
+      })
+      .catch(err => {
+      });
+
+    await RotatePhoto.createRotatedPhoto(sourceImage, 2000, 2000, "JPEG", 100, 270, null)
+      .then(response => {
+        savePhotoInLocalGallery(response.uri, rotateCroppedPath)
       })
       .catch(err => {
       });
   }
 
-  const savePhotoInLocalGallery = async (localPath) => {
-    var promise = CameraRoll.save(localPath, {
-      type: "photo",
-      album: "BFIScoring",
-      filename: "image" + moment(new Date()).format('MMDDYYYYhhmmss'),
-    });
-    promise.then(async function (result) { }).catch(function (error) { });
-
-    moveToNativeFunctions(localPath)
+  const savePhotoInLocalGallery = async (localPath, croppedPath) => {
+    moveToNativeFunctions(localPath, croppedPath)
   }
 
   useEffect(() => {
@@ -227,60 +241,62 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 
   const scanDocument = async (position) => {
     indexNew.current = position
-
-    if (isCameraPermissionON === false) {
-      checkCameraPermissions()
-      return
-    }
-
-    navigation.navigate('CameraComponent', { indexPos: position, })
+    set_openMediaOptions(true)
   };
 
-  const moveToNativeFunctions = (imagePath) => {
-    RNFS.readFile(imagePath, 'base64')
+  const moveToNativeFunctions = (imagePath, croppedPath) => {
+    RNFS.readFile(croppedPath, 'base64')
       .then(imageBase64 => {
         if (Platform.OS === 'android') {
           NativeModules.ImageBlueIdentification.checkIsImageBlur(imageBase64, (value) => {
-            checkBlurStatus(value, imagePath, imageBase64)
+            checkBlurStatus(value, imagePath, imageBase64, croppedPath)
           });
         }
         else {
           NativeModules.RNOpenCvLibrary.checkForBlurryImage(imageBase64, (error, dataArray) => {
-            checkBlurStatus(dataArray[0], imagePath, imageBase64)
+            checkBlurStatus(dataArray[0], imagePath, imageBase64, croppedPath)
           });
         }
       });
   };
 
-  const checkBlurStatus = (value, imagePath, imageBase64) => {
+  const checkBlurStatus = (value, imagePath, imageBase64, croppedPath) => {
+    refImagePath.current = imagePath
+    refImageBase64.current = imageBase64
+    refImageCroppedPath.current = croppedPath
+
     if (value == false) {
-      //Object Detection using ML-Kit
-      if (Platform.OS === "android") {
-        set_isLoading(true);
-        NativeModules.ImageObjectDetection.getImageLabellingData(imageBase64, (value) => {
-          set_isLoading(false);
-          handleNativeObjectDetection(value, imagePath)
-        });
-      } else {
-        //ios image labelling validation
-        set_isLoading(true);
-        NativeModules.ObjectDetection.imageObjectDetection(imageBase64, (value) => {
-          handleNativeObjectDetection(value, imagePath)
-        });
-      }
+      handleBlurResponse()
     } else {
-      set_isLoading(false);
       //Image is Blur
       set_isLoading(false);
       clearImageLables()
 
       set_popupMessage(Constant.CAPTURED_BLURRY_IMAGES)
       set_popRightTitle('Re-Take');
-      set_popLeftTitle('Cancel');
+      set_popLeftTitle('Ignore');
       set_isPopUp(true);
       set_popupLftBtnEnable(true)
     }
   };
+
+  const handleBlurResponse = () => {
+    //Object Detection using ML-Kit
+    if (Platform.OS === "android") {
+      set_isLoading(true);
+      NativeModules.ImageObjectDetection.getImageLabellingData(refImageBase64.current, (value) => {
+        set_isLoading(false);
+        handleNativeObjectDetection(value, refImagePath.current)
+      });
+    } else {
+      //ios image labelling validation
+      set_isLoading(true);
+      NativeModules.ObjectDetection.imageObjectDetection(refImageBase64.current, (value) => {
+        set_isLoading(false);
+        handleNativeObjectDetection(value, refImagePath.current)
+      });
+    }
+  }
 
   const clearImageLables = () => {
     setPetCurrentImage(undefined)
@@ -294,27 +310,48 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 
   const handleNativeObjectDetection = (value, imagePath) => {
     if (value === true) {
-      //Update UI 
-      setPetCurrentImage(imagePath)
-
-      if (indexNew.current === 0) setPetFrontImage(imagePath)
-      else if (indexNew.current === 1) setPetBackImage(imagePath)
-      else if (indexNew.current === 2) setPetTopImage(imagePath)
-      else if (indexNew.current === 3) setPetLeftSideImage(imagePath)
-      else if (indexNew.current === 4) setPetRightSideImage(imagePath)
-      else if (indexNew.current === 5) setPetFullBody(imagePath)
-
-      //compress and update thumbnail
-      compressImage(imagePath)
-
+      handleObjectDetectionResponse(imagePath)
     } else {
       set_isLoading(false);
       set_popupMessage(Constant.CAPTURE_DOG_IMAGE)
       set_popRightTitle('Re-Take');
-      set_popLeftTitle('Cancel');
+      set_popLeftTitle('Ignore');
       set_isPopUp(true);
       set_popupLftBtnEnable(true)
     }
+  }
+
+  const handleObjectDetectionResponse = (imagePath) => {
+    //Update UI 
+    setPetCurrentImage(imagePath)
+
+    if (indexNew.current === 0) {
+      setPetFrontImage(imagePath)
+      setPetFrontCropImage(refImageCroppedPath.current)
+    }
+    else if (indexNew.current === 1) {
+      setPetBackImage(imagePath)
+      setPetBackCropImage(refImageCroppedPath.current)
+    }
+    else if (indexNew.current === 2) {
+      setPetTopImage(imagePath)
+      setPetTopCropImage(refImageCroppedPath.current)
+    }
+    else if (indexNew.current === 3) {
+      setPetLeftSideImage(imagePath)
+      setPetLeftSideCropImage(refImageCroppedPath.current)
+    }
+    else if (indexNew.current === 4) {
+      setPetRightSideImage(imagePath)
+      setPetRightSideCropImage(refImageCroppedPath.current)
+    }
+    else if (indexNew.current === 5) {
+      setPetFullBody(imagePath)
+      setPetFullCropBody(refImageCroppedPath.current)
+    }
+
+    //compress and update thumbnail
+    compressImage(imagePath)
   }
 
   const compressImage = async (imgPath) => {
@@ -351,17 +388,7 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
     else if (indexNew.current === 4) setPetRightSideThumbImage(compressPath)
     else if (indexNew.current === 5) setPetFullBodyThumb(compressPath)
 
-    var promise = CameraRoll.save(compressPath, {
-      type: "photo",
-      album: "BFIScoring",
-      filename: "image" + moment(new Date()).format('MMDDYYYYhhmmss'),
-    });
-
-    promise.then(async function (result) {
-      //set_isLoading(false);
-
-
-    }).catch(function (error) { set_isLoading(false); });
+    set_isLoading(false);
   }
 
   const submitToImageClasification = (imagePath) => {
@@ -372,7 +399,7 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
     //by default update as in-progress
     updateWidgetStatus(instArray[indexNew.current].title, status_inprogress)
 
-    //set_isLoading(true)
+    set_isLoading(true)
     isLoadingdRef.current = 1;
     RNFS.readFile(imagePath, 'base64')
       .then(imageBase64 => {
@@ -389,12 +416,9 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
           },
           body: JSON.stringify(mlModelreq),
         };
-        //http://34.107.175.16/image_classification
-        //https://orientation-classification-service-uathxnywea-uc.a.run.app/image_classification
-        fetch("https://orientation-classification-uat.ctepl.com/image_classification", options)
+        fetch(Environment.bfiImageClassfication, options)
           .then(response => response.json())
           .then(data => {
-            console.log("data", data)
             let imageType = data.imgType
             if (data && data.dog_orientation) {
               if ((indexNew.current === 0 && data.dog_orientation !== "Front") ||
@@ -420,7 +444,7 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
           .catch(error => {
             //error case update as match to close widget and show alert
             updateWidgetStatus(instArray[indexNew.current].title, status_match)
-            firebaseHelper.logEvent(firebaseHelper.event_image_classification_api_fails, firebaseHelper.screen_capture_bfi, "Image Classification Service failed", 'Service error : ' + error);
+            firebaseHelper.logEvent(firebaseHelper.event_image_classification_api, firebaseHelper.screen_capture_bfi, "Image Classification Service failed", 'Service error : ' + error.message);
             handleResponse(Constant.CAPTURED_SUBMIT_IMAGES_FAIL)
           }).finally(() => {
             isLoadingdRef.current = 0;
@@ -444,7 +468,16 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
   }
 
   const backBtnAction = () => {
-    if (isLoadingdRef.current === 0) {
+    //handle back exits if user captured some orientation
+    if (hashmapImageSigmentationStatus.current.size > 0) {
+      set_popupMessage(true)
+      set_popupMessage(Constant.BFI_CAPTURE_SCREEN_LEAVE)
+      set_popRightTitle('OK');
+      set_popLeftTitle('Cancel');
+      set_isPopUp(true);
+      set_popupLftBtnEnable(true)
+    }
+    else if (isLoadingdRef.current === 0) {
       if (isFromOnBoarding) {
         navigation.navigate("PetListComponent");
       } else {
@@ -461,7 +494,7 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 
   const validateNextAction = () => {
     if (hashmapMediaData.current.has(5) && (hashmapMediaData.current.has(3) || hashmapMediaData.current.has(4))) {
-      firebaseHelper.logEvent(firebaseHelper.event_capture_bfi_submitted_api, firebaseHelper.screen_capture_bfi, "CaptureBFI Submit action clicked", '');
+      firebaseHelper.logEvent(firebaseHelper.event_capture_bfi_submit_click, firebaseHelper.screen_capture_bfi, "CaptureBFI Submit action clicked", '');
       nextButtonAction()
     } else {
       set_popupMessage(true)
@@ -475,9 +508,6 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
   const nextButtonAction = async () => {
     //clear old data
     isFirebaseUploadDone.current = []
-    //isLoadingdRef.current = 1
-    //set_loaderText(Constant.LOADER_WAIT_MESSAGE)
-    //set_isLoading(true)
 
     var jsonArray = [];
     var jsonFullBody = { localFileURL: petFullBody, localthmbURl: petFullBodyThumb, imageType: 'Full Body', imagePositionId: 6, fbFileURL: undefined, fbThumbURL: undefined };
@@ -546,6 +576,9 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
       set_isPopUp(false);
       set_popupMessage(undefined);
       scanDocument(indexNew.current)
+    } if (popupMessage === Constant.BFI_CAPTURE_SCREEN_LEAVE) {
+      set_isPopUp(false);
+      navigation.pop()
     } else {
       set_popUpAlert("Alert")
       set_isPopUp(false);
@@ -554,8 +587,20 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
   };
 
   const popCancelBtnAction = () => {
-    set_isPopUp(false);
-    set_popupMessage(undefined);
+    if (popupMessage === Constant.CAPTURED_BLURRY_IMAGES) {
+      handleBlurResponse()
+      set_isPopUp(false);
+      set_popupMessage(undefined);
+    }
+    else if (popupMessage === Constant.CAPTURE_DOG_IMAGE) {
+      handleObjectDetectionResponse(refImagePath.current)
+      set_isPopUp(false);
+      set_popupMessage(undefined);
+    }
+    else {
+      set_isPopUp(false);
+      set_popupMessage(undefined);
+    }
   }
 
   const callGoogleVIsionApi = async (base64, imagePath) => {
@@ -631,7 +676,6 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
     let notMatchData = []
     let matchData = []
     hashmapImageSigmentationStatus.current.forEach(function (value, key) {
-      //console.log("key", key, "value", value,)
       if (value === status_inprogress) {
         pendingData.push(key)
         pendingCount = pendingCount + 1
@@ -689,13 +733,99 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
     } else {
       set_isLoading(false);
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, 'OK', false, true);
-      firebaseHelper.logEvent(firebaseHelper.event_get_capture_image_pos, firebaseHelper.screen_capture_bfi, "getPetImagePositions Service failed", 'Service Status : false');
+      firebaseHelper.logEvent(firebaseHelper.event_get_capture_image_pos_api, firebaseHelper.screen_capture_bfi, "getPetImagePositions Service failed", 'Service Status : false');
     }
 
     if (serviceCallsObj && serviceCallsObj.error) {
       let errors = serviceCallsObj.error.length > 0 ? serviceCallsObj.error[0].code : ''
       set_isLoading(false);
-      firebaseHelper.logEvent(firebaseHelper.event_get_capture_image_pos, firebaseHelper.screen_capture_bfi, "getPetImagePositions Service failed", 'Service error : ' + errors);
+      firebaseHelper.logEvent(firebaseHelper.event_get_capture_image_pos_api, firebaseHelper.screen_capture_bfi, "getPetImagePositions Service failed", 'Service error : ' + errors);
+    }
+  };
+
+  const actionOnRow = async (item) => {
+    set_openMediaOptions(false);
+    if (item === 'GALLERY') {
+      if (Platform.OS === 'ios') {
+        chooseImage()
+      } else {
+        chooseMultipleMedia();
+      }
+    }
+    if (item === 'CAMERA') {
+      if (isCameraPermissionON === false) {
+        checkCameraPermissions()
+        return
+      }
+      navigation.navigate('CameraComponent', { indexPos: indexNew.current, })
+    }
+  }
+
+  const chooseImage = () => {
+    set_popupMessage(Constant.LOADER_WAIT_MESSAGE)
+    set_isLoading(true);
+    ImagePicker.launchImageLibrary({
+      mediaType: 'photo',
+      includeBase64: false,
+      selectionLimit: 1,
+      durationLimit: 1200,
+      includeExtra: true,
+    },
+      async (response) => {
+        set_isLoading(false);
+        if (response && response.errorCode === 'permission') {
+          set_isLoading(false);
+          let high = <Highlighter highlightStyle={{ fontWeight: "bold", }}
+            searchWords={[Constant.GALLERY_PERMISSION_MSG_HIGHLIGHTED]}
+            textToHighlight={
+              Constant.GALLERY_PERMISSION_MSG
+            } />
+          set_popupMessage(high)
+          set_popUpAlert('Alert');
+          set_popRightTitle('OK');
+          set_isPopUp(true);
+          return
+        }
+        if (response.didCancel) {
+          set_isLoading(false);
+        } else if (response.error) {
+          set_isLoading(false);
+        } else {
+          if (response && response.assets) {
+            moveToNativeFunctions(response.assets[0].uri, response.assets[0].uri)
+            set_isLoading(false);
+          } else {
+            set_isLoading(false);
+          }
+        }
+      },)
+  };
+
+  const chooseMultipleMedia = async () => {
+    try {
+      var response = await MultipleImagePicker.openPicker({
+        selectedAssets: [],
+        maxVideo: 0,
+        usedCameraButton: true,
+        singleSelectedMode: true,
+        isCrop: false,
+        isCropCircle: false,
+        mediaType: "image",
+        singleSelectedMode: true,
+        selectedColor: '#f9813a',
+        haveThumbnail: true,
+        maxSelectedAssets: 1,
+        allowedPhotograph: true,
+        allowedVideoRecording: false,
+        preventAutomaticLimitedAccessAlert: true,
+        isPreview: true
+      });
+
+      if (response && response.path) {
+        moveToNativeFunctions(response.path, response.path)
+      }
+    } catch (e) { } finally {
+      set_isLoading(false);
     }
   };
 
@@ -735,13 +865,13 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
         <View style={[styles.container]}>
           <TouchableOpacity onPress={() => { scanDocument(5) }}>
             <View style={[styles.imageItemLarge]}>
-              {petFullBody ?
-                <TouchableOpacity onPress={() => { viewCaptureImageAction(petFullBody) }}>
-                  <ImageBackground style={styles.imageStyleLandScape} resizeMode="contain" source={{ uri: petFullBody }} />
+              {petFullCropBody ?
+                <TouchableOpacity onPress={() => { viewCaptureImageAction(petFullCropBody) }}>
+                  <ImageBackground style={styles.imageStyleLandScape} resizeMode="contain" source={{ uri: petFullCropBody }} />
                 </TouchableOpacity> :
                 <ImageBackground style={styles.infoImageStyle1} resizeMode='contain' source={dogImgArray[5]}></ImageBackground>
               }
-              {!petFullBody ?
+              {!petFullCropBody ?
                 < Text style={[CommonStyles.captureImageLable]}>{instArray[5].title}</Text>
                 : <View style={[styles.viewBtnStyle]}>
                   <TouchableOpacity onPress={() => { scanDocument(5) }}>
@@ -756,13 +886,13 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 
           <TouchableOpacity onPress={() => { scanDocument(3) }}>
             <View style={[styles.imageItemLarge]}>
-              {petLeftSideImage ?
-                <TouchableOpacity onPress={() => { viewCaptureImageAction(petLeftSideImage) }}>
-                  <ImageBackground style={styles.imageStyleLandScape} resizeMode="contain" source={{ uri: petLeftSideImage }} />
+              {petLeftSideCropImage ?
+                <TouchableOpacity onPress={() => { viewCaptureImageAction(petLeftSideCropImage) }}>
+                  <ImageBackground style={styles.imageStyleLandScape} resizeMode="contain" source={{ uri: petLeftSideCropImage }} />
                 </TouchableOpacity> :
                 <ImageBackground style={styles.infoImageStyle1} resizeMode='contain' source={dogImgArray[3]}></ImageBackground>
               }
-              {!petLeftSideImage ?
+              {!petLeftSideCropImage ?
                 < Text style={[CommonStyles.captureImageLable]}>{instArray[3].title}</Text>
                 : <TouchableOpacity style={[styles.viewBtnStyle]} onPress={() => { scanDocument(3) }}>
                   <ImageBackground style={styles.viewTextStyle} resizeMode="contain" source={retakeIcon} />
@@ -773,13 +903,13 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 
           <TouchableOpacity onPress={() => { scanDocument(4) }}>
             <View style={[styles.imageItemLarge]}>
-              {petRightSideImage ?
-                <TouchableOpacity onPress={() => { viewCaptureImageAction(petRightSideImage) }}>
-                  <ImageBackground style={styles.imageStyleLandScape} source={{ uri: petRightSideImage }} />
+              {petRightSideCropImage ?
+                <TouchableOpacity onPress={() => { viewCaptureImageAction(petRightSideCropImage) }}>
+                  <ImageBackground style={styles.imageStyleLandScape} source={{ uri: petRightSideCropImage }} />
                 </TouchableOpacity> :
                 <ImageBackground style={styles.infoImageStyle1} resizeMode='contain' source={dogImgArray[4]}></ImageBackground>
               }
-              {!petRightSideImage ?
+              {!petRightSideCropImage ?
                 <Text style={[CommonStyles.captureImageLable]}>{instArray[4].title}</Text>
                 : <TouchableOpacity style={[styles.viewBtnStyle]} onPress={() => { scanDocument(4) }}>
                   <ImageBackground style={styles.viewTextStyle} resizeMode="contain" source={retakeIcon} />
@@ -790,13 +920,13 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 
           <TouchableOpacity onPress={() => { scanDocument(2) }}>
             <View style={[styles.imageItemLarge]}>
-              {petTopImage ?
-                <TouchableOpacity onPress={() => { viewCaptureImageAction(petTopImage) }}>
-                  <ImageBackground style={[styles.imageStyleLandScape]} source={{ uri: petTopImage }} />
+              {petTopCropImage ?
+                <TouchableOpacity onPress={() => { viewCaptureImageAction(petTopCropImage) }}>
+                  <ImageBackground style={[styles.imageStyleLandScape]} source={{ uri: petTopCropImage }} />
                 </TouchableOpacity> :
                 <ImageBackground style={[styles.infoImageStyle1, { width: wp('25%'), }]} resizeMode='contain' source={dogImgArray[2]}></ImageBackground>
               }
-              {!petTopImage ?
+              {!petTopCropImage ?
                 <Text style={[CommonStyles.captureImageLable]}>{instArray[2].title}</Text>
                 : <TouchableOpacity style={[styles.viewBtnStyle, {
 
@@ -809,14 +939,14 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
           <View style={{ flexDirection: 'row' }}>
             <TouchableOpacity onPress={() => { scanDocument(0) }}>
               <View style={[styles.imageItemSmall]}>
-                {petFrontImage ?
-                  <TouchableOpacity onPress={() => { viewCaptureImageAction(petFrontImage) }}>
-                    <ImageBackground style={styles.imageStyle} resizeMode="contain" source={{ uri: petFrontImage }}>
+                {petFrontCropImage ?
+                  <TouchableOpacity onPress={() => { viewCaptureImageAction(petFrontCropImage) }}>
+                    <ImageBackground style={styles.imageStyle} resizeMode="contain" source={{ uri: petFrontCropImage }}>
                     </ImageBackground>
                   </TouchableOpacity> :
                   <ImageBackground style={styles.infoImageStyle} resizeMode='contain' source={dogImgArray[0]}></ImageBackground>}
 
-                {!petFrontImage ?
+                {!petFrontCropImage ?
                   <Text style={[CommonStyles.captureImageLable]}>{instArray[0].title}</Text>
                   : <TouchableOpacity style={[styles.viewBtnStylePortrait, {}]} onPress={() => { scanDocument(0) }}>
                     <ImageBackground style={styles.viewTextStyleFront} resizeMode="contain" source={retakeIcon} /></TouchableOpacity>}
@@ -826,14 +956,14 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 
             <TouchableOpacity onPress={() => { scanDocument(1) }}>
               <View style={[styles.imageItemSmall]}>
-                {petBackImage ?
-                  <TouchableOpacity onPress={() => { viewCaptureImageAction(petBackImage) }}>
-                    <ImageBackground style={styles.imageStyle} resizeMode="contain" source={{ uri: petBackImage }} >
+                {petBackCropImage ?
+                  <TouchableOpacity onPress={() => { viewCaptureImageAction(petBackCropImage) }}>
+                    <ImageBackground style={styles.imageStyle} resizeMode="contain" source={{ uri: petBackCropImage }} >
                     </ImageBackground>
                   </TouchableOpacity> :
                   <ImageBackground style={styles.infoImageStyle} resizeMode='contain' source={dogImgArray[1]}></ImageBackground>
                 }
-                {!petBackImage ?
+                {!petBackCropImage ?
                   <Text style={[CommonStyles.captureImageLable]}>{instArray[1].title}</Text>
                   : <TouchableOpacity style={[styles.viewBtnStylePortrait]} onPress={() => { scanDocument(1) }}>
                     <ImageBackground style={styles.viewTextStyleFront} resizeMode="contain" source={retakeIcon} /></TouchableOpacity>}
@@ -878,6 +1008,22 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
         />
       </View> : null}
 
+      {isOpenMediaOptions ? <View style={[styles.popSearchViewStyle]}>
+        <FlatList
+          data={['CAMERA', 'GALLERY', 'CANCEL']}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity onPress={() => { actionOnRow(item) }}>
+              <View style={styles.flatview}>
+                <Text numberOfLines={2} style={[styles.name]}>{item}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          enableEmptySections={true}
+          keyExtractor={(item, index) => index}
+        />
+      </View> : null}
+
     </View >
 
   );
@@ -919,7 +1065,7 @@ const styles = StyleSheet.create({
   infoImageStyle1: {
     width: wp('25%'),
     height: hp('13%'),
-    marginVertical: 5,
+    marginVertical: 5
   },
 
   buttonTextStyle: {
@@ -981,7 +1127,7 @@ const styles = StyleSheet.create({
     width: wp('60%'),
     height: hp('18%'),
     resizeMode: 'contain',
-    borderRadius: 5
+    borderRadius: 5,
   },
   crossImageStyle: {
     width: wp('6%'),
@@ -1078,6 +1224,34 @@ const styles = StyleSheet.create({
     fontSize: fonts.fontSmall,
     ...CommonStyles.textStyleSemiBold,
     color: 'white',
+  },
+
+  popSearchViewStyle: {
+    height: hp("30%"),
+    width: wp("95%"),
+    backgroundColor: '#DCDCDC',
+    bottom: 0,
+    position: 'absolute',
+    alignSelf: 'center',
+    borderTopRightRadius: 15,
+    borderTopLeftRadius: 15,
+  },
+
+  flatview: {
+    height: hp("8%"),
+    alignSelf: "center",
+    justifyContent: "center",
+    borderBottomColor: "grey",
+    borderBottomWidth: wp("0.1%"),
+    width: wp('90%'),
+    alignItems: 'center',
+  },
+
+  name: {
+    ...CommonStyles.textStyleSemiBold,
+    fontSize: fonts.fontMedium,
+    textAlign: "left",
+    color: "black",
   },
 
 });

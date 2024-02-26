@@ -156,7 +156,7 @@ const UpdateNameService = ({ navigation, route, ...props }) => {
         if(cNameServiceObj && cNameServiceObj.error) {
             firebaseHelper.logEvent(firebaseHelper.event_change_name_api_fail, firebaseHelper.screen_change_name, "User Name Api failed", 'error');
             set_isNavigate(false);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.NAME_ERROR_UPDATE,true);  
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);  
         }
     };
 

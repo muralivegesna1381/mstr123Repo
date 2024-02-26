@@ -112,7 +112,7 @@ const  SensorFirmwareComponent = ({ route, ...props }) => {
 
         if(isLoadingdRef.current === 0 && popIdRef.current === 0){
           firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_sensor_firmware, "User clicked on back button to navigate to Select Sensor Action Page", '');     
-          navigation.navigate("SelectSensorActionComponent");  
+          navigation.navigate("AllDevicesListComponent");  
         }
            
     }

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import SubmittedScoreUI from './submittedScoreUI';
 import moment from 'moment';
+import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
 
 const SubmittedScoreComponent = ({ navigation, route, ...props }) => {
 
@@ -13,10 +14,10 @@ const SubmittedScoreComponent = ({ navigation, route, ...props }) => {
   var scoreImg = useRef([]);
   let localDeviceDate = moment(new Date(new Date())).utcOffset("+00:00").format("YYYY-MM-DD")
 
-
   useEffect(() => {
     if (route.params?.imagesArray) {
-      console.log("array-->", route.params?.imagesArray)
+      firebaseHelper.reportScreen(firebaseHelper.screen_submitted_scores);
+      firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_submitted_scores, "User in Submitted scores Screen", '');
       dataMain.current = route.params?.imagesArray
       setData(route.params?.imagesArray)
       getInstructionsData();
@@ -41,6 +42,8 @@ const SubmittedScoreComponent = ({ navigation, route, ...props }) => {
   const navigateToPrevious = () => {
     navigation.pop();
   };
+
+ 
 
   //Getting instructions values from backend
   const getInstructionsData = async (instructionValue) => {

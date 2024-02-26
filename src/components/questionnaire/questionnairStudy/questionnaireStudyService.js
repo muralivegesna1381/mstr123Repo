@@ -21,6 +21,7 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
     const [isLoading, set_isLoading] = useState(false);
     const [questionnaireData, set_questionnaireData] = useState(undefined);
     const [date, set_Date] = useState(new Date());
+    const [isSearchDropdown, set_isSearchDropdown] = useState(undefined);
     const [isFrom, set_isFrom] = useState(undefined);
 
     let popIdRef = useRef(0);
@@ -28,7 +29,7 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
 
      /**
    * This Useeffect calls when there is cahnge in API responce
-   * All the Observations data will be saved for rendering in UI
+   * All the Questionnaire data will be saved for rendering in UI
    */
     React.useEffect(() => {
       
@@ -76,6 +77,7 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
         await trace_inQuestionnaireScreen.stop();
     };
 
+    // Fetches the Pets having the Questionnaire permissions
     const getQuestPets = async () => {
 
         let questPets =  await DataStorageLocal.getDataFromAsync(Constant.QUESTIONNAIR_PETS_ARRAY);
@@ -84,8 +86,9 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
         set_petsArray(duplicates);
         
         let defPet = await DataStorageLocal.getDataFromAsync(Constant.QUESTIONNAIRE_SELECTED_PET);
-        set_defaultPetObj(JSON.parse(defPet));
-        getQuestionnaireData(JSON.parse(defPet).petID);
+        defPet = JSON.parse(defPet)
+        set_defaultPetObj(defPet);
+        getQuestionnaireData(defPet.petID);
         
     };
 
@@ -95,6 +98,7 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
       return uniqueArray;
     };
 
+    // API to fetch the Questionnaires for a selected pet
     const getQuestionnaireData = async (petId) => {
 
       trace_Questionnaire_API_Complete = await perf().startTrace('t_GetQuestionnaireByPetId_API');
@@ -174,13 +178,16 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
         set_popUpMessage(undefined);
     };
 
+    // Pet selection action
     const questPetSelection = (pObject) => {
-        firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_pet_swipe_button_trigger, firebaseHelper.screen_questionnaire_study, "User selected another Pet for Questionnaires", 'Pet Id : '+pObject.petID);
-        getQuestPets();       
+      firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_pet_swipe_button_trigger, firebaseHelper.screen_questionnaire_study, "User selected another Pet for Questionnaires", 'Pet Id : '+pObject.petID);
+      getQuestPets();       
     };
 
+    // Navigates to Questionnaire question section
     const selectQuetionnaireAction = async (item) => {
       
+      searchDropAction();
       let selectedQuest = await DataStorageLocal.getDataFromAsync(Constant.SELECTED_QUESTIONNAIRE);
       selectedQuest = JSON.parse(selectedQuest);
       let questId = item.questionnaireId;
@@ -208,26 +215,42 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
         }
 
       } else {
-          firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_question_button_trigger, firebaseHelper.screen_questionnaire_study, "User selected Question : ", 'Questionnaire Name : '+item.questionnaireName);
-          navigation.navigate('QuestionnaireQuestionsService',{questionObject : item, petObj : defaultPetObj});
+        firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_question_button_trigger, firebaseHelper.screen_questionnaire_study, "User selected Question : ", 'Questionnaire Name : '+item.questionnaireName);
+        navigation.navigate('QuestionnaireQuestionsService',{questionObject : item, petObj : defaultPetObj});
       }
         
     };
 
+    const selectedSearchPetAction = (item) => {
+      firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_pet_swipe_button_trigger, firebaseHelper.screen_questionnaire_study, "User selected another Pet for Questionnaires", 'Pet Id : '+item.petID);
+      getQuestPets();  
+    };
+
+    // Removes Dropdown while navigating to another screen
+    const searchDropAction = () => {
+      if(isSearchDropdown === false) {
+        set_isSearchDropdown(undefined);
+      } else {
+        set_isSearchDropdown(false);
+      }
+    };
+
     return (
-        <QuestionnaireStudyUI 
-            defaultPetObj = {defaultPetObj}
-            petsArray = {petsArray}
-            isPopUp = {isPopUp}
-            popUpMessage = {popUpMessage}
-            popUpTitle = {popUpTitle}
-            isLoading = {isLoading}
-            questionnaireData = {questionnaireData}
-            popOkBtnAction = {popOkBtnAction}
-            questPetSelection = {questPetSelection}
-            navigateToPrevious = {navigateToPrevious}
-            selectQuetionnaireAction = {selectQuetionnaireAction}
-        />
+      <QuestionnaireStudyUI 
+        defaultPetObj = {defaultPetObj}
+        petsArray = {petsArray}
+        isPopUp = {isPopUp}
+        popUpMessage = {popUpMessage}
+        popUpTitle = {popUpTitle}
+        isLoading = {isLoading}
+        questionnaireData = {questionnaireData}
+        isSearchDropdown = {isSearchDropdown}
+        popOkBtnAction = {popOkBtnAction}
+        questPetSelection = {questPetSelection}
+        navigateToPrevious = {navigateToPrevious}
+        selectQuetionnaireAction = {selectQuetionnaireAction}
+        selectedSearchPetAction = {selectedSearchPetAction}
+      />
     );
 
   }

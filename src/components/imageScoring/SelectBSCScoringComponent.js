@@ -139,10 +139,9 @@ const SelectBSCScoringComponent = ({ navigation, route, ...props }) => {
 
     // Navigates to Images scoring component
     const selectActivityAction = (item, index) => {
-        console.log("item", item)
+
         let itemName = item && item.imageScaleName ? item.imageScaleName : ''
         firebaseHelper.logEvent(firebaseHelper.event_image_scoring_button_trigger, firebaseHelper.screen_image_based_score, "User selected item", '' + itemName);
-        
         navigation.navigate('ImageScoringMainComponent', { scoreObj: item });
 
         // //Redirect to new BFI Scoring screen for dog

@@ -241,7 +241,7 @@ const  ConnectSensorCommonComponent = ({navigation, route, ...props }) => {
                 isChatEnable={false}
                 isTImerEnable={false}
                 isTitleHeaderEnable={true}
-                title={'Connect Device'}
+                title={'Connect Sensor'}
                 backBtnAction = {() => navigateToPrevious()}
             />
         </View>
@@ -249,7 +249,7 @@ const  ConnectSensorCommonComponent = ({navigation, route, ...props }) => {
         <View style={styles.mainViewStyle}>
             
             <View style={styles.topViewStyle}>
-                <Text style={styles.headerStyle}>{'Searching for '}<Text style={[styles.headerStyle,{...CommonStyles.textStyleBold}]}>{'Device : '}</Text>
+                <Text style={styles.headerStyle}>{'Searching for '}<Text style={[styles.headerStyle]}>{'Sensor : '}</Text>
                 <Text style={[styles.headerStyle,{...CommonStyles.textStyleBold}]}>{deviceNumber}</Text>
                 </Text>
             </View>

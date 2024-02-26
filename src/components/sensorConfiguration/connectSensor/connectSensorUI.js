@@ -52,15 +52,15 @@ const ConnectSensorUI = ({navigation, route, ...props }) => {
         set_isLoading(props.isLoading);
         set_btnTitle(props.btnTitle);
         set_popupRBtnTitle(props.popupRBtnTitle);
-        getDevice();
+        // getDevice();
 
     }, [props.isPopUp,props.popUpMessage,props.popUpTitle,props.isLoading,props.btnTitle,props.popupRBtnTitle,props.isFirstTime]);
-
+    
     const getDevice = async () => {
-        let defaultObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
-        let devNumber = JSON.parse(defaultObj).devices[parseInt(sensorIndex)].deviceNumber;
-        set_deviceNumber(devNumber);
+        // let defaultObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
+        // let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
+        // let devNumber = JSON.parse(defaultObj).devices[parseInt(sensorIndex)].deviceNumber;
+        // set_deviceNumber(devNumber);
     }
 
     const nextButtonAction = () => {
@@ -81,24 +81,24 @@ const ConnectSensorUI = ({navigation, route, ...props }) => {
 
 return (
 
-        <View style={CommonStyles.mainComponentStyle}>
+    <View style={CommonStyles.mainComponentStyle}>
 
-            <View style={[CommonStyles.headerView,{}]}>
-                <HeaderComponent
-                    isBackBtnEnable={!isLoading}
-                    isSettingsEnable={false}
-                    isChatEnable={false}
-                    isTImerEnable={false}
-                    isTitleHeaderEnable={true}
-                    title={'Device Setup'}
-                    backBtnAction = {() => backBtnAction()}
-                />
-            </View>
+        <View style={[CommonStyles.headerView,{}]}>
+            <HeaderComponent
+                isBackBtnEnable={!isLoading}
+                isSettingsEnable={false}
+                isChatEnable={false}
+                isTImerEnable={false}
+                isTitleHeaderEnable={true}
+                title={'Sensor Setup'}
+                backBtnAction = {() => backBtnAction()}
+            />
+        </View>
 
             <View style={styles.mainViewStyle}>
                 <View style={styles.topViewStyle}>
-                    {props.isFirstTime ? <Text style={[styles.headerFirstStyle]}>{Constant.SENSOR_FIRST_CONFG_MSG}</Text> : <Text style={styles.headerStyle}>{'Searching for '}<Text style={[styles.headerStyle,{...CommonStyles.textStyleBold}]}>{'Device : '}</Text>
-                    <Text style={[styles.headerStyle,{...CommonStyles.textStyleBold}]}>{deviceNumber}</Text>
+                    {props.isFirstTime ? <Text style={[styles.headerFirstStyle]}>{Constant.SENSOR_FIRST_CONFG_MSG}</Text> : <Text style={styles.headerStyle}>{'Searching for '}<Text style={[styles.headerStyle]}>{'Sensor : '}</Text>
+                    <Text style={[styles.headerStyle,{...CommonStyles.textStyleBold}]}>{props.deviceNumber}</Text>
                     </Text>}
                 </View>
 

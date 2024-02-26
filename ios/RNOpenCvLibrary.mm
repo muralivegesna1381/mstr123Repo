@@ -80,16 +80,23 @@ RCT_EXPORT_METHOD(checkForBlurryImage:(NSString *)imageAsBase64 callback:(RCTRes
       maxLap = pixels[i];
     }
   }
+  int soglia = -6118750;
+  if (maxLap <= soglia) {
+    //is blur image
+  }else{
+    //is not blur
+  }
+  
   // one of the main parameters here: threshold sets the sensitivity for the blur check
   // smaller number = less sensitive; default = 180
   int threshold = 100;
 //  RCTLogInfo(@"Priting maxlap here %d and %d", maxLap, threshold);
-  cv::Laplacian(matImageGrey, laplacianImage, CV_8U);
+  cv::Laplacian(matImageGrey, laplacianImage, CV_64F);
     cv::Scalar mean, stddev;
     meanStdDev(laplacianImage, mean, stddev, cv::Mat());
     double variance = stddev.val[0] * stddev.val[0];
-    double newThreshold = 50;
-  //RCTLogInfo(@"Priting result here %f at %f", variance, newThreshold);
+    double newThreshold = 40;
+    RCTLogInfo(@"Priting result here %f at %f", variance, newThreshold);
     if (variance <= newThreshold) {
         // Blurry
       //RCTLogInfo(@"IMAGE BLUR STATUS Prblm---> is image Blur");

@@ -97,7 +97,7 @@ const PetAgeComponent = ({ route, ...props }) => {
     };
 
     const backBtnAction = () => {
-        navigation.navigate('PetFoodInfoComponent');
+        navigation.pop()
     };
 
     return (

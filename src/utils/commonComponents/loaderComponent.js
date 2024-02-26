@@ -29,7 +29,7 @@ const LoaderComponent = ({navigation, route,loaderText,isButtonEnable,heightLoad
 
     return (
 
-        <View style={[styles.mainActivity,{height:hp(heightL)}]}>
+        <View style={[styles.mainActivity,{height:hp(heightL),zIndex:999}]}>
 
             {showLoaderBox1 === 'show' ? <ImageBackground source={require ('../../../assets/images/timerImages/svg/bgTimerFilter.svg')} style = {styles.loaderBckViewStyle} imageStyle={{borderRadius:5}}>
 
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         minHeight : hp('20%'),
         justifyContent: "center",
         alignItems: "center",
-
+        marginTop : hp('5%'),
     },
 
     dogStyle: {

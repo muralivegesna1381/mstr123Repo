@@ -13,7 +13,6 @@ import RNAndroidLocationEnabler from "react-native-android-location-enabler";
 import BleManager from "react-native-ble-manager";
 import Highlighter from "react-native-highlight-words";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import { useBluetoothStatus } from 'react-native-bluetooth-status';
 import perf from '@react-native-firebase/perf';
 import * as PermissionsiOS from './../../../utils/permissionsComponents/permissionsiOS';
 import * as CheckPermissionsAndroid from './../../../utils/permissionsComponents/permissionsAndroid';
@@ -24,12 +23,13 @@ const SensorChargeConfirmationComponent = ({navigation, route, ...props }) => {
 
     const [isPopUp, set_isPopUp] = useState(false);
     const [popUpMessage, set_popUpMessage] = useState(undefined);
-    const [defaultpet, set_defaultPet] = useState(undefined);
+    const [setupStatus, set_setupStatus] = useState(undefined);
     const [sensorType, set_sensorType] = useState(undefined)
-    const [btStatus, isPending, setBluetooth] = useBluetoothStatus();
     const [date, set_Date] = useState(new Date());
     
     let popIdRef = useRef(0);
+    let actionType = useRef();
+    let isFirmwareReq = useRef();
 
     useEffect(() => {
 
@@ -56,26 +56,25 @@ const SensorChargeConfirmationComponent = ({navigation, route, ...props }) => {
     }, []);
 
     useEffect(() => {
-
-        if(route.params?.defaultPetObj){
-            set_defaultPet(route.params?.defaultPetObj);
-            getSensorType(route.params?.defaultPetObj);         
-        }
-
-    }, [route.params?.defaultPetObj]);
+      getSensorType(); 
+    }, []);
 
     const getSensorType = async (defPet) => {
 
-      let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
-      let devModel = undefined;
-      if(sensorIndex){
-        devModel = defPet.devices[parseInt(sensorIndex)].deviceModel;
-        set_sensorType(devModel)
-      } else {
-        devModel = defPet.devices[0].deviceModel;
-        set_sensorType(devModel)
+      let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+      configObj = JSON.parse(configObj);
+
+      if(configObj) {
+        if(configObj.isForceSync === 1) {
+          set_sensorType(configObj.deviceModel);
+        } else {
+          set_sensorType(configObj.configDeviceModel);
+        }
+        set_setupStatus(configObj.isDeviceSetupDone);
+        actionType.current = configObj.actionType;
+        isFirmwareReq.current = configObj.isFirmwareReq;
+        firebaseHelper.logEvent(firebaseHelper.event_Sensor_type, firebaseHelper.screen_Sensor_charge_confirm, "Getting Sensor Type", 'Device Type : '+configObj.configDeviceModel);
       }
-      firebaseHelper.logEvent(firebaseHelper.event_Sensor_type, firebaseHelper.screen_Sensor_charge_confirm, "Getting Sensor Type", 'Device Type : '+devModel);
 
     }
   
@@ -93,15 +92,7 @@ const SensorChargeConfirmationComponent = ({navigation, route, ...props }) => {
     };
 
     const nextButtonAction = async () => {
-
-      // if (Platform.OS === "android") {
-      //   checkBleState();
-      // } else {
-      //   getBluetoothState1();
-      // }
-
       checkBleState();
-
     };
 
     const backBtnAction = () => {
@@ -136,11 +127,10 @@ const SensorChargeConfirmationComponent = ({navigation, route, ...props }) => {
         let permissions = await CheckPermissionsAndroid.checkBLEPermissions();
         if(permissions) {
           BleManager.enableBluetooth().then(() => {
-
             navigateTosensorAction();
 
           }).catch((error) => {
-                showBleFailed(Constant.BLE_PERMISSIONS_ENABLED_HIGH_ANDROID,Constant.BLE_PERMISSIONS_ENABLED_ANDROID);
+            showBleFailed(Constant.BLE_PERMISSIONS_ENABLED_HIGH_ANDROID,Constant.BLE_PERMISSIONS_ENABLED_ANDROID);
           });
           
         } else {
@@ -153,14 +143,8 @@ const SensorChargeConfirmationComponent = ({navigation, route, ...props }) => {
 
     const navigateTosensorAction = async () => {
 
-      let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
       firebaseHelper.logEvent(firebaseHelper.event_sensor_ble_status, firebaseHelper.screen_Sensor_charge_confirm, "Checking Bluetooth Status", 'Ble Status : Enabled');
-      firebaseHelper.logEvent(firebaseHelper.event_sensor_setupStatus, firebaseHelper.screen_Sensor_charge_confirm, "Checking Setup Status ", 'setup Status : '+defaultpet.devices[parseInt(sensorIndex)].isDeviceSetupDone);
-      if(defaultpet.devices[parseInt(sensorIndex)].isDeviceSetupDone){
-        navigation.navigate('SelectSensorActionComponent',{setupStatus:'success'});
-      } else {
-        navigation.navigate('SelectSensorActionComponent',{setupStatus:'pending'});
-      }
+      navigation.navigate('FindSensorComponent');
 
     };
 
@@ -176,44 +160,6 @@ const SensorChargeConfirmationComponent = ({navigation, route, ...props }) => {
       set_isPopUp(true);
       popIdRef.current = 1;
 
-    }
-    
-    const getBluetoothState1 = async () => {
-      
-      const isEnabled = await BluetoothStatus.state();
-      if(isEnabled){
-            
-      } else {
-        
-      }
-      
-    };
-
-    const onBleSuccess = async (value) => {
-
-        if(value){
-
-            let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
-            firebaseHelper.logEvent(firebaseHelper.event_sensor_ble_status, firebaseHelper.screen_Sensor_charge_confirm, "Checking Bluetooth Status", 'Ble Status : Enabled');
-            firebaseHelper.logEvent(firebaseHelper.event_sensor_setupStatus, firebaseHelper.screen_Sensor_charge_confirm, "Checking Setup Status ", 'setup Status : '+defaultpet.devices[parseInt(sensorIndex)].isDeviceSetupDone);
-            if(defaultpet.devices[parseInt(sensorIndex)].isDeviceSetupDone){
-              navigation.navigate('SelectSensorActionComponent',{setupStatus:'success'});
-            } else {
-                navigation.navigate('SelectSensorActionComponent',{setupStatus:'pending'});
-            }
-
-        } else {
-            firebaseHelper.logEvent(firebaseHelper.event_sensor_ble_status, firebaseHelper.screen_Sensor_charge_confirm, "Checking Bluetooth Status", 'Ble Status : Disabled');
-            let high = <Highlighter highlightStyle={{ fontWeight: "bold",}}
-            searchWords={["Phone Settings > Wearables App > Enable Bluetooth permission"]}
-            textToHighlight={
-              "Please turn on your Bluetooth in order to continue.\nPlease make sure you have granted the required Bluetooth permissions. If not please go to Phone Settings > Wearables App > Enable Bluetooth permission."
-            }/>
-            set_popUpMessage(high);
-            set_isPopUp(true);
-            popIdRef.current = 1;
-        }
-        
     };
 
     const popOkBtnAction = () => {
@@ -239,7 +185,7 @@ return (
                     isChatEnable={false}
                     isTImerEnable={false}
                     isTitleHeaderEnable={true}
-                    title={'Device Setup Instructions'}
+                    title={'Sensor Setup Instructions'}
                     backBtnAction = {() => backBtnAction()}
                 />
             </View>

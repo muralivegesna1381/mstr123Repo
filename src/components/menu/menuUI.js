@@ -96,7 +96,6 @@ const  MenuUI = ({route, ...props }) => {
 
     menuView : {
       flex : 4,
-      alignItems:'center',
       marginBottom :  hp('3%'),
     },
 

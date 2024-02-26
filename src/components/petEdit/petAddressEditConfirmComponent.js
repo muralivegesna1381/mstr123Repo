@@ -99,21 +99,20 @@ const PetAddressEditConfirmComponent = ({ route, ...props }) => {
 
         let pParentObj = await DataStorageLocal.getDataFromAsync(Constant.PET_PARENT_OBJ);
         pParentObj = JSON.parse(pParentObj);
-        
         if(pParentObj) {
             set_petParentObj(pParentObj);  
-            if(pParentObj.petParentAddress&& Object.keys(pParentObj.petParentAddress).length !==0) {
+            if(pParentObj.address&& Object.keys(pParentObj.address).length !==0) {
                 
                 let tempAdd2 = '';
-                if(pParentObj.petParentAddress.address2 !=='' && pParentObj.petParentAddress.address2) {
-                    tempAdd2 = pParentObj.petParentAddress.address2 + ', '
+                if(pParentObj.address.address2 !=='' && pParentObj.address.address2) {
+                    tempAdd2 = pParentObj.address.address2 + ', '
                 }
-                let tempAdd = pParentObj.petParentAddress.address1+ ', ' 
+                let tempAdd = pParentObj.address.address1+ ', ' 
               + tempAdd2 
-              + pParentObj.petParentAddress.city + ', ' 
-              + pParentObj.petParentAddress.state+ ', '
-              + pParentObj.petParentAddress.country+ ', '
-              + pParentObj.petParentAddress.zipCode;
+              + pParentObj.address.city + ', ' 
+              + pParentObj.address.state+ ', '
+              + pParentObj.address.country+ ', '
+              + pParentObj.address.zipCode;
               set_petParentAddress(tempAdd);
             }     
         }

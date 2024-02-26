@@ -289,13 +289,13 @@ const  LeaderBoardUI = ({route, ...props }) => {
 
           {!isPetInTop && leaderBoardCurrent && Object.keys(leaderBoardCurrent).length !== 0 ? <TouchableOpacity style={styles.bottomComStyle} onPress={async () => {rewardPointsBtnAction();}}>
 
-            <ImageBackground style={[styles.rewardBackImgStyle]} imageStyle={{borderTopLeftRadius:5,borderTopRightRadius:5}} source={require("../../../../assets/images/pointTracking/svg/PTBtnImg.svg")}>
+            <ImageBackground style={[styles.rewardBackImgStyle]} imageStyle={{borderTopLeftRadius:5,borderTopRightRadius:5}} source={require("../../../../assets/images/pointTracking/png/ptBackground.png")}>
               <View style={{width:wp('65%'),flexDirection:'row',justifyContent:'space-between',}}>
                 <View style={{flexDirection:'row',alignItems:'center'}}>
                   <View>
                     {leaderBoardCurrent && Object.keys(leaderBoardCurrent).length !== 0 && leaderBoardCurrent.petPhotoUrl && leaderBoardCurrent.petPhotoUrl!=="" ? 
                       <ImageBackground style={Platform.isPad ? [styles.rewardImgStyle,{width:wp('6%')}]: [styles.rewardImgStyle]} imageStyle={{borderRadius:100, borderColor:'black',borderWidth:2 }} source={{uri: leaderBoardCurrent.petPhotoUrl}}></ImageBackground>
-                      : <ImageBackground style={styles.rewardImgStyle} imageStyle={{borderRadius:100, borderColor:'black',borderWidth:2 }} source={defaultPetImg}></ImageBackground>}
+                      : <ImageBackground style={Platform.isPad ? [styles.rewardImgStyle,{width:wp('6%')}]: [styles.rewardImgStyle]} imageStyle={{borderRadius:100, borderColor:'black',borderWidth:2 }} source={defaultPetImg}></ImageBackground>}
                   </View>
                   <View style={{marginLeft:wp('4%'),justifyContent:'center',height:hp('4%')}}>
                     <Text style={[styles.petNameStyle,{textTransform: 'uppercase'}]}>{leaderBoardCurrent && Object.keys(leaderBoardCurrent).length !== 0 ? leaderBoardCurrent.petName.length > 20 ? leaderBoardCurrent.petName.slice(0, 20) + "..." : leaderBoardCurrent.petName : ''}</Text>
@@ -314,7 +314,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
           :
             <TouchableOpacity style={styles.bottomComStyle} onPress={async () => {rewardPointsBtnAction();}}>
 
-              <ImageBackground style={[styles.rewardBackImgStyle]} imageStyle={{borderTopLeftRadius:5,borderTopRightRadius:5}} source={require("../../../../assets/images/pointTracking/svg/PTBtnImg.svg")}>
+              <ImageBackground style={[styles.rewardBackImgStyle]} imageStyle={{borderTopLeftRadius:5,borderTopRightRadius:5}} source={require("../../../../assets/images/pointTracking/png/ptBackground.png")}>
                   <View style={{width:wp('55%'),flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
                     <Text style={[styles.petNameStyle,{textTransform: 'uppercase'}]}>{'Reward Points'}</Text>
                     <View style={{justifyContent:'flex-end'}}>
@@ -370,6 +370,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
     mainComponentStyle : {
       flex:1,
       alignItems:'center' ,
+      
     },
 
     topComStyle : {

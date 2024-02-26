@@ -86,7 +86,7 @@ return (
 
                     <View style={[styles.cellBckView]}>
                     
-                        <Text style={[styles.headerStyle,{flex:1.5,}]}>{'Device Number : '}</Text>
+                        <Text style={[styles.headerStyle,{flex:1.5,}]}>{'Sensor Number : '}</Text>
                         <Text style={[styles.headerStyle,{...CommonStyles.textStyleBold,marginRight:wp('2%'),}]}>{deviceNumber}</Text>
 
                     </View>

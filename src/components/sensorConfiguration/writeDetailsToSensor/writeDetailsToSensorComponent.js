@@ -14,6 +14,7 @@ import perf from '@react-native-firebase/perf';
 import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
 import * as Apolloclient from './../../../config/apollo/apolloConfig';
 import * as Queries from "../../../config/apollo/queries";
+import moment from "moment";
 
 var Buffer = require("buffer/").Buffer;
 const Environment = JSON.parse(BuildEnv.Environment());
@@ -39,7 +40,6 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
     const [popUpTitle, set_popUpTitle] = useState(undefined);
     const [loaderMsg, set_loaderMsg] = useState('Please Wait..');
     const [isLoading, set_isLoading] = useState(true);
-    const [defaultpet, set_defaultPet] = useState(undefined);
     const [wifiName, set_wifiName] = useState(undefined);
     const [wifiPsd, set_wifiPsd] = useState(undefined);
     const [setupSuccess, set_setupSuccess] = useState(undefined);
@@ -49,16 +49,20 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
     const [hpn1ConfigWIFICount, set_hpn1ConfigWIFICount] = useState(9);
     const [isSensorAwaiting, set_isSensorAwaiting] = useState(false);
     const [date, set_Date] = useState(new Date());
+    const [configurePet, set_configurePet] = useState(undefined);
+    const [setupStatus, set_setupStatus] = useState(undefined);
+    const [sensorNumber, set_sensorNumber] = useState(undefined);
 
     const maxRetryChances = 5;
     let sensorModeVal = useRef();
     let wifiSSID = useRef();
     let wifiSSIDPsd = useRef();
-    let defaultPetSensor = useRef();
+    let configPetSensor = useRef();
     var isFromScreen = useRef('');
     var devNumber = useRef('');
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(1);
+    let isReplaceSensor = useRef();
 
     useEffect(() => {
        
@@ -99,53 +103,7 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
           isFromScreen.current = route.params?.isFromScreen;
         }
 
-        if(route.params?.devNumber){
-          devNumber.current = route.params?.devNumber;
-        }
-
-    }, [route.params?.wifiName,route.params?.wifiPsd,route.params?.isFromScreen, route.params?.devNumber]);
-
-    // useEffect(() => { 
-
-    //       if(sensorStatusData){
-    //         set_isSensorAwaiting(false);
-    //         if(sensorStatusData.sensorUpdate.success){
-    //           firebaseHelper.logEvent(firebaseHelper.event_sensor_write_details_api_success, firebaseHelper.screen_sensor_write_details, "Confirming Configuration status to Backend Success", 'Device Number : '+devNumber.current);
-    //             getTotalPets();
-    //         } else {
-    //             createPopups("Unable to Save the Wi-Fi details. Please try again.",'Alert',true);
-    //             isLoadingdRef.current = 0;
-    //             firebaseHelper.logEvent(firebaseHelper.event_sensor_write_details_api_fail, firebaseHelper.screen_sensor_write_details, "Confirming Configuration status to Backend Failed", 'Device Number : '+devNumber.current);
-    //             set_setupSuccess('failed');
-    //             set_loaderMsg('YOUR SENSOR SETUP IS UNSUCCESSFUL');
-    //         }           
-            
-    //       }
-    
-    //       if(sensorStatusError) {
-    //         createPopups("Unable to Save the Wi-Fi details. Please try again.",'Alert',true);
-    //         set_isSensorAwaiting(false);
-    //         clearTimeout(timerId);
-    //         isLoadingdRef.current = 0;
-    //         firebaseHelper.logEvent(firebaseHelper.event_sensor_write_details_api_fail, firebaseHelper.screen_sensor_write_details, "Confirming Configuration status to Backend Failes : "+sensorStatusError, 'Device Number : '+devNumber.current);
-    //       }
-    
-    // }, [sensorStatusData, sensorStatusError, sensorStatusLoading]);
-
-    // useEffect(() => {
-
-    //     if (getPatientInfoData && getPatientInfoData.SensorInfo.result) {
-    //       firebaseHelper.logEvent(firebaseHelper.event_sensor_write_details_getPets_api_success, firebaseHelper.screen_sensor_write_details, "Getting Pets from API Success", '');
-    //         setDefaultPetAfterSetup(getPatientInfoData.SensorInfo.result, defaultPetSensor.current.petID);
-    //         set_setupSuccess('success');
-    //         set_loaderMsg('YOUR SENSOR SETUP IS SUCCESSFUL');        
-    //     }
-  
-    //     if(getPatientInfoError){
-    //       firebaseHelper.logEvent(firebaseHelper.event_sensor_write_details_getPets_api_fail, firebaseHelper.screen_sensor_write_details, "Getting Pets from API Failed", 'error : '+getPatientInfoError);
-    //     }
-  
-    // }, [getPatientInfoLoading, getPatientInfoError, getPatientInfoData]);
+    }, [route.params?.wifiName,route.params?.wifiPsd,route.params?.isFromScreen]);
 
     useInterval(() => {
         setDelay(null);
@@ -167,15 +125,46 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
 
     const getDefaultPet = async () => {
 
-        let defPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
+        // let defPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
         let savedConfiguredWIFIArray = await DataStorageLocal.getDataFromAsync(Constant.CONFIGURED_WIFI_LIST);
         savedConfiguredWIFIArray = JSON.parse(savedConfiguredWIFIArray);
-        set_defaultPet(JSON.parse(defPet));
-        defaultPetSensor.current = JSON.parse(defPet);
+        // set_defaultPet(JSON.parse(defPet));
+        // defaultPetSensor.current = JSON.parse(defPet);
+        let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+        configObj = JSON.parse(configObj);
+        if(configObj) {
+
+          isReplaceSensor.current = configObj.isReplaceSensor;
+
+          if(configObj.isReplaceSensor === 1) {
+            set_setupStatus(false);
+          } else {
+            set_setupStatus(configObj.isDeviceSetupDone);
+          }
+
+          // if(configObj.isReplaceSensor === 1) {
+
+            set_configurePet(configObj.pObj);
+            configPetSensor.current = configObj.pObj;
+            // set_setupStatus(false);
+            devNumber.current = configObj.configDeviceNo;
+            set_sensorNumber(configObj.configDeviceNo)
+
+        // } else {
+
+        //   set_configurePet(configObj.pObj);
+        //   configPetSensor.current = configObj.pObj;
+        //   set_setupStatus(configObj.isDeviceSetupDone);
+        //   devNumber.current = configObj.configDeviceNo;
+        //   set_sensorNumber(configObj.configDeviceNo)
+
+        // }
+      }
 
     };
 
     const getSensorType = async () => {
+
       let sensorType1 = await DataStorageLocal.getDataFromAsync(Constant.SENSOR_TYPE_CONFIGURATION);
       if(sensorType1){
         set_sensorType(sensorType1);
@@ -199,6 +188,7 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
 
     ////// Step by step modes writing to sensor //////
     const updateSensorMode = () => {
+      
         let nextMode = sensorModeVal.current;
         switch (sensorModeVal.current) {
         case SensorMode.GET_WIFI_LIST:
@@ -232,37 +222,35 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
     };
 
     const updateLoaderMsg = (mode) => {
-        set_setupSuccess('pending');
-        if(mode==='writeWifiService'){
-          set_loaderMsg('Initiating the configuration process ');
-        }else if(mode==='writeWifiName'){
-          set_loaderMsg('Writing Wi-Fi SSID to the sensor');
-        }else if(mode==='writeWifiPassword'){
-          set_loaderMsg('Writing Wi-Fi password to the sensor');
-        }else if(mode==='writeWifiSecurity' || mode==='forceSync'){
-          set_loaderMsg('Finishing setup');
-        }else if(mode==='eventlog'){
-          set_loaderMsg('Awaiting configuration confirmation from the sensor');
-          dataSyncMsgChange();
-        }       
+      set_setupSuccess('pending');
+      if(mode==='writeWifiService'){
+        set_loaderMsg('Initiating the configuration process ');
+      }else if(mode==='writeWifiName'){
+        set_loaderMsg('Writing Wi-Fi SSID to the sensor');
+      }else if(mode==='writeWifiPassword'){
+        set_loaderMsg('Writing Wi-Fi password to the sensor');
+      }else if(mode==='writeWifiSecurity' || mode==='forceSync'){
+        set_loaderMsg('Finishing setup');
+      }else if(mode==='eventlog'){
+        set_loaderMsg('Awaiting configuration confirmation from the sensor');
+        // dataSyncMsgChange();
+      }       
     };
 
     const updateSensorRequest = async () => {
 
       updateLoaderMsg(sensorModeVal.current);
-        await SensorHandler.getInstance().stopScanProcess(true);
+      await SensorHandler.getInstance().stopScanProcess(true);
 
         switch (sensorModeVal.current) {
 
           case SensorMode.WRITE_WIFI_SERVICE:
-
             firebaseHelper.logEvent(firebaseHelper.event_sensor_aglCmas_write_sequence, firebaseHelper.screen_sensor_write_details, "Writing device URL to Sensor : "+Environment.deviceConnectUrl, 'Device Number : '+devNumber.current);           
             const url = stringToBytes(Environment.deviceConnectUrl);
             requestWriteSensorHandler(bleUUID.WIFI_SERVICE,bleUUID.AGL_SVRNAME_CHAR,url);
             break;
 
           case SensorMode.WRITE_WIFI_NAME:
-
             firebaseHelper.logEvent(firebaseHelper.event_sensor_aglCmas_write_sequence, firebaseHelper.screen_sensor_write_details, "Writing SSID to Sensor : "+ssid, 'Device Number : '+devNumber.current);           
             const ssid = stringToBytes(wifiSSID.current);
             requestWriteSensorHandler(bleUUID.WIFI_SERVICE,bleUUID.WIFI_SSID_CHAR,ssid);    
@@ -275,14 +263,12 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
             break;
 
           case SensorMode.WRITE_SECURITY:
-
             firebaseHelper.logEvent(firebaseHelper.event_sensor_aglCmas_write_sequence, firebaseHelper.screen_sensor_write_details, "Writing Security Wap to Sensor : 1", 'Device Number : '+devNumber.current);           
             const wep = [1];//this.state.isEncrypt ? [1] : [2];
             requestWriteSensorHandler(bleUUID.WIFI_SERVICE,bleUUID.WIFI_SECT_CHAR,wep);
             break;
 
           case SensorMode.FORCE_SYNC:
-
             firebaseHelper.logEvent(firebaseHelper.event_sensor_aglCmas_write_sequence, firebaseHelper.screen_sensor_write_details, "Initiating Force sync Command : 1", 'Device Number : '+devNumber.current);           
             const writeVal = [1];
             requestWriteSensorHandler(bleUUID.COMM_SERVICE,bleUUID.COMMAND_CHAR,writeVal);
@@ -314,44 +300,46 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
     };
 
     //// Reads data from sensor after writing writeVal /////////
-    const requestReadSensorHandler = (serviceId, characterId) => {
+    const requestReadSensorHandler = async (serviceId, characterId) => {
 
-        SensorHandler.getInstance().readDataFromSensor(serviceId,characterId,({ data, dissconnectError, error }) => {
+      SensorHandler.getInstance().readDataFromSensor(serviceId,characterId,({ data, dissconnectError, error }) => {
+        if (data) {
 
-            if (data) {
+          set_isLoading(false);  
+          set_retryCount(0);
+          sensorModeVal.current = SensorMode.IDEAL_STATE;
+          const buffer = Buffer.from(data.sensorData);
+          const eventLogType = buffer.readUInt8(0, true);
+          firebaseHelper.logEvent(firebaseHelper.event_sensor_aglCmas_eventLog, firebaseHelper.screen_sensor_write_details, "Event Log : "+eventLogType, 'Device Number : '+devNumber.current);           
+          if (eventLogType == 0) {
 
-                set_isLoading(false);  
-                set_retryCount(0);
-                sensorModeVal.current = SensorMode.IDEAL_STATE;
-                const buffer = Buffer.from(data.sensorData);
-                const eventLogType = buffer.readUInt8(0, true);
-                firebaseHelper.logEvent(firebaseHelper.event_sensor_aglCmas_eventLog, firebaseHelper.screen_sensor_write_details, "Event Log : "+eventLogType, 'Device Number : '+devNumber.current);           
-            if (eventLogType == 0) {
-                clearTimeout(timerId);
-                saveSensorStausToBackend();
+            clearTimeout(timerId);
+            updateToBackendSStatus();
+                
+          } else {
+            set_isSensorAwaiting(false);
+            isLoadingdRef.current = 0;
+            clearTimeout(timerId);
+            if (eventLogType == 2) {
+
+              createPopups(Constant.SENSOR_FAIL_2,Constant.ALERT_DEFAULT_TITLE,true);
+
+            } else if (eventLogType == 3) {
+
+              createPopups(Constant.SENSOR_FAIL_3,Constant.ALERT_DEFAULT_TITLE,true);
+
+            } else if (eventLogType == 4) {
+
+              createPopups(Constant.SENSOR_FAIL_4,Constant.ALERT_DEFAULT_TITLE,true);
+
             } else {
-                set_isSensorAwaiting(false);
-                isLoadingdRef.current = 0;
-                clearTimeout(timerId);
-                if (eventLogType == 2) {
 
-                    createPopups(Constant.SENSOR_FAIL_2,Constant.ALERT_DEFAULT_TITLE,true);
+              updateToBackendSStatus();
 
-                } else if (eventLogType == 3) {
-
-                    createPopups(Constant.SENSOR_FAIL_3,Constant.ALERT_DEFAULT_TITLE,true);
-
-                } else if (eventLogType == 4) {
-
-                    createPopups(Constant.SENSOR_FAIL_4,Constant.ALERT_DEFAULT_TITLE,true);
-
-                } else {
-
-                    saveSensorStausToBackend();
-
-                }
-              }
+            }
+          }
             } else if (error) {
+
                 if (retryCount < maxRetryChances) {
                     set_retryCount(retryCount + 1);
                     updateSensorRequest();
@@ -362,7 +350,6 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
                 }
 
             } else if (dissconnectError){
-
                 if(retryCount < maxRetryChances){
                     set_retryCount(retryCount  + 1);
                     setDelay(5000);
@@ -388,7 +375,8 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
       
       let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
       SensorHandler.getInstance().dissconnectSensor();  
-      if(defaultPetSensor.current.devices[parseInt(sensorIndex)].isDeviceSetupDone){   
+      // if(defaultPetSensor.current.devices[parseInt(sensorIndex)].isDeviceSetupDone){
+      if(setupStatus){    
         firebaseHelper.logEvent(firebaseHelper.event_sensor_write_details_navi, firebaseHelper.screen_sensor_write_details, "User clicked on Next button to navigate to DashBoardService Page", 'Configuration Status : Reconfigured the sensor');           
         navigation.navigate('DashBoardService');
       } else {
@@ -403,6 +391,12 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
       if(isLoadingdRef.current === 0 && popIdRef.current === 0){
         firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_sensor_write_details, "User clicked on back button to navigate to SensorWiFiListComponent Page", '');
         await SensorHandler.getInstance().stopScanProcess(false);
+        
+        if(sensorType === 'HPN1Sensor'){
+          await SensorHandler.getInstance().dissconnectHPN1Sensor();
+        } else {
+          await SensorHandler.getInstance().dissconnectSensor();
+        }
         if(isFromScreen.current === 'manual'){
           navigation.navigate('ManualNetworkComponent');
         } else {
@@ -599,33 +593,26 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
       }
     };
 
-    const writeWIFIConformationToHPN1Sensor = ({ data, error }) => {
+    const writeWIFIConformationToHPN1Sensor = async ({ data, error }) => {
       // all values are to be printed here
       //////// Checking the values after confirmation /////////////
       if (data) {
         //show setup success/////////////////////eeeeeeeeeesssssss/////////////
         set_loaderMsg('Awaiting configuration confirmation from the sensor');
-        dataSyncMsgChange();
+        updateToBackendSStatus();
+        // dataSyncMsgChange();
         saveHPN1SSIDCount();
-        saveSensorStausToBackend();
-
-        // set_isSensorAwaiting(false);
-        // isLoadingdRef.current = 0;
-        // let command = [0];
-        // SensorHandler.getInstance().writeDataToSensor(bleUUID.HPN1_WIFI_COMMAND_SERVICE,bleUUID.HPN1_WIFI_ENTRY_STATUS,command,getConfirmationWIFI);
-        // SensorHandler.getInstance().readDataFromSensor(bleUUID.HPN1_WIFI_COMMAND_SERVICE,bleUUID.HPN1_WIFI_ENTRY_STATUS,getConfirmationWIFI);
 
       } else {
         ////////////Add popup when failed to write Confirmation command //////////////
         set_isSensorAwaiting(false);
         isLoadingdRef.current = 0;
         firebaseHelper.logEvent(firebaseHelper.event_sensor_HPN1_write_details_confirm_fail, firebaseHelper.screen_sensor_write_details, "Writing Command 1 to confirm SSID, password and security failed : "+error, 'Device Number : '+devNumber.current);
-        createPopups("Unable to Save the Wi-Fi details. Please ensure the sensor is charging and try again.",'Alert',true);
+        // createPopups("Unable to Save the Wi-Fi details. Please ensure the sensor is charging and try again.",'Alert',true);
       }
     };
 
     const dataSyncMsgChange = () => {
-
       timerId = setTimeout( () => {
         set_isSensorAwaiting(true);
       },60000);
@@ -650,19 +637,37 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
         set_popUpTitle(undefined);  
     };
 
-    const saveSensorStausToBackend = async () => {
+    const updateToBackendSStatus = async () => {
 
-      await SensorHandler.getInstance().stopScanProcess(false);
       let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
       let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-      let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
+      let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+      configObj = JSON.parse(configObj);
+      let newDate = moment(new Date()).format("YYYY-MM-DD")
+      if(configObj.isReplaceSensor === 1) {
+        saveReplaceSensorStausToBackend(clientId,token,configPetSensor.current.petID,configObj.petItemObj.deviceNumber, wifiSSID.current,newDate,configObj.configDeviceModel,configObj.configDeviceNo);
+      } else {
+        saveSensorStausToBackend(clientId,token,configPetSensor.current.petID,devNumber.current, wifiSSID.current);
+      }
+
+    };
+
+    const saveSensorStausToBackend = async (clientId,token,petID,devNumber, wifiSSID) => {
+
+      await SensorHandler.getInstance().stopScanProcess(false);
+      if(sensorType === 'HPN1Sensor'){
+        await SensorHandler.getInstance().dissconnectHPN1Sensor();
+      } else {
+        await SensorHandler.getInstance().dissconnectSensor();
+      }
+      // await SensorHandler.getInstance().clearPeriID();
       firebaseHelper.logEvent(firebaseHelper.event_sensor_write_details_api, firebaseHelper.screen_sensor_write_details, "Initiating Api to confirm Configuration status to backend", 'Device Number : '+devNumber.current);
       let json = {
         ClientID: clientId.toString(),
-        PatientID: defaultPetSensor.current.petID.toString(),
+        PatientID: petID.toString(),
         SetupStatus: "Setup Success",
-        "DeviceNumber":defaultPetSensor.current.devices[parseInt(sensorIndex)].deviceNumber.toString(),
-        SSIDList: wifiSSID.current,
+        "DeviceNumber":devNumber.toString(),
+        SSIDList: wifiSSID,
       };
       updateSensorSetupStatus(json,token)
 
@@ -672,7 +677,6 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
 
       set_isSensorAwaiting(false);
       let updateSSServiceObj = await ServiceCalls.updateSensorSetupStatus(json,token); 
-      
       set_isSensorAwaiting(false);
 
       if(updateSSServiceObj && updateSSServiceObj.logoutData){
@@ -710,6 +714,69 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
 
     };
 
+    const saveReplaceSensorStausToBackend = async (clientId,token,petID,devNumber, wifiSSID,newDate,devModel,newDeviceNo) => {
+
+      await SensorHandler.getInstance().stopScanProcess(false);
+
+      if(devModel === 'HPN1') {
+        await SensorHandler.getInstance().dissconnectHPN1Sensor();
+      }
+      firebaseHelper.logEvent(firebaseHelper.event_sensor_write_details_api, firebaseHelper.screen_sensor_write_details, "Initiating Api to confirm Configuration status to backend", 'Device Number : '+devNumber.current);
+      let json = {
+        "petId": petID.toString(),
+        "petParentId": clientId.toString(),
+        "deviceNumber": newDeviceNo.toString(),
+        "deviceType": "Sensor" + "###" + devModel,
+        "assignedDate": newDate,
+        "setupStatus": "Setup Success",
+        "ssidList": wifiSSID,
+        "createdBy": 0,
+        "oldDeviceNumber" : devNumber.toString(),
+      };
+      updateReplaceSensorSetupStatus(json,token)
+
+    };
+
+    const updateReplaceSensorSetupStatus = async (json,token) => {
+
+      set_isSensorAwaiting(false);
+      let updateSSServiceObj = await ServiceCalls.updateReplaceSensorSetupStatus(json,token); 
+      set_isSensorAwaiting(false);
+
+      if(updateSSServiceObj && updateSSServiceObj.logoutData){
+        firebaseHelper.logEvent(firebaseHelper.event_sensor_Replace_Update_details_api_fail, firebaseHelper.screen_sensor_write_details, "Replace Sensor To Pet Backend Failed - Logged in another device", 'Device Number : '+devNumber.current);
+        AuthoriseCheck.authoriseCheck();
+        navigation.navigate('WelcomeComponent');
+        return;
+      }
+        
+      if(updateSSServiceObj && !updateSSServiceObj.isInternet){
+        firebaseHelper.logEvent(firebaseHelper.event_sensor_Replace_Update_details_api_fail, firebaseHelper.screen_sensor_write_details, "Replace Sensor To Pet Backend Failed : No Internet", 'Device Number : '+devNumber.current);
+        createPopups(Constant.NETWORK_STATUS,Constant.ALERT_NETWORK,true);
+        return;
+      }
+
+      if(updateSSServiceObj && updateSSServiceObj.statusData){
+        getTotalPets();
+      } else {
+        createPopups("Unable to Save the Wi-Fi details. Please try again.",'Alert',true);
+        isLoadingdRef.current = 0;
+        firebaseHelper.logEvent(firebaseHelper.event_sensor_Replace_Update_details_api_fail, firebaseHelper.screen_sensor_write_details, "Replace Sensor To Pet Backend Failed : service false", 'Device Number : '+devNumber.current);
+        set_setupSuccess('failed');
+        set_loaderMsg('YOUR SENSOR SETUP IS UNSUCCESSFUL');
+      }
+
+      if(updateSSServiceObj && updateSSServiceObj.error) {
+
+        createPopups("Unable to Save the Wi-Fi details. Please try again.",'Alert',true);
+        clearTimeout(timerId);
+        isLoadingdRef.current = 0;
+        firebaseHelper.logEvent(firebaseHelper.event_sensor_Replace_Update_details_api_fail, firebaseHelper.screen_sensor_write_details, "Replace Sensor To Pet Backend Failes : error", 'Device Number : '+devNumber.current);
+
+      }
+
+    };
+
     const getTotalPets = async () => {
 
         let clientID = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
@@ -719,7 +786,6 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
         let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 
         let getPetsServiceObj = await ServiceCalls.getPetParentPets(clientID,token);
-
         set_isLoading(false);
         isLoadingdRef.current = 0;
         clearTimeout(timerId);    
@@ -742,7 +808,8 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
 
         if(getPetsServiceObj && getPetsServiceObj.statusData && getPetsServiceObj.responseData){
           firebaseHelper.logEvent(firebaseHelper.event_sensor_write_details_getPets_api_success, firebaseHelper.screen_sensor_write_details, "Getting Pets from API Success", '');            
-          setDefaultPetAfterSetup(getPetsServiceObj.responseData, defaultPetSensor.current.petID);
+          // setDefaultPetAfterSetup(getPetsServiceObj.responseData, defaultPetSensor.current.petID);
+          setDefaultPetAfterSetup(getPetsServiceObj.responseData, configPetSensor.current.petID);
         } else {
           firebaseHelper.logEvent(firebaseHelper.event_sensor_write_details_getPets_api_success, firebaseHelper.screen_sensor_write_details, "Getting Pets from API fail", ' : ');                   
         }
@@ -766,8 +833,15 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
 
     const leftButtonAction = async () => {
 
+      
         firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_sensor_write_details, "User clicked on Configure another SSID button and navigated to SensorWiFiListComponent Page", '');
         await SensorHandler.getInstance().stopScanProcess(false);
+        if(sensorType === 'HPN1Sensor'){
+          await SensorHandler.getInstance().dissconnectHPN1Sensor();
+        } else {
+          await SensorHandler.getInstance().dissconnectSensor();
+        }
+
         // if(isFromScreen.current === 'manual'){
         //   navigation.navigate('ManualNetworkComponent');
         // } else {
@@ -807,11 +881,13 @@ return (
             popUpMessage = {popUpMessage}
             popUpTitle = {popUpTitle}
             isPopUp = {isPopUp}
-            defaultpet = {defaultpet}
+            // defaultpet = {defaultpet}
             setupSuccess = {setupSuccess}
             sensorType = {sensorType}
             hpn1ConfigWIFICount = {hpn1ConfigWIFICount}
             isSensorAwaiting = {isSensorAwaiting}
+            deviceNumber = {devNumber.current}
+            sensorNumber = {sensorNumber}
             backBtnAction = {backBtnAction}
             popOkBtnAction = {popOkBtnAction}
             nextButtonAction = {nextButtonAction}

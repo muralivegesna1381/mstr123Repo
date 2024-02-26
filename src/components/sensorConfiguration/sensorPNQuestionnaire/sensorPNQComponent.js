@@ -99,11 +99,12 @@ const SensorPNQComponent = ({navigation, route, ...props }) => {
     const getFeedbackQuestionnaire = async (pId) => {
 
         let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let petObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        petObj = JSON.parse(petObj);
+        // let petObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
+        // petObj = JSON.parse(petObj);
+        let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+        configObj = JSON.parse(configObj);
 
-        let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
-        let getFQuestServiceObj = await ServiceCalls.getFeedbackQuestionnaireByPetId(pId,petObj.devices[sensorIndex].deviceModel,token);
+        let getFQuestServiceObj = await ServiceCalls.getFeedbackQuestionnaireByPetId(configObj.petID,configObj.configDeviceModel,token);
         set_isLoading(false);
         isLoadingdRef.current = 0;
 
@@ -141,16 +142,17 @@ const SensorPNQComponent = ({navigation, route, ...props }) => {
 
         let sobPets = await DataStorageLocal.getDataFromAsync(Constant.SAVE_SOB_PETS); 
         sobPets = JSON.parse(sobPets);
-        let defaultPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        defaultPet = JSON.parse(defaultPet);
+
+        let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+        configObj = JSON.parse(configObj);
 
         if(sobPets){
             await DataStorageLocal.removeDataFromAsync(Constant.SAVE_SOB_PETS); 
         }
         firebaseHelper.logEvent(firebaseHelper.event_sensor_pnq_next_btn_action, firebaseHelper.screen_sensor_pn_noti, "User clicked on Next button to navigate to Checkin Questionnaire Page", '');
         if(obJCheckin && Object.keys(obJCheckin).length !== 0){
-            // navigation.navigate('CheckinQuestionnaireComponent',{loginPets:sobPets, obJCheckin : obJCheckin});
-            navigation.navigate('CheckinQuestionnaireComponent',{petObj:defaultPet, questionObject : obJCheckin,loginPets:sobPets});
+            // navigation.navigate('CheckinQuestionnaireComponent',{petObj:defaultPet, questionObject : obJCheckin,loginPets:sobPets});
+            navigation.navigate('CheckinQuestionnaireComponent',{petObj:configObj.pObj, questionObject : obJCheckin,loginPets:sobPets});
         } else {
             navigation.navigate('DashBoardService',{loginPets:sobPets});
         }

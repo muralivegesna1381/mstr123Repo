@@ -100,6 +100,28 @@ export const screen_pet_address = 'Pet_Address_Page';
 export const screen_SOB_petLocation_selection_screen = 'SOB_Pet_Location_Select_Page';
 export const screen_petLocation_selection_screen = 'Pet_Address_Edit_Confirm_Page';
 export const screen_petAddress_EditComponent_screen = 'Pet_Address_Edit_Page';
+export const screen_add_observations_Category = 'Obs_Category_Page';
+export const screen_PP_Food_Units = 'PP_Food_Units_Accounts_Page';
+export const screen_behavior_Visualization = 'Behavior_Visualization_Page';
+export const screen_D_Tutorial_Units = 'Device_Tutorial_Page';
+export const screen_Goal_Inst = 'Goal_Instructions_Page';
+export const screen_Goal_Set = 'Goal_Set_Page';
+export const screen_All_Devices_Set = 'All_Devices_Page';
+export const screen_New_Replace_Sensor_Req = 'New_Replace_Sensor_Req_Page';
+export const screen_Replace_Sensor = 'Replace_Sensor_Page';
+export const screen_Replace_Sync_Sensor = 'Replace_Sync_Sensor_Page';
+export const screen_Food_Pet_Sel = 'Food_Pet_Selection_Page';
+export const screen_Food_Intake = 'Food_Intake_Page';
+export const screen_Food_Intake_List_Sel = 'Food_Intake_List_Page';
+export const screen_capture_bfi = 'capture_bfi_Page';
+export const screen_bfi_pet_information = 'bfi_pet_information_Page';
+export const screen_bfi_pet_list = 'bfi_pet_list_Page';
+export const screen_bfi_instrutions = 'bfi_instructions_Page';
+export const screen_bfi_review = 'bfi_review_Page';
+export const screen_submitted_scores = 'bfi_submitted_score_Page';
+export const screen_bfi_scoring_Instructions = 'bfi_scoring_instructions_Page';
+export const screen_bfi_pet_list_scoring = 'bfi_pet_list_scoring_Page';
+export const screen_bfi_submitted_images = 'bfi_submitted_images_Page';
 
 /////////////////////////// Events //////////////////////////
 
@@ -171,6 +193,10 @@ export const event_change_phone = 'Change_Phone_Trigr';
 export const event_change_phone_api_success = 'Change_Phone_Api_Success';
 export const event_change_phone_api_fail = 'Change_Phone_Api_Fail';
 
+/////////////////////////// Accounts Food Units Page //////////////////////////
+export const event_get_foodUnits_api_fail = 'Get_Food_Units_Api_Fail';
+export const event_update_foodUnits_api_fail = 'Update_Food_Units_Api_Fail';
+
 /////////////////////////// Dashboard Page //////////////////////////
 export const event_dashboard_timer_widget = 'Dboard_Timer_Widget_Trigr';
 export const event_dashboard_Android_bk = 'Dboard_Android_Back_Btn_Trigr';
@@ -205,6 +231,14 @@ export const event_dashboard_getMeterials_success = 'Dboard_Get_Meterials_Api_Su
 export const event_dashboard_getMeterials_fail = 'Dboard_Get_Meterials_Api_Fail';
 export const event_dashboard_defaultPet_Status = 'Dboard_Get_default_pet_status';
 export const event_dashboard_CaptureImages_selection = 'Dboard_Cap_Images_Btn_Trigr';
+export const event_dashboard_Features_selection = 'Dboard_Features_Btn_Trigr';
+export const event_dashboard_Food_Rec = 'Dboard_Food_Rec_Btn_Trigr';
+export const event_dashboard_Goal_Set = 'Dboard_Goal_Set_Btn_Trigr';
+export const event_dashboard_Goal_Vis = 'Dboard_Goal_Visualization_Btn_Trigr';
+export const event_dBoard_getVisual_fail = 'Dboard_GetVisualization_Api_Fail';
+export const event_dBoard_getPet_Wgt_History_fail = 'Dboard_Get_Pet_Wgt_Hist_Api_Fail';
+export const event_dBoard_Get_Permi_Pets_fail = 'Dboard_Get_Pet_Prmsions_Api_Fail';
+export const event_dBoard_Food_Intake_fail = 'Dboard_Get_Food_Intake_Api_Fail';
 
 /////////////////////////// Timer Main Page //////////////////////////
 export const event_timer_go_action = 'Timer_Main_Go_Btn_Trig';
@@ -361,6 +395,7 @@ export const event_sensor_write_details_api_fail = 'Sensor_Wrte_Dtls_Api_Fail';
 export const event_sensor_write_details_getPets_api = 'Sensor_Write_Dtls_GPets_Api';
 export const event_sensor_write_details_getPets_api_success = 'Sensor_Wrte_Dtls_GPets_Api_Success';
 export const event_sensor_write_details_getPets_api_fail = 'Sensor_Wrte_Dtls_GPets_Api_Fail';
+export const event_sensor_Replace_Update_details_api_fail = 'Sensor_Update_Replace_Dtls_Api_Fail';
 
 //Support page
 export const event_support_menu_trigger = 'Support_Page_Menu_Trigr';
@@ -511,17 +546,33 @@ export const event_score_submit_screen_entered = 'score_submit_screen_entered';
 export const event_score_submit_btn_clicked = 'score_submit_btn_clicked';
 export const event_bfi_score_submit_api = 'bfi_score_submit_api';
 export const event_getscore_ids_api = 'getscore_ids_api';
-export const screen_submit_bfiScore = 'submit_bfiScore';
+export const screen_submit_bfiScore = 'submit_bfiScore_Page';
 
-export const screen_capture_bfi = 'capture_bfi';
 export const event_add_pet_click = 'add_pet_click';
+export const event_existing_pet_click = 'existing_pet_click';
 export const event_existing_pet_clicked = 'existing_pet_clicked';
-export const event_capture_bfi_submitted = 'capture_bfi_submitted';
-export const event_capture_bfi_submitted_api = 'capture_bfi_submitted_api';
+export const event_capture_bfi_submit_click = 'capture_bfi_Btn_Action';
+export const event_capture_bfi_submit_api = 'capture_bfi_imgs_submit_api';
 export const event_get_pets_api = 'get_pets_api';
-export const event_get_capture_image_pos = 'get_capture_image_positions';
+export const event_get_capture_image_pos_api = 'get_capture_image_positions_api';
 export const event_submit_capture_bfi = 'submit_capture_bfi';
-export const event_image_classification_api_fails = 'image_classification_api_fails';
+export const event_image_classification_api = 'image_classification_api';
+
+export const event_get_Support_Met_api_fail = 'Get_Support_Meterials_Api_Fail';
+export const event_save_GoalSet_api_fail = 'Save_Goal_Set_Api_Fail';
+export const event_save_Food_Inatke_api_fail = 'SaveUpdate_Food_Intake_Api_Fail';
+export const event_Get_Food_Inatke_Config_api_fail = 'Get_Food_Intake_Config_Api_Fail';
+export const event_Get_Food_Inatke_By_Id_api_fail = 'Get_Food_Intake_By_Id_Api_Fail';
+export const event_Get_Food_Inatke_List_api_fail = 'Get_Food_Intake_List_Api_Fail';
+export const event_Food_Inatke_Screen = 'Food_Intake_List_Screen';
+
+export const event_instructions_api = 'getPetBfiInstructions_api';
+export const event_score_instructions_api = 'getBfiImageScores_api';
+export const event_getPetBfiImages_api = 'getPetBfiImages_api';
+export const event_getBfiPets_api = 'getBfiPets_api';
+
+
+
 
 
 export async function setUserId(userId) {

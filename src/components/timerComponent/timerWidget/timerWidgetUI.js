@@ -4,6 +4,8 @@ import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-nati
 import fonts from '../../../utils/commonStyles/fonts'
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
+import * as Constant from "./../../../utils/constants/constant";
+import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 
 const  TimerWidgetUI = ({route, ...props }) => {
 
@@ -11,6 +13,9 @@ const  TimerWidgetUI = ({route, ...props }) => {
     const [popUpMessage, set_popUpMessage] = useState(undefined);
     const [petName, set_petName] = useState(undefined);
     const [activityText, set_activityText] = useState(undefined);
+    const [showSearch, set_showSearch] = useState(false);
+    const [adjustTimer, set_adjustTimer] = useState('');
+    const [adjustTimerDev, set_adjustTimerDev] = useState('');
 
     useEffect(() => {
         set_isPopUp(props.isPopUp);
@@ -20,11 +25,48 @@ const  TimerWidgetUI = ({route, ...props }) => {
     }, [props.isPopUp,props.popUpMessage,props.petName,props.activityText]);
     
     useEffect(() => {
+        getUserMenu();
     }, [props.isTimerPaused,props.isTimerVisible]);
 
     useEffect(() => {
 
     }, [props.isPopUp,props.popUpMessage,props.isPopLftBtn,props.popRightBtnTitle,props.poplftBtnTitle,props.popAlert]);
+
+    useEffect(() => {
+        checkTimerDimentions();
+        checkTimerDimentionsDevice();
+    }, [props.seconds]);
+
+    const getUserMenu = async () => {
+        let userRoleDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
+        userRoleDetails = JSON.parse(userRoleDetails);
+        if(userRoleDetails && (userRoleDetails.RoleName === "Hill's Vet Technician")) {
+            set_showSearch(true);
+        } else {
+            set_showSearch(false);
+        }
+    };
+
+    const checkTimerDimentions = async () => {
+
+        let adjust = await DataStorageLocal.getDataFromAsync(Constant.TIMER_DIMENTIONS);
+        if(adjust && adjust === 'adjust') {
+            set_adjustTimer('adjust')
+        } else {
+            set_adjustTimer('')
+        }
+        
+    }
+
+    const checkTimerDimentionsDevice = async () => {
+
+        let adjust = await DataStorageLocal.getDataFromAsync(Constant.TIMER_DIMENTIONS_DEVICE);
+        if(adjust === "deviceStat" ){
+            set_adjustTimerDev(adjust)
+        } else {
+            set_adjustTimerDev('')
+        }
+    }
 
     const stopBtnAction = () => {
         props.stopBtnAction();
@@ -58,11 +100,13 @@ const  TimerWidgetUI = ({route, ...props }) => {
                 width: wp('100%'),
                 height: Platform.isPad ? hp('14%') : hp('12%'),
                 bottom: hp('45%'),
-                top:hp('20.5%'),}}>
+                // top:showSearch ? hp('27%') : (adjustTimer === 'adjust' ? (Platform.isPad ? hp('27.0%') : (adjustTimerDev === 'deviceStat' ? hp('33%') : hp('26%'))) : (adjustTimerDev === 'deviceStat' ? hp('27.5%') : hp('20.5%'))),}}>
+                top:showSearch ? (adjustTimer === 'adjust' ? (adjustTimerDev === 'deviceStat' ? hp('39.5%') : hp('32.5%')) : (adjustTimerDev === 'deviceStat' ? hp('34%') : hp('27%'))) : (Platform.isPad ? (adjustTimer === 'adjust' ? (adjustTimerDev === 'deviceStat' ? hp('33%') : hp('26.0%')) : (adjustTimerDev === 'deviceStat' ? hp('27.5%') : hp('20.5%'))) : 
+                (adjustTimer === 'adjust' ? (adjustTimerDev === 'deviceStat' ? hp('33.0%') : hp('26.0%')) : (adjustTimerDev === 'deviceStat' ? hp('32.5.0%') : hp('20.5%'))))}}>
 
                 <View>
 
-                    <View style={{height: hp('3%'),alignItems: 'center',flexDirection:'row'}}>
+                    <View style={{height: hp('3%'),flexDirection:'row',marginTop: Platform.isPad ? hp('1%') : hp('0%')}}>
                         <Text style={styles.petTextStyle}>{petName}</Text>
                         <Text style={styles.petTextStyle}>{' : '}</Text>
                         <Text style={styles.petTextStyle}>{activityText}</Text>
@@ -82,19 +126,19 @@ const  TimerWidgetUI = ({route, ...props }) => {
 
                         <View style={{flexDirection:'row',flex:1}}>
                             <View>
-                                <TouchableOpacity style={[styles.btnsBckStyle,{backgroundColor:'#c91010'}]} onPress={() => {stopBtnAction()}}>
+                                <TouchableOpacity style={[styles.btnsBckStyle,{backgroundColor:'#c91010',width: Platform.isPad ? wp('10%') : wp('13%')}]} onPress={() => {stopBtnAction()}}>
                                     <Text style={[styles.btnTextStyle,{color:"white"}]}>{'STOP'}</Text>
                                 </TouchableOpacity>                               
                             </View>
 
                             <View>
-                                <TouchableOpacity style={[styles.btnsBckStyle]} onPress={() => {pauseBtnAction(props.isTimerPaused)}}>
+                                <TouchableOpacity style={[styles.btnsBckStyle,{width: Platform.isPad ? wp('10%') : wp('13%')}]} onPress={() => {pauseBtnAction(props.isTimerPaused)}}>
                                     <Text style={[styles.btnTextStyle,{color:"white"}]}>{!props.isTimerPaused ? 'PAUSE' : 'RESUME'}</Text>
                                 </TouchableOpacity>
                             </View>
 
                             <View>
-                                <TouchableOpacity style={[styles.btnsBckStyle,{backgroundColor:'#18cfac'}]} onPress={() => {timerLogsBtnAction()}}>
+                                <TouchableOpacity style={[styles.btnsBckStyle,{backgroundColor:'#18cfac',width: Platform.isPad ? wp('10%') : wp('13%')}]} onPress={() => {timerLogsBtnAction()}}>
                                     <Text style={[styles.btnTextStyle,{color:"white"}]}>{'TIMER LOGS'}</Text>
                                 </TouchableOpacity>                              
                             </View>
@@ -140,10 +184,10 @@ const  TimerWidgetUI = ({route, ...props }) => {
 
     timerTextViewStyle : {
         flexDirection:'row',
-        justifyContent:'center',
+        // justifyContent:'center',
         alignItems:'center',
         flex:1,
-        marginRight:wp('2%')
+        marginRight:wp('8%')
     },
 
     timerTextStyle : {

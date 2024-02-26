@@ -39,7 +39,12 @@
     <uses-permission-sdk-23 android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
     <!--    <uses-permission android:name="android.permission.VIBRATE" />-->
     <!--    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>-->
     <uses-permission
@@ -83,12 +88,12 @@
 
 
         <activity android:name="com.ahmedadeltito.photoeditor.PhotoEditorActivity" />
-<!--        <activity android:name="com.yalantis.ucrop.UCropActivity" />-->
+        <!--        <activity android:name="com.yalantis.ucrop.UCropActivity" />-->
 
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
-            tools:replace="android:theme"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:replace="android:theme" />
 
         <activity android:name=".ZendeskLaunchActivity"></activity>
 

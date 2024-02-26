@@ -23,6 +23,7 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
   const [date, set_Date] = useState(new Date());
   const [observationsArray, set_observationsArray] = useState([]);
   const [defauiltPetId, set_defauiltPetId] = useState(undefined);
+  const [isSearchDropdown, set_isSearchDropdown] = useState(undefined);
 
   let popIdRef = useRef(0);
   let isLoadingdRef = useRef(0);
@@ -58,6 +59,7 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
     return true;
   };
 
+  // Firebase traces
   const observationsSessionStart = async () => {
     trace_inObservationsList = await perf().startTrace('t_inObservationsList');
   };
@@ -66,6 +68,7 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
     await trace_inObservationsList.stop();
   };
 
+  // Fetches the Observation permitted pets
   const getObsPets = async () => {
 
     let obsPets = await DataStorageLocal.getDataFromAsync(Constant.ADD_OBSERVATIONS_PETS_ARRAY);
@@ -150,6 +153,7 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
    */
   const submitAction = async (value) => {
 
+    searchDropAction();
     let obsObj = {
       selectedPet : defaultPetObj, 
       fromScreen : 'obsList', 
@@ -163,7 +167,8 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
     if (petsArray && petsArray.length > 1) {
       navigation.navigate('AddOBSSelectPetComponent', { petsArray: petsArray, defaultPetObj: defaultPetObj });
     } else {
-      navigation.navigate('ObservationComponent');
+      // navigation.navigate('ObservationComponent');
+      navigation.navigate('CategorySelectComponent');
     }
 
   };
@@ -175,6 +180,7 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
     } 
   };
 
+  // Popup Actions
   const createPopup = (title,msg,isPop) => {
     set_popUpTitle(title);
     set_popUpMessage(msg);
@@ -198,9 +204,23 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
 
   // Navigates to view the selected observation record
   const selectObservationAction = async (item) => {
+    searchDropAction();
     firebaseHelper.logEvent(firebaseHelper.event_observations_view_btn, firebaseHelper.screen_observations, "User clicked on View Observation", '');
     await DataStorageLocal.removeDataFromAsync(Constant.DELETE_MEDIA_RECORDS);
     navigation.navigate('ViewObservationService', { obsObject: item });
+  };
+
+  const selectedSearchPetAction = (item) => {
+    getObsPets();
+  };
+
+  // Removes Dropdown while navigating to another screen
+  const searchDropAction = () => {
+    if(isSearchDropdown === false) {
+      set_isSearchDropdown(undefined);
+    } else {
+      set_isSearchDropdown(false);
+    }
   };
 
   return (
@@ -213,11 +233,13 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
       isLoading={isLoading}
       loaderMsg={loaderMsg}
       observationsArray={observationsArray}
+      isSearchDropdown = {isSearchDropdown}
       popOkBtnAction={popOkBtnAction}
       submitAction={submitAction}
       observationsPetSelection={observationsPetSelection}
       navigateToPrevious={navigateToPrevious}
       selectObservationAction={selectObservationAction}
+      selectedSearchPetAction = {selectedSearchPetAction}
     />
   );
 

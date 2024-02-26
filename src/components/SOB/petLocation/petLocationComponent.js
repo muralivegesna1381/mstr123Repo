@@ -174,7 +174,7 @@ const PetLocationComponent = ({ route, ...props }) => {
         if(isFromScreen === 'petEdit'){
             navigation.navigate('PetEditComponent');
         } else {
-            navigation.navigate('PetFeedingPreferencesComponentUI');
+            navigation.pop()
         }
         
     };

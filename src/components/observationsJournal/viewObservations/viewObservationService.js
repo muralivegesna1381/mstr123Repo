@@ -8,6 +8,7 @@ import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
+import { parse } from 'qs';
 
 const OBS_DELETE = 1;
 const OBS_EDIT = 2;
@@ -22,6 +23,7 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
   const [behavioursData, set_behavioursData] = useState(undefined);
   const [mediaArray, set_mediaArray] = useState([]);
   const [behItem, set_behItem] = useState([]);
+  const [isEdit, set_isEdit] = useState(undefined);
 
   const [isPopUp, set_isPopUp] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
@@ -42,13 +44,16 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
 
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     const focus = navigation.addListener("focus", () => {
+
       set_Date(new Date());
       firebaseHelper.reportScreen(firebaseHelper.screen_view_observations);
       firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_view_observations, "User in View Observation Screen", ''); 
       viewObservationsSessionStart();
+
       set_isLoading(true);
       isLoadingdRef.current = 1;
       behavioursAPIRequest();
+
     });
 
     const unsubscribe = navigation.addListener('blur', () => {
@@ -65,45 +70,8 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
   }, [navigation]);
 
   useEffect(() => {
-
     if(route.params?.obsObject){
-      set_obsObject(route.params?.obsObject);
-      behTypeId.current = route.params?.obsObject.behaviorId
-      let tempArray = [];
-      if(route.params?.obsObject.photos && route.params?.obsObject.photos.length>0){
-        for (let i = 0; i < route.params?.obsObject.photos.length; i++){
-
-          if(route.params?.obsObject.photos[i].filePath!==''){
-            let pObj = {
-              fileName: route.params?.obsObject.photos[i].fileName,
-              filePath: route.params?.obsObject.photos[i].filePath,
-              isDeleted: route.params?.obsObject.photos[i].isDeleted,
-              observationPhotoId:route.params?.obsObject.photos[i].observationPhotoId,
-              type:'image'
-            }
-            tempArray.push(pObj);
-          }
-               
-        }
-            
-      }
-
-      if(route.params?.obsObject.videos && route.params?.obsObject.videos.length>0){
-        for (let i = 0; i < route.params?.obsObject.videos.length; i++){
-          let pObj = {
-            videoName: route.params?.obsObject.videos[i].videoName,
-            videoUrl: route.params?.obsObject.videos[i].videoUrl,
-            isDeleted: route.params?.obsObject.videos[i].isDeleted,
-            observationVideoId: route.params?.obsObject.videos[i].observationVideoId,
-            type:'video',
-            videoThumbnailUrl:route.params?.obsObject.videos[i].videoThumbnailUrl
-            }
-          tempArray.push(pObj);
-        }
-      }
-
-      set_mediaArray(tempArray);
-      totalCount.current = tempArray.length;
+      prepareObservation(route.params?.obsObject);
     }
   }, [route.params?.obsObject]);
 
@@ -120,11 +88,65 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
     return true;
   };
 
+  const prepareObservation = (obsObject) => {
+
+    if(obsObject){
+
+      set_obsObject(obsObject);
+      behTypeId.current = obsObject.behaviorId
+      let tempArray = [];
+      if(obsObject.behaviorTypeId && (parseInt(obsObject.behaviorTypeId) === 3 || parseInt(obsObject.behaviorTypeId) === 4)) {
+        set_isEdit(true);
+      } else {
+        set_isEdit(false);
+      }
+
+      if(obsObject.photos && obsObject.photos.length>0){
+
+        for (let i = 0; i < obsObject.photos.length; i++){
+
+          if(obsObject.photos[i].filePath!==''){
+            let pObj = {
+              fileName: obsObject.photos[i].fileName,
+              filePath: obsObject.photos[i].filePath,
+              isDeleted: obsObject.photos[i].isDeleted,
+              observationPhotoId: obsObject.photos[i].observationPhotoId,
+              type:'image'
+            }
+            tempArray.push(pObj);
+          }
+               
+        }
+            
+      }
+
+      if(obsObject.videos && obsObject.videos.length>0){
+        for (let i = 0; i < obsObject.videos.length; i++){
+          let pObj = {
+            videoName: obsObject.videos[i].videoName,
+            videoUrl: obsObject.videos[i].videoUrl,
+            isDeleted: obsObject.videos[i].isDeleted,
+            observationVideoId: obsObject.videos[i].observationVideoId,
+            type:'video',
+            videoStartDate : obsObject.videos[i].videoStartDate,
+            videoEndDate : obsObject.videos[i].videoEndDate,
+            videoThumbnailUrl: obsObject.videos[i].videoThumbnailUrl
+            }
+          tempArray.push(pObj);
+        }
+      }
+
+      set_mediaArray(tempArray);
+      totalCount.current = tempArray.length;
+    }
+  }
+
   const behavioursAPIRequest = async () => {
     getDefaultData();
   };
 
   const getDefaultData = async () => {
+
     let defPet = await DataStorageLocal.getDataFromAsync(Constant.OBS_SELECTED_PET);
     defPet = JSON.parse(defPet);
     let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
@@ -322,11 +344,14 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
 
   const popOkBtnAction = async () => {
 
-    if(popupId===OBS_DELETE){
+    if(popupId === OBS_DELETE){
+
       set_isLoading(true);
       isLoadingdRef.current = 1;
       deleteObservationBcknd(obsObject.observationId,obsObject.petId);
-    } else if(popupId===OBS_EDIT){
+
+    } else if(popupId === OBS_EDIT){
+
       let defPet = await DataStorageLocal.getDataFromAsync(Constant.OBS_SELECTED_PET);
       defPet = JSON.parse(defPet);
 
@@ -359,7 +384,7 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
           }
 
         } 
-        if (obsObject.videos && obsObject.videos.length>0){
+        if (obsObject && obsObject.videos && obsObject.videos.length>0){
 
           for (let i = 0; i < obsObject.videos.length; i++){
 
@@ -368,14 +393,16 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
               let vidObj = {
                 'filePath':'',
                 'fbFilePath':obsObject.videos[i].videoUrl,
-                'fileName': obsObject.videos[i].videoName,
+                'fileName':obsObject.videos[i].videoName,//dateFile+"_#"+response.assets[i].fileName,
                 'observationVideoId' : obsObject.videos[i].observationVideoId,
                 'localThumbImg': obsObject.videos[i].videoThumbnailUrl,
                 'fileType':'video',
                 "isDeleted": 0,
                 "actualFbThumFile": obsObject.videos[i].videoThumbnailUrl,
-                'thumbFilePath':'',
-                'compressedFile':''
+                'thumbFilePath':obsObject.videos[i].videoThumbnailUrl,
+                'compressedFile':'',
+                "videoStartDate" : obsObject.videos[i].videoStartDate,
+                "videoEndDate" : obsObject.videos[i].videoEndDate,
               };
               tempArray.push(vidObj);
 
@@ -397,7 +424,8 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
         isPets : false,
         isEdit : true,
         behaviourItem : behItem, 
-        observationId : obsObject.observationId
+        observationId : obsObject.observationId,
+        ctgNameId : obsObject.behaviorTypeId === 3 ? 0 : 1
       }
 
       firebaseHelper.logEvent(firebaseHelper.event_edit_observation_Action, firebaseHelper.screen_view_observations, "User clicked on the Observation(iD) Edit button : "+obsObject.observationId, 'Pet Id : '+defPet.petID);
@@ -431,6 +459,7 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
       popUpMessage = {popUpMessage}
       popUpAlert = {popUpAlert}
       isPopUp = {isPopUp}
+      isEdit = {isEdit}
       navigateToPrevious = {navigateToPrevious}
       deleteButtonAction = {deleteButtonAction}
       viewAction = {viewAction}

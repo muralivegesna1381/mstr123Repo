@@ -12,12 +12,11 @@ let trace_inMenuScreen;
 
 const  MenuComponent = ({navigation, route, ...props }) => {
 
-  const [modularityArray, set_modularityArray] = useState(undefined);
   const [renderArray, set_renderArray] = useState();
   const [renderArrayFirstUser, set_renderArrayFirstUser] = useState(
     [
       {mobileAppConfigID : 0,title : 'Dashboard', iconImg : require('../../../assets/images/sideMenuImages/svg/Dashboard.svg'), nav : "DashBoardService"},     
-      {mobileAppConfigID : 6,title : 'Onboard Pet', iconImg : require('../../../assets/images/sideMenuImages/svg/Onboard-a-pet.svg'), nav : "PetNameComponent"},       
+      // {mobileAppConfigID : 5,title : 'Food Intake', iconImg : require('../../../assets/images/dashBoardImages/svg/home-food.svg'), nav : "FoodIntakeMainComponent"},       
       {mobileAppConfigID : 10,title : 'Account', iconImg : require('../../../assets/images/sideMenuImages/svg/Account.svg'), nav : "AccountInfoService"},   
       {mobileAppConfigID : 12,title : 'Support', iconImg : require('../../../assets/images/sideMenuImages/svg/Support.svg'), nav : "SupportComponent"},    
     ]);
@@ -68,78 +67,92 @@ const  MenuComponent = ({navigation, route, ...props }) => {
       let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
       let userRoleDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
       userRoleDetails = JSON.parse(userRoleDetails);
+      let userDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS,);
+      userDetails = JSON.parse(userDetails)
       let firstUser = await DataStorageLocal.getDataFromAsync(Constant.IS_FIRST_TIME_USER);
       firstUser = JSON.parse(firstUser);
 
-      //if(userRole === '7' || userRole === '9'){
-      if(userRole === '7'){
+      if(userDetails.ClientID > 0 ) {
 
         if(firstUser){
+
           set_isFirstUser(true);
-          // set_modularityArray([0]);
-          
-          if(userRole === '9') {
-            let tempArray = renderArrayFirstUser;
+          let tempArray = renderArrayFirstUser;
             tempArray.push(
-              {mobileAppConfigID: 3, title: 'Capture BFI Photos', iconImg: require('../../../assets/images/sideMenuImages/svg/Capture-BFI-Photos.svg'), nav: "PetListComponent"},
-              {mobileAppConfigID: 4, title: 'Score BFI', iconImg: require('../../../assets/images/sideMenuImages/svg/Score-BFI.svg'), nav: "PetListBFIScoringScreen" },
+              {mobileAppConfigID : 7,title : 'Onboard Pet', iconImg : require('../../../assets/images/sideMenuImages/svg/Onboard-a-pet.svg'), nav : "PetNameComponent"}, 
               );
               tempArray.sort((a, b) => (a.mobileAppConfigID > b.mobileAppConfigID) ? 1 : -1)
-              set_renderArrayFirstUser(tempArray)
-          } else {
-
-            if (userRoleDetails && userRoleDetails.RolePermissions && userRoleDetails.RolePermissions.length > 0) {
-              let tempArray = renderArrayFirstUser;
-              for (let i = 0; i < userRoleDetails.RolePermissions.length; i++) {
-                if(userRoleDetails.RolePermissions[i].menuId === 67) {
-                  tempArray.push({mobileAppConfigID: 3, title: 'Capture BFI Photos', iconImg: require('../../../assets/images/sideMenuImages/svg/Capture-BFI-Photos.svg'), nav: "PetListComponent"},);
-                } else if(userRoleDetails.RolePermissions[i].menuId === 68) {
-                  tempArray.push({mobileAppConfigID: 4, title: 'Score BFI', iconImg: require('../../../assets/images/sideMenuImages/svg/Score-BFI.svg'), nav: "PetListBFIScoringScreen"},);
-                }
-              }
-
-              tempArray.sort((a, b) => (a.mobileAppConfigID > b.mobileAppConfigID) ? 1 : -1)
-              set_renderArrayFirstUser(tempArray)
-
-            }
-
-          }
-
+              set_renderArray(tempArray)
         } else {
           set_isFirstUser(false);
           prepareMenus(userRoleDetails,userRole);
         }
 
-      }
-      else if(userRole === '9'){
+      } else {
 
-        let perArray = [ 
-          {mobileAppConfigID : 0,title : 'Dashboard', iconImg : require('../../../assets/images/sideMenuImages/svg/Dashboard.svg'), nav : "DashBoardService"},
-          // {mobileAppConfigID : 4,title : 'Onboard Pet', iconImg : require('../../../assets/images/sideMenuImages/svg/Onboard-a-pet.svg'), nav : "PetNameComponent"},       
-          // {mobileAppConfigID : 6,title : 'Configure Sensor', iconImg : require('../../../assets/images/sideMenuImages/svg/Config-Sensor.svg'), nav : "SensorInitialComponent"},
-          // {mobileAppConfigID : 7,title : 'Devices', iconImg : require('../../../assets/images/sideMenuImages/svg/Devices.svg'),nav : "AllDevicesListComponent"}, 
-          {mobileAppConfigID : 9,title : 'Account', iconImg : require('../../../assets/images/sideMenuImages/svg/Account.svg'), nav : "AccountInfoService"},
-          {mobileAppConfigID : 11,title : 'Support', iconImg : require('../../../assets/images/sideMenuImages/svg/Support.svg'), nav : "SupportComponent"},
-          {mobileAppConfigID: 1, title: 'Capture BFI Photos', iconImg: require('../../../assets/images/sideMenuImages/svg/Capture-BFI-Photos.svg'), nav: "PetListComponent" },
-          {mobileAppConfigID: 4, title: 'Score BFI', iconImg: require('../../../assets/images/sideMenuImages/svg/Score-BFI.svg'), nav: "PetListBFIScoringScreen" },   
- 
-        ]
+        let hasBFIImgCapture = false;
+        let hasBFIScore = false;
 
-        perArray.sort((a, b) => (a.mobileAppConfigID > b.mobileAppConfigID) ? 1 : -1)
-        set_renderArray(perArray);
+        if(userDetails.RolePermissions) {
 
-      } 
-      else if(userRole === '8'){
+          for (let i =0; i < userDetails.RolePermissions.length; i++) {
 
-        let perArray = [ 
-          {mobileAppConfigID : 0,title : 'Dashboard', iconImg : require('../../../assets/images/sideMenuImages/svg/Dashboard.svg'), nav : "DashBoardService"},     
-          {mobileAppConfigID : 10,title : 'Account', iconImg : require('../../../assets/images/sideMenuImages/svg/Account.svg'), nav : "AccountInfoService"},   
-          {mobileAppConfigID: 4, title: 'Score BFI', iconImg: require('../../../assets/images/sideMenuImages/svg/Score-BFI.svg'), nav: "PetListBFIScoringScreen" },   
-          {mobileAppConfigID : 12,title : 'Support', iconImg : require('../../../assets/images/sideMenuImages/svg/Support.svg'), nav : "SupportComponent"} 
-        ]
-        perArray.sort((a, b) => (a.mobileAppConfigID > b.mobileAppConfigID) ? 1 : -1)
-        set_renderArray(perArray);
-        
+            if(userDetails.RolePermissions[i].menuId === 67 && !firstUser) {
+              hasBFIImgCapture = true;
+            }
+  
+            if(userDetails.RolePermissions[i].menuId === 68 && !firstUser) {
+              hasBFIScore = true;
+            }
+  
+          }
+          if(hasBFIScore && hasBFIImgCapture) {
+            // Representative
+            let tempArray = renderArrayFirstUser;
+            tempArray.push(
+              {mobileAppConfigID: 3, title: 'Capture BFI Photos', iconImg: require('../../../assets/images/sideMenuImages/svg/Capture-BFI-Photos.svg'), nav: "PetListComponent"},
+              {mobileAppConfigID: 4, title: 'Score BFI', iconImg: require('../../../assets/images/sideMenuImages/svg/Score-BFI.svg'), nav: "PetListBFIScoringScreen" },
+              );
+            tempArray.sort((a, b) => (a.mobileAppConfigID > b.mobileAppConfigID) ? 1 : -1)
+            set_renderArray(tempArray)
+
+          } else if(hasBFIScore) {
+            // Veterinerian
+            let tempArray = renderArrayFirstUser;
+            tempArray.push(
+              {mobileAppConfigID: 4, title: 'Score BFI', iconImg: require('../../../assets/images/sideMenuImages/svg/Score-BFI.svg'), nav: "PetListBFIScoringScreen" },
+              );
+            tempArray.sort((a, b) => (a.mobileAppConfigID > b.mobileAppConfigID) ? 1 : -1)
+            set_renderArray(tempArray);
+
+          } else if(hasBFIImgCapture) {
+            // Only Capture
+            let tempArray = renderArrayFirstUser;
+            tempArray.push(
+              {mobileAppConfigID: 3, title: 'Capture BFI Photos', iconImg: require('../../../assets/images/sideMenuImages/svg/Capture-BFI-Photos.svg'), nav: "PetListComponent"},
+              );
+            tempArray.sort((a, b) => (a.mobileAppConfigID > b.mobileAppConfigID) ? 1 : -1)
+            set_renderArray(tempArray);
+          } 
+          // else {
+          //   console.log('User Details1 ',userDetails,firstUser)
+          //   if(firstUser){
+
+          //     set_isFirstUser(true);
+          //     let tempArray = renderArrayFirstUser;
+          //       tempArray.push(
+          //         {mobileAppConfigID : 7,title : 'Onboard Pet', iconImg : require('../../../assets/images/sideMenuImages/svg/Onboard-a-pet.svg'), nav : "PetNameComponent"}, 
+          //         );
+          //         tempArray.sort((a, b) => (a.mobileAppConfigID > b.mobileAppConfigID) ? 1 : -1)
+          //         set_renderArray(tempArray)
+          //   } else {
+          //     set_isFirstUser(false);
+          //     prepareMenus(userRoleDetails,userRole);
+          //   }
+          // }
+
+        }
+
       }
       
     }
@@ -156,40 +169,77 @@ const  MenuComponent = ({navigation, route, ...props }) => {
      */
     const prepareMenus = async (menuDetails,roleId) => {
 
+      let questPer = await DataStorageLocal.getDataFromAsync(Constant.QUESTIONNAIR_PETS_ARRAY);
+      questPer = JSON.parse(questPer);
+
+      let userRoleDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
+      userRoleDetails = JSON.parse(userRoleDetails);
+
+      let totalPets = await DataStorageLocal.getDataFromAsync(Constant.ALL_PETS_ARRAY);
+      totalPets = JSON.parse(totalPets);
+      let isDogs = undefined
+
+      if(totalPets) {
+        for (let i = 0; i < totalPets.length; i++) {
+
+          if(parseInt(totalPets[i].speciesId) === 1) {
+            isDogs = true;
+            break;
+          }
+
+        }
+      }
+
       let menuItem = [
         {mobileAppConfigID : 0,title : 'Dashboard', iconImg : require('../../../assets/images/sideMenuImages/svg/Dashboard.svg'), nav : "DashBoardService"},
-        {mobileAppConfigID : 6,title : 'Onboard Pet', iconImg : require('../../../assets/images/sideMenuImages/svg/Onboard-a-pet.svg'), nav : "PetNameComponent"},       
-        {mobileAppConfigID : 7,title : 'Configure Sensor', iconImg : require('../../../assets/images/sideMenuImages/svg/Config-Sensor.svg'), nav : "SensorInitialComponent"},
-        {mobileAppConfigID : 8,title : 'Devices', iconImg : require('../../../assets/images/sideMenuImages/svg/Devices.svg'),nav : "AllDevicesListComponent"}, 
+        {mobileAppConfigID : 7,title : 'Onboard Pet', iconImg : require('../../../assets/images/sideMenuImages/svg/Onboard-a-pet.svg'), nav : "PetNameComponent"},       
+        // {mobileAppConfigID : 7,title : 'Configure Sensor', iconImg : require('../../../assets/images/sideMenuImages/svg/Config-Sensor.svg'), nav : "SensorInitialComponent"},
+        {mobileAppConfigID : 8,title : 'Sensors', iconImg : require('../../../assets/images/sideMenuImages/svg/Devices.svg'),nav : "AllDevicesListComponent"}, 
         {mobileAppConfigID : 10,title : 'Account', iconImg : require('../../../assets/images/sideMenuImages/svg/Account.svg'), nav : "AccountInfoService"},
         {mobileAppConfigID : 12,title : 'Support', iconImg : require('../../../assets/images/sideMenuImages/svg/Support.svg'), nav : "SupportComponent"},
         {mobileAppConfigID : 11,title : 'Feedback', iconImg : require('../../../assets/images/sideMenuImages/svg/Feedback.svg'),nav : "FeedbackComponent"}, 
       ]
 
+      if(userRoleDetails && (userRoleDetails.RoleName === "Hill's Vet Technician" || userRoleDetails.RoleName === "External Vet Technician")) {
+        menuItem.push({mobileAppConfigID: 4, title: 'Score BFI', iconImg: require('../../../assets/images/sideMenuImages/svg/Score-BFI.svg'), nav: "PetListBFIScoringScreen" })
+      } 
+
       if (menuDetails && menuDetails.RolePermissions && menuDetails.RolePermissions.length > 0) {
-
         for (let i = 0; i < menuDetails.RolePermissions.length; i++) {
-
           if(menuDetails.RolePermissions[i].menuId === 54) {
             menuItem.push({mobileAppConfigID : 2,title : 'Questionnaire', iconImg : require('../../../assets/images/sideMenuImages/svg/Questionnaire.svg'), nav : "QuestionnaireStudyComponent"},)
           } else if(menuDetails.RolePermissions[i].menuId === 56) {
             menuItem.push({mobileAppConfigID : 1,title : 'Observations', iconImg : require('../../../assets/images/sideMenuImages/svg/Observations.svg'), nav : "ObservationsListComponent"});
           }  else if(menuDetails.RolePermissions[i].menuId === 60) {
-            menuItem.push({mobileAppConfigID : 5,title : 'Timer', iconImg : require('../../../assets/images/sideMenuImages/svg/Timer.svg'), nav : "Timer"},);
-          } else if(menuDetails.RolePermissions[i].menuId === 67) {
+            menuItem.push({mobileAppConfigID : 6,title : 'Timer', iconImg : require('../../../assets/images/sideMenuImages/svg/Timer.svg'), nav : "Timer"},);
+          } else if(menuDetails.RolePermissions[i].menuId === 67 && isDogs) {
             menuItem.push({mobileAppConfigID: 3, title: 'Capture BFI Photos', iconImg: require('../../../assets/images/sideMenuImages/svg/Capture-BFI-Photos.svg'), nav: "PetListComponent" },);
+          }
+          else if(menuDetails.RolePermissions[i].menuId === 74) {
+            menuItem.push({mobileAppConfigID : 5,title : 'Food Intake', iconImg : require('../../../assets/images/sideMenuImages/svg/Food_Intake_Menu.svg'), nav : "FoodIntakeMainComponent"},       
+            );
           }
         }
 
         if(deviceType.current && deviceType.current.includes('HPN1')) {
 
           if(deviceStatus.current==='SetupDone'){
-            menuItem.push({mobileAppConfigID : 8,title : 'Beacons', iconImg : require('../../../assets/images/sideMenuImages/svg/Beacons.svg'), nav : "BeaconsInitialComponent"},)
+            menuItem.push({mobileAppConfigID : 9,title : 'Beacons', iconImg : require('../../../assets/images/sideMenuImages/svg/Beacons.svg'), nav : "BeaconsInitialComponent"},)
           }
 
         }
       }
-      menuItem.sort((a, b) => (a.mobileAppConfigID > b.mobileAppConfigID) ? 1 : -1);
+
+      let questPerimission = await DataStorageLocal.getDataFromAsync(Constant.QUETIONNAIRE_PERMISSION,);
+      if(!questPerimission && questPer && questPer.length > 0) {
+
+        var iArray = menuItem.filter(item => item.mobileAppConfigID === 2);
+        if(iArray.length === 0) {
+          menuItem.push({mobileAppConfigID : 2,title : 'Questionnaire', iconImg : require('../../../assets/images/sideMenuImages/svg/Questionnaire.svg'), nav : "QuestionnaireStudyComponent"},)
+        } 
+      } 
+      
+      let temp = menuItem.sort((a, b) => (a.mobileAppConfigID > b.mobileAppConfigID) ? 1 : -1);
       set_renderArray(menuItem);
 
     };
@@ -212,22 +262,15 @@ const  MenuComponent = ({navigation, route, ...props }) => {
 
       if(item.nav === 'ObservationsListComponent'){
 
-        let obsPets = await permissionPetsAPI(56);
-        obsPets = await getsetupFeaturePets(obsPets);
+        let obsPets = await permissionPetsAPI(1);
+        // obsPets = await getsetupFeaturePets(obsPets);
 
         if(obsPets && obsPets.length > 0) {
           await DataStorageLocal.saveDataToAsync(Constant.ADD_OBSERVATIONS_PETS_ARRAY, JSON.stringify(obsPets));
-          if(defaultPet.devices.length > 0 && defaultPet.devices[0].isDeviceSetupDone){
-
-            let isPet = await findArrayElementByPetId(obsPets,defaultPet.petID);
-            if(isPet){
-              await DataStorageLocal.saveDataToAsync(Constant.OBS_SELECTED_PET, JSON.stringify(defaultPet));
-            } else {
-              await DataStorageLocal.saveDataToAsync(Constant.OBS_SELECTED_PET, JSON.stringify(obsPets[0]));
-            }
-            
+          let isPet = await findArrayElementByPetId(obsPets,defaultPet.petID);
+          if(isPet){
+            await DataStorageLocal.saveDataToAsync(Constant.OBS_SELECTED_PET, JSON.stringify(defaultPet));
           } else {
-            
             await DataStorageLocal.saveDataToAsync(Constant.OBS_SELECTED_PET, JSON.stringify(obsPets[0]));
           }
 
@@ -240,12 +283,10 @@ const  MenuComponent = ({navigation, route, ...props }) => {
 
       }else if(item.nav === 'QuestionnaireStudyComponent'){
         
-        let questPets = await permissionPetsAPI(54);
-        questPets = await getsetupFeaturePets(questPets);
-
+        let questPets = await permissionPetsAPI(2);
+        // questPets = await getsetupFeaturePets(questPets);
+        
         if(questPets && questPets.length > 0) {
-
-          if(defaultPet.devices.length > 0 && defaultPet.devices[0].isDeviceSetupDone){
           
             let isPet = await findArrayElementByPetId(questPets,defaultPet.petID);
             if(isPet){
@@ -253,9 +294,7 @@ const  MenuComponent = ({navigation, route, ...props }) => {
             } else {
               await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(questPets[0]));
             }
-          } else {
-            await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(questPets[0]));
-          }    
+ 
           await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIR_PETS_ARRAY, JSON.stringify(questPets));
           navigation.navigate(item.nav,{defaultPetObj:defaultPet});
         } else {
@@ -273,21 +312,15 @@ const  MenuComponent = ({navigation, route, ...props }) => {
 
       } else if(item.nav === 'Timer'){
 
-        let timerPets = await permissionPetsAPI(60);
-        timerPets = await getsetupFeaturePets(timerPets);
-
+        let timerPets = await permissionPetsAPI(5);
         if(timerPets && timerPets.length > 0) {
 
-          if(defaultPet.devices.length > 0 && defaultPet.devices[0].isDeviceSetupDone){
             let isPet = await findArrayElementByPetId(timerPets,defaultPet.petID);
             if(isPet){
               await DataStorageLocal.saveDataToAsync(Constant.TIMER_SELECTED_PET, JSON.stringify(defaultPet));
             } else {
               await DataStorageLocal.saveDataToAsync(Constant.TIMER_SELECTED_PET, JSON.stringify(timerPets[0]));
-            }
-          } else {
-            await DataStorageLocal.saveDataToAsync(Constant.TIMER_SELECTED_PET, JSON.stringify(timerPets[0]));
-          }    
+            }  
           
           await DataStorageLocal.saveDataToAsync(Constant.TIMER_PETS_ARRAY, JSON.stringify(timerPets));
           navigation.navigate('TimerComponent'); 
@@ -310,7 +343,21 @@ const  MenuComponent = ({navigation, route, ...props }) => {
 
         navigation.navigate("BeaconsInitialComponent");
 
-      } else if(item.nav === 'PetNameComponent'){
+      } else if(item.nav === 'FoodIntakeMainComponent'){
+
+        let foodPets = await permissionPetsAPI(11);
+        let isPet = await findArrayElementByPetId(foodPets,defaultPet.petID);
+
+        if(isPet){
+          await DataStorageLocal.saveDataToAsync(Constant.FH_SELECTED_PET, JSON.stringify(defaultPet));
+        } else {
+          await DataStorageLocal.saveDataToAsync(Constant.FH_SELECTED_PET, JSON.stringify(foodPets[0]));
+        }
+        
+        await DataStorageLocal.saveDataToAsync(Constant.FH_PETS_ARRAY, JSON.stringify(foodPets));
+        navigation.navigate("FoodHistoryPetSelectionComponent",{petsArray:foodPets,defaultPetObj:defaultPet});
+
+      }else if(item.nav === 'PetNameComponent'){
 
         removeOnboardData();
         navigation.navigate("PetNameComponent");
@@ -376,7 +423,6 @@ const  MenuComponent = ({navigation, route, ...props }) => {
     set_isLoading(true);
     isLoadingdRef.current = 1;
     let permissionServiceObj = await ServiceCalls.configPermissionAPI(clientId,mId,token);
-
     set_isLoading(false);
     isLoadingdRef.current = 0;
 

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="56" height="56" viewBox="0 0 56 56">
+  <defs>
+    <filter id="Rectangle_85738" x="0" y="0" width="56" height="56" filterUnits="userSpaceOnUse">
+      <feOffset dx="-2" dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feFlood flood-color="#b8cee2"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Group_14489" data-name="Group 14489" transform="translate(-29 -130)">
+    <g transform="matrix(1, 0, 0, 1, 29, 130)" filter="url(#Rectangle_85738)">
+      <g id="Rectangle_85738-2" data-name="Rectangle 85738" transform="translate(5 2)" fill="#fff" stroke="#6bc100" stroke-width="1">
+        <rect width="50" height="50" rx="4" stroke="none"/>
+        <rect x="0.5" y="0.5" width="49" height="49" rx="3.5" fill="none"/>
+      </g>
+    </g>
+    <rect id="Rectangle_85739" data-name="Rectangle 85739" width="36" height="6" rx="3" transform="translate(41 154)" fill="#e5e5e5"/>
+    <g id="Ellipse_674" data-name="Ellipse 674" transform="translate(43 152)" fill="#fff" stroke="#6bc100" stroke-width="1">
+      <circle cx="5.5" cy="5.5" r="5.5" stroke="none"/>
+      <circle cx="5.5" cy="5.5" r="5" fill="none"/>
+    </g>
+  </g>
+</svg>

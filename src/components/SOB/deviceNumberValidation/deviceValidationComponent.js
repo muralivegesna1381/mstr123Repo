@@ -180,8 +180,28 @@ const DeviceValidationComponent = ({ navigation, route, ...props }) => {
         }
 
       }
+      
+      let devObj = {
+        pObj : defaultPet, 
+        petItemObj : defaultPet.devices[0],
+        actionType : 2,
+        isReplaceSensor : 0,
+        isForceSync : 0,
+        syncDeviceNo : '',
+        syncDeviceModel : '',
+        configDeviceNo: defaultPet.devices[0].deviceNumber,
+        configDeviceModel : defaultPet.devices[0].deviceModel,
+        reasonId : '',
+        petName : defaultPet.petName,
+        deviceNo : defaultPet.devices[0].deviceNumber,
+        isDeviceSetupDone : defaultPet.devices[0].isDeviceSetupDone,
+        petID: defaultPet.petID,
+        isFirmwareReq : defaultPet.devices[0].isFirmwareVersionUpdateRequired
+      }
+  
+      await DataStorageLocal.saveDataToAsync(Constant.CONFIG_SENSOR_OBJ, JSON.stringify(devObj));
 
-      navigation.navigate('SensorInitialComponent', { defaultPetObj: defaultPet });
+      navigation.navigate('SensorInitialComponent', {isFromType : isFromType, defaultPetObj: defaultPet });
     }
 
   };
@@ -490,6 +510,7 @@ const DeviceValidationComponent = ({ navigation, route, ...props }) => {
       isPopUp={isPopUp}
       popUpMessage={popUpMessage}
       popUpTitle={popUpTitle}
+      isFromType = {isFromType}
       popupLeftBtnEnable={popupLeftBtnEnable}
       popOkBtnAction={popOkBtnAction}
       navigateToPrevious={navigateToPrevious}

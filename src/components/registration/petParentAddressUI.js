@@ -9,6 +9,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 import AlertComponent from '../../utils/commonComponents/alertComponent';
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../utils/constants/constant";
+import GooglePlacesComponent from "./../../utils/googlePlacesComponent/googlePlacesComponent";
 
 let downArrowImg = require('./../../../assets/images/otherImages/svg/downArrowGrey.svg');
 
@@ -22,7 +23,6 @@ const  PetParentAddressUi = ({route, ...props }) => {
   const [country, set_country] = useState(undefined);
   const [allAnswered, set_allAnswered] = useState(false);
   const [isPrelude, set_isPrelude] = useState(false);
-  const [isDropdown, set_isDropdown] = useState(false);
 
   let addLine1Ref = useRef('');
   let addLine2Ref = useRef('');
@@ -51,53 +51,45 @@ const  PetParentAddressUi = ({route, ...props }) => {
       set_allAnswered(true);
     }
 
+    if(props.addressMOBJ) {
+
+      set_addLine1(props.addressMOBJ.address1);
+      set_addLine2(props.addressMOBJ.address2);
+      set_city(props.addressMOBJ.city);
+      set_state(props.addressMOBJ.state);
+      set_country(props.addressMOBJ.country);
+      set_zipCode(props.addressMOBJ.zipCode);
+
+      addLine1Ref.current = props.addressMOBJ.address1;
+      addLine2Ref.current = props.addressMOBJ.address2;
+      cityRef.current = props.addressMOBJ.city;
+      stateRef.current = props.addressMOBJ.state;
+      zipCodeRef.current = props.addressMOBJ.zipCode;
+      countryRef.current = props.addressMOBJ.country;
+
+    }
+
     if(props.isPrelude) {
       set_allAnswered(true);
       set_isPrelude(props.isPrelude);
     }
         
-  }, [props.parentObj,props.isPrelude]);
+  }, [props.parentObj,props.isPrelude,props.addressMOBJ]);
 
     const nextButtonAction = () => {
-      props.submitAction(addLine1Ref.current,addLine2Ref.current,cityRef.current,stateRef.current,zipCodeRef.current,countryRef.current,isPrelude);
+      props.submitAction(isPrelude);
     };
 
     const backBtnAction = () => {
       props.navigateToPrevious();
     };
 
-    const validateAddress = (address,value) => {
-
-      if(value === 1) {
-        addLine1Ref.current = address ? address : '';
-        set_addLine1(address ? address : '');
-      } if(value === 2) {
-        addLine2Ref.current = address ? address : '';
-        set_addLine2(address ? address : '');
-      } if(value === 3) {
-        cityRef.current = address ? address : '';
-        set_city(address ? address : '');
-      } if(value === 4) {
-        stateRef.current = address ? address : '';
-        set_state(address ? address : '');
-      } if(value === 5) {
-        zipCodeRef.current = address ? address : '';
-        set_zipCode(address ? address : '');
-      } if(value === 6) {
-        countryRef.current = address ? address : '';
-        set_country(address ? address : '');
-      }
-
-      if(addLine1Ref.current && cityRef.current && stateRef.current && zipCodeRef.current && countryRef.current){
-        set_allAnswered(true);
-      } else {
-        set_allAnswered(false);
-      }
-
-    };
-
     const popOkBtnAction = () => {
       props.popOkBtnAction();
+    };
+
+    const getAddress = (address) => {
+      props.getAddress(address);
     };
 
     return (
@@ -113,24 +105,35 @@ const  PetParentAddressUi = ({route, ...props }) => {
             backBtnAction = {() => backBtnAction()}
           />
         </View>
-            
-        <KeyboardAwareScrollView showsVerticalScrollIndicator={true} style={{marginBottom:150}} enableOnAndroid={true} scrollEnabled={true}>
-          <View style={{width:wp('100%'),height:hp('70%'),alignItems:'center',marginBottom:hp('20%')}}>
 
-            <View style={{width:wp('80%'),marginTop:hp('4%')}}>
-              <Text style={CommonStyles.headerTextStyle}>{"Let's get to"}</Text>
-              <Text style={CommonStyles.headerTextStyle}>{"know your location"}</Text>
-            </View>
+        <View style={{width:wp('80%'),marginTop:hp('4%'), alignSelf:'center'}}>
+          <Text style={CommonStyles.headerTextStyle}>{"Let's get to"}</Text>
+          <Text style={CommonStyles.headerTextStyle}>{"know your location"}</Text>
+        </View>
+            
+        <View style={{marginTop:hp('2%'),width:wp('100%'),height:hp('5%'),zIndex:999}}>
+
+          <GooglePlacesComponent
+            setValue={(address) => {
+              getAddress(address)
+            }}
+          />
+
+        </View>
+
+        <KeyboardAwareScrollView showsVerticalScrollIndicator={true} enableOnAndroid={true} scrollEnabled={true}>
+
+          {props.addressMOBJ ? <View style={{width:wp('100%'),height:hp('70%'),alignItems:'center',marginBottom:hp('10%')}}>
 
               <View style={{marginTop:hp('4%')}} >
 
                 <TextInputComponent 
                   inputText = {addLine1} 
                   labelText = {'Address line 1*'} 
-                  isEditable = {props.isPrelude ? false : true}
+                  isEditable = {false}
                   maxLengthVal = {50}
+                  isBackground = {'#dedede'}
                   autoCapitalize = {'none'}
-                  setValue={(textAnswer) => {validateAddress(textAnswer,1)}}
                 />
 
               </View>  
@@ -140,10 +143,10 @@ const  PetParentAddressUi = ({route, ...props }) => {
                 <TextInputComponent 
                   inputText = {addLine2} 
                   labelText = {'Address line 2 (Optional)'} 
-                  isEditable = {props.isPrelude ? false : true}
+                  isEditable = {false}
                   maxLengthVal = {50}
                   autoCapitalize = {'none'}
-                  setValue={(textAnswer) => {validateAddress(textAnswer,2)}}
+                  isBackground = {'#dedede'}
                 />
 
               </View>  
@@ -153,10 +156,10 @@ const  PetParentAddressUi = ({route, ...props }) => {
                 <TextInputComponent 
                   inputText = {city} 
                   labelText = {'City*'} 
-                  isEditable = {props.isPrelude ? false : true}
+                  isEditable = {false}
                   maxLengthVal = {50}
                   autoCapitalize = {'none'}
-                  setValue={(textAnswer) => {validateAddress(textAnswer,3)}}
+                  isBackground = {'#dedede'}
                 />
 
               </View>  
@@ -166,10 +169,10 @@ const  PetParentAddressUi = ({route, ...props }) => {
                 <TextInputComponent 
                   inputText = {state} 
                   labelText = {'State*'} 
-                  isEditable = {props.isPrelude ? false : true}
+                  isEditable = {false}
                   maxLengthVal = {50}
                   autoCapitalize = {'none'}
-                  setValue={(textAnswer) => {validateAddress(textAnswer,4)}}
+                  isBackground = {'#dedede'}
                 />
 
               </View>  
@@ -182,13 +185,8 @@ const  PetParentAddressUi = ({route, ...props }) => {
                   isEditable = {false}
                   maxLengthVal = {50}
                   autoCapitalize = {'none'}
-                  setValue={(textAnswer) => {validateAddress(textAnswer,6)}}
+                  isBackground = {'#dedede'}
                 />
-                      
-                <TouchableOpacity disabled = {props.isPrelude ? true : false} style={[CommonStyles.addressCountryStyle, {}]} onPress={() => 
-                  {set_isDropdown(!isDropdown)}}>
-                  <Image source={downArrowImg} style={styles.imageStyle}/>
-                </TouchableOpacity>
 
               </View>  
 
@@ -197,15 +195,15 @@ const  PetParentAddressUi = ({route, ...props }) => {
                 <TextInputComponent 
                   inputText = {zipCode} 
                   labelText = {'Zip Code*'} 
-                  isEditable = {props.isPrelude ? false : true}
+                  isEditable = {false}
                   maxLengthVal = {9}
                   autoCapitalize = {'none'}
-                  setValue={(textAnswer) => {validateAddress(textAnswer,5)}}
+                  isBackground = {'#dedede'}
                 />
 
               </View>  
                 
-          </View>           
+          </View> : null}       
         </KeyboardAwareScrollView>
 
         <View style={CommonStyles.bottomViewComponentStyle}>
@@ -213,14 +211,14 @@ const  PetParentAddressUi = ({route, ...props }) => {
             rightBtnTitle = {'NEXT'}
             leftBtnTitle={'BACK'}
             isLeftBtnEnable = {true}
-            rigthBtnState = {props.isPrelude || allAnswered ? true : false}
+            rigthBtnState = {props.isPrelude || props.addressMOBJ ? true : false}
             isRightBtnEnable = {true}
             rightButtonAction = {async () => nextButtonAction()}
             leftButtonAction = {async () => backBtnAction()}
           />
         </View>   
 
-        {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
+        {props.isPopUp ? <View style={[CommonStyles.customPopUpStyle,{zIndex:999}]}>
           <AlertComponent
             header = {props.popUpAlert}
             message={props.popUpMessage}
@@ -232,22 +230,6 @@ const  PetParentAddressUi = ({route, ...props }) => {
           />
         </View> : null}
 
-        {isDropdown ? <View style={[styles.popSearchViewStyle]}>
-          <FlatList
-            style={styles.flatcontainer}
-            data={['United States', 'United Kingdom']}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => (
-              <TouchableOpacity onPress={() => {set_country(item),set_isDropdown(!isDropdown),countryRef.current = item}}>
-                <View style={styles.flatview}>
-                  <Text numberOfLines={2} style={[styles.name]}>{item}</Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            enableEmptySections={true}
-            keyExtractor={(item,index) => index}/>     
-        </View> : null}
-
         {props.isLoading ? <LoaderComponent isLoader={true} loaderText = {Constant.LOADER_WAIT_MESSAGE} isButtonEnable = {false} /> : null} 
 
       </View>
@@ -255,47 +237,3 @@ const  PetParentAddressUi = ({route, ...props }) => {
   }
   
   export default PetParentAddressUi;
-
-  const styles = StyleSheet.create({
-
-    flatcontainer: {
-      flex: 1,
-    },
-
-    flatview: {
-      height: hp("8%"),
-      marginBottom: hp("0.3%"),
-      alignSelf: "center",
-      justifyContent: "center",
-      borderBottomColor: "grey",
-      borderBottomWidth: wp("0.1%"),
-      width:wp('90%'),
-      alignItems:'center' 
-    },
-
-    name: {
-      ...CommonStyles.textStyleSemiBold,
-      fontSize: fonts.fontNormal,
-      textAlign: "left",
-      color: "black",
-    },
-
-    popSearchViewStyle : {
-      height: hp("25%"),
-      width: wp("95%"),
-      backgroundColor:'#DCDCDC',
-      bottom:0,
-      position:'absolute',
-      alignSelf:'center',
-      borderTopRightRadius:15,
-      borderTopLeftRadius:15
-    },
-
-    imageStyle: {
-      margin: "4%",
-      height: 20,
-      width: 20,
-      resizeMode: "contain",
-    },
-
-  });

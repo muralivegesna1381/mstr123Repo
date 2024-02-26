@@ -15,6 +15,7 @@ const  TimerPetSelectionComponent = ({navigation, route, ...props }) => {
     const [selectedIndex, set_selectedIndex] = useState(undefined);
     const [selectedPName, set_selectedPName] = useState(undefined);
     const [date, set_Date] = useState(new Date());
+    const [isKeboard, set_isKeboard] = useState(undefined);
 
     useEffect(() => {
 
@@ -49,8 +50,8 @@ const  TimerPetSelectionComponent = ({navigation, route, ...props }) => {
                     if(duplicates[i].petID === route.params?.defaultPetObj.petID){
                         set_selectedPet(duplicates[i]);
                         set_selectedIndex(i);
-                        set_nxtBtnEnable(true);  
-                        set_selectedPName(duplicates[i].petName);                  
+                        set_selectedPName(duplicates[i].petName);
+                        set_nxtBtnEnable(true);                    
                     }
                 }
             }
@@ -82,18 +83,23 @@ const  TimerPetSelectionComponent = ({navigation, route, ...props }) => {
     };
 
     const submitAction = () => {
+        if(isKeboard === false) {
+            set_isKeboard(undefined);
+        } else {
+            set_isKeboard(false);
+        }
         firebaseHelper.logEvent(firebaseHelper.event_timer_selected_pet, firebaseHelper.screen_timer_activity, "User selected Pet for Timer ", "Pet Id : "+selectedPet ? selectedPet.petID : '');
         navigation.navigate('TimerActivityComponent',{timerPet : selectedPet});
-    }
+    };
 
     const navigateToPrevious = () => {        
        navigation.navigate('TimerComponent');     
-    }
+    };
 
     const selectPetAction = (item) => {
        set_selectedPet(item);
        set_nxtBtnEnable(true);
-    }
+    };
 
     return (
         <TimerPetSelectionUI 
@@ -102,6 +108,7 @@ const  TimerPetSelectionComponent = ({navigation, route, ...props }) => {
             nxtBtnEnable = {nxtBtnEnable}
             selectedIndex = {selectedIndex}
             selectedPName = {selectedPName}
+            isKeboard = {isKeboard}
             navigateToPrevious = {navigateToPrevious}
             submitAction = {submitAction}
             selectPetAction = {selectPetAction}

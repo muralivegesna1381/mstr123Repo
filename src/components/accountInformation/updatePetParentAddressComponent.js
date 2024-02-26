@@ -26,6 +26,8 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
     const [isNotification, set_isNotification] = useState(false);
     const [phnNo, set_phNo] = useState(undefined);
     const [isNavigate, set_isNavigate] = useState(undefined);
+    const [isEditable, set_isEditable] = useState(false);
+    const [addressMOBJ, set_addressMOBJ] = useState(false);
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
@@ -101,27 +103,27 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
 
     const submitAction = async (addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef) => {
 
-        if(addLine1Ref && cityRef && stateRef && zipCodeRef && countryRef) {
-            validatePetParentAddress(addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef);
-        } else {
+        // if(addLine1Ref && cityRef && stateRef && zipCodeRef && countryRef) {
+        //     validatePetParentAddress(addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef);
+        // } else {
 
-        }
+        // }
+
+        
+        updateAddress(petParentAddress);
 
     };
 
-    const validatePetParentAddress = async (addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef) => {
+    const validatePetParentAddress = async (address) => {
 
-        let line1 = addLine1Ref.replace(/(^[,\s]+)|([,\s]+$)/g, '');
-        let line2 = '';
-        if(addLine2Ref && addLine2Ref !== '') {
-            line2 = addLine2Ref.replace(/(^[,\s]+)|([,\s]+$)/g, '');
+        let obj = {
+            'address' : address
         }
 
         set_isLoading(true);
         isLoadingdRef.current = 1;
-        let seviceString = 'address1='+line1+'&'+'address2='+line2+'&'+'city='+cityRef+'&'+'state='+stateRef+'&'+'country='+countryRef+'&'+'zipCode='+zipCodeRef;
 
-        let addressServiceObj = await ServiceCalls.validateAddress(seviceString);
+        let addressServiceObj = await ServiceCalls.validateAddress(obj);
         set_isLoading(false);
         isLoadingdRef.current = 0;
 
@@ -139,32 +141,32 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
 
         if (addressServiceObj && addressServiceObj.statusData) {
             
-            if(addressServiceObj.responseData && addressServiceObj.responseData.isValidAddress === 1)  {
+            if(addressServiceObj.responseData && addressServiceObj.responseData.isValidAddress === 1) {
 
                 let addObj = {
                     "addressId" : null,
-                    "address1" : line1,
-                    "address2" : line2,
-                    "city" : cityRef,
-                    "state" : stateRef,
-                    "country" : countryRef,
-                    "zipCode" : zipCodeRef,
+                    "address1" : addressServiceObj.responseData.address.address1,
+                    "address2" : '',
+                    "city" : addressServiceObj.responseData.address.city,
+                    "state" : addressServiceObj.responseData.address.state,
+                    "country" : addressServiceObj.responseData.address.country,
+                    "zipCode" : addressServiceObj.responseData.address.zipCode,
                     "timeZoneId" : addressServiceObj.responseData.address.timeZone.timeZoneId,
                     "timeZone" : addressServiceObj.responseData.address.timeZone.timeZoneName,
                     "addressType" : 1,
                     "isPreludeAddress" : 0
                }
-   
-               updateAddress(addObj);
+               set_addressMOBJ(addObj);
+               set_petParentAddress(addObj);
 
             } else {
                 firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'error : Invalid Address');
-                createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
+                createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_UPDATE_ERROR_MSG, true);
             }
             
 
         } else {
-            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
+            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_UPDATE_ERROR_MSG, true);
         }
 
         if (addressServiceObj && addressServiceObj.error) {
@@ -176,8 +178,11 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
 
     const updateAddress = async (objAddress) => {
 
+        set_isLoading(true);
+        isLoadingdRef.current = 1;
         let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
         let userId = await DataStorageLocal.getDataFromAsync(Constant.USER_ID);
+
         let jsonTemp = {
             ClientID: "" + clientIdTemp,
             UserId : userId,
@@ -254,6 +259,10 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
         }
     };
 
+    const getAddress = (address) => {
+        validatePetParentAddress(address);
+    };
+
     return (
         <UpdatePetParentAddressUI
             isNxtBtnEnable = {isNxtBtnEnable}
@@ -262,9 +271,11 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
             isPopUp = {isPopUp}
             isLoading = {isLoading}
             petParentAddress = {petParentAddress}
+            addressMOBJ = {addressMOBJ}
             submitAction={submitAction}
             navigateToPrevious={navigateToPrevious}
             popOkBtnAction = {popOkBtnAction}
+            getAddress = {getAddress}
         />
     );
 

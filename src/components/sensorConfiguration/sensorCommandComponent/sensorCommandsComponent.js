@@ -31,6 +31,7 @@ const SensorCommandComponent = ({navigation, route, ...props }) => {
     const [loaderText, set_loaderText] = useState(undefined);
     const [isLoading, set_isLoading] = useState(false);
     const [deviceNumber, set_deviceNumber] = useState(undefined);
+    const [deviceNumberNew, set_deviceNumberNew] = useState(undefined);
     const [petName, set_petName] = useState(undefined);
     const [retryCount, set_retryCount] = useState(0);
     const [sensorImages, set_sensorImages] = useState([]);
@@ -39,6 +40,7 @@ const SensorCommandComponent = ({navigation, route, ...props }) => {
     let executeCommand = useRef(true);
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
+    let isReplaceSensor = useRef(1);
 
     let maxRetryCount = 3;
 
@@ -130,6 +132,7 @@ const SensorCommandComponent = ({navigation, route, ...props }) => {
     useEffect(() => {
 
         if(route.params?.commandType){
+
             commandType.current = route.params?.commandType;
             
             if(commandType.current === 'Force Sync'){
@@ -196,19 +199,30 @@ const SensorCommandComponent = ({navigation, route, ...props }) => {
 
     const getDevice = async () => {
 
-        let defaultObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT,);
-        defaultObj = JSON.parse(defaultObj);
-        let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
-        let devNumber = defaultObj.devices[parseInt(sensorIndex)].deviceNumber;
-        
-        set_deviceNumber(devNumber);
-        set_petName(defaultObj.petName);
+        let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+        configObj = JSON.parse(configObj);        
+
+        if(configObj) {
+            isReplaceSensor.current = configObj.isReplaceSensor;
+            if(configObj.isForceSync === 1) {
+                set_deviceNumber(configObj.deviceNo);
+            } else {
+                set_deviceNumber(configObj.configDeviceNo);
+            }
+            
+            set_petName(configObj.petName);
+            if(configObj) {
+                
+            }
+        }
     };
 
     const connectSensor = async (devNumber) => {
+
         set_isLoading(true);
         isLoadingdRef.current = 1;
         set_loaderText('Please wait while we connect to sensor..');
+
         if(Platform.OS==='ios'){
             SensorHandler.getInstance();
             setTimeout(() => {  
@@ -359,6 +373,7 @@ const SensorCommandComponent = ({navigation, route, ...props }) => {
             set_isPopUpLeft(false);
             set_popupId(POPUP_COMMAND_SUCCESS);
             if(commandType.current === 'Force Sync'){
+                await SensorHandler.getInstance().dissconnectHPN1Sensor();
                 set_popUpMessage(Constant.SYNC_SUCCESS);       
             }
 
@@ -368,12 +383,26 @@ const SensorCommandComponent = ({navigation, route, ...props }) => {
 
     }
 
-    const backBtnAction = () => {
+    const backBtnAction = async () => {
 
         if(isLoadingdRef.current === 0 && popIdRef.current === 0){
-            firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_sensor_command_component, "User clicked on back button to navigate to Select Sensor Action Page", '');
-            SensorHandler.getInstance().dissconnectSensor();
-            navigation.navigate('SelectSensorActionComponent');
+
+            if(isReplaceSensor.current === 0) {
+
+                firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_sensor_command_component, "User clicked on back button to navigate to Select Sensor Action Page", '');
+                SensorHandler.getInstance().dissconnectSensor();
+                navigation.navigate('AllDevicesListComponent');
+
+            } else if(isReplaceSensor.current === 1) {
+
+                let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+                configObj = JSON.parse(configObj);
+                configObj.isForceSync = 2;
+                await DataStorageLocal.saveDataToAsync(Constant.CONFIG_SENSOR_OBJ, JSON.stringify(configObj));
+                navigation.navigate('NewReplaceSensorRequestComponent');
+
+            }
+            
         }
         
     };
@@ -395,7 +424,6 @@ const SensorCommandComponent = ({navigation, route, ...props }) => {
                 if(popupId === POPUP_COMMAND_CONFIRM){
                     connectSensor(deviceNumber);
                 } 
-                
                 if(popupId === POPUP_COMMAND_SUCCESS) {
                     backBtnAction();
                 }
@@ -412,7 +440,8 @@ const SensorCommandComponent = ({navigation, route, ...props }) => {
 
     };
 
-    const popCancelBtnAction = () => {
+    const popCancelBtnAction = async () => {
+
         set_isPopUp(false);
         popIdRef.current = 0;
         set_popUpTitle(undefined);
@@ -420,7 +449,24 @@ const SensorCommandComponent = ({navigation, route, ...props }) => {
         set_popUpRBtnTitle(undefined);
         set_popUplBtnTitle(undefined);
         // SensorHandler.getInstance().dissconnectSensor();
-        navigation.navigate('SelectSensorActionComponent');
+        // navigation.navigate('SelectSensorActionComponent');
+
+        if(isReplaceSensor.current === 1) {
+
+            let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+            configObj = JSON.parse(configObj);
+            if(configObj.isForceSync === 1) {
+                navigation.navigate('ReplaceSensorComponent');
+            } else {
+                navigation.navigate('NewReplaceSensorRequestComponent');
+            }
+            
+        } else {
+            navigation.navigate('AllDevicesListComponent');
+        }
+            
+        
+        
     };
 
     const mailToHPN = () => {
@@ -449,7 +495,7 @@ return (
             <View style={styles.mainViewStyle}>
 
                 <View style={styles.topViewStyle}>
-                    <Text style={styles.headerStyle}>{'Device : '}<Text style={[styles.headerStyle,{...CommonStyles.textStyleBold}]}>{deviceNumber}</Text></Text>
+                    <Text style={styles.headerStyle}>{'Sensor : '}<Text style={[styles.headerStyle,{...CommonStyles.textStyleBold}]}>{deviceNumber}</Text></Text>
                     <Text style={styles.headerStyle}>{'Pet Name : '}<Text style={[styles.headerStyle,{...CommonStyles.textStyleBold}]}>{petName}</Text></Text>
                 </View>
 

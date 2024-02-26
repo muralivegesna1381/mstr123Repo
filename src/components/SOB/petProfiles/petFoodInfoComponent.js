@@ -47,6 +47,7 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
     const [dietName, set_dietName] = useState(undefined);
     const [dietID, set_dietID] = useState(undefined);
     const [isDropdown, set_isDropdown] = useState(false);
+    const [speciesId, set_speciesId] = useState('');
 
     let isLoadingdRef = useRef(0);
     let sJosnObj = useRef();
@@ -103,11 +104,24 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
     };
 
     const getSOBDetails = async () => {
+        
         let sJson1 = await DataStorageLocal.getDataFromAsync(Constant.ONBOARDING_OBJ);
         sJson1 = JSON.parse(sJson1);
         if (sJson1) {
             sJosnObj.current = sJson1;
+
+            set_petFoodAmount(sJson1.foodIntake);
             set_petName(sJson1.petName);
+            set_dietName(sJson1.dietName);
+            set_dietID(sJson1.brandId);
+            set_petFoodAmountUnits(sJson1.dietAmountType === 1 ? 'Cups' : "Grams");
+            set_speciesId(sJson1.speciesId);
+
+            if (sJson1.dietName && sJson1.dietAmountType) {
+                set_isBtnEnable(true)
+            }
+
+
         } else {
             sJosnObj.current = {};
         }
@@ -170,15 +184,20 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
         const units = petFoodAmountUnits === "Cups" ? 1 : 2
         sJosnObj.current.dietAmountType = units;
         await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));
-        navigation.navigate('PetAgeComponent');
+        //navigation.navigate('PetAgeComponent');
+        if (sJosnObj.current && !sJosnObj.current.isSkip) {
+            navigation.navigate('PetLocationComponent', { isFrom: 'pLocation' });
+        } else {
+            navigation.navigate('PetAddressComponent', { isFrom: 'feedingPrefs' });
+        }
     };
 
     const backBtnAction = async () => {
-        navigation.navigate('PetBreedComponent');
+        navigation.pop()
     };
 
     const validateFoodData = (foodAmount) => {
-        if (parseInt(foodAmountRef.current) > 0 && dietName) {
+        if (parseFloat(foodAmountRef.current) > 0 && dietName) {
             set_isBtnEnable(true)
         } else {
             set_isBtnEnable(false)
@@ -198,7 +217,7 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
         set_dietName(item.brandName)
         set_isSearchView(false)
 
-        if (item.brandName && parseInt(foodAmountRef.current) > 0) {
+        if (item.brandName && parseFloat(foodAmountRef.current) > 0) {
             set_isBtnEnable(true)
         }
     };
@@ -232,7 +251,7 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
     const getDietList = async () => {
         totalRecordsData.current = []
         let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        fetch(Environment.uri + "petBfi/getPetFoodBrands/1", {
+        fetch(Environment.uri + "petBfi/getPetFoodBrands/" + speciesId, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -274,7 +293,7 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
                         <View style={{ width: wp('80%'), height: hp('40%') }}>
                             <Text style={CommonStyles.headerTextStyle}>{'What is'}</Text>
                             <Text style={CommonStyles.headerTextStyle}>{petName + "'s" + ' primary food'}</Text>
-                            <Text style={CommonStyles.headerTextStyle}>{'brand and amount'}</Text>
+                            <Text style={CommonStyles.headerTextStyle}>{'brand and amount per day'}</Text>
 
                             <View style={{ width: wp('80%'), marginTop: hp('5%'), alignItems: 'center' }}>
                                 <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("80%"), }} onPress={() => { getDietList(); }}>
@@ -294,17 +313,28 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
                                 <View style={{ width: wp("50%") }}>
                                     <TextInputComponent
                                         inputText={petFoodAmount}
-                                        labelText={'Amount'}
+                                        labelText={'Amount per day'}
                                         isEditable={true}
                                         widthValue={wp('50%')}
                                         maxLengthVal={10}
                                         keyboardType={'numeric'}
                                         autoCapitalize={false}
-                                        setValue={(textAnswer) => {
-                                            foodAmountRef.current = textAnswer.replace('.', '');
-                                            const sanitizedText = textAnswer.replace('.', '');
-                                            set_petFoodAmount(sanitizedText)
-                                            validateFoodData()
+                                        setValue={(text) => {
+                                            if (text.includes(".")) {
+                                                var weightSplit = text.split('.')
+                                                var decimalValue = weightSplit[1]
+                                                if (decimalValue.length > 2) {
+                                                    decimalValue = weightSplit[1].substring(0, 2)
+                                                }
+                                                var finalValue = weightSplit[0] + "." + decimalValue
+                                                foodAmountRef.current = finalValue
+                                                set_petFoodAmount(finalValue)
+                                                validateFoodData()
+                                            } else {
+                                                foodAmountRef.current = text
+                                                set_petFoodAmount(text)
+                                                validateFoodData()
+                                            }
                                         }}
                                     />
                                 </View>

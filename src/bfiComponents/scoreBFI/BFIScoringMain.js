@@ -74,6 +74,8 @@ const BFIScoreMain = ({ route, navigation }) => {
     { name: 'N/A', checked: false },
   ]);
 
+  let trace_bfiScoreSubmit_Screen;
+
   //Android Physical back button action
   useEffect(() => {
     //start session time
@@ -82,14 +84,25 @@ const BFIScoreMain = ({ route, navigation }) => {
 
     getScoreIDs()
 
-    firebaseHelper.logEvent(firebaseHelper.screen_submit_bfiScore, firebaseHelper.event_score_submit_screen_entered, "score BFI Screen entered", "");
+    initialSessionStart();
+    firebaseHelper.reportScreen(firebaseHelper.screen_bfi_pet_information);
+    firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_submit_bfiScore, "score BFI Screen entered", '');
 
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     return () => {
+      initialSessionStop();
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
     };
 
   }, []);
+
+  const initialSessionStart = async () => {
+    trace_bfiScoreSubmit_Screen = await perf().startTrace('t_inBFIScoreSubmitScreen');
+  };
+
+  const initialSessionStop = async () => {
+    await trace_bfiScoreSubmit_Screen.stop();
+  };
 
   useEffect(() => {
     if (route.params?.from === "setImages" && route.params?.bfiInfoData) {
@@ -116,15 +129,18 @@ const BFIScoreMain = ({ route, navigation }) => {
         previousScore.current = route.params?.bfiInfoData[0].bfiScore
         set_descriptionEnable(true)
       }
-      for (let i = 0; i < route.params?.bfiInfoData[0].petBfiImages.length; i++) {
-        let tempObj = {
-          uri: route.params?.bfiInfoData[0].petBfiImages[i].imageUrl,
-        }
-        tempArray.push(tempObj);
-      }
-      set_imagesFullview(tempArray)
 
-      set_images(route.params?.bfiInfoData[0].petBfiImages)
+      if (route.params?.bfiInfoData[0].petBfiImages) {
+        for (let i = 0; i < route.params?.bfiInfoData[0].petBfiImages.length; i++) {
+          let tempObj = {
+            uri: route.params?.bfiInfoData[0].petBfiImages[i].imageUrl,
+          }
+          tempArray.push(tempObj);
+        }
+        set_imagesFullview(tempArray)
+        set_images(route.params?.bfiInfoData[0].petBfiImages)
+      }
+
     }
 
     if (route.params?.petName) {
@@ -163,7 +179,7 @@ const BFIScoreMain = ({ route, navigation }) => {
       createPopup("", Constant.SCORE_EDIT_REASON, 'OK', false, true);
     }
     else {
-      firebaseHelper.logEvent(firebaseHelper.screen_submit_bfiScore, firebaseHelper.event_score_submit_btn_clicked, "BFI Screen submit action clicked", "");
+      firebaseHelper.logEvent(firebaseHelper.event_score_submit_btn_clicked, firebaseHelper.screen_submit_bfiScore, "BFI Screen submit action clicked", "");
       submitBFIScore()
       set_isLoading(true);
     }

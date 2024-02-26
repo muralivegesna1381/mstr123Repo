@@ -39,7 +39,7 @@ const  SelectDateUI = ({route, ...props }) => {
       </View>
 
       <View style={{width: wp('80%'),height: hp('70%'),alignSelf:'center'}}>
-        <Text style={[CommonStyles.headerTextStyle,{marginTop: hp("8%"),marginBottom: hp("8%")}]}>{Constant.OBS_SELECT_DATE_TEXT}</Text> 
+      <Text style={[CommonStyles.headerTextStyle,{marginTop: hp("8%"),marginBottom: hp("8%")}]}>{props.mediaType === 0 ? Constant.OBS_SELECT_DATE_PHOTO_TEXT : Constant.OBS_SELECT_DATE_VIDEO_TEXT}</Text> 
         <View style={styles.datePickerMViewStyle}>
           <View style={styles.datePickerSubViewStyle}>
             <DatePicker 

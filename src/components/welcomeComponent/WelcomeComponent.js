@@ -94,7 +94,7 @@ const WelcomeComponent = ({navigation, route, ...props }) => {
 
       {isPopUp ? <View style={CommonStyles.customPopUpStyle}>
         <AlertComponent
-          header = {'Sorry!'}
+          header = {'Login Limit Exceeded'}
           message={Constant.AUTO_LOGOUT_MSG}
           isLeftBtnEnable = {false}
           isRightBtnEnable = {true}

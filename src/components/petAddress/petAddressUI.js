@@ -9,6 +9,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 import AlertComponent from '../../utils/commonComponents/alertComponent';
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../utils/constants/constant";
+import GooglePlacesComponent from "./../../utils/googlePlacesComponent/googlePlacesComponent";
 
 let downArrowImg = require('./../../../assets/images/otherImages/svg/downArrowGrey.svg');
 
@@ -92,9 +93,14 @@ const  PetAddressUI = ({route, ...props }) => {
 
     const popOkBtnAction = () => {
       props.popOkBtnAction()
-    }
+    };
+
+    const getAddress = (address) => {
+      props.getAddress(address);
+    };
 
     return (
+
       <View style={[CommonStyles.mainComponentStyle]}>
         <View style={[CommonStyles.headerView,{}]}>
           <HeaderComponent
@@ -108,26 +114,34 @@ const  PetAddressUI = ({route, ...props }) => {
           />
         </View>
             
-        <KeyboardAwareScrollView showsVerticalScrollIndicator={true} style={{marginBottom:150}} enableOnAndroid={true} scrollEnabled={true}>
-          <View style={{width:wp('100%'),minHeight:hp('70%'),alignItems:'center',marginBottom:hp('20%')}}>
-
-            {!props.isPetParentAddress ? <View style={{width:wp('80%'),marginTop:hp('4%')}}>
+        {!props.isPetParentAddress ? <View style={{width:wp('80%'),alignSelf:'center',marginTop:hp('2%')}}>
               <Text style={CommonStyles.headerTextStyle}>{"Lets get to"}</Text>
               <Text style={CommonStyles.headerTextStyle}>{"know your pet location"}</Text>
-            </View> : <View style={{width:wp('80%'),marginTop:hp('4%')}}>
+            </View> : <View style={{width:wp('80%'),marginTop:hp('4%'),alignSelf:'center'}}>
               <Text style={CommonStyles.headerTextStyle}>{Constant.CHANGE_ADDRESS_LATER_HEADER}</Text>
-            </View>}
+        </View>}
+
+        {!props.isPetParentAddress ? <View style={{marginTop:hp('2%'),width:wp('100%'),height:hp('5%'),zIndex:999}}>
+          <GooglePlacesComponent
+            setValue={(address) => {
+              getAddress(address)
+            }}
+          />
+        </View> : null}
+
+        <KeyboardAwareScrollView showsVerticalScrollIndicator={true} style={{}} enableOnAndroid={true} scrollEnabled={true}>
+
+          {props.addressMOBJ || props.isPetParentAddress ? <View style={{width:wp('100%'),minHeight:hp('70%'),alignItems:'center',marginBottom:hp('15%')}}>
 
             <View style={{marginTop:hp('4%')}} >
 
               <TextInputComponent 
                 inputText = {addLine1} 
                 labelText = {'Address line 1*'} 
-                isEditable = {!props.isPetParentAddress}
+                isEditable = {false}
                 maxLengthVal = {50}
                 autoCapitalize = {'none'}
-                isBackground = {!props.isPetParentAddress ? 'transparent' : '#dedede'}
-                setValue={(textAnswer) => {validateAddress(textAnswer,1)}}
+                isBackground = {'#dedede'}
               />
 
             </View>  
@@ -136,10 +150,10 @@ const  PetAddressUI = ({route, ...props }) => {
               <TextInputComponent 
                 inputText = {addLine2} 
                 labelText = {'Address line 2 (Optional)'} 
-                isEditable = {props.isPetParentAddress ? false : true}
+                isEditable = {false}
                 maxLengthVal = {50}
                 autoCapitalize = {'none'}
-                isBackground = {!props.isPetParentAddress ? 'transparent' : '#dedede'}
+                isBackground = {'#dedede'}
                 setValue={(textAnswer) => {validateAddress(textAnswer,2)}}
               />
             </View>  
@@ -148,10 +162,10 @@ const  PetAddressUI = ({route, ...props }) => {
               <TextInputComponent 
                 inputText = {city} 
                 labelText = {'City*'} 
-                isEditable = {props.isPetParentAddress ? false : true}
+                isEditable = {false}
                 maxLengthVal = {50}
                 autoCapitalize = {'none'}
-                isBackground = {!props.isPetParentAddress ? 'transparent' : '#dedede'}
+                isBackground = {'#dedede'}
                 setValue={(textAnswer) => {validateAddress(textAnswer,3)}}
               />
             </View>  
@@ -160,10 +174,10 @@ const  PetAddressUI = ({route, ...props }) => {
               <TextInputComponent 
                 inputText = {state} 
                 labelText = {'State*'} 
-                isEditable = {props.isPetParentAddress ? false : true}
+                isEditable = {false}
                 maxLengthVal = {50}
                 autoCapitalize = {'none'}
-                isBackground = {!props.isPetParentAddress ? 'transparent' : '#dedede'}
+                isBackground = {'#dedede'}
                 setValue={(textAnswer) => {validateAddress(textAnswer,4)}}
               />
             </View>  
@@ -175,13 +189,8 @@ const  PetAddressUI = ({route, ...props }) => {
                 isEditable = {false}
                 maxLengthVal = {50}
                 autoCapitalize = {'none'}
-                isBackground = {!props.isPetParentAddress ? 'transparent' : '#dedede'}
-                setValue={(textAnswer) => {validateAddress(textAnswer,6)}}/>
-                      
-                <TouchableOpacity disabled = {!props.isPetParentAddress ? false : true} style={[CommonStyles.addressCountryStyle, {}]} onPress={() => 
-                  {set_isDropdown(!isDropdown)}}>
-                    <Image source={downArrowImg} style={styles.imageStyle} />
-                </TouchableOpacity>
+                isBackground = {'#dedede'}
+                />
             </View> 
 
             <View style={{marginTop:hp('2%')}} >
@@ -189,15 +198,15 @@ const  PetAddressUI = ({route, ...props }) => {
               <TextInputComponent 
                 inputText = {zipCode} 
                 labelText = {'Zip Code*'} 
-                isEditable = {props.isPetParentAddress ? false : true}
+                isEditable = {false}
                 maxLengthVal = {9}
                 autoCapitalize = {'none'}
-                isBackground = {!props.isPetParentAddress ? 'transparent' : '#dedede'}
+                isBackground = {'#dedede'}
                 setValue={(textAnswer) => {validateAddress(textAnswer,5)}}
               />
             </View>   
                
-          </View>           
+          </View> : null }          
         </KeyboardAwareScrollView>
 
         <View style={CommonStyles.bottomViewComponentStyle}>
@@ -205,14 +214,14 @@ const  PetAddressUI = ({route, ...props }) => {
             rightBtnTitle = {props.isFromScreen === 'petEdit' ? 'SUBMIT' : 'NEXT'}
             leftBtnTitle={'BACK'}
             isLeftBtnEnable = {true}
-            rigthBtnState = {!allAnswered ? false : true}
+            rigthBtnState = {props.isNxtBtnEnable ? true : false}
             isRightBtnEnable = {true}
             rightButtonAction = {async () => nextButtonAction()}
             leftButtonAction = {async () => backBtnAction()}
           />
         </View>    
 
-        {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
+        {props.isPopUp ? <View style={[CommonStyles.customPopUpStyle,{zIndex:999}]}>
           <AlertComponent
             header = {props.popUpAlert}
             message={props.popUpMessage}
@@ -222,22 +231,6 @@ const  PetAddressUI = ({route, ...props }) => {
             rightBtnTilte = {'OK'}
             popUpRightBtnAction = {() => popOkBtnAction()}
           />
-        </View> : null}
-
-        {isDropdown ? <View style={[styles.popSearchViewStyle]}>
-          <FlatList
-            style={styles.flatcontainer}
-            data={['United States', 'United Kingdom']}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => (
-              <TouchableOpacity onPress={() => {set_country(item),set_isDropdown(!isDropdown),countryRef.current = item}}>
-                <View style={styles.flatview}>
-                  <Text numberOfLines={2} style={[styles.name]}>{item}</Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            enableEmptySections={true}
-            keyExtractor={(item,index) => index}/>        
         </View> : null}
 
         {props.isLoading ? <LoaderComponent isLoader={true} loaderText = {Constant.LOADER_WAIT_MESSAGE} isButtonEnable = {false} /> : null} 

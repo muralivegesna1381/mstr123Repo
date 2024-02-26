@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View, BackHandler } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import CommonStyles from '../../utils/commonStyles/commonStyles';
 import fonts from '../../utils/commonStyles/fonts';
@@ -7,16 +7,43 @@ import BottomComponent from '../../utils/commonComponents/bottomComponent';
 import HeaderComponent from '../../utils/commonComponents/headerComponent';
 import * as DataStorageLocal from '../../utils/storage/dataStorageLocal';
 import * as Constant from "../../utils/constants/constant";
+import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 
 const ReviewComponent = ({ route, navigation }) => {
 
   const [isFromScreen, set_isFromScreen] = useState(undefined);
+  let trace_bfi_review_Screen;
 
   useEffect(() => {
+
+    initialSessionStart();
+    firebaseHelper.reportScreen(firebaseHelper.screen_bfi_review);
+    firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_review, "BFI Review Screen entered", '');
+
     if (route.params?.isFromScreen) {
       set_isFromScreen(route.params?.isFromScreen);
     }
+
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+      initialSessionStop();
+      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };
+
   }, [route.params?.isFromScreen]);
+
+  const handleBackButtonClick = () => {
+    backBtnAction();
+    return true;
+  };
+
+  const initialSessionStart = async () => {
+    trace_bfi_review_Screen = await perf().startTrace('t_inBFIReviewScreen');
+  };
+
+  const initialSessionStop = async () => {
+    await trace_bfi_review_Screen.stop();
+  };
 
   const nextButtonAction = async () => {
     if (isFromScreen === 'bfiScore') {
@@ -31,21 +58,39 @@ const ReviewComponent = ({ route, navigation }) => {
 
   const backBtnAction = async () => {
     //change logic as per role
-    let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
-    if (userRole === '7') {
-      //Pet parent so navigate to dashboard
+    let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
+    let userDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
+    userDetails = JSON.parse(userDetails)
+
+    if (clientId && clientId > 0) {
       navigation.navigate("DashBoardService");
-    }
-    else if (userRole === '8') {
-      //Vet role so navigate to scoring page
-      navigation.navigate("PetListBFIScoringScreen");
-    }
-    else if (userRole === '9') {
-      //Representative so navigate to representative dashboard
-      navigation.navigate("BFIUserDashboardComponent");
-    }
+    } else {
+      if (userDetails && userDetails.RolePermissions) {
+        let hasBFIImgCapture = false;
+        let hasBFIScore = false;
 
+        for (let i = 0; i < userDetails.RolePermissions.length; i++) {
+          if (userDetails.RolePermissions[i].menuId === 67) {
+            hasBFIImgCapture = true;
+          }
 
+          if (userDetails.RolePermissions[i].menuId === 68) {
+            hasBFIScore = true;
+          }
+        }
+
+        if (hasBFIScore && hasBFIImgCapture) {
+          // Representative Dashboard
+          navigation.navigate("BFIUserDashboardComponent");
+        } else if (hasBFIScore) {
+          // Veterinerian
+          navigation.navigate("PetListBFIScoringScreen");
+        } else if (hasBFIImgCapture) {
+          // Only Capture
+          navigation.navigate("DashBoardService");
+        }
+      }
+    }
   };
 
   return (

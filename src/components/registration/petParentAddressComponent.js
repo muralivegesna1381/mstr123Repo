@@ -16,7 +16,6 @@ const PetParentAddressComponent = ({ navigation, route, ...props }) => {
     const [primaryEmail, set_primaryEmail] = useState(undefined);
     const [secondaryEmail, set_secondaryEmail] = useState(undefined);
     const [date, set_Date] = useState(new Date());
-    const [isNxtBtnEnable, set_isNxtBtnEnable] = useState(true);
     const [isNotificationEnable, set_isNotificationEnable] = useState(false);
     const [isLoading, set_isLoading] = useState(false);
     const [popUpMessage, set_popUpMessage] = useState(undefined);
@@ -24,6 +23,7 @@ const PetParentAddressComponent = ({ navigation, route, ...props }) => {
     const [popUpAlert, set_popUpAlert] = useState('Alert');
     const [parentObj, set_parentObj] = useState(undefined);
     const [isPrelude, set_isPrelude] = useState(false);
+    const [addressMOBJ, set_addressMOBJ] = useState(false);
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
@@ -100,39 +100,19 @@ const PetParentAddressComponent = ({ navigation, route, ...props }) => {
         navigation.navigate('RegisterAccountComponent');
     };
 
-    const submitAction = async (addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef,prludeValue) => {
-
-        let line1 = addLine1Ref.replace(/(^[,\s]+)|([,\s]+$)/g, '');
-        let line2 = '';
-        if(addLine2Ref && addLine2Ref !== '') {
-            line2 = addLine2Ref.replace(/(^[,\s]+)|([,\s]+$)/g, '');
-        }
-
-        if(addLine1Ref && cityRef && stateRef && zipCodeRef && countryRef) {
-            set_isLoading(true);
-            let objAddress = {
-                "address1" : line1,
-                "address2" : line2,
-                "city" : cityRef,
-                "state" : stateRef,
-                "zipCode" : zipCodeRef,
-                "country" : countryRef,
-            }
-
-            firebaseHelper.logEvent(firebaseHelper.event_registration_account_Address_action, firebaseHelper.screen_register_parent_address, "User address", 'isPrelude User ' + isPrelude);
-            trace_Pet_Parent_Address_API_Complete = await perf().startTrace('t_Parent_Address_Validation_API');
-            validateAddress(line1,line2,cityRef,stateRef,zipCodeRef,countryRef);
-        } 
-        
+    const submitAction = async (isPrelude) => {
+        getOTPAPI(primaryEmail,addressMOBJ);
     };
 
-    const validateAddress = async (addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef) => {
+    const validateAddress = async (address) => {
 
+        let obj = {
+            'address' : address
+        }
         set_isLoading(true);
         isLoadingdRef.current = 1;
-        let seviceString = 'address1='+addLine1Ref+'&'+'address2='+addLine2Ref+'&'+'city='+cityRef+'&'+'state='+stateRef+'&'+'country='+countryRef+'&'+'zipCode='+zipCodeRef;
 
-        let addressServiceObj = await ServiceCalls.validateAddress(seviceString);
+        let addressServiceObj = await ServiceCalls.validateAddress(obj);
         set_isLoading(false);
         isLoadingdRef.current = 0;
         stopAddFBTrace();
@@ -150,21 +130,29 @@ const PetParentAddressComponent = ({ navigation, route, ...props }) => {
         }
 
         if (addressServiceObj && addressServiceObj.statusData) {
-            
-            let addObj = {
-                 "addressId" : null,
-                 "address1" : addLine1Ref,
-                 "address2" : addLine2Ref,
-                 "city" : cityRef,
-                 "state" : stateRef,
-                 "country" : countryRef,
-                 "zipCode" : zipCodeRef,
-                 "timeZoneId" : addressServiceObj.responseData.address.timeZone.timeZoneId,
-                 "timeZone" : addressServiceObj.responseData.address.timeZone.timeZoneName,
-                 "addressType" : 1,
-                 "isPreludeAddress" : 0
+
+            if(addressServiceObj.responseData && addressServiceObj.responseData.isValidAddress === 1)  {
+
+                let addObj = {
+                    "addressId" : null,
+                    "address1" : addressServiceObj.responseData.address.address1,
+                    "address2" : '',
+                    "city" : addressServiceObj.responseData.address.city,
+                    "state" : addressServiceObj.responseData.address.state,
+                    "country" : addressServiceObj.responseData.address.country,
+                    "zipCode" : addressServiceObj.responseData.address.zipCode,
+                    "timeZoneId" : addressServiceObj.responseData.address.timeZone.timeZoneId,
+                    "timeZone" : addressServiceObj.responseData.address.timeZone.timeZoneName,
+                    "addressType" : 1,
+                    "isPreludeAddress" : 0
+               }
+
+                set_addressMOBJ(addObj);
+
+            } else {
+                firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'error : Invalid Address');
+                createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
             }
-            getOTPAPI(primaryEmail,addObj);
 
         } else {
             firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'Service Status : false' );
@@ -192,6 +180,8 @@ const PetParentAddressComponent = ({ navigation, route, ...props }) => {
 
     const psdRequest = async (json,email,addObj) => {
 
+        set_isLoading(true);
+        isLoadingdRef.current = 1;
         let pRequestServiceObj = await ServiceCalls.registerUserSendEmailVerificationCode(json);
         set_isLoading(false);
         isLoadingdRef.current = 0;
@@ -239,18 +229,23 @@ const PetParentAddressComponent = ({ navigation, route, ...props }) => {
         popIdRef.current = 0;
     };
 
+    const getAddress = (address) => {
+        validateAddress(address);
+    };
+
     return (
         <PetParentAddressUi
-            isNxtBtnEnable = {isNxtBtnEnable}
             popUpAlert = {popUpAlert}
             popUpMessage = {popUpMessage}
             isPopUp = {isPopUp}
             isLoading = {isLoading}
             isPrelude = {isPrelude}
             parentObj = {parentObj}
+            addressMOBJ = {addressMOBJ}
             submitAction={submitAction}
             navigateToPrevious={navigateToPrevious}
             popOkBtnAction = {popOkBtnAction}
+            getAddress = {getAddress}
         />
     );
 

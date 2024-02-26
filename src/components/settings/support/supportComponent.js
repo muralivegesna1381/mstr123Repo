@@ -46,9 +46,15 @@ const SupportComponent = ({ navigation, route, ...props }) => {
     }, [route.params?.isFrom]);
 
     const updateArrayData = async () => {
-        let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
-        if (userRole === '8' || userRole === '9')
-            set_arraySupport(arraySupport.splice(1, 5))
+        
+        // let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
+        let userDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS,);
+        userDetails = JSON.parse(userDetails);
+
+        if (userDetails.RoleName === "Hill's Veterinarian" || userDetails.RoleName === "External Veterinarian" || userDetails.RoleName === "Hill's Representative") {
+            set_arraySupport(arraySupport.splice(1, 5));
+        }
+        
     }
 
     const popActions = (msg, title, value, id) => {

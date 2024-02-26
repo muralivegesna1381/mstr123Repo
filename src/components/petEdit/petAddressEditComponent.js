@@ -31,9 +31,12 @@ const PetAddressEditComponent = ({ navigation, route, ...props }) => {
     const [petObj, set_petObj] = useState(undefined);
     const [popupId, set_popupId] = useState(undefined);
     const [isEditable, set_isEditable] = useState(false);
+    const [addressMOBJ, set_addressMOBJ] = useState(false);
+    const [invalidAddress, set_invalidAddress] = useState(null);
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
+    let inValid = useRef(false);
 
     React.useEffect(() => {
         
@@ -92,14 +95,12 @@ const PetAddressEditComponent = ({ navigation, route, ...props }) => {
 
         set_isEditable(isEditable);
         if(isPetWithParent) {
-
-            if(petParentObj && petParentObj.petParentAddress && Object.keys(petParentObj.petParentAddress).length !== 0) {
+            if(petParentObj && petParentObj.address && Object.keys(petParentObj.address).length !== 0) {
                 set_isNxtBtnEnable(true);
-                setaddressValues(petParentObj.petParentAddress,isPetWithParent);
+                setaddressValues(petParentObj.address,isPetWithParent);
             }
 
         } else {
-
             if(petObj && petObj.petAddress && Object.keys(petObj.petAddress).length !== 0) {
                 set_isNxtBtnEnable(true);
                 setaddressValues(petObj.petAddress,isPetWithParent)
@@ -110,27 +111,48 @@ const PetAddressEditComponent = ({ navigation, route, ...props }) => {
     };
 
     const setaddressValues = (pObj,isPetWithParent) => {
+
         set_addLine1(pObj.address1);
         set_addLine2(pObj.address2);
         set_city(pObj.city);
         set_state(pObj.state);
         set_zipCode(pObj.zipCode);
         set_country(pObj.country);
-        set_isPetWithPP(isPetWithParent);       
+        set_isPetWithPP(isPetWithParent); 
+        
+        if(isPetWithParent) {
+
+            let addObj = {
+                "addressId" : pObj.addressId,
+                "address1" : pObj.address1,
+                "address2" : pObj.address2,
+                "city" : pObj.city,
+                "state" : pObj.state,
+                "country" : pObj.country,
+                "zipCode" : pObj.zipCode,
+                "timeZoneId" : pObj.timeZoneId,
+                "timeZone" : pObj.timeZone,
+                "addressType" : 1,
+                "isPreludeAddress" : 0
+           }
+
+           set_addressMOBJ(addObj)
+
+        }
+        
+
     };
 
-    const validatePetParentAddress = async (addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef) => {
+    const validatePetParentAddress = async (address) => {
 
-        let line1 = addLine1Ref.replace(/(^[,\s]+)|([,\s]+$)/g, '');
-        let line2 = '';
-        if(addLine2Ref && addLine2Ref !== '') {
-            line2 = addLine2Ref.replace(/(^[,\s]+)|([,\s]+$)/g, '');
+        let addObj = {
+            "address":address
         }
-
         set_isLoading(true);
         isLoadingdRef.current = 1;
-        let seviceString = 'address1='+line1+'&'+'address2='+line2+'&'+'city='+cityRef+'&'+'state='+stateRef+'&'+'country='+countryRef+'&'+'zipCode='+zipCodeRef;
-        let addressServiceObj = await ServiceCalls.validateAddress(seviceString);
+        let addressServiceObj = await ServiceCalls.validateAddress(addObj);
+        set_isLoading(false);
+        isLoadingdRef.current = 0;
 
         if (addressServiceObj && addressServiceObj.logoutData) {
             firebaseHelper.logEvent(firebaseHelper.event_Pet_Address_api_fail, firebaseHelper.screen_petAddress_EditComponent_screen, "Validate Address Failed - PetAddressEditComponent", 'User Loged Out - Multiple login');
@@ -140,47 +162,55 @@ const PetAddressEditComponent = ({ navigation, route, ...props }) => {
         }
 
         if (addressServiceObj && addressServiceObj.invalidData) {
-            set_isLoading(false);
-            isLoadingdRef.current = 0;
+            inValid.current = 100;
+            set_invalidAddress(true);
             firebaseHelper.logEvent(firebaseHelper.event_Pet_Address_api_fail, firebaseHelper.screen_petAddress_EditComponent_screen, "Validate Address Failed - PetAddressEditComponent", 'Invalid Address');
             createPopup(Constant.ALERT_DEFAULT_TITLE, 'Invalid Address', true,0,1);
             return;
         }
 
         if (addressServiceObj && !addressServiceObj.isInternet) {
-            set_isLoading(false);
-            isLoadingdRef.current = 0;
             firebaseHelper.logEvent(firebaseHelper.event_Pet_Address_api_fail, firebaseHelper.screen_petAddress_EditComponent_screen, "Validate Address Failed - PetAddressEditComponent", 'No Internet');
             createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true,0,1);
             return;
         }
 
         if (addressServiceObj && addressServiceObj.statusData) {
-            
-            let addObj = {
-                 "addressId" : null,
-                 "address1" : line1,
-                 "address2" : line2,
-                 "city" : cityRef,
-                 "state" : stateRef,
-                 "country" : countryRef,
-                 "zipCode" : zipCodeRef,
-                 "timeZoneId" : addressServiceObj.responseData.address.timeZone.timeZoneId,
-                 "timeZone" : addressServiceObj.responseData.address.timeZone.timeZoneName,
-                 "addressType" : 1,
-                 "isPreludeAddress" : 0
+
+            if(addressServiceObj.responseData && addressServiceObj.responseData.address) {
+
+                let addObj = {
+                    "addressId" : null,
+                    "address1" : addressServiceObj.responseData.address.address1,
+                    "address2" : '',
+                    "city" : addressServiceObj.responseData.address.city,
+                    "state" : addressServiceObj.responseData.address.state,
+                    "country" : addressServiceObj.responseData.address.country,
+                    "zipCode" : addressServiceObj.responseData.address.zipCode,
+                    "timeZoneId" : addressServiceObj.responseData.address.timeZone.timeZoneId,
+                    "timeZone" : addressServiceObj.responseData.address.timeZone.timeZoneName,
+                    "addressType" : 1,
+                    "isPreludeAddress" : 0
+               }
+               set_addressMOBJ(addObj)
+                set_addLine1(addressServiceObj.responseData.address.address1);
+                set_addLine2('');
+                set_city(addressServiceObj.responseData.address.city);
+                set_state(addressServiceObj.responseData.address.state);
+                set_zipCode(addressServiceObj.responseData.address.zipCode);
+                set_country(addressServiceObj.responseData.address.country);
+
             }
-            updateAddress(addObj);
+            
         } else {
-            set_isLoading(false);
-            isLoadingdRef.current = 0;
+            
+            set_invalidAddress(true);
             firebaseHelper.logEvent(firebaseHelper.event_Pet_Address_api_fail, firebaseHelper.screen_petAddress_EditComponent_screen, "Validate Address Failed - PetAddressEditComponent", 'Service Status : false');
             createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true,0,1);
         }
 
         if (addressServiceObj && addressServiceObj.error) {
-            set_isLoading(false);
-            isLoadingdRef.current = 0;
+            set_invalidAddress(true);
             createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true,0,1);
             let errors = addressServiceObj.error.length > 0 ? addressServiceObj.error[0].code : '';
             firebaseHelper.logEvent(firebaseHelper.event_Pet_Address_api_fail, firebaseHelper.screen_petAddress_EditComponent_screen, "Validate Address Failed - PetAddressEditComponent", 'error : '+errors);
@@ -199,24 +229,17 @@ const PetAddressEditComponent = ({ navigation, route, ...props }) => {
         
     };
 
-    const submitAction = async (addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef) => {
+    const submitAction = async () => {
 
-       if(!isPetWithPP && petParentObj.petParentAddress.address1 === addLine1Ref && petParentObj.petParentAddress.address2 === addLine2Ref 
-        && petParentObj.petParentAddress.city === cityRef && petParentObj.petParentAddress.zipCode === zipCodeRef 
-         && petParentObj.petParentAddress.country === countryRef) {
-            createPopup(Constant.ALERT_DEFAULT_TITLE, 'No changes found in the Address', true,0,1);
-            return;
+        if(addressMOBJ) {
+            updateAddress(addressMOBJ);
         }
-       
-       if(isPetWithPP && !isEditable) {
-        updateAddress(petParentObj.petParentAddress);
-       } else {
-        validatePetParentAddress(addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef);
-       }
 
     };
 
-    const updateAddress = (addObj) => {
+    const updateAddress = async (addObj) => {
+
+        let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
 
         let finalJSON = {
     
@@ -242,7 +265,7 @@ const PetAddressEditComponent = ({ navigation, route, ...props }) => {
             },
       
             Client: {
-                ClientID: petParentObj.clientId+ "",
+                ClientID: clientId+ "",
                 ClientEmail: petParentObj.email,
                 ClientFullName: petParentObj.fullName,
                 ClientFirstName: petParentObj.firstName,
@@ -260,7 +283,6 @@ const PetAddressEditComponent = ({ navigation, route, ...props }) => {
 
         set_isLoading(true);
         isLoadingdRef.current = 1;
-
         let addressServiceObj = await ServiceCalls.updatePetInfo(finalJSON,token);
         set_isLoading(false);
         isLoadingdRef.current = 0;
@@ -315,6 +337,10 @@ const PetAddressEditComponent = ({ navigation, route, ...props }) => {
         createPopup('','',false,0,0);
     };
 
+    const getAddress = (address) => {
+        validatePetParentAddress(address);
+    };
+
     return (
         <PetAddressEditUI
             addLine1 = {addLine1}
@@ -330,9 +356,12 @@ const PetAddressEditComponent = ({ navigation, route, ...props }) => {
             popUpAlert = {popUpAlert}
             isLoading ={isLoading}
             isEditable = {isEditable}
+            addressMOBJ = {addressMOBJ}
+            invalidAddress = {inValid.current}
             navigateToPrevious = {navigateToPrevious}
             submitAction = {submitAction}
             popOkBtnAction = {popOkBtnAction}
+            getAddress = {getAddress}
         />
     );
 

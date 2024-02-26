@@ -29,9 +29,7 @@ const questionnaireMultiSelectionComponent = ({navigation,_questionId,value,setV
      * Default option selection will be set in this useEffect.
      */
     useEffect( () => {  
-
       prepareOptions(answerArray);
-
     },[answerArray]);
 
     useEffect(() => {     
