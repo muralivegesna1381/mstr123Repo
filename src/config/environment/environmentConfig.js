@@ -1,25 +1,21 @@
-// @flow
-//import { getBundleId } from '../../utils/device.info';
 
-// ///////Migrated Service////////
-export const GCPUAT = {
-  uri: 'https://wms-uat3-ygue7fpaba-uc.a.run.app/wearables_mobile_services/app/',
-  deviceConnectUrl: "tst.wearablesclinicaltrials.com",
-  bfiImageClassfication: 'https://orientation-classifier.uat.wearablesclinicaltrials.com/image_classification',
-  isHPN1Bcon: true,
+export const PROD = {
+  uri: "https://mobileservices.wearablesclinicaltrials.com/wearables_mobile_services/app/",
+  deviceConnectUrl: "prd.wearablesclinicaltrials.com",
+  bfiImageClassfication: 'https://orientation-classifier.wearablesclinicaltrials.com/image_classification',
+  isHPN1Bcon: false,
 };
 
-const bundleId = "GCPUAT";
+const bundleId = 'PROD';
 
 export let env = "";
-
-if (bundleId === "GCPUAT") {
-  env = "GCPUAT";
-}
+if (bundleId === "PROD") {
+  env = "PROD";
+} 
 
 const Base = {
   Environment: function () {
-    if (env === "GCPUAT") return JSON.stringify(GCPUAT);
+    if (env === "PROD") return JSON.stringify(PROD);
   },
 };
 

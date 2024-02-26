@@ -38,7 +38,7 @@
     "apollo-link-error": "1.1.13",
     "apollo-link-http": "1.5.17",
     "apollo-link-rest": "0.7.2",
-    "axios": "0.22.0",
+    "axios": "1.6.7",
     "buffer": "6.0.3",
     "convert-string": "0.1.0",
     "deprecated-react-native-prop-types": "2.2.0",

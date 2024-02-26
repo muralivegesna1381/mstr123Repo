@@ -2739,7 +2739,7 @@ export async function getGooglePlacesApi(searchText) {
         components: { country: ['us'] },
     }
 
-    await fetch("https://maps.googleapis.com/maps/api/place/autocomplete/json?key=AIzaSyBAWqIHLdP7rRrkm4GG5Rrsl1e1P1j6cLo&input=" + searchText + "&components=country:us|country:uk|country:ca",
+    await fetch("https://maps.googleapis.com/maps/api/place/autocomplete/json?" + searchText + "&components=country:us|country:uk|country:ca",
         {
             method: "GET",
             headers: {
@@ -2796,7 +2796,7 @@ export async function getGooglePlacesApiBy(searchText) {
         components: { country: ['us'] },
     }
 
-    await fetch("https://maps.googleapis.com/maps/api/place/details/json?place_id="+searchText+"&sensor=true&key=AIzaSyBAWqIHLdP7rRrkm4GG5Rrsl1e1P1j6cLo",
+    await fetch("https://maps.googleapis.com/maps/api/place/details/json?place_id="+searchText+"&sensor=true",
         {
             method: "GET",
             headers: {
