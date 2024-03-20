@@ -9,7 +9,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>WAG</string>
+	<string>Wearables</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -50,9 +50,9 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>This app uses your Bio Metrics</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>WAG app uses your location to locate and get directions to your veterinary practice</string>
+	<string>Wearables app uses your location to locate and get directions to your veterinary practice</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>WAG App uses your location to locate and get directions to your veterinary practice</string>
+	<string>Wearables App uses your location to locate and get directions to your veterinary practice</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>The app uses your phone microphone while recording the observation video</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

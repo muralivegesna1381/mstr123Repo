@@ -643,9 +643,10 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
       let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
       let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
       configObj = JSON.parse(configObj);
+
       let newDate = moment(new Date()).format("YYYY-MM-DD")
       if(configObj.isReplaceSensor === 1) {
-        saveReplaceSensorStausToBackend(clientId,token,configPetSensor.current.petID,configObj.petItemObj.deviceNumber, wifiSSID.current,newDate,configObj.configDeviceModel,configObj.configDeviceNo);
+        saveReplaceSensorStausToBackend(clientId,token,configPetSensor.current.petID,configObj.petItemObj.deviceNumber, wifiSSID.current,newDate,configObj.configDeviceModel,configObj.configDeviceNo,configObj.reasonId);
       } else {
         saveSensorStausToBackend(clientId,token,configPetSensor.current.petID,devNumber.current, wifiSSID.current);
       }
@@ -714,7 +715,7 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
 
     };
 
-    const saveReplaceSensorStausToBackend = async (clientId,token,petID,devNumber, wifiSSID,newDate,devModel,newDeviceNo) => {
+    const saveReplaceSensorStausToBackend = async (clientId,token,petID,devNumber, wifiSSID,newDate,devModel,newDeviceNo,reasonId) => {
 
       await SensorHandler.getInstance().stopScanProcess(false);
 
@@ -732,7 +733,9 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
         "ssidList": wifiSSID,
         "createdBy": 0,
         "oldDeviceNumber" : devNumber.toString(),
+        "reasonId" : reasonId
       };
+
       updateReplaceSensorSetupStatus(json,token)
 
     };

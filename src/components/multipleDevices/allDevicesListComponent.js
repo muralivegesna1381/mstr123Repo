@@ -4,6 +4,8 @@ import AllDevicesUI from './allDevicesListUI';
 import * as DataStorageLocal from '../../utils/storage/dataStorageLocal';
 import perf from '@react-native-firebase/perf';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
+import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
+import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
 
 let trace_inAllDevicesScreen;
 
@@ -15,6 +17,9 @@ const AllDevicesListComponent = ({navigation, route, ...props }) => {
     const [isListView, set_isListView] = useState(false);
     const [petItemObj, set_petItemObj] = useState(undefined);
     const [optionsArray, set_optionsArray] = useState([]);
+    const [reasonsArray, set_reasonsArray] = useState([{reasonId:1, reasonName:'Defective', reasonSubName:'For charging or hardware issue'},
+    {reasonId:2, reasonName:'Damaged', reasonSubName:'Due to breakage or water immersion'},
+    {reasonId:3, reasonName:'Upgraded', reasonSubName:'For sensor version upgrades'}])
 
     React.useEffect(() => {
 
@@ -28,6 +33,7 @@ const AllDevicesListComponent = ({navigation, route, ...props }) => {
 
      useEffect(() => {
         prepareDevices();
+        getReplaceReasonsAPI();
     }, []);
 
     const initialSessionStart = async () => {
@@ -66,6 +72,64 @@ const AllDevicesListComponent = ({navigation, route, ...props }) => {
         }
         set_devices(tempArray);
     };
+
+    const prepareReasons = (rData) => {
+
+        let tempReasons = rData.reasons;
+        if(tempReasons && tempReasons.length > 0) {
+          for (let reason = 0; reason < tempReasons.length; reason++) {
+  
+            if(tempReasons[reason].reasonId === 1) {
+              tempReasons[reason].reasonSubName = 'For charging or hardware issue'
+            } else if(tempReasons[reason].reasonId === 2) {
+              tempReasons[reason].reasonSubName = 'Due to breakage or water immersion'
+            } else if(tempReasons[reason].reasonId === 3) {
+              tempReasons[reason].reasonSubName = 'For sensor version upgrades'
+            } else {
+                tempReasons[reason].reasonSubName = ''
+            }
+  
+          }
+  
+        }
+  
+        set_reasonsArray(tempReasons)
+  
+      };
+  
+      const getReplaceReasonsAPI = async () => {
+  
+        // set_isLoading(true);
+        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
+        let reasonsServiceObj = await ServiceCalls.replaceSensorReasons(token);
+        // set_isLoading(false);
+        // isLoadingdRef.current = 0;
+  
+        if(reasonsServiceObj && reasonsServiceObj.logoutData){
+          // firebaseHelper.logEvent(firebaseHelper.event_SOB_device_number_api_fail, firebaseHelper.screen_SOB_deviceNumber, "Device number Api fail", 'error : Duplicate login');
+          AuthoriseCheck.authoriseCheck();
+          navigation.navigate('WelcomeComponent');
+          return;
+        }
+          
+        if(reasonsServiceObj && !reasonsServiceObj.isInternet){
+          createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,false,1);
+          return;
+        }
+    
+        if(reasonsServiceObj && reasonsServiceObj.statusData){
+  
+          prepareReasons(reasonsServiceObj.responseData);
+          
+        } else {
+          // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,false,0);
+        }
+    
+        if(reasonsServiceObj && reasonsServiceObj.error) {
+          // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,false,0);
+        }
+    
+      };
 
     const navigateToPrevious = () => {  
         navigation.pop();
@@ -157,7 +221,7 @@ const AllDevicesListComponent = ({navigation, route, ...props }) => {
         await DataStorageLocal.saveDataToAsync(Constant.CONFIG_SENSOR_OBJ, JSON.stringify(devObj));
 
         if(item.id === Constant.SENSOR_REPLACE) {
-            navigation.navigate('ReplaceSensorComponent');
+            navigation.navigate('ReplaceSensorComponent',{reasonsArray : reasonsArray});
         } else {
 
             if(petItemObj.deviceModel === 'AGL2' || petItemObj.deviceModel === 'CMAS') {

@@ -2720,7 +2720,7 @@ export async function saveForwardMotionGoal(jsonValue, token) {
 };
 
 ////// Google Places API //////
-export async function getGooglePlacesApi(searchText) {
+export async function getGooglePlacesApi(searchText,gKey) {
 
     let returnError = undefined;
     let statusData = undefined;
@@ -2739,64 +2739,7 @@ export async function getGooglePlacesApi(searchText) {
         components: { country: ['us'] },
     }
 
-    await fetch("https://maps.googleapis.com/maps/api/place/autocomplete/json?" + searchText + "&components=country:us|country:uk|country:ca",
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-                "ClientToken": ''
-            },
-        }
-    ).then((response) => response.json()).then(async (data) => {
-
-        if (data && data.errors && data.errors.length && data.errors[0].code === 'WEARABLES_TKN_003') {
-            logoutData = true;
-        } else {
-            logoutData = false;
-        }
-
-        if (data && data.errors && data.errors.length && data.errors[0].message === 'Invalid Address') {
-            invalidData = true;
-        } else {
-            invalidData = false;
-        }
-        if (data) {
-            statusData = true;
-            responseData = data.predictions;
-
-        } else {
-            statusData = undefined;
-        }
-
-    }).catch((error) => {
-        returnError = error;
-    });
-
-    obj = { logoutData: logoutData, invalidData: invalidData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
-    return obj;
-};
-
-export async function getGooglePlacesApiBy(searchText) {
-
-    let returnError = undefined;
-    let statusData = undefined;
-    let responseData = undefined;
-    let invalidData = false;
-    let logoutData = false;
-    let obj = undefined;
-
-    let internet = await internetCheck();
-    if (!internet) {
-        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
-        return obj;
-    }
-
-    const searchOptions = {
-        components: { country: ['us'] },
-    }
-
-    await fetch("https://maps.googleapis.com/maps/api/place/details/json?place_id="+searchText+"&sensor=true",
+    await fetch("https://maps.googleapis.com/maps/api/place/autocomplete/json?key=" + gKey + "&input=" + searchText + "&components=country:us|country:uk|country:ca",
         {
             method: "GET",
             headers: {
@@ -3338,6 +3281,54 @@ export async function getFoofdUnitsApi(value,token) {
       }
       
     ).then((response) => response.json()).then(async (data) => {
+
+        if(data && data.errors && data.errors.length && data.errors[0].code==='WEARABLES_TKN_003'){
+            logoutData = true;
+        } else {
+            logoutData = false;
+        }
+
+        if (data.status.success) {
+            statusData = data.status.success;
+            responseData = data.response;
+
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        returnError = error;
+    });
+
+    let obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError,isInternet : internet}
+    return obj;
+
+};
+
+////// Get Reasons API //////
+export async function replaceSensorReasons(token) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+
+    let internet  = await internetCheck();
+    if(!internet) {
+        obj = {logoutData : logoutData, statusData : statusData, responseData : responseData, error : returnError, isInternet : internet};
+        return obj;
+    } 
+
+    await fetch(Environment.uri + "pets/replace-sensor-reasons", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "ClientToken" : token
+        },
+      }
+
+      ).then((response) => response.json()).then(async (data) => {
 
         if(data && data.errors && data.errors.length && data.errors[0].code==='WEARABLES_TKN_003'){
             logoutData = true;

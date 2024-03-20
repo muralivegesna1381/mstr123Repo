@@ -558,7 +558,7 @@ const CommonStyles = StyleSheet.create({
     },
 
     droDownViewStyle : {
-        minHeight: hp("35%"),
+        minHeight: hp("25%"),
         width: wp("100%"),
         backgroundColor:'#EEEEEE',
         bottom:0,

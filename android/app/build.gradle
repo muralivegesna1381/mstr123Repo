@@ -152,13 +152,13 @@ android {
 
 
     defaultConfig {
-        applicationId "com.ctepl.wearablesclinicaltrialsdev"
+        applicationId "com.cte.wearables"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
         aaptOptions { cruncherEnabled = false }
-        versionCode 9
-        versionName "4.0"
+        versionCode 38
+        versionName "4.1"
         missingDimensionStrategy 'react-native-camera', 'general'
     }
     splits {

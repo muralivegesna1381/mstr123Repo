@@ -46,7 +46,7 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
   const [isPopUp, set_isPopUp] = useState(false);
   const [date, set_Date] = useState(undefined);
   const [userRole, set_UserRole] = useState(undefined);
-
+  
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
@@ -79,8 +79,17 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
   }, []);
 
   const getUserRole = async () => {
-    let userRole = await DataStorageLocal.getDataFromAsync(Constant.MENU_ID);
-    set_UserRole(userRole)
+
+    // let userRole = await DataStorageLocal.getDataFromAsync(Constant.MENU_ID);
+    // set_UserRole(userRole)
+
+    let userRoleDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
+    userRoleDetails = JSON.parse(userRoleDetails);
+
+    if(userRoleDetails){
+      set_UserRole(userRoleDetails.RoleName)
+    }
+
   }
 
   const initialSessionStart = async () => {
@@ -103,7 +112,7 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
   const backBtnAction = async () => {
     
     let userRole = await DataStorageLocal.getDataFromAsync(Constant.MENU_ID);
-
+console.log('App ', userRole)
     if (Platform.OS === "android" && userRole === '68') {
       set_popUpAlert('Exit App');
       set_popupMessage(Constant.ARE_YOU_SURE_YOU_WANT_EXIT);
@@ -375,8 +384,8 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <View style={[CommonStyles.headerView, {}]}>
         <HeaderComponent
-          isBackBtnEnable={userRole === "68" ? false : true}
-          isSettingsEnable={userRole === "68" ? true : false}
+          isBackBtnEnable={userRole === "Hill's Veterinarian" || userRole === "Hill's Veterinarian" ? false : true}
+          isSettingsEnable={userRole === "Hill's Veterinarian" || userRole === "Hill's Veterinarian" ? true : false}
           isTitleHeaderEnable={true}
           isInfoEnable={true}
           title={"Score BFI"}

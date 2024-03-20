@@ -5,6 +5,7 @@ import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
 import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
 import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
+import * as AppKeys from "./../../utils/appKeys/appKeys.js";
 
 let searchImg = require('./../../../assets/images/otherImages/svg/searchIcon.svg');
 let failedImg = require('../../../assets/images/otherImages/svg/clear_white_icon.svg');
@@ -27,7 +28,7 @@ const  GooglePlacesComponent = ({isBackBtnEnable,route,setValue,invalidAddress, 
     const getGooglePlaces = async (searchText) => {
 
         set_placeName(searchText);
-        let addressServiceObj = await ServiceCalls.getGooglePlacesApi(searchText);
+        let addressServiceObj = await ServiceCalls.getGooglePlacesApi(searchText,AppKeys.GOOGLE_PLACES_KEY);
  
         if (addressServiceObj && addressServiceObj.logoutData) {
             AuthoriseCheck.authoriseCheck();
@@ -65,48 +66,6 @@ const  GooglePlacesComponent = ({isBackBtnEnable,route,setValue,invalidAddress, 
 
     };
 
-    const getGooglePlacesBy = async (searchText) => {
-
-        // set_placeName(searchText);
-        let addressServiceObj = await ServiceCalls.getGooglePlacesApiBy(searchText);
- 
-        if (addressServiceObj && addressServiceObj.logoutData) {
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-
-        if (addressServiceObj && !addressServiceObj.isInternet) {
-            // createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
-            return;
-        }
-
-        if (addressServiceObj && addressServiceObj.statusData) {
-
-            if(addressServiceObj.responseData && addressServiceObj.responseData.length > 0) {
-
-                if(isShowSearch.current) {
-                    set_isListOpen(true);
-                } else {
-                    set_isListOpen(false);
-                }
-                
-            } else {
-                set_isListOpen(false);
-            }
-            set_placesArray(addressServiceObj.responseData);
-            
-
-        } else {
-            // createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
-        }
-
-        if (addressServiceObj && addressServiceObj.error) {
-            // createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
-        }
-
-    };
-
     const selectedPlaceAction = (item) => {
         
         isShowSearch.current = false;
@@ -118,7 +77,6 @@ const  GooglePlacesComponent = ({isBackBtnEnable,route,setValue,invalidAddress, 
         } else {
             set_isListOpen(undefined);
         }
-        // getGooglePlacesBy(item.place_id);
         // hideKeyboard()
     };
     

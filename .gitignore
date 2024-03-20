@@ -111,3 +111,5 @@ android/app/release/app-release.apk
 coverage/
 test-report.html
 *.html
+src/utils/appKeys/appKeys.js
+android/app/google-services.json

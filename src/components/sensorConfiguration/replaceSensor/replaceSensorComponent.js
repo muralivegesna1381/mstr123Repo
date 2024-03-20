@@ -1,4 +1,4 @@
-import React, { useState,useRef } from 'react';
+import React, { useState,useRef, useEffect } from 'react';
 import {BackHandler} from 'react-native';
 import ReplaceSensorUI from './replaceSensorUI.js';
 import * as DataStorageLocal from "../../../utils/storage/dataStorageLocal";
@@ -30,6 +30,7 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
     const [selectedIndex, set_selectedIndex] = useState(null);
     const [isSensorType, set_isSensorType] = useState(false);
     const [sensorType, set_sensorType] = useState(null);
+    const [reasonsArray, set_reasonsArray] = useState([])
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
@@ -59,6 +60,14 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
 
     }, [[]]);
 
+    useEffect(() => {
+
+      if(route.params?.reasonsArray) {
+        set_reasonsArray(route.params?.reasonsArray)
+      }
+            
+    }, [[route.params?.reasonsArray]]);
+
     const initialSessionStart = async () => {
       trace_inReplaceSensorScreen = await perf().startTrace('t_inReplaceSensorScreen');
     };
@@ -71,7 +80,6 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
 
       let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
       configObj = JSON.parse(configObj);
-
       if(configObj) {
         set_deviceNumber(configObj.petItemObj.deviceNumber);
         set_petName(configObj.petName);
@@ -199,6 +207,67 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
       validateDeviceFromBackend(json,token,deviceNo)
   
     };
+
+    // const prepareReasons = (rData) => {
+
+    //   let tempReasons = rData;
+    //   if(rData && rData.length > 0) {
+        
+    //     for (let reason = 0; reason < rData.length; reason++) {
+
+    //       if(rData[reason].reasonId === 1) {
+    //         tempReasons[reason].reasonSubName = 'For charging or hardware issue'
+    //       }
+  
+    //       if(rData[reason].reasonId === 2) {
+    //         tempReasons[reason].reasonSubName = 'Due to breakage or water immersion'
+    //       }
+  
+    //       if(rData[reason].reasonId === 3) {
+    //         tempReasons[reason].reasonSubName = 'For sensor version upgrades'
+    //       }
+
+    //     }
+
+    //   }
+
+    //   set_reasonsArray(tempReasons)
+
+    // };
+
+    // const getReplaceReasonsAPI = async () => {
+
+    //   // set_isLoading(true);
+    //   let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
+    //   let reasonsServiceObj = await ServiceCalls.replaceSensorReasons(token);
+    //   set_isLoading(false);
+    //   isLoadingdRef.current = 0;
+
+    //   if(reasonsServiceObj && reasonsServiceObj.logoutData){
+    //     // firebaseHelper.logEvent(firebaseHelper.event_SOB_device_number_api_fail, firebaseHelper.screen_SOB_deviceNumber, "Device number Api fail", 'error : Duplicate login');
+    //     AuthoriseCheck.authoriseCheck();
+    //     navigation.navigate('WelcomeComponent');
+    //     return;
+    //   }
+        
+    //   if(reasonsServiceObj && !reasonsServiceObj.isInternet){
+    //     createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,false,1);
+    //     return;
+    //   }
+  
+    //   if(reasonsServiceObj && reasonsServiceObj.statusData){
+
+    //     prepareReasons(reasonsServiceObj.responseData);
+        
+    //   } else {
+    //     // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,false,0);
+    //   }
+  
+    //   if(reasonsServiceObj && reasonsServiceObj.error) {
+    //     // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,false,0);
+    //   }
+  
+    // };
   
     const validateDeviceFromBackend = async (json,token,deviceNo) => {
 
@@ -306,9 +375,9 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
 
     const updateReason = (item, index) => {
 
-      set_reasonId(item.id);
+      set_reasonId(item.reasonId);
       set_selectedIndex(index);
-      if(index + 1 && deviceNumberNew  && sensorType) {
+      if(index + 1 && deviceNumberNew && sensorType) {
         set_nextBtnEnable(true);
       } else {
         set_nextBtnEnable(false);
@@ -401,6 +470,7 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
         selectedIndex = {selectedIndex}
         isSensorType = {isSensorType}
         sensorType = {sensorType}
+        reasonsArray = {reasonsArray}
         navigateToPrevious = {navigateToPrevious}
         popOkBtnAction = {popOkBtnAction}
         validateNewDevice = {validateNewDevice}

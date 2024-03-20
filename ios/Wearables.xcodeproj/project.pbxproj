@@ -38,7 +38,7 @@
 		94CEC7EBF4C5401785911AB7 /* Barlow-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AC4DD8611A6F47F387A87AB3 /* Barlow-Thin.ttf */; };
 		9756BDF1A58981B86912A245 /* Pods_Wearables.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5FC92E637C1E1581E56002FD /* Pods_Wearables.framework */; };
 		9A6D02C5299A6ECF0063B054 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* SplashScreen.storyboard */; };
-		9A8B790F2ABF3689007DE2B2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A8B790E2ABF3689007DE2B2 /* GoogleService-Info.plist */; };
+		9A9F96412BAB47AA00E460DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A9F96402BAB47AA00E460DC /* GoogleService-Info.plist */; };
 		9D61E8E6C3BD47C8A1A428FE /* Poppins-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6B8C333FB2F743E7A206D5CE /* Poppins-Black.ttf */; };
 		A3A946CB4DA645B8ACD3D522 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FB5BEFEFD6804D77A507BAA8 /* Poppins-Bold.ttf */; };
 		A644D0D4F3EE4E9EA250DCEF /* Poppins-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8DD9BDA7E25743B0AE0A33E3 /* Poppins-ExtraBoldItalic.ttf */; };
@@ -121,7 +121,7 @@
 		8DD9BDA7E25743B0AE0A33E3 /* Poppins-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBoldItalic.ttf"; path = "../assets/fonts/Poppins-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
 		9252F49433C34087BEFA8620 /* Poppins-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-MediumItalic.ttf"; path = "../assets/fonts/Poppins-MediumItalic.ttf"; sourceTree = "<group>"; };
 		99A05D50F8354ED3B4C4CFD7 /* Barlow-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Bold.ttf"; path = "../assets/fonts/Barlow-Bold.ttf"; sourceTree = "<group>"; };
-		9A8B790E2ABF3689007DE2B2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9A9F96402BAB47AA00E460DC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9F97FE06375F4C558CB7A0BE /* Poppins-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-BlackItalic.ttf"; path = "../assets/fonts/Poppins-BlackItalic.ttf"; sourceTree = "<group>"; };
 		A41E151EFE934C1181FA9ED2 /* Barlow-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Medium.ttf"; path = "../assets/fonts/Barlow-Medium.ttf"; sourceTree = "<group>"; };
 		A81871F62B27452A00540DA7 /* RNOpenCvLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenCvLibrary.h; sourceTree = "<group>"; };
@@ -310,7 +310,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				9A8B790E2ABF3689007DE2B2 /* GoogleService-Info.plist */,
+				9A9F96402BAB47AA00E460DC /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* Wearables */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* WearablesTests */,
@@ -487,8 +487,8 @@
 				BC44F84F163D4200A088F504 /* Poppins-SemiBold.ttf in Resources */,
 				1D7B4701DE044FD2AF647A54 /* Poppins-SemiBoldItalic.ttf in Resources */,
 				DBFC461FF70B4C4597744D20 /* Poppins-Thin.ttf in Resources */,
+				9A9F96412BAB47AA00E460DC /* GoogleService-Info.plist in Resources */,
 				3A8C0871D8264A91B0C4161E /* Poppins-ThinItalic.ttf in Resources */,
-				9A8B790F2ABF3689007DE2B2 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -792,10 +792,11 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Wearables/Wearables.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4.0;
-				DEVELOPMENT_TEAM = GUTBJ785HC;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Cambridge Technology Inc (GUTBJ785HC)";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4.1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GUTBJ785HC;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -805,22 +806,23 @@
 				GCC_NO_COMMON_BLOCKS = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Wearables/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = WAG;
+				INFOPLIST_KEY_CFBundleDisplayName = Wearables;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.0;
+				MARKETING_VERSION = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ctepl.wearablesclinicaltrialsdev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.HPN.wearablesclinicaltrials;
 				PRODUCT_NAME = Wearables;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wearables_AppStore_Profile;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -840,10 +842,11 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Wearables/Wearables.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4.0;
-				DEVELOPMENT_TEAM = GUTBJ785HC;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Cambridge Technology Inc (GUTBJ785HC)";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4.1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GUTBJ785HC;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -852,22 +855,23 @@
 				GCC_NO_COMMON_BLOCKS = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Wearables/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = WAG;
+				INFOPLIST_KEY_CFBundleDisplayName = Wearables;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.0;
+				MARKETING_VERSION = 4.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ctepl.wearablesclinicaltrialsdev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.HPN.wearablesclinicaltrials;
 				PRODUCT_NAME = Wearables;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wearables_AppStore_Profile;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;

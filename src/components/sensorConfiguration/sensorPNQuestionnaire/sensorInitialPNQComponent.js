@@ -78,16 +78,18 @@ const SensorInitialPNQComponent = ({navigation, route, ...props }) => {
 
     const getFeedbackQuestionnaire = async () => {
 
-        set_isLoading(true);
         let defaultPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
         defaultPet = JSON.parse(defaultPet);
         
-        let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
         let sobPets = await DataStorageLocal.getDataFromAsync(Constant.SAVE_SOB_PETS); 
         sobPets = JSON.parse(sobPets);
 
+        let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+        configObj = JSON.parse(configObj);
+
+        set_isLoading(true);
         let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let getFQuestServiceObj = await ServiceCalls.getFeedbackQuestionnaireByPetId(defaultPet.petID,defaultPet.devices[sensorIndex].deviceModel,token);
+        let getFQuestServiceObj = await ServiceCalls.getFeedbackQuestionnaireByPetId(configObj.petID,configObj.configDeviceModel,token);
         set_isLoading(false);
   
         if(getFQuestServiceObj && getFQuestServiceObj.logoutData){

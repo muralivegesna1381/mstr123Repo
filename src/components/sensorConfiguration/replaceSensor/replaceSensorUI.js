@@ -18,11 +18,7 @@ let radioUnCheckImg = require('./../../../../assets/images/otherImages/svg/radio
 const ReplaceSensorUI = ({route, ...props }) => {
 
     const [newDeviceNo, set_newDeviceNo] = useState(undefined);
-    const [reasonArray, set_reasonArray] = useState([
-        {id:1, header:'Defective', subHeader:'For charging or hardware issue'},
-        {id:2, header:'Damaged', subHeader:'Due to breakage or water immersion'},
-        {id:3, header:'Upgrade', subHeader:'For sensor version upgrades'}
-    ]);
+    // const [reasonArray, set_reasonArray] = useState([]);
     const [sensorTypeArray, set_sensorTypeArray] = useState([
         {id:1, name:'AGL2'},
         {id:2, name:'CMAS'},
@@ -90,8 +86,8 @@ const ReplaceSensorUI = ({route, ...props }) => {
                             <Image style= {[styles.iconImgStyle]} source={props.selectedIndex === index ? radioCheckImg : radioUnCheckImg}></Image>
                         </View>
                         <View style={{marginLeft:hp('1%')}}>
-                            <Text style={[styles.headerTextStyle]}>{item.header}</Text>
-                            <Text style={[styles.subHeaderTextStyle]}>{item.subHeader}</Text>
+                            <Text style={[styles.headerTextStyle]}>{item.reasonName}</Text>
+                            <Text style={[styles.subHeaderTextStyle]}>{item.reasonSubName}</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -111,7 +107,7 @@ const ReplaceSensorUI = ({route, ...props }) => {
                     isChatEnable={false}
                     isTImerEnable={false}
                     isTitleHeaderEnable={true}
-                    title={'Replace Sesnor'}
+                    title={'Replace Sensor'}
                     headerColor = {'#F5F7F9'}
                     backBtnAction = {() => backBtnAction()}
                 />
@@ -177,7 +173,7 @@ const ReplaceSensorUI = ({route, ...props }) => {
 
                     <Text style={[styles.leftTextStyle]}>{'Reason for Replacement'}</Text>
                     <FlatList
-                        data={reasonArray}
+                        data={props.reasonsArray}
                         renderItem={renderItems}
                         showsHorizontalScrollIndicator = {false}
                         showsVerticalScrollIndicator = {false}
@@ -211,7 +207,7 @@ const ReplaceSensorUI = ({route, ...props }) => {
                 isLeftBtnEnable = {props.isPopLeftBtnEnable}
                 isRightBtnEnable = {true}
                 leftBtnTilte = {'NO'}
-                rightBtnTilte = {'OK'}
+                rightBtnTilte = {'YES'}
                 popUpRightBtnAction = {() => popOkBtnAction()}
                 popUpLeftBtnAction = {() => popCancelBtnAction()}
             />
