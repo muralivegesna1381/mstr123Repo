@@ -1,5 +1,4 @@
-import { tsLiteralType } from '@babel/types';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Keyboard, ScrollView } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import fonts from '../commonStyles/fonts'

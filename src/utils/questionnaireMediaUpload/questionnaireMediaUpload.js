@@ -10,9 +10,9 @@ import CommonStyles from './../commonStyles/commonStyles';
 import * as ImageProgress from './../../utils/questionnaireMediaUpload/imageProcessComponent/questImageProcessComponent.js';
 import * as VideoProcessingComponent from './../../utils/questionnaireMediaUpload/videoProcessingComponent/questVideoProcessingComponent.js';
 import * as Apolloclient from './../../config/apollo/apolloConfig';
-import * as ServiceCalls from './../getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './..//authorisedComponent/authorisedComponent';
 import  * as QestionnaireDataObj from "./../../components/questionnaire/questionnaireCustomComponents/questionnaireData/questionnaireSaveGetData";
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 
 var RNFS = require('react-native-fs');
 
@@ -330,9 +330,8 @@ const QuestionnaireMediaUpload = ({navigation, route,...props }) => {
 
     const serviceCallToBackend = async (answersDictToBackend,totalMedia,totalMediaSuccess,petId, questId) => {
 
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let answersServiceObj = await ServiceCalls.saveQuestionAnswers(answersDictToBackend,token);
-
+        let apiMethod = apiMethodManager.SAVE_QUESTION_ANSWERS;
+        let apiService = await apiRequest.postData(apiMethod,answersDictToBackend,Constant.SERVICE_JAVA,navigation);
         Apolloclient.client.writeQuery({query: Queries.UPLOAD_QUESTIONNAIRE_VIDEO_BACKGROUND_STATUS,data: {data: {
             questName : '', 
             statusUpload : 'Uploading Done',
@@ -345,21 +344,10 @@ const QuestionnaireMediaUpload = ({navigation, route,...props }) => {
             uploadMode:'backGround',
             __typename: 'UploadQuestionnaireVideoBackgroundStatus'
         }},}) 
-
-        if(answersServiceObj && answersServiceObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-          
-        if(answersServiceObj && !answersServiceObj.isInternet){
-            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK',true); 
-            return;
-        }
-          
-        if(answersServiceObj && answersServiceObj.statusData){
-
-            if(answersServiceObj.responseData){
+                        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+        
+            if(apiService.data.message){
                 let msg = ''
 
                 if(totalMedia === totalMediaSuccess) {
@@ -382,15 +370,20 @@ const QuestionnaireMediaUpload = ({navigation, route,...props }) => {
                 
                 await reConfigureQuestObj(answersDictToBackend,petId, questId); 
             }
+    
+        } else if(apiService && apiService.isInternet === false) {
+
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK',true); 
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,'OK',true);
           
         } else {
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,'OK',true);                    
-        }
-          
-        if(answersServiceObj && answersServiceObj.error) {
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,'OK',true);
-        }
 
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,'OK',true);     
+
+        }
 
     };
 

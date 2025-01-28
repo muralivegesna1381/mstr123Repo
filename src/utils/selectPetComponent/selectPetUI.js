@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {View,StyleSheet,Text,TouchableWithoutFeedback,FlatList, ImageBackground,ActivityIndicator,TouchableOpacity,Image,Keyboard,TextInput,Platform} from 'react-native';
+import {View,StyleSheet,Text,TouchableWithoutFeedback,FlatList,ImageBackground,ActivityIndicator,TouchableOpacity,Keyboard,TextInput,Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
 import * as Constant from "./../../utils/constants/constant";
-import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
 
-let defaultPetImg = require( "./../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
-let searchImg = require('./../../../assets/images/otherImages/svg/searchIcon.svg');
-let noLogsDogImg = require("./../../../assets/images/dogImages/noRecordsDog.svg");
+import RadioGreenImg from "../../../assets/images/otherImages/svg/radioBtnGreen.svg";
+import RadioUnSelectedImg from "../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg";
+import DefaultPetImg from "./../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
+import SearchImg from "./../../../assets/images/otherImages/svg/searchIcon.svg";
+import NoLogsDogImg from "./../../../assets/images/dogImages/noRecordsDog.svg";
 
 const  SelectPetUI = ({route, ...props }) => {
 
@@ -42,8 +44,7 @@ const  SelectPetUI = ({route, ...props }) => {
 
     const checkForSearchAvailable = async () => {
 
-        let userRoleDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
-        userRoleDetails = JSON.parse(userRoleDetails);
+        let userRoleDetails = UserDetailsModel.userDetailsData.userRole;
     
         if(userRoleDetails && (userRoleDetails.RoleName === "Hill's Vet Technician" || userRoleDetails.RoleName === "External Vet Technician")) {
           set_showSearch(true)
@@ -152,7 +153,7 @@ const  SelectPetUI = ({route, ...props }) => {
                     <View style = {{flexDirection:'row',height: hp("6%"),alignItems:'center'}}>
                         <View>
                             {item && item.photoUrl ? <ImageBackground resizeMode='stretch' style={CommonStyles.searchIconStyle} imageStyle={{ borderRadius: 5}} source={{uri:item.photoUrl}} ></ImageBackground>
-                            : <ImageBackground imageStyle={{ borderRadius: 5}} resizeMode='contain' style={CommonStyles.searchIconStyle} source={defaultPetImg} ></ImageBackground> }
+                            : <ImageBackground source={DefaultPetImg} style={styles.petImgStyle}></ImageBackground>}
                         </View>
                         <View style = {{marginLeft:hp('1%')}}>
                             <Text style={CommonStyles.searchTexStyle} >{item.petName}</Text>
@@ -172,7 +173,7 @@ const  SelectPetUI = ({route, ...props }) => {
             {petsArray && petsArray.length > Constant.NO_OF_SELECTED_PETS && showSearch ? <View style={CommonStyles.searchBarStyle}>
                             
                 <View style={[CommonStyles.searchInputContainerStyle]}>
-                    <Image source={searchImg} style={CommonStyles.searchImageStyle} />
+                    <SearchImg width={wp('3%')} height={hp('4%')} style={CommonStyles.searchImageStyle}/>
                     <TextInput style={CommonStyles.searchTextInputStyle}
                         underlineColorAndroid="transparent"
                         placeholder="Search a pet"
@@ -211,10 +212,10 @@ const  SelectPetUI = ({route, ...props }) => {
                                         set_imgLoader(false)}} style={styles.petImgStyle}>
                                         {imgLoader ? <View style={styles.petImgStyle}><ActivityIndicator size='small' color="grey"/></View> : null}
                                         </ImageBackground> 
-                                        : <ImageBackground source={defaultPetImg} style={styles.petImgStyle}></ImageBackground>}
+                                        : <ImageBackground source={DefaultPetImg} style={styles.petImgStyle}></ImageBackground>}
                                     </View>
 
-                                    <ImageBackground source={selectIndex === index ? require("../../../assets/images/otherImages/svg/radioBtnGreen.svg") : require("../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg")} style={styles.selectionImgStyle}/>
+                                    {selectIndex === index ? <RadioGreenImg width={wp('6%')} height={hp('5.5%')} style={styles.selectionImgStyle}/> : <RadioUnSelectedImg width={wp('6%')} height={hp('5.5%')} style={styles.selectionImgStyle}/>}
 
                                     <View>
                                         <Text style={[styles.name]}>{item.petName.length> 9 ? item.petName.slice(0, 9)+"..."  : item.petName }</Text>
@@ -238,7 +239,7 @@ const  SelectPetUI = ({route, ...props }) => {
                 renderItem={renderSearchItems}
                 keyExtractor={(item, index) => "" + index}
             /> : <View style={{flexDirection:'row',alignItems:'center',width: wp("90%"),}}>
-                <Image style= {[CommonStyles.searchNologsDogStyle]} source={noLogsDogImg}></Image>
+                <NoLogsDogImg style= {[CommonStyles.searchNologsDogStyle]}/>
                 <View>
                     <Text style={CommonStyles.noRecTexStyle} >{Constant.NO_RECORDS_LOGS}</Text>
                     <Text style={CommonStyles.noRecSubTextStyle} >{Constant.NO_RECORDS_LOGS1}</Text>
@@ -257,7 +258,7 @@ const  SelectPetUI = ({route, ...props }) => {
     flatcontainer: {
         width: wp('90%'),
         marginTop: hp("2%"),
-        flex:1,              
+        flex:1,  
     },
 
     flatview: {
@@ -269,7 +270,6 @@ const  SelectPetUI = ({route, ...props }) => {
         borderWidth : 1,
         borderColor : '#96B2C9',
         borderRadius : 5,
-        backgroundColor : "#F6FAFD"       
     },
 
     name: {
@@ -277,6 +277,7 @@ const  SelectPetUI = ({route, ...props }) => {
         fontSize: fonts.fontXSmall,
         textAlign: "center",
         color:'black',
+        marginTop: hp("-1%"),
     },
     
     petImgStyle: {
@@ -290,10 +291,8 @@ const  SelectPetUI = ({route, ...props }) => {
     },
 
     selectionImgStyle : {
-        width: hp("3%"),
-        aspectRatio:1,
         resizeMode: "contain",
-        marginTop: hp("-2%"),
+        marginTop: hp("-4%"),
     },
 
   });

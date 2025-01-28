@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { BackHandler, Platform, NativeModules } from 'react-native';
 import UploadObsVideoUI from './uploadObsVideoUI';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
@@ -16,6 +16,7 @@ import * as PermissionsiOS from './../../../../utils/permissionsComponents/permi
 import * as CheckPermissionsAndroid from './../../../../utils/permissionsComponents/permissionsAndroid';
 import Highlighter from "react-native-highlight-words";
 import DeviceInfo from "react-native-device-info";
+import * as ObservationModel from "./../../observationModel/observationModel.js";
 
 var RNFS = require('react-native-fs');
 
@@ -42,6 +43,11 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
   const [isEdit, set_isEdit] = useState(false);
   const [popId, set_PopId] = useState(undefined)
   const [mediaType, set_mediaType] = useState(undefined);
+  const [petId, set_petId] = useState('');
+  const [pName, set_pName] = useState('');
+  const [sName, set_sName] = useState('');
+  const [bName, set_bName] = useState('');
+  const [deviceNumber, set_deviceNumber] = useState();
 
   let deleteSelectedMediaFile = useRef(undefined);
   let deletedMediaArray = useRef([]);
@@ -51,7 +57,6 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
   let editedImagesArray = useRef([]);
   let videoArray = [];
   let timmedVideosArray = [];
-  let cameraTrimmedpath;
 
   React.useEffect(() => {
 
@@ -97,21 +102,42 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
 
   const getObsDetails = async () => {
 
-    let oJson = await DataStorageLocal.getDataFromAsync(Constant.OBSERVATION_DATA_OBJ);
-    oJson = JSON.parse(oJson);
-    if (oJson) {
-      set_obsObject(oJson);
-      set_selectedPet(oJson.selectedPet);
-      set_isEdit(oJson.isEdit);
-      // set_fromScreen(oJson.fromScreen);
-      set_mediaType(oJson.ctgNameId);
-      if (oJson && oJson.mediaArray) {
-        set_mediaArray(oJson.mediaArray);
-        set_mediaSize(oJson.mediaArray.length);
-      } else {
-        set_mediaArray([]);
-      }
+    let oJson = ObservationModel.observationData;
+    Object.keys(oJson.selectedPet).length > 0 ? set_selectedPet(oJson.selectedPet) : set_selectedPet(undefined);
+    set_mediaType(oJson.ctgNameId);
+    if (oJson.mediaArray && Object.keys(oJson.mediaArray).length > 0) {
+      set_mediaArray(oJson.mediaArray);
+      set_mediaSize(oJson.mediaArray.length);
+    } else {
+      set_mediaArray([]);
     }
+
+    if(oJson.selectedPet) {
+
+      set_petId(oJson.selectedPet.petID);
+        
+      let pName = oJson.selectedPet.petName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+      pName = pName.length > 15 ? pName.substring(0, 15) : pName;
+      set_pName(pName.toLocaleLowerCase());
+      let sName = oJson.selectedPet.studyName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+      sName = sName !== "" ? (sName.length > 20 ? sName.substring(0, 20) : sName) : "NOSTUDY";
+      set_sName(sName.toLocaleLowerCase());
+      let bName = oJson.behaviourItem.behaviorName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+      bName = bName !== "" ? (bName.length > 15 ? bName.substring(0, 15) : bName) : 'NOBEHAVIOR';
+      set_bName(bName.toLocaleLowerCase());
+
+      if (oJson.selectedPet && oJson.selectedPet.devices && oJson.selectedPet.devices.length > 0) {
+        if (oJson.selectedPet.devices[0].isDeviceSetupDone) {
+          set_deviceNumber(oJson.selectedPet.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, ''));
+        } else {
+          set_deviceNumber(oJson.selectedPet.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, ''));
+        }
+      } else {
+        set_deviceNumber('NODEVICE');
+      }
+
+    }
+
   };
 
   const requestCameraPermission = async () => {
@@ -144,11 +170,8 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
 
   const submitAction = async () => {
 
-    if (obsObject) {
-      obsObject.mediaArray = mediaArray
-    }
+    ObservationModel.observationData.mediaArray = mediaArray;
     firebaseHelper.logEvent(firebaseHelper.event_add_observations_media_submit, firebaseHelper.screen_add_observations_media, "User selected Media ", 'No of Media : ' + mediaArray.length);
-    await DataStorageLocal.saveDataToAsync(Constant.OBSERVATION_DATA_OBJ, JSON.stringify(obsObject));
     navigation.navigate("ObsReviewComponent", { deletedMedia: deletedMediaArray.current });
 
   };
@@ -173,7 +196,7 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
 
   };
 
-  const chooseImage = () => {
+  const chooseImage = async () => {
 
     ImagePicker.launchImageLibrary({
       mediaType: mediaType === 0 ? 'photo' : 'video',
@@ -218,7 +241,7 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
                 if (mArray && mArray.length > 0) {
 
                   const isFound = mArray.some(element => {
-                    if (element.fileName === response.assets[i].fileName) {
+                    if (element.actualFileName === response.assets[i].id) {
                       isExists = true;
                     }
                   });
@@ -226,35 +249,21 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
                 }
 
                 if (isExists) {
-
+                  createPopup(Constant.OBSERVATION_DUPLICATE_MEDIA_FILE_ERROR, Constant.ALERT_DEFAULT_TITLE, false, true, 1);
+                  return;
                 } else {
 
-                  var dateFile = moment().utcOffset("+00:00").format("MMDDYYYYHHmmss");
+                  var dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
                   if (response.assets[i].timestamp) {
-                    dateFile = moment(response.assets[i].timestamp).utcOffset("+00:00").format("MMDDYYYYHHmmss");
+                    dateFile = moment(response.assets[i].timestamp).utcOffset("+00:00").format("MMDDYYHHmmss");
                   }
-
+                  
                   let fileName = '';
-                  if (selectedPet && selectedPet.devices && selectedPet.devices.length > 0) {
-                    let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-                    let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-                    let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-                    if (selectedPet.devices[0].isDeviceSetupDone) {
-                      fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPet.devices[0].deviceNumber + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.jpg';
-                    } else {
-                      fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + "_SETUP_PENDING" + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.jpg';
-                    }
-                  } else {
-
-                    let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-                    let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-                    let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-                    fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + 'NO_DEVICE' + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.jpg';
-
-                  }
-
+                  fileName = pName+"_"+petId+"_"+sName+"_"+deviceNumber+"_"+dateFile + '_' + bName+ ".jpg";
+                  fileName = fileName.toLocaleLowerCase();
                   let imgObj = {
                     'filePath': response.assets[i].uri,
+                    'actualFileName' : response.assets[i].id,
                     'fbFilePath': '',
                     'fileName': fileName,//response.assets[i].fileName,
                     'observationPhotoId': '',
@@ -290,9 +299,9 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
                 }
                 var vStartDate = null;
                 var vEndDate = null;
-                var dateFile = moment().utcOffset("+00:00").format("MMDDYYYYHHmmss");
+                var dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
                 if (response.assets[i].timestamp) {
-                  dateFile = moment(response.assets[i].timestamp).utcOffset("+00:00").format("MMDDYYYYHHmmss");
+                  dateFile = moment(response.assets[i].timestamp).utcOffset("+00:00").format("MMDDYYHHmmss");
                 }
 
                 if (response.assets[i].timestamp) {
@@ -307,31 +316,15 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
 
                 }
                 let fileName = '';
-
-                if (selectedPet && selectedPet.devices && selectedPet.devices.length > 0) {
-                  let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-                  let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-                  let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-                  if (selectedPet.devices[0].isDeviceSetupDone) {
-                    fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPet.devices[0].deviceNumber + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.mp4';
-                  } else {
-                    fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPet.devices[0].deviceNumber + "_SETUP_PENDING" + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.mp4';
-                  }
-                } else {
-
-                  let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-                  let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-                  let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-                  fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + 'NO_DEVICE' + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.mp4';
-
-                }
+                fileName = pName+"_"+petId+"_"+sName+"_"+deviceNumber+"_"+dateFile + '_' + bName+ ".mp4";
+                fileName = fileName.toLocaleLowerCase();
 
                 let isExists = undefined;
                 if (mArray && mArray.length > 0) {
 
                   const isFound = mArray.some(element => {
                     let spliTArray = element.fileName.split('_#');
-                    if (spliTArray[1] === response.assets[i].fileName) {
+                    if (element.actualFileName === response.assets[i].id) {
                       isExists = true;
                     }
                   });
@@ -339,6 +332,8 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
                 }
 
                 if (isExists) {
+                  createPopup(Constant.OBSERVATION_DUPLICATE_MEDIA_FILE_ERROR, Constant.ALERT_DEFAULT_TITLE, false, true, 1);
+                  return;
 
                 } else {
                   let thumImg = undefined;
@@ -353,6 +348,7 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
                         'filePath': newPath,
                         'fbFilePath': '',
                         'fileName': fileName,
+                        'actualFileName' : response.assets[i].id,
                         'observationVideoId': '',
                         'localThumbImg': thumImg,
                         'fileType': 'video',
@@ -365,7 +361,6 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
                       };
 
                       timmedVideosArray[i] = newPath;
-                      //mArray.splice(0, 0, vidObj);
                       mArray.push(vidObj)
                       set_mediaArray(null)
                       set_mediaArray(mArray);
@@ -375,6 +370,7 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
                       'filePath': response.assets[i].uri,
                       'fbFilePath': '',
                       'fileName': fileName,
+                      'actualFileName' : response.assets[i].id,
                       'observationVideoId': '',
                       'localThumbImg': thumImg,
                       'fileType': 'video',
@@ -386,7 +382,6 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
                       "videoEndDate": vEndDate,
                     };
                     timmedVideosArray[i] = response.assets[i].uri;
-                    //mArray.splice(0, 0, vidObj);
                     mArray.push(vidObj)
                     set_mediaArray(null)
                     set_mediaArray(mArray);
@@ -397,7 +392,6 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
               }
             }
 
-            //editPhoto(mArray)
             set_mediaSize(mediaSize + actualEditImgCountRef.current)
           } else {
             set_loaderMsg('');
@@ -419,7 +413,7 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
       mediaType: value,
       durationLimit: 1200,
       videoQuality: "medium", // 'low', 'medium', or 'high'
-      allowsEditing: true, //Allows Video for trimming
+      allowsEditing: true,
       storageOptions: {
         skipBackup: true,
         path: "Wearables",
@@ -441,6 +435,7 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
           set_mediaSize(mediaSize+response.assets.length)
 
           await MediaMeta.get(_uri).then((metadata) => {
+
             if (Platform.OS === 'android') {
 
               vEndDate = moment(metadata.creation_time).utcOffset("+00:00").format("MMDDYYYYHHmmss");
@@ -473,7 +468,6 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
         }
         let mArray = mediaArray;
         set_videoPath();
-        // set_mediaArray(mArray);
         var promise = CameraRoll.save(response.assets[0].uri, {
           type: "video",
           album: "Wearables",
@@ -485,72 +479,18 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
             set_loaderMsg('');
             set_isLoading(false);
 
-            // let myPromise = new Promise(function (resolve) {
-            //   if (Platform.OS === 'android') {
-            //     NativeModules.K4lVideoTrimmer.navigateToTrimmer(response.assets[0].uri, "11", (convertedVal) => {
-            //       resolve(convertedVal);
-            //     });
-            //   }
-            //   if (Platform.OS === 'ios') {
-            //     NativeModules.ChangeViewBridge.changeToNativeView(
-            //       [response.assets[0].uri],
-            //       eventId => {
-            //         resolve(eventId);
-            //       },
-            //     );
-
-            //   }
-            // });
-
-            //cameraTrimmedpath = await myPromise;
-            //write function here to handle video path for android and iOS
-
-            // if (Platform.OS === 'android') {
-            //   cameraTrimmedpath = cameraTrimmedpath.replace("[", "");
-            //   cameraTrimmedpath = cameraTrimmedpath.replace("]", "");
-            //   cameraTrimmedpath = 'file://' + cameraTrimmedpath;
-            // }
-            // else {
-
-            //   if (cameraTrimmedpath[0].startsWith("file://")) {
-            //     cameraTrimmedpath = cameraTrimmedpath[0]
-            //   }
-            //   else {
-            //     cameraTrimmedpath = 'file://' + cameraTrimmedpath[0];
-            //   }
-
-            // }
-
-
             let thumImg = undefined;
-            await createThumbnail({ url: response.assets[0].uri, timeStamp: 10000, }).then(response => thumImg = response.path)
-              .catch(err => { });
+            await createThumbnail({ url: response.assets[0].uri, timeStamp: 10000, }).then(response => thumImg = response.path).catch(err => { });
 
-            var dateFile = moment().utcOffset("+00:00").format("MMDDYYYYHHmmss");
+            var dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
             let fileName = '';
-
-            if (selectedPet && selectedPet.devices && selectedPet.devices.length > 0) {
-              let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-              let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-              let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-              if (selectedPet.devices[0].isDeviceSetupDone) {
-                fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPet.devices[0].deviceNumber + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + '.mp4';
-              } else {
-                fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPet.devices[0].deviceNumber + "_SETUP_PENDING" + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + '.mp4';
-              }
-            } else {
-
-              let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-              let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-              let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-              fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + 'NO_DEVICE' + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + '.mp4';
-
-            }
+            fileName = pName+"_"+petId+"_"+sName+"_"+deviceNumber+"_"+dateFile + '_' + bName+ ".mp4";
+            fileName = fileName.toLocaleLowerCase();
 
             let vidObj = {
               'filePath': response.assets[0].uri,
               'fbFilePath': '',
-              'fileName': fileName,//dateFile+"_"+response.assets[0].fileName,
+              'fileName': fileName,
               'observationVideoId': '',
               'localThumbImg': thumImg,
               'fileType': 'video',
@@ -573,31 +513,15 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
         if (response.assets[0].type.includes('image')) {
           
           set_mediaSize(mediaSize+response.assets.length)
-          var dateFile = moment().utcOffset("+00:00").format("MMDDYYYYHHmmss");
+          var dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
           let fileName = '';
-
-          if (selectedPet && selectedPet.devices && selectedPet.devices.length > 0) {
-            let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-            let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-            let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-            if (selectedPet.devices[0].isDeviceSetupDone) {
-              fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPet.devices[0].deviceNumber + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + '.jpg';
-            } else {
-              fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPet.devices[0].deviceNumber + "_SETUP_PENDING" + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + '.mp4';
-            }
-          } else {
-
-            let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-            let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-            let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-            fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + 'NO_DEVICE' + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + '.jpg';
-
-          }
+          fileName = pName+"_"+petId+"_"+sName+"_"+deviceNumber+"_"+dateFile + '_' + bName+ ".jpg";
+          fileName = fileName.toLocaleLowerCase();
 
           let imgObj = {
             'filePath': response.assets[0].uri,
             'fbFilePath': '',
-            'fileName': fileName,//response.assets[0].fileName,
+            'fileName': fileName,
             'observationPhotoId': '',
             'localThumbImg': response.assets[0].uri,
             'fileType': 'image',
@@ -608,9 +532,6 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
             'isEdited': false,
             'fileDate': dateFile.toString()
           };
-
-          //mArray.splice(0, 0, imgObj);
-          //editPhoto(mArray);
           mArray.push(imgObj)
           set_mediaArray(null)
           set_mediaArray(mArray)
@@ -628,16 +549,15 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
     editedImagesArray.current = [];
 
     if (item === 'GALLERY') {
-      set_loaderMsg(Constant.LOADER_WAIT_MESSAGE);
-      set_isLoading(true);
+      // set_loaderMsg(Constant.LOADER_WAIT_MESSAGE);
+      // set_isLoading(true);
       if (Platform.OS === 'android') {
         if (mediaArray.length == 0) {
           NativeModules.K4lVideoTrimmer.clearExistingMedia()
         }
-        if (DeviceInfo.getSystemVersion() > 12 && mediaType === 1) {
-          chooseImage();
-        }
-        else {
+        if (Platform.Version > 31) {
+          chooseImage()
+        } else {
           chooseMultipleMedia();
         }
 
@@ -779,9 +699,9 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
       });
 
       if (response) {
+
         let mArray = mediaArray;
         set_mediaSize(mediaSize+response.length);
-
         for (let i = 0; i < response.length; i++) {
 
           if (response[i].type.includes('image')) {
@@ -799,31 +719,15 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
               let time = numb.substring(8, 14)
 
               let momentObj = moment(year + '-' + month + '-' + day + '-' + time, 'YYYY-MM-DD-HHmmss');
-              dateFile = moment(momentObj).utcOffset("+00:00").format("MMDDYYYYHHmmss");
+              dateFile = moment(momentObj).utcOffset("+00:00").format("MMDDYYHHmmss");
               if (dateFile === "Invalid date") {
-                dateFile = moment(new Date).utcOffset("+00:00").format("MMDDYYYYHHmmss");
+                dateFile = moment(new Date).utcOffset("+00:00").format("MMDDYYHHmmss");
               }
             }
 
             let fileName = '';
-
-            if (selectedPet && selectedPet.devices && selectedPet.devices.length > 0) {
-              let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-              let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-              let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-              if (selectedPet.devices[0].isDeviceSetupDone) {
-                fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPet.devices[0].deviceNumber + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.jpg';
-              } else {
-                fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPet.devices[0].deviceNumber + "_SETUP_PENDING" + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.jpg';
-              }
-            } else {
-
-              let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-              let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-              let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-              fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + 'NO_DEVICE' + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.jpg';
-
-            }
+            fileName = pName+"_"+petId+"_"+sName+"_"+deviceNumber+"_"+dateFile + '_' + bName+ ".jpg";
+            fileName = fileName.toLocaleLowerCase();
 
             let imgObj = {
               'filePath': response[i].path,
@@ -851,28 +755,17 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
 
             let _uri = '';
             _uri = response[i].realPath.replace("file:///", "/");
-
-            // if (Platform.OS === 'android') {
-
-            //   NativeModules.K4lVideoTrimmer.navigateToTrimmer(response[i].realPath, "10", (convertedVal) => {
-            //     convertedVal = convertedVal.replace("[", "");
-            //     convertedVal = convertedVal.replace("]", "");
-            //     timmedVideosArray = convertedVal.split(",");
-            //     //CALL UPDATE URLS METHOD FROM HERE
-            //     updateTrimmedURLs();
-            //   });
-            // }
-            var dateFile = moment().utcOffset("+00:00").format("MMDDYYYYHHmmss");
+            var dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
 
             let vStartDate = null;
             let vEndDate = null;
 
             await MediaMeta.get(_uri).then((metadata) => {
 
-              dateFile = moment(metadata.creation_time).utcOffset("+00:00").format("MMDDYYYYHHmmss");
+              dateFile = moment(metadata.creation_time).utcOffset("+00:00").format("MMDDYYHHmmss");
 
               if (dateFile === "Invalid date") {
-                dateFile = moment(new Date).utcOffset("+00:00").format("MMDDYYYYHHmmss");
+                dateFile = moment(new Date).utcOffset("+00:00").format("MMDDYYHHmmss");
               }
 
               if (metadata.creation_time) {
@@ -891,25 +784,8 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
             );
 
             let fileName = '';
-
-            if (selectedPet && selectedPet.devices && selectedPet.devices.length > 0) {
-              let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-              let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-              let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-              if (selectedPet.devices[0].isDeviceSetupDone) {
-                fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPet.devices[0].deviceNumber + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.mp4';
-              } else {
-                fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPet.devices[0].deviceNumber + "_SETUP_PENDING" + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.mp4';
-              }
-            } else {
-
-              let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0, 15) : selectedPet.petName;
-              let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0, 20) : selectedPet.studyName;
-              let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0, 15) : obsObject.behaviourItem.behaviorName;
-              fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + 'NO_DEVICE' + '_' + dateFile + '_' + bName.replace(/_/g, ' ') + i + '.mp4';
-
-            }
-
+            fileName = pName+"_"+petId+"_"+sName+"_"+deviceNumber+"_"+dateFile + '_' + bName+ ".mp4";
+            fileName = fileName.toLocaleLowerCase();
             let vidObj = undefined;
 
             vidObj = {
@@ -943,168 +819,12 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
     }
   }
 
-  // const editPhoto = async (mediaArray) => {
-  //   let vArray = [];
-  //   let iArray = [];
-
-  //   for (let i = 0; i < mediaArray.length; i++) {
-  //     if (mediaArray[i].fileType === 'image') {
-  //       iArray.push(mediaArray[i])
-  //     }
-  //     if (mediaArray[i].fileType === 'video') {
-  //       vArray.push(mediaArray[i])
-  //     }
-  //   }
-
-  //   if (iArray.length > 0) {
-  //     actualEditImgCountRef.current = iArray.length;
-  //     addEditedImg(iArray[editImgCountRef.current].filePath, iArray, vArray);
-  //   } else if (vArray.length > 0) {
-  //     if (Platform.OS === 'ios') {
-  //       trimVideos(vArray);
-  //     }
-  //   }
-
-  // };
-
-  // const addEditedImg = async (uri, iArray, vArray) => {
-
-  //   let isEdit = iArray[editImgCountRef.current].isEdited;
-
-  //   if (uri && !isEdit) {
-
-  //     let fileName = uri.split('/').pop();
-  //     let newPath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
-  //     RNFS.copyFile(uri, newPath).then((success) => {
-
-  //       setTimeout(() => {
-  //         PhotoEditor.Edit({
-  //           path: newPath,
-  //           // colors : ['#000000', '#808080', '#a9a9a9'],
-  //           hiddenControls: ['share', 'sticker'],
-  //           onDone: imagePath => {
-
-  //             let imgObj = {
-  //               'filePath': imagePath,
-  //               'fbFilePath': '',
-  //               'fileName': iArray[editImgCountRef.current].fileName,
-  //               'observationPhotoId': '',
-  //               'localThumbImg': iArray[editImgCountRef.current].localThumbImg,
-  //               'fileType': 'image',
-  //               "isDeleted": 0,
-  //               "actualFbThumFile": '',
-  //               "thumbFilePath": iArray[editImgCountRef.current].thumbFilePath,
-  //               "compressedFile": '',
-  //               'isEdited': true,
-  //               'fileDate': iArray[editImgCountRef.current].fileDate
-  //             };
-
-  //             editedImagesArray.current.push(imgObj);
-  //             editImgCountRef.current = editImgCountRef.current + 1;
-  //             if (editImgCountRef.current < actualEditImgCountRef.current) {
-  //               addEditedImg(iArray[editImgCountRef.current].filePath, iArray, vArray);
-  //             } else {
-  //               let tempArray = [...editedImagesArray.current, ...vArray]
-  //               //let tempArray = [...iArray, ...vArray]
-  //               set_mediaArray(tempArray);
-  //               set_mediaSize(tempArray.length);
-  //               set_loaderMsg('');
-  //               set_isLoading(false);
-  //               if (vArray.length > 0) {
-  //                 if (Platform.OS === 'ios') {
-  //                   trimVideos(tempArray);
-  //                 }
-  //               }
-
-  //             }
-
-  //           },
-  //           onCancel: () => {
-
-  //             let imgObj = {
-  //               'filePath': iArray[editImgCountRef.current].filePath,
-  //               'fbFilePath': '',
-  //               'fileName': iArray[editImgCountRef.current].fileName,
-  //               'observationPhotoId': '',
-  //               'localThumbImg': iArray[editImgCountRef.current].localThumbImg,
-  //               'fileType': 'image',
-  //               "isDeleted": 0,
-  //               "actualFbThumFile": '',
-  //               "thumbFilePath": iArray[editImgCountRef.current].thumbFilePath,
-  //               "compressedFile": '',
-  //               'isEdited': true,
-  //               'fileDate': iArray[editImgCountRef.current].fileDate
-  //             };
-
-  //             editedImagesArray.current.push(imgObj);
-  //             // editedImagesArray.current.push(iArray[editImgCountRef.current]);
-  //             editImgCountRef.current = editImgCountRef.current + 1;
-  //             if (editImgCountRef.current < actualEditImgCountRef.current) {
-  //               addEditedImg(iArray[editImgCountRef.current].filePath, iArray, vArray);
-  //             } else {
-
-  //               let tempArray = [...editedImagesArray.current, ...vArray]
-  //               set_mediaArray(tempArray);
-  //               set_mediaSize(tempArray.length);
-  //               set_loaderMsg('');
-  //               set_isLoading(false);
-  //               if (vArray.length > 0) {
-  //                 if (Platform.OS === 'ios') {
-  //                   trimVideos(tempArray);
-  //                 }
-  //               }
-  //             }
-  //           }
-  //         });
-  //       }, 700,
-
-  //       );
-  //     }).catch((err) => {
-
-  //       editedImagesArray.current.push(iArray[editImgCountRef.current]);
-  //       editImgCountRef.current = editImgCountRef.current + 1;
-  //       if (editImgCountRef.current < actualEditImgCountRef.current) {
-  //         addEditedImg(iArray[editImgCountRef.current].filePath, iArray, vArray);
-  //       } else {
-  //         let tempArray = [...editedImagesArray.current, ...vArray]
-  //         set_mediaArray(tempArray);
-  //         set_mediaSize(tempArray.length);
-  //         set_loaderMsg('');
-  //         set_isLoading(false);
-  //         if (vArray.length > 0) {
-  //           if (Platform.OS === 'ios') {
-  //             trimVideos(tempArray);
-  //           }
-  //         }
-  //       }
-  //     });
-
-  //   } else {
-
-  //     editedImagesArray.current.push(iArray[editImgCountRef.current]);
-  //     editImgCountRef.current = editImgCountRef.current + 1;
-  //     if (editImgCountRef.current < actualEditImgCountRef.current) {
-  //       addEditedImg(iArray[editImgCountRef.current].filePath, iArray, vArray);
-  //     } else {
-  //       let tempArray = [...editedImagesArray.current, ...vArray]
-  //       set_mediaArray(tempArray);
-  //       set_mediaSize(tempArray.length);
-  //       set_loaderMsg('');
-  //       set_isLoading(false);
-  //       if (Platform.OS === 'ios') {
-  //         trimVideos(tempArray);
-  //       }
-  //       return;
-  //     }
-  //   }
-
-  // };
-
   const moveToPhotoEditor = async (item, index) => {
 
     if (item && item.fileType === 'image') {
-      let fileName = item.filePath.split('/').pop();
-      let newPath = `${RNFS.DocumentDirectoryPath}/${fileName + Date.now()}`;
+      let fileName = 1+item.filePath.split('/').pop();
+      let newPath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+      
       RNFS.copyFile(item.filePath, newPath).then((success) => {
         PhotoEditor.Edit({
           path: newPath,

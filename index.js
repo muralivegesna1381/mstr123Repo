@@ -7,11 +7,17 @@ import App from './App';
 import {name as appName} from './app.json';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 var PushNotification = require("react-native-push-notification");
-import { Alert } from 'react-native';
+import * as DataStorageLocal from "./src/utils/storage/dataStorageLocal";
+import * as Constant from "./src/utils/constants/constant";
+
 AppRegistry.registerComponent(appName, () => App);
 
+  const updateNotificationFlow = async () => {
+    await DataStorageLocal.saveDataToAsync(Constant.IS_FROM_NOTIFICATION, JSON.stringify(true)); 
+  }
+
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
-PushNotification.configure({
+  PushNotification.configure({
     // (optional) Called when Token is generated (iOS and Android)
     onRegister: function (token) {
     },
@@ -19,7 +25,7 @@ PushNotification.configure({
     // (required) Called when a remote is received or opened, or local notification is opened
     onNotification: function (notification) {
       // process the notification
-  
+      updateNotificationFlow();
       // (required) Called when a remote is received or opened, or local notification is opened
       notification.finish(PushNotificationIOS.FetchResult.NoData);
     },

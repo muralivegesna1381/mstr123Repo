@@ -9,9 +9,10 @@ import * as DataStorageLocal from "./../../../../utils/storage/dataStorageLocal"
 import * as Apolloclient from './../../../../config/apollo/apolloConfig';
 import * as firebaseHelper from './../../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as AuthoriseCheck from './../../../../utils/authorisedComponent/authorisedComponent';
-import * as ServiceCalls from './../../../../utils/getServicesData/getServicesData.js';
 import * as generatRandomNubmer from './../../../../utils/generateRandomId/generateRandomId.js';
+import * as apiRequest from './../../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../../utils/getServicesData/apiMethodManger.js';
+import * as ObservationModel from "./../../observationModel/observationModel.js";
 
 const FAIL_NETWORK = 1;
 const SEND_OBS_COMPRESS_UPLOAD = 2;
@@ -20,8 +21,6 @@ const REMOVE_MEDIA = 3;
 const NETWORK_TYPE = 7;
 
 let trace_inAddObservationReview;
-let trace_Upload_Observation_API_Complete;
-let trace_Upload_Media_Complete;
 
 const  ObsReviewComponent = ({navigation, route, ...props }) => {
 
@@ -44,7 +43,7 @@ const  ObsReviewComponent = ({navigation, route, ...props }) => {
     const fromScreen1 = useRef(undefined);
     const [mediaArray, set_mediaArray] = useState([]);
     const [isEdit, set_isEdit] = useState(false);
-    const [mediaType, set_mediaType] = useState(undefined)
+    const [mediaType, set_mediaType] = useState(undefined);
 
     let deleteSelectedMediaFile = useRef(undefined);
     let deletedMedia = useRef([]);
@@ -68,7 +67,7 @@ const  ObsReviewComponent = ({navigation, route, ...props }) => {
           BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
         };
         
-      }, [navigation]);
+    }, [navigation]);
 
     useEffect(() => {  
 
@@ -87,8 +86,7 @@ const  ObsReviewComponent = ({navigation, route, ...props }) => {
 
     const getObsDetails = async () => {
 
-        let oJson = await DataStorageLocal.getDataFromAsync(Constant.OBSERVATION_DATA_OBJ);
-        oJson = JSON.parse(oJson);
+        let oJson = ObservationModel.observationData;
         if(oJson){
             set_obsObject(oJson);
             set_selectedPet(oJson.selectedPet);
@@ -118,14 +116,11 @@ const  ObsReviewComponent = ({navigation, route, ...props }) => {
 
     const submitOBSObj = async (iArray,vArray) => {
 
-        stopFBTraceMediaUpload();
         set_isLoading(true);
         isLoadingdRef.current = 1;
         set_loadingMsg('Please wait..');
 
         let client = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-
         trace_Upload_Observation_API_Complete = await perf().startTrace('t_SavePetObservation_API');
         let finalObj = { 
             "observationId": obsObject ? obsObject.observationId : '',
@@ -141,46 +136,37 @@ const  ObsReviewComponent = ({navigation, route, ...props }) => {
 
         }
 
-        sendOBSToBackend(finalObj,token);
+        sendOBSToBackend(finalObj);
 
     };
 
-    const sendOBSToBackend = async (finalObj,token) => {
+    const sendOBSToBackend = async (finalObj) => {
 
-        let sendObsServiceObj = await ServiceCalls.savePetObservation(finalObj,token);
-        stopFBTraceSaveObservation();
-
-        if(sendObsServiceObj && sendObsServiceObj.logoutData){
-          AuthoriseCheck.authoriseCheck();
-          navigation.navigate('WelcomeComponent');
-          return;
-        }
-        
-        if(sendObsServiceObj && !sendObsServiceObj.isInternet){
-            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,1,FAIL_OBS,false,'OK','');
-            return;
-        }
-  
-        if(sendObsServiceObj && sendObsServiceObj.statusData){
-
-            firebaseHelper.logEvent(firebaseHelper.event_add_observations_api_success, firebaseHelper.screen_add_observations_review, "Add Observation Api Success", 'Media count : '+imgArray.current.length);
+        let apiMethod = apiMethodManager.SAVE_PET_OBSERVATION;
+        let apiService = await apiRequest.postData(apiMethod,finalObj,Constant.SERVICE_JAVA,navigation);
+        set_isLoading(false);
+        isLoadingdRef.current = 0;
+            
+        if(apiService && apiService.status) {
             set_isLoading(false);    
             isLoadingdRef.current = 0;
             set_loadingMsg(undefined);
+            Apolloclient.client.writeQuery({query: Queries.UPDATE_OBSERVATION_LIST,data: {data: { obsData:finalObj,__typename: 'UpadateObservationList'}},})
             navigateToOBSList();
-        
-        } else {
-            
-            firebaseHelper.logEvent(firebaseHelper.event_add_observations_api_fail, firebaseHelper.screen_add_observations_review, "Add Observation Api Fail", '');
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,1,FAIL_OBS,false,'OK','');
-        }
-  
-        if(sendObsServiceObj && sendObsServiceObj.error) {
+                
+        } else if(apiService && apiService.isInternet === false) {
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,1,FAIL_OBS,false,'OK','');
+                
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
             firebaseHelper.logEvent(firebaseHelper.event_add_observations_api_fail, firebaseHelper.screen_add_observations_review, "Add Observation Api Fail", '');
             set_isLoading(false);
             isLoadingdRef.current = 0;
             set_loadingMsg(undefined);
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true,1,FAIL_OBS,false,'OK','');
+        } else {
+            firebaseHelper.logEvent(firebaseHelper.event_add_observations_api_fail, firebaseHelper.screen_add_observations_review, "Add Observation Api Fail", '');
             createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,1,FAIL_OBS,false,'OK','');
+
         }
 
     };
@@ -250,13 +236,13 @@ const  ObsReviewComponent = ({navigation, route, ...props }) => {
             
             }
             tempArray.push(finalObj);
-
             if(iProcess) {
                 await DataStorageLocal.saveDataToAsync(Constant.IMAGE_UPLOAD_DATA,JSON.stringify(tempArray));
             } else {
                 await DataStorageLocal.saveDataToAsync(Constant.IMAGE_UPLOAD_DATA,JSON.stringify(tempArray));
-                Apolloclient.client.writeQuery({query: Queries.UPLOAD_IMAGE_BACKGROUND,data: {data: { imageData:'checkForUploads',__typename: 'UploadImageBackground'}},})
+                Apolloclient.client.writeQuery({query: Queries.UPLOAD_IMAGE_BACKGROUND,data: {data: {imgObj : tempArray, imageData:'checkForUploads',__typename: 'UploadImageBackground'}},})
             }
+
             navigation.navigate('DashBoardService');
             return;
 
@@ -292,7 +278,7 @@ const  ObsReviewComponent = ({navigation, route, ...props }) => {
             } else {
                 tempArray.push(finalObj);
                 await DataStorageLocal.saveDataToAsync(Constant.VIDEOS_UPLOAD_DATA,JSON.stringify(tempArray));
-                Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEOS_BACKGROUND,data: {data: { videoData:'checkForUploads',__typename: 'UploadVideosBackground'}},})
+                Apolloclient.client.writeQuery({query: Queries.UPLOAD_VIDEOS_BACKGROUND,data: {data: {vidObj : tempArray, videoData:'checkForUploads',__typename: 'UploadVideosBackground'}},});
             }
             navigation.navigate('DashBoardService');
             return;
@@ -549,14 +535,6 @@ const  ObsReviewComponent = ({navigation, route, ...props }) => {
 
         }
 
-    };
-
-    const stopFBTraceSaveObservation = async () => {
-        await trace_Upload_Observation_API_Complete.stop();
-    };
-
-    const stopFBTraceMediaUpload = async () => {
-        await trace_Upload_Media_Complete.stop();
     };
 
     const removeMedia = (item,index) => {

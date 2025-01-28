@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {View,StyleSheet,Text,TouchableOpacity,ImageBackground,Platform} from 'react-native';
-import { useNavigation } from "@react-navigation/native";
 import BottomComponent from "./../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from './../../utils/commonComponents/headerComponent';
@@ -96,7 +95,7 @@ const  PetAddressEditConfrimUI = ({route, ...props }) => {
                 {props.petAddress || props.isPetWithParent ? <View style={{ flexDirection: 'row' }}>
                         <View style={[styles.backViewStyle,{minHeight: hp('6%')}]}>
                             <Text style={styles.headerTextStyle}>{'Pet Address : '}</Text>
-                            <Text style={styles.subHeaderTextStyle}>{!props.petAddress && props.isPetWithParent ? 'Same as your Address' :props.petAddress}</Text>
+                            <Text style={styles.subHeaderTextStyle}>{props.isPetWithParent ? 'Same as your Address' : props.petAddress}</Text>
                         </View>
                         
                 </View> : null}

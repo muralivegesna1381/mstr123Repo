@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,BackHandler,TouchableOpacity,Image,FlatList,Linking,Platform} from 'react-native';
+import {View,StyleSheet,Text,BackHandler,TouchableOpacity,FlatList,Linking} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from './../../utils/commonStyles/fonts'
 import CommonStyles from './../../utils/commonStyles/commonStyles';
@@ -7,8 +7,14 @@ import HeaderComponent from './../../utils/commonComponents/headerComponent';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 
+import ImgRef from "./../../../assets/images/otherImages/svg/document-link.svg";
+import Inst1Img from "./../../../assets/images/otherImages/svg/inst-1.svg";
+import Inst2Img from "./../../../assets/images/otherImages/svg/inst-2.svg";
+import Inst3Img from "./../../../assets/images/otherImages/svg/inst-3.svg";
+import Inst4Img from "./../../../assets/images/otherImages/svg/inst-4.svg";
+import Inst5Img from "./../../../assets/images/otherImages/svg/inst-5.svg";
+
 const POP_SUCCESS = 1;
-let imgRef = require('./../../../assets/images/otherImages/svg/document-link.svg');
 let trace_gInst_Screen;
 
 const  GoalInstructionsComponent = ({navigation,route, ...props }) => {
@@ -18,27 +24,27 @@ const  GoalInstructionsComponent = ({navigation,route, ...props }) => {
             {
                 "instruction" : 'The goal setting sider allows you to slide the slider on the scale from left to right, i.e., from starting 30mins, 40mins,_____4hrs.',
                 "instructionId" : 1,
-                "instructionImg" : require('./../../../assets/images/otherImages/svg/inst-1.svg')
+                "instructionImg" : Inst1Img
             },
             {
                 "instruction" : 'The forward motion goal can be modified multiple times in a day.',
                 "instructionId" : 2,
-                "instructionImg" : require('./../../../assets/images/otherImages/svg/inst-2.svg')
+                "instructionImg" : Inst2Img
             },
             {
                 "instruction" : 'The latest forward motion goal set will be taken into consideration.',
                 "instructionId" : 3,
-                "instructionImg" : require('./../../../assets/images/otherImages/svg/inst-3.svg')
+                "instructionImg" : Inst3Img
             },
             {
                 "instruction" : "Ideally, it is suggested to define just a forward motion goal to monitor the pet's activity.",
                 "instructionId" : 4,
-                "instructionImg" : require('./../../../assets/images/otherImages/svg/inst-4.svg')
+                "instructionImg" : Inst4Img
             },
             {
                 "instruction" : "Forward motion goal-setting history data is not maintained in the mobile app.",
                 "instructionId" : 5,
-                "instructionImg" : require('./../../../assets/images/otherImages/svg/inst-5.svg')
+                "instructionImg" : Inst5Img
             },
         ]
     )
@@ -88,10 +94,8 @@ const  GoalInstructionsComponent = ({navigation,route, ...props }) => {
     const renderItem = ({ item, index }) => {
         return (
             <View style={{flexDirection:'row',width:wp('85%'),minHeight: ( hp('10%')),alignSelf:'center'}}>
-
-                <Image style={styles.imgStyle} resizeMode='contain' source={item.instructionImg}></Image>
+                <item.instructionImg style={styles.imgStyle} />
                 <Text style={styles.textStyle}>{item.instruction}</Text>
-
             </View>
         );
     };
@@ -130,10 +134,10 @@ const  GoalInstructionsComponent = ({navigation,route, ...props }) => {
                         </View>
                         <View style={{flexDirection:'row',marginTop:hp('2%'),}}>
                             <TouchableOpacity onPress={() => {instructionAction(1)}}>
-                                <Image style={styles.imgStyle1} resizeMode='contain' source={imgRef}></Image>
+                                <ImgRef style={styles.imgStyle1}/>
                             </TouchableOpacity>
                             <TouchableOpacity style={{marginLeft:hp('2%'),}} onPress={() => {instructionAction(2)}}>
-                                <Image style={styles.imgStyle1} resizeMode='contain' source={imgRef}></Image>
+                                <ImgRef style={styles.imgStyle1}/>
                             </TouchableOpacity>
                         </View>
                         

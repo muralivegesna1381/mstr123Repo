@@ -1,5 +1,5 @@
 import React,{useState, useEffect,useRef} from 'react';
-import {View,Text,TouchableOpacity,FlatList, Image,ImageBackground, ScrollView, Platform} from 'react-native';
+import {View,Text,TouchableOpacity,FlatList, Image,ImageBackground, Platform} from 'react-native';
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
@@ -24,14 +24,14 @@ import QstMediaUploadComponent from '../questionnaireCustomComponents/customComp
 import QstDatePickerComponent from '../questionnaireCustomComponents/customComponents/qstDatePickerComponent';
 import QstImageBasedComponent from '../questionnaireCustomComponents/customComponents/qstImageBasedComponent';
 
-import downButtonImg from "./../../../../assets/images/otherImages/svg/downArrowGrey.svg";
-import upButtonImg from "./../../../../assets/images/otherImages/svg/upArrow.svg";
+import DefaultPetImg from "./../../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
+import NoLogsDogImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
+import NoLogsCatImg from "./../../../../assets/images/dogImages/noRecordsCat.svg";
+import DownButtonImg from "./../../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import UpButtonImg from "./../../../../assets/images/otherImages/svg/upArrow.svg";
+import QuestInfoImg from "../../../../assets/images/otherImages/svg/questInst.svg";
 import filterImg from "./../../../../assets/images/otherImages/png/filter.png";
 import gradientImg from "./../../../../assets/images/otherImages/png/petCarasoulBck.png";
-let defaultPetImg = require( "./../../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
-
-let noLogsDogImg = require("./../../../../assets/images/dogImages/noRecordsDog.svg");
-let noLogsCatImg = require("./../../../../assets/images/dogImages/noRecordsCat.svg");
 
 const QUESTIONNAIRE_QUESTIONS_KEY = {
     QUESTIONITEM: 'questionItem',
@@ -83,6 +83,7 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
 
     var indexArray = useRef([]);
     var popCancelValue = useRef(undefined);
+    var questionnaireDictRef = useRef(undefined);
 
     useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
@@ -90,11 +91,11 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
 
     useEffect(() => {
 
-        set_questionnaireDict(props.questionnaireDict);        
+        questionnaireDictRef.current = props.questionnaireDict
+        set_questionnaireDict(props.questionnaireDict); 
         if(props.questionsArray) {
             set_questionsArray(props.questionsArray);
             // getMandatoryQuestions(props.questionsArray);
-
         }
         if(props.defaultPetObj) {
             set_defaultPetObj(props.defaultPetObj);
@@ -171,7 +172,7 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
 
     const getQuestionnaireQuestions = (key, subKey) => {
         if(questionnaireDict) {
-            const requiredSubDict = questionnaireDict['QestionId_'+key+petId];   
+            const requiredSubDict = questionnaireDictRef.current['QestionId_'+key+petId];   
               if(requiredSubDict) {
                  const _subKey = subKey || QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONANSWER;
                  return requiredSubDict ? requiredSubDict[_subKey] : '';
@@ -216,8 +217,12 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
         props.checkErrorPermissions(value);
     };
 
-    const autoSubmitQuestionnaire = (value,qId) => {
-        props.autoSubmitQuestionnaire(value,qId);
+    const autoSubmitQuestionnaire = (value,qId,index) => {
+        if(value) {
+            var temp = indexArray.current.filter(item => item === index);
+            indexArray.current = temp;
+        }
+        props.autoSubmitQuestionnaire(value,qId,index);
     };
    
     const showMandatePopup = () => {
@@ -242,7 +247,13 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
         // set_isShowInfoView(!isShowInfoView);
     };
 
-    const autoSubmitQuestRadioBtnAction = (value,qId) => {
+    const autoSubmitQuestRadioBtnAction = (value,qId,index) => {
+
+        if(value) {
+            var temp = indexArray.current.filter(item => item === index);
+            indexArray.current = temp;
+        }
+        
         props.autoSubmitQuestRadioBtnAction(value,qId);
     };
 
@@ -274,8 +285,6 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
         questListStyle,
         filterImageBackViewStyles,
         backViewGradientStyle,
-        dropDownBtnStyle,
-        dropTextStyle,
         popSearchViewStyle,
         flatcontainer,
         flatview,
@@ -283,9 +292,6 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
         saveBtnStyle,
         infoBtnStyle,
         infoImgStyle,
-        infoPopStyle,
-        infoPopImgStyle,
-        infoTextStyle,
         secDescStyle,
         secDescTxtStyle,
         secNumTxtStyle,
@@ -323,44 +329,45 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
 
                     for (let i = 0; i < questionsArray.length; i++) {
                         if(((questionsArray[i].questionOrder < item.questionOrder)) ) { 
-
+                            
                             if(questionsArray[i].isMandatory) {
+                                if(questionsArray[i] && questionsArray[i].questionTypeId === QUEST_SCALE){
 
-                                if(!getQuestionnaireQuestions(questionsArray[i].questionId)) {
-                                    isNotAnswered = true;
-                                    break;
                                 } else {
-                                    let temp = getQuestionnaireQuestions(questionsArray[i].questionId);        
-                                    if(questionsArray[i].questionTypeId === QUEST_MULTIPLE_CHECKBOX) {
-                                        if(temp && temp !== '' && temp[0] && temp[0].option === Constant.MSELECTION_OTHER_SPECIFY && temp[0].rAnswer === '') {
-                                            isNotAnswered = true;
-                                            break;
-                                        }
+
+                                    if(!getQuestionnaireQuestions(questionsArray[i].questionId)) {                                  
+                                        isNotAnswered = true;
+                                        break;
                                     } else {
-                                        if(temp && temp !== '' && temp.option === Constant.MSELECTION_OTHER_SPECIFY && temp.rAnswer === '') {
-                                            isNotAnswered = true;
-                                            break;
-                                        } else {
-                                            if(questionsArray[i].questionTypeId === QUEST_DROPDOWN && temp !== '' && temp.option === undefined) {
-                                                isNotAnswered = true;
-                                                break;
-                                            } else if(questionsArray[i].questionTypeId === QUEST_RADIO_BUTTON && temp !== '' && temp.option === undefined) {
+                                        
+                                        let temp = getQuestionnaireQuestions(questionsArray[i].questionId); 
+                                        if(questionsArray[i].questionTypeId === QUEST_MULTIPLE_CHECKBOX) {
+                                            if(temp && temp !== '' && temp[0] && temp[0].option === Constant.MSELECTION_OTHER_SPECIFY && temp[0].rAnswer === '') {
                                                 isNotAnswered = true;
                                                 break;
                                             }
+                                        } else {
+                                            if(temp && temp !== '' && temp.option === Constant.MSELECTION_OTHER_SPECIFY && temp.rAnswer === '') {
+                                                isNotAnswered = true;
+                                                break;
+                                            } else {
+                                                if(questionsArray[i].questionTypeId === QUEST_DROPDOWN && temp !== '' && temp.option === undefined) {
+                                                    isNotAnswered = true;
+                                                    break;
+                                                } else if(questionsArray[i].questionTypeId === QUEST_RADIO_BUTTON && temp !== '' && temp.option === undefined) {
+                                                    isNotAnswered = true;
+                                                    break;
+                                                }
+                                            }
                                         }
-                                    }
-                                     
-                                    // else if(temp !== '' && temp.questionTypeId === 1 && dict.questionAnswer.option === undefined) {
-                                    // }else if(dict.questionItem.questionTypeId === 2 && dict.questionAnswer.option === undefined) {
-                                    // }
     
+                                    }
+
                                 }
 
                             } else {
                                 
                                 let temp = getQuestionnaireQuestions(questionsArray[i].questionId);
-
                                 if(temp && temp !== '' && questionsArray[i].questionTypeId === QUEST_MULTIPLE_CHECKBOX ) {
                                     temp = JSON.parse(temp);
                                     if(temp !== '' && temp[0] && temp[0].option === Constant.MSELECTION_OTHER_SPECIFY && temp[0].rAnswer === '') {
@@ -404,7 +411,7 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
                     </View>
                                     
                     <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-                        {<Image source={indexArray.current.includes(index) ? upButtonImg : downButtonImg} style={imageStyle}/>}                                          
+                        {indexArray.current.includes(index) ? <UpButtonImg style={imageStyle}/> : <DownButtonImg style={imageStyle}/>  }                                   
                     </View>
                 </TouchableOpacity>
 
@@ -416,7 +423,7 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
                             placeholder={'Enter Text (Limit: 500)'}   
                             maxLength = {500}
                             textAnswer={getQuestionnaireQuestions(item.questionId)}
-                            isMultiLineText={true}
+                            isMultiLineText={false}
                             status_QID = {status}
                             questionImageUrl = {item.questionImageUrl ? item.questionImageUrl : false}
                             isAnsSubmitted = {item.answer ? true : false}
@@ -431,7 +438,7 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
                             textAnswer={getQuestionnaireQuestions(item.questionId)}
                             isMultiLineText={false}
                             status_QID = {status}
-                            questionImageUrl = {item.questionImageUrl}
+                            questionImageUrl = {item.questionImageUrl ? item.questionImageUrl : false}
                             isAnsSubmitted = {item.answer ? true : false}
                             setValue={(textAnswer) => {
                                 updateQuestionnaireQuestions(item,textAnswer,item.isMandatory,item.questionType);
@@ -464,10 +471,10 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
                                     ansOptionMediaFileName : textAnswer.ansOptionMediaFileName
                                 }; 
                                 skipRadioBtnAction(tempValue,item);
-                                // updateQuestionnaireQuestions(item,textAnswer,item.isMandatory,item.questionType);
+                                updateQuestionnaireQuestions(item,textAnswer,item.isMandatory,item.questionType);
                             }} 
                             setSubmitValue={(value) => {
-                                autoSubmitQuestRadioBtnAction(value,item.questionId);
+                                autoSubmitQuestRadioBtnAction(value,item.questionId,index);
                             }} 
                             // setSkipValue={(value) => {
                               
@@ -513,15 +520,12 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
                                 }; 
     
                                 skipRadioBtnAction(tempValue,item);
-                                // updateQuestionnaireQuestions(item,value,item.isMandatory,item.questionType);
+                                updateQuestionnaireQuestions(item,tempValue,item.isMandatory,item.questionType);
                             }}
                             setSubmitValue={(value) => {
-                                autoSubmitQuestionnaire(value,item.questionId);
+                                autoSubmitQuestionnaire(value,item.questionId,index);
                             }}
-                            // setSkipValue={(value) => {
-                            //     let tempValue = {skipQuestion : value.skipQuestion,skipSection : value.skipSection, questionAnswerId : value.questionAnswerId, questSecOrder : item.sectionOrder, questOrder : item.questionOrder, questionId: item.questionId}; 
-                            //     skipRadioBtnAction(tempValue,item);
-                            // }}  
+
                         /> : null}
 
                        {item.questionTypeId === QUEST_SCALE && !item.isVerticalScale ? <QuestionnaireSliderComponent
@@ -653,19 +657,18 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
                 <ImageBackground style={[backViewGradientStyle]} imageStyle={{ borderRadius: 5 }} source={gradientImg}>
 
                     <View style={{alignItems:'center',justifyContent:'center',marginRight:hp('2%'),marginLeft:hp('3%'),}}>
-                        {petURL && !isImgFailed  ? <ImageBackground source={{uri:petURL}} style={Platform.isPad ? [petImageStyle1] : [petImageStyle]} resizeMode = {'cover'} onError = {() => set_isImgFailed(true)}/> : <ImageBackground source={defaultPetImg} style={Platform.isPad ? [petImageStyle1] : [petImageStyle]}/>}
+                        {petURL && !isImgFailed  ? <ImageBackground source={{uri:petURL}} style={Platform.isPad ? [petImageStyle1] : [petImageStyle]} resizeMode = {'cover'} onError = {() => set_isImgFailed(true)}/> : <ImageBackground source={DefaultPetImg} style={Platform.isPad ? [petImageStyle1] : [petImageStyle]}/>}
                     </View>
 
                     <View style={{flex:3,justifyContent:'center'}}>
                         <Text style={[petTitle]}>{defaultPetObj ? (defaultPetObj.petName && defaultPetObj.petName.length > 20 ? defaultPetObj.petName.slice(0,20) + '...' : defaultPetObj.petName): ''}</Text>
                         <Text style={[petSubTitle]}>{defaultPetObj ? (defaultPetObj.petBreed && defaultPetObj.petBreed.length > 18 ? defaultPetObj.petBreed.slice(0,18) : defaultPetObj.petBreed) : ''}</Text>
-                        {/* <Text style={[petSubTitle]}>{defaultPetObj ? defaultPetObj.gender : ''}</Text> */}
                         <Text style={[petSubTitle]}>{ defaultPetObj && defaultPetObj.speciesId === '1' ? 'Dog ' : 'Cat '}<Text>{defaultPetObj ? (defaultPetObj.gender ? '- ' +defaultPetObj.gender : defaultPetObj.gender) : ''}</Text></Text>
                     </View>
 
                     {props.infoText !== '' ? <View style={{flex:0.8,justifyContent:'center'}}>
                         <TouchableOpacity style={[infoBtnStyle]} onPress={() => {showInfo()}}>
-                            <Image style={[infoImgStyle]} source={require("../../../../assets/images/otherImages/svg/questInst.svg")}></Image>  
+                            <QuestInfoImg style={[infoImgStyle]}/>
                         </TouchableOpacity>
                     </View> : null}
 
@@ -679,7 +682,6 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
                     <View style={progressViewStyle}>               
                         <View style={{backgroundColor:'#6BC105',alignItems: "center",flex:calculateQuestionsPercentage()}}></View>
                     </View>
-
                 
                     <View style={{width:wp('30%'),height:hp('5%')}}>
                         <View style={filterButtonUI} onLayout={(event) => {
@@ -707,7 +709,7 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
                 </View>
             
                 <View style={{marginTop:hp('1.1%'), marginLeft:wp('18%'), position:'absolute',}}>
-                    <Text style={[progressAnswered]}>{props.sectionsAnswered + " of " + props.totalSection + " Sections Answered"}</Text>
+                    <Text style={[progressAnswered]}>{props.sectionsAnswered + " of " + props.totalSection + (props.totalSection > 1 ? " Sections Answered" : " Section Answered")}</Text>
                 </View>
            
             </View>
@@ -746,7 +748,7 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
              
             </View> : 
             <View style={{justifyContent:'center', alignItems:'center',marginTop: hp("15%"),}}>
-                <Image style= {[CommonStyles.nologsDogStyle]} source={defaultPetObj && defaultPetObj.speciesId && parseInt(defaultPetObj.speciesId) === 1 ? noLogsDogImg : noLogsCatImg}></Image>
+                {defaultPetObj && defaultPetObj.speciesId && parseInt(defaultPetObj.speciesId) === 1 ? <NoLogsDogImg style= {[CommonStyles.nologsDogStyle]}/> : <NoLogsCatImg style= {[CommonStyles.nologsDogStyle]}/>}
                 <Text style={[CommonStyles.noRecordsTextStyle,{marginTop: hp("2%")}]}>{Constant.NO_RECORDS_LOGS}</Text>
                 <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
             </View>}

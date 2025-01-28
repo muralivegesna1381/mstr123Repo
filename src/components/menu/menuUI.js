@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TouchableOpacity,Image, FlatList, ImageBackground,Platform} from 'react-native';
+import {View,StyleSheet,Text,TouchableOpacity, FlatList} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import Fonts from './../../utils/commonStyles/fonts'
 import CommonStyles from './../../utils/commonStyles/commonStyles';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../utils/constants/constant";
+
+import MenuImg from "../../../assets/images/sideMenuImages/svg/menuImg.svg";
 
 const  MenuUI = ({route, ...props }) => {
 
@@ -22,61 +23,61 @@ const  MenuUI = ({route, ...props }) => {
     };
 
     return (
-        <View style={[styles.mainComponentStyle]}>
+      
+      <View style={[styles.mainComponentStyle]}>
 
-          <View style={styles.topView}>
+        <View style={styles.topView}>
 
-            <TouchableOpacity style = {{width:wp('35%')}} onPress={() => menuHeaderBtnAction()}>
-                <View style = {{flexDirection:'row',marginLeft:wp('5%'),alignItems:'center'}}>
-                    <Image source={require('../../../assets/images/sideMenuImages/svg/menuImg.svg')} style={styles.hImgStyle} />
-                    <Text style={styles.headerTextStyle}>{'Menu'}</Text>
-                </View>
-            </TouchableOpacity>
+          <TouchableOpacity style = {{width:wp('35%')}} onPress={() => menuHeaderBtnAction()}>
+            <View style = {{flexDirection:'row',marginLeft:wp('5%'),alignItems:'center'}}>
+              <MenuImg/>
+              <Text style={styles.headerTextStyle}>{'Menu'}</Text>
+            </View>
+          </TouchableOpacity>
               
-          </View>
+        </View>
 
-          <View style={styles.menuView}>
+        <View style={styles.menuView}>
 
-            <FlatList
-                style={styles.flatcontainer}
-                data={props.renderArray ? props.renderArray : []}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item, index }) => (
+          <FlatList
+            style={styles.flatcontainer}
+            data={props.renderArray ? props.renderArray : []}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) => (
 
-                    <View style={{alignItems:'center',width: wp('30%'),}}>
+              <View style={{alignItems:'center',width: wp('30%'),}}>
 
-                        <TouchableOpacity  onPress={() => menuBtnAction(item, index)}>
-                            <View style={styles.flatview}>
-                              <Image source={item.iconImg} style={Platform.isPad ? [styles.btnImgStylePad] : [styles.btnImgStyle]} />
-                            </View>
-                            <Text style={[styles.labelTextStyle]}>{item.title}</Text>
-                        </TouchableOpacity>
+                <TouchableOpacity  onPress={() => menuBtnAction(item, index)}>
+                  <View style={styles.flatview}>
+                    <item.iconImg/>
+                  </View>
+                  <Text style={[styles.labelTextStyle]}>{item.title}</Text>
+                </TouchableOpacity>
 
-                    </View> 
+              </View> 
 
-                )}
-                keyExtractor={(item) => item.title}
-                numColumns={3}
-            />
-
-          </View>
-
-          {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
-            <AlertComponent
-              header = {props.popUpAlert}
-              message={props.popUpMessage}
-              isLeftBtnEnable = {false}
-              isRightBtnEnable = {true}
-              leftBtnTilte = {'NO'}
-              rightBtnTilte = {'OK'}
-              popUpRightBtnAction = {() => popOkBtnAction()}
-                        // popUpLeftBtnAction = {() => popCancelBtnAction()}
-            />
-          </View> : null}
-
-          {props.isLoading === true ? <LoaderComponent isLoader={false} loaderText = {Constant.DEFAULT_LOADER_MSG} isButtonEnable = {false} /> : null} 
+            )}
+            keyExtractor={(item) => item.title}
+            numColumns={3}
+          />
 
         </View>
+
+        {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
+          <AlertComponent
+            header = {props.popUpAlert}
+            message={props.popUpMessage}
+            isLeftBtnEnable = {false}
+            isRightBtnEnable = {true}
+            leftBtnTilte = {'NO'}
+            rightBtnTilte = {'OK'}
+            popUpRightBtnAction = {() => popOkBtnAction()}
+          />
+        </View> : null}
+
+        {props.isLoading === true ? <LoaderComponent isLoader={false} loaderText = {Constant.DEFAULT_LOADER_MSG} isButtonEnable = {false} /> : null} 
+
+      </View>
     );
   }
   
@@ -132,6 +133,7 @@ const  MenuUI = ({route, ...props }) => {
 
     btnImgStyle : {
       width:wp('20%'),
+      aspectRatio:1,
       // height:hp('10%'),
       resizeMode:'contain',
     },
@@ -139,12 +141,6 @@ const  MenuUI = ({route, ...props }) => {
     btnImgStylePad : {
       height:hp('10%'),
       width:wp('20%'),
-      resizeMode:'contain',
-    },
-
-    hImgStyle : {
-      width:wp('4%'),
-      aspectRatio:1,
       resizeMode:'contain',
     },
 

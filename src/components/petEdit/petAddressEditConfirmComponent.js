@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState} from 'react';
 import { BackHandler } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
-import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
-import * as Constant from "./../../utils/constants/constant";
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 import PetAddressEditConfrimUI from './petAddressEditConfrimUI';
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
 
 let trace_inPetAddress_Confirmation_Screen;
 
@@ -27,7 +26,6 @@ const PetAddressEditConfirmComponent = ({ route, ...props }) => {
 
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
         const focus = navigation.addListener("focus", () => {
-            
             set_date(new Date());
             initialSessionStart();
             firebaseHelper.reportScreen(firebaseHelper.screen_petLocation_selection_screen);
@@ -96,12 +94,11 @@ const PetAddressEditConfirmComponent = ({ route, ...props }) => {
     };
 
     const preparePetParentDetails = async () => {
-
-        let pParentObj = await DataStorageLocal.getDataFromAsync(Constant.PET_PARENT_OBJ);
-        pParentObj = JSON.parse(pParentObj);
+        
+        let pParentObj = UserDetailsModel.userDetailsData.user;
         if(pParentObj) {
             set_petParentObj(pParentObj);  
-            if(pParentObj.address&& Object.keys(pParentObj.address).length !==0) {
+            if(pParentObj.address && Object.keys(pParentObj.address).length !==0) {
                 
                 let tempAdd2 = '';
                 if(pParentObj.address.address2 !=='' && pParentObj.address.address2) {
@@ -127,7 +124,7 @@ const PetAddressEditConfirmComponent = ({ route, ...props }) => {
 
     const nextButtonAction = () => {
         firebaseHelper.logEvent(firebaseHelper.event_PLocation_Selection_btn, firebaseHelper.screen_petLocation_selection_screen, "User in PetAddressEditConfirmComponent selection Screen", 'isPetWithPetParent : ' + addressType);
-        navigation.navigate('PetAddressEditComponent',{petParentObj : petParentObj, petObj : petObj,isFromScreen:'petEditConfirm', isPetWithPetParent : addressType && addressType === 'same' ? true : false,isEditable : addressType && addressType === 'same' ? false : true});
+        navigation.navigate('PetAddressEditComponent',{petParentObj : petParentObj, petObj : petObj,isFromScreen:'petEditConfirm', isPetWithPetParent : addressType && addressType === 'same' ? true : false,isEditable : addressType && addressType === 'same' ? false : true,showAddressFields : addressType && addressType === 'same' ? true : false });
     };
 
     return (

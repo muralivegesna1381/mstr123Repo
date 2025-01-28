@@ -5,11 +5,10 @@ import * as Apolloclient from './../../../config/apollo/apolloConfig';
 import * as Queries from "../../../config/apollo/queries";
 import * as internetCheck from "./../../../utils/internetCheck/internetCheck";
 import * as Constant from "./../../../utils/constants/constant";
-import * as DataStorageLocal from './../../../utils/storage/dataStorageLocal';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 
 let trace_Leaderboard_API_Complete;
 
@@ -32,7 +31,10 @@ const  LeaderBoardService = ({route, ...props }) => {
       set_leaderBoardCurrent(props.currentCampaignPet);
       set_campagainName(props.campagainName);
       set_enableLoader(props.enableLoader);
-      set_ptActivityLimits(props.campagainArray[0].activityLimits)
+      if(props.campagainArray && props.campagainArray.length > 0) {
+        set_ptActivityLimits(props.campagainArray[0].activityLimits)
+      }
+      
     }, [props.leaderBoardArray,props.leaderBoardCurrent,props.campagainName,props.enableLoader,props.ptActivityLimits,props.currentCampaignPet]);
 
     useEffect(() => {
@@ -79,43 +81,34 @@ const  LeaderBoardService = ({route, ...props }) => {
     const getLeaderBoardDetails = async (campId) => {
 
       trace_Leaderboard_API_Complete = await perf().startTrace('t_GetLeaderBoardByCampaign_API');
-      let defaultPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-      defaultPet = JSON.parse(defaultPet);
-      let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-
-      let getLedBoardServiceObj = await ServiceCalls.getLeaderBoardByCampaignId(campId,defaultPet.petID,token);
+      let apiMethod = apiMethodManager.GET_LEADERBOARD;
+      let apiService = await apiRequest.postData(apiMethod,weightJson,Constant.SERVICE_JAVA,navigation);
       set_isloading(false);
       stopFBTrace();
+        
+      if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
 
-      if(getLedBoardServiceObj && getLedBoardServiceObj.logoutData){
-        firebaseHelper.logEvent(firebaseHelper.event_leaderBoard_api_fail, firebaseHelper.screen_leaderBoard, "Pet GetLeaderBoardByCampaign API Failed", 'Unautherised');
-        AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
-        return;
-      }
-        
-      if(getLedBoardServiceObj && !getLedBoardServiceObj.isInternet){
-        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
-        firebaseHelper.logEvent(firebaseHelper.event_leaderBoard_api_fail, firebaseHelper.screen_leaderBoard, "Pet GetLeaderBoardByCampaign API Failed", 'Internet : false');
-        return;
-      }
-  
-      if(getLedBoardServiceObj && getLedBoardServiceObj.statusData){
         firebaseHelper.logEvent(firebaseHelper.event_leaderBoard_api_success, firebaseHelper.screen_leaderBoard, "Pet GetLeaderBoardByCampaign API Success", '');
-          if(getLedBoardServiceObj.responseData){
-              set_leaderBoardArray(getLedBoardServiceObj.responseData.leaderBoards);
-              set_leaderBoardCurrent(getLedBoardServiceObj.responseData.currentObj);   
-          } 
-        
+        if(leaderboardAPI.data.leaderBoards.length > 0){
+          set_leaderBoardArray(leaderboardAPI.data.leaderBoards);
+          set_leaderBoardCurrent(leaderboardAPI.data.currentObj);   
+        } 
+
+      } else if(apiService && apiService.isInternet === false) {
+
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
+        firebaseHelper.logEvent(firebaseHelper.event_leaderBoard_api_fail, firebaseHelper.screen_leaderBoard, "Pet GetLeaderBoardByCampaign API Failed", 'Internet : false');  
+
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+        createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);
+        firebaseHelper.logEvent(firebaseHelper.event_leaderBoard_api_fail, firebaseHelper.screen_leaderBoard, "Pet GetLeaderBoardByCampaign API Failed", 'error : '+apiService.error);
+            
       } else {
+
         firebaseHelper.logEvent(firebaseHelper.event_leaderBoard_api_fail, firebaseHelper.screen_leaderBoard, "Pet GetLeaderBoardByCampaign API Failed", 'Service Status : false');
         createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-      }
-  
-      if(getLedBoardServiceObj && getLedBoardServiceObj.error) {
-        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-        let errors = getLedBoardServiceObj.error.length > 0 ? getLedBoardServiceObj.error[0].code : '';
-        firebaseHelper.logEvent(firebaseHelper.event_leaderBoard_api_fail, firebaseHelper.screen_leaderBoard, "Pet GetLeaderBoardByCampaign API Failed", 'error : '+errors);
+
       }
 
     };

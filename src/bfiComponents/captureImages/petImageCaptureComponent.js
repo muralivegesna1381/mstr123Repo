@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-community/async-storage";
-import CameraRoll from "@react-native-community/cameraroll";
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, ImageBackground, NativeModules, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, BackHandler, FlatList } from 'react-native';
 import RNFS from 'react-native-fs';
@@ -12,23 +11,27 @@ import HeaderComponent from '../../utils/commonComponents/headerComponent';
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from "../../utils/constants/constant";
 import * as PermissionsiOS from '../../utils/permissionsComponents/permissionsiOS';
-import moment from 'moment';
 import { Image } from 'react-native-compressor';
 import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
 import RotatePhoto from 'react-native-rotate-photo';
-import storage from '@react-native-firebase/storage';
 import BuildEnv from './../../config/environment/environmentConfig';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
-import * as ServiceCalls from '../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import * as Apolloclient from './../../config/apollo/apolloConfig';
 import * as Queries from "./../../config/apollo/queries";
 import * as ImagePicker from 'react-native-image-picker';
 import Highlighter from "react-native-highlight-words";
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
+import perf from '@react-native-firebase/perf';
 
-let retakeIcon = require("./../../../assets/images/bfiGuide/svg/re-take.svg");
+import RetakeImg from "./../../../assets/images/bfiGuide/svg/re-take.svg";
+import PetFrontImg from "./../../../assets/images/bfiGuide/svg/ic_front.svg";
+import PetBackImg from "./../../../assets/images/bfiGuide/svg/ic_back.svg";
+import PetTopImg from "./../../../assets/images/bfiGuide/svg/ic_top.svg";
+import PetSideLeftImg from "./../../../assets/images/bfiGuide/svg/ic_side_left.svg";
+import PetSideRightImg from "./../../../assets/images/bfiGuide/svg/ic_side_right.svg";
+import PetFullBodyImg from "./../../../assets/images/bfiGuide/svg/ic_full_body.svg";
 
 const Environment = JSON.parse(BuildEnv.Environment());
 
@@ -36,40 +39,33 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 
   const [index, set_index] = useState(0);
   const [isDataValid, setIsDataValid] = React.useState(true);
-
   const [petID, setPetID] = useState(undefined);
   const [petParentId, set_PetParentId] = useState(undefined);
   const [isFromOnBoarding, set_isFromOnBoarding] = useState(false);
-
   const [petCurrentImage, setPetCurrentImage] = useState(undefined);
-
   const [petFrontCropImage, setPetFrontCropImage] = useState(undefined);
   const [petBackCropImage, setPetBackCropImage] = useState(undefined);
   const [petTopCropImage, setPetTopCropImage] = useState(undefined);
   const [petRightSideCropImage, setPetRightSideCropImage] = useState(undefined);
   const [petLeftSideCropImage, setPetLeftSideCropImage] = useState(undefined);
   const [petFullCropBody, setPetFullCropBody] = useState(undefined);
-
   const [petFrontImage, setPetFrontImage] = useState(undefined);
   const [petBackImage, setPetBackImage] = useState(undefined);
   const [petTopImage, setPetTopImage] = useState(undefined);
   const [petRightSideImage, setPetRightSideImage] = useState(undefined);
   const [petLeftSideImage, setPetLeftSideImage] = useState(undefined);
   const [petFullBody, setPetFullBody] = useState(undefined);
-
   const [petFrontThumbImage, setPetFrontThumbImage] = useState(undefined);
   const [petBackThumbImage, setPetBackThumbImage] = useState(undefined);
   const [petTopThumbImage, setPetTopThumbImage] = useState(undefined);
   const [petRightSideThumbImage, setPetRightSideThumbImage] = useState(undefined);
   const [petLeftSideThumbImage, setPetLeftSideThumbImage] = useState(undefined);
   const [petFullBodyThumb, setPetFullBodyThumb] = useState(undefined);
-
   const [images, set_images] = useState([]);
   const [isImageView, set_isImageView] = useState(false);
   const [isLoading, set_isLoading] = useState(false);
   const [loaderText, set_loaderText] = useState(undefined);
   const [isCameraPermissionON, set_isCameraPermissionON] = useState(false);
-
   const [popUpAlert, set_popUpAlert] = useState('Alert');
   const [popupMessage, set_popupMessage] = useState(undefined);
   const [popLeftTitle, set_popLeftTitle] = useState(undefined);
@@ -78,23 +74,22 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
   const [isAsyncPending, setIsAsyncPending] = useState(false);
   const [completedProgress, setCompletedProgress] = useState('0');
   const [statusTitle, set_StatusTitle] = useState(undefined);
-  const [statusSubject, set_StatusSubject] = useState(undefined);
-
+  const [statusSubject, set_StatusSubject] = useState(undefined)
   const [isOpenMediaOptions, set_openMediaOptions] = useState(false);
-
+  const [date, set_Date] = useState(new Date());
   const [isPopUp, set_isPopUp] = useState(false);
+
   var rotation = 0;
   let isLoadingdRef = useRef(0);
-
   var totalRecordsData = useRef([]);
 
   const [dogImgArray, set_dogImgArray] = useState([
-    require('./../../../assets/images/bfiGuide/svg/ic_front.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_back.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_top.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_side_left.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_side_right.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_full_body.svg')
+    {"id":1, "pImg" : PetFrontImg },
+    {"id":2, "pImg" : PetBackImg },
+    {"id":3, "pImg" : PetTopImg },
+    {"id":4, "pImg" : PetSideLeftImg },
+    {"id":5, "pImg" : PetSideRightImg },
+    {"id":6, "pImg" : PetFullBodyImg }
   ]);
 
   let indexNew = useRef(0)
@@ -123,6 +118,26 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
   let trace_bfi_capture_Screen;
 
   useEffect(() => {
+
+    const focus = navigation.addListener("focus", () => {
+      set_Date(new Date());
+      initialSessionStart();
+      firebaseHelper.reportScreen(firebaseHelper.screen_capture_bfi);
+      firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_capture_bfi, "User in Capture BFI Screen", '');
+    });
+
+    checkCameraPermissions();
+    updateParentID();
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+
+    return () => {
+      initialSessionStop();
+      focus();
+      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };
+  }, []);
+
+  useEffect(() => {
     //Update when coming from camera component
     if (route.params?.indexPos) {
       indexNew.current = route.params?.indexPos
@@ -137,23 +152,8 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
         savePhotoInLocalGallery(route.params?.imagePath, route.params?.imageCroppedPath)
       }
     }
+
   }, [route.params?.indexPos, route.params?.imagePath, route.params?.imageCroppedPath]);
-
-  useEffect(() => {
-    initialSessionStart();
-    firebaseHelper.reportScreen(firebaseHelper.screen_capture_bfi);
-    firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_capture_bfi, "User in Capture BFI Screen", '');
-
-    checkCameraPermissions();
-
-    updateParentID()
-
-    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
-    return () => {
-      initialSessionStop();
-      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
-    };
-  }, []);
 
   const initialSessionStart = async () => {
     trace_bfi_capture_Screen = await perf().startTrace('t_inCaptureBFIScreen');
@@ -165,8 +165,8 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 
   const updateParentID = async () => {
     let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-    let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
-    if (userRole === '7') {
+    let userRole = UserDetailsModel.userDetailsData.userRole.RoleId;
+    if (parseInt(userRole) === 7) {
       set_PetParentId(clientId)
     }
   }
@@ -248,6 +248,7 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
     RNFS.readFile(croppedPath, 'base64')
       .then(imageBase64 => {
         if (Platform.OS === 'android') {
+          //checkBlurStatus(false, imagePath, imageBase64, croppedPath)
           NativeModules.ImageBlueIdentification.checkIsImageBlur(imageBase64, (value) => {
             checkBlurStatus(value, imagePath, imageBase64, croppedPath)
           });
@@ -369,12 +370,19 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
         rotation = 90;
       }
     }
-    RotatePhoto.createRotatedPhoto(result, 2000, 2000, "JPEG", 100, rotation, null)
+
+    if(result && result.length > 10) {
+      RotatePhoto.createRotatedPhoto(result, 2000, 2000, "JPEG", 100, rotation, null)
       .then(response => {
         updateThumnailPath(response.uri)
       })
       .catch(err => {
+        updateThumnailPath(imgPath)
       });
+    } else {
+      updateThumnailPath(imgPath)
+    }
+    
   };
 
   const updateThumnailPath = async (compressPath) => {
@@ -401,6 +409,7 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 
     set_isLoading(true)
     isLoadingdRef.current = 1;
+    imagePath = imagePath.replace("file://file:///", "file:///")
     RNFS.readFile(imagePath, 'base64')
       .then(imageBase64 => {
         var mlModelreq = {
@@ -523,6 +532,7 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
     jsonArray.push(jsonTopObject);
     jsonArray.push(jsonLeftSideObject);
     jsonArray.push(jsonRightSideObject);
+    // return
 
     var submitRequest = { petParentId: petParentId, petId: petID, "petBfiImages": jsonArray };
 
@@ -536,12 +546,9 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
       await DataStorageLocal.saveDataToAsync('CaptureImagesData', JSON.stringify(submitRequest));
     }
 
-    // var mediaData = await DataStorageLocal.getDataFromAsync('CaptureImagesData')
-    // mediaData = JSON.parse(mediaData)
-
     Apolloclient.client.writeQuery({
       query: Queries.UPLOAD_CAPTURE_BFI_BACKGROUND,
-      data: { data: { bfiData: 'checkForBFIUploads', __typename: 'UploadCaptureBFIBackground' } },
+      data: { data: {value: new Date(), bfiData: 'checkForBFIUploads', __typename: 'UploadCaptureBFIBackground' } },
     })
 
     navigation.navigate("ReviewComponent", { isFromScreen: 'capture_image' });
@@ -637,8 +644,6 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
         set_isLoading(false)
         var status = googleVisionRes.responses[0].labelAnnotations.some(objectData => objectData.description === 'Dog'); // true
         status = googleVisionRes.responses[0].labelAnnotations.some(objectData => objectData.description === 'Dog breed'); // true
-
-        //Testing console log
         googleVisionRes.responses[0].labelAnnotations.map((object, index) => {
 
         })
@@ -679,7 +684,8 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
       if (value === status_inprogress) {
         pendingData.push(key)
         pendingCount = pendingCount + 1
-        setIsDataValid(false)
+        setIsDataValid(true);
+        // setIsDataValid(false)
       } else if (value === status_not_mtach) {
         notMatchData.push(key)
         setIsDataValid(true)
@@ -703,53 +709,17 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
     }
   }
 
-  const getPetImagePositions = async () => {
-    set_isLoading(true);
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-    let serviceCallsObj = await ServiceCalls.getCaptureBFIImageOrientationPositions(token);
-
-    if (serviceCallsObj && serviceCallsObj.logoutData) {
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
-
-    if (serviceCallsObj && !serviceCallsObj.isInternet) {
-      set_isLoading(false);
-      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, 'OK', false, true);
-      return;
-    }
-
-    if (serviceCallsObj && serviceCallsObj.statusData) {
-      set_isLoading(false);
-      if (serviceCallsObj && serviceCallsObj.responseData && serviceCallsObj.responseData.length > 0) {
-        if (serviceCallsObj.responseData.length > 0) {
-          for (let i = 0; i < serviceCallsObj.responseData.length; i++) {
-            totalRecordsData.current.push(serviceCallsObj.responseData[i]);
-          }
-          set_isLoading(false);
-        }
-      }
-    } else {
-      set_isLoading(false);
-      createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, 'OK', false, true);
-      firebaseHelper.logEvent(firebaseHelper.event_get_capture_image_pos_api, firebaseHelper.screen_capture_bfi, "getPetImagePositions Service failed", 'Service Status : false');
-    }
-
-    if (serviceCallsObj && serviceCallsObj.error) {
-      let errors = serviceCallsObj.error.length > 0 ? serviceCallsObj.error[0].code : ''
-      set_isLoading(false);
-      firebaseHelper.logEvent(firebaseHelper.event_get_capture_image_pos_api, firebaseHelper.screen_capture_bfi, "getPetImagePositions Service failed", 'Service error : ' + errors);
-    }
-  };
-
   const actionOnRow = async (item) => {
     set_openMediaOptions(false);
     if (item === 'GALLERY') {
       if (Platform.OS === 'ios') {
         chooseImage()
       } else {
-        chooseMultipleMedia();
+        if (Platform.Version > 31) {
+          chooseImage()
+        } else {
+          chooseMultipleMedia();
+        }
       }
     }
     if (item === 'CAMERA') {
@@ -763,7 +733,7 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 
   const chooseImage = () => {
     set_popupMessage(Constant.LOADER_WAIT_MESSAGE)
-    set_isLoading(true);
+    // set_isLoading(true);
     ImagePicker.launchImageLibrary({
       mediaType: 'photo',
       includeBase64: false,
@@ -868,21 +838,19 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
               {petFullCropBody ?
                 <TouchableOpacity onPress={() => { viewCaptureImageAction(petFullCropBody) }}>
                   <ImageBackground style={styles.imageStyleLandScape} resizeMode="contain" source={{ uri: petFullCropBody }} />
-                </TouchableOpacity> :
-                <ImageBackground style={styles.infoImageStyle1} resizeMode='contain' source={dogImgArray[5]}></ImageBackground>
+                </TouchableOpacity> : <PetFullBodyImg style={styles.infoImageStyle1}/>
+               
               }
               {!petFullCropBody ?
                 < Text style={[CommonStyles.captureImageLable]}>{instArray[5].title}</Text>
                 : <View style={[styles.viewBtnStyle]}>
                   <TouchableOpacity onPress={() => { scanDocument(5) }}>
-                    <ImageBackground style={styles.viewTextStyle} resizeMode="contain" source={retakeIcon} />
+                    <RetakeImg style={styles.viewTextStyle} />
                   </TouchableOpacity>
                 </View>
               }
             </View>
           </TouchableOpacity>
-
-
 
           <TouchableOpacity onPress={() => { scanDocument(3) }}>
             <View style={[styles.imageItemLarge]}>
@@ -890,12 +858,12 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
                 <TouchableOpacity onPress={() => { viewCaptureImageAction(petLeftSideCropImage) }}>
                   <ImageBackground style={styles.imageStyleLandScape} resizeMode="contain" source={{ uri: petLeftSideCropImage }} />
                 </TouchableOpacity> :
-                <ImageBackground style={styles.infoImageStyle1} resizeMode='contain' source={dogImgArray[3]}></ImageBackground>
+                <PetSideLeftImg style={styles.infoImageStyle1}/>
               }
               {!petLeftSideCropImage ?
                 < Text style={[CommonStyles.captureImageLable]}>{instArray[3].title}</Text>
                 : <TouchableOpacity style={[styles.viewBtnStyle]} onPress={() => { scanDocument(3) }}>
-                  <ImageBackground style={styles.viewTextStyle} resizeMode="contain" source={retakeIcon} />
+                  <RetakeImg style={styles.viewTextStyle}/>
                 </TouchableOpacity>
               }
             </View>
@@ -906,13 +874,12 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
               {petRightSideCropImage ?
                 <TouchableOpacity onPress={() => { viewCaptureImageAction(petRightSideCropImage) }}>
                   <ImageBackground style={styles.imageStyleLandScape} source={{ uri: petRightSideCropImage }} />
-                </TouchableOpacity> :
-                <ImageBackground style={styles.infoImageStyle1} resizeMode='contain' source={dogImgArray[4]}></ImageBackground>
+                </TouchableOpacity> : <PetSideRightImg style={styles.infoImageStyle1}/>
               }
               {!petRightSideCropImage ?
                 <Text style={[CommonStyles.captureImageLable]}>{instArray[4].title}</Text>
                 : <TouchableOpacity style={[styles.viewBtnStyle]} onPress={() => { scanDocument(4) }}>
-                  <ImageBackground style={styles.viewTextStyle} resizeMode="contain" source={retakeIcon} />
+                  <RetakeImg style={styles.viewTextStyle}/>
                 </TouchableOpacity>}
 
             </View>
@@ -923,15 +890,14 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
               {petTopCropImage ?
                 <TouchableOpacity onPress={() => { viewCaptureImageAction(petTopCropImage) }}>
                   <ImageBackground style={[styles.imageStyleLandScape]} source={{ uri: petTopCropImage }} />
-                </TouchableOpacity> :
-                <ImageBackground style={[styles.infoImageStyle1, { width: wp('25%'), }]} resizeMode='contain' source={dogImgArray[2]}></ImageBackground>
+                </TouchableOpacity> : <PetTopImg style={[styles.infoImageStyle1, { width: wp('25%'), }]}/>
               }
               {!petTopCropImage ?
                 <Text style={[CommonStyles.captureImageLable]}>{instArray[2].title}</Text>
                 : <TouchableOpacity style={[styles.viewBtnStyle, {
 
                 }]} onPress={() => { scanDocument(2) }}>
-                  <ImageBackground style={styles.viewTextStyle} resizeMode="contain" source={retakeIcon} />
+                  <RetakeImg style={styles.viewTextStyle}/>
                 </TouchableOpacity>}
             </View>
           </TouchableOpacity>
@@ -943,13 +909,12 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
                   <TouchableOpacity onPress={() => { viewCaptureImageAction(petFrontCropImage) }}>
                     <ImageBackground style={styles.imageStyle} resizeMode="contain" source={{ uri: petFrontCropImage }}>
                     </ImageBackground>
-                  </TouchableOpacity> :
-                  <ImageBackground style={styles.infoImageStyle} resizeMode='contain' source={dogImgArray[0]}></ImageBackground>}
+                  </TouchableOpacity> : <PetFrontImg width={wp('14%')} style={[styles.infoImageStyle1]}/>}
 
                 {!petFrontCropImage ?
                   <Text style={[CommonStyles.captureImageLable]}>{instArray[0].title}</Text>
                   : <TouchableOpacity style={[styles.viewBtnStylePortrait, {}]} onPress={() => { scanDocument(0) }}>
-                    <ImageBackground style={styles.viewTextStyleFront} resizeMode="contain" source={retakeIcon} /></TouchableOpacity>}
+                    <RetakeImg style={styles.viewTextStyle}/></TouchableOpacity>}
 
               </View>
             </TouchableOpacity>
@@ -960,13 +925,12 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
                   <TouchableOpacity onPress={() => { viewCaptureImageAction(petBackCropImage) }}>
                     <ImageBackground style={styles.imageStyle} resizeMode="contain" source={{ uri: petBackCropImage }} >
                     </ImageBackground>
-                  </TouchableOpacity> :
-                  <ImageBackground style={styles.infoImageStyle} resizeMode='contain' source={dogImgArray[1]}></ImageBackground>
+                  </TouchableOpacity> :<PetBackImg width={wp('15%')} height={hp('16%')} style={[styles.infoImageStyle1]}/>
                 }
                 {!petBackCropImage ?
                   <Text style={[CommonStyles.captureImageLable]}>{instArray[1].title}</Text>
                   : <TouchableOpacity style={[styles.viewBtnStylePortrait]} onPress={() => { scanDocument(1) }}>
-                    <ImageBackground style={styles.viewTextStyleFront} resizeMode="contain" source={retakeIcon} /></TouchableOpacity>}
+                    <RetakeImg style={styles.viewTextStyle}/></TouchableOpacity>}
               </View>
             </TouchableOpacity>
           </View>
@@ -993,7 +957,7 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
         /> : null
       }
 
-      {isLoading === true ? <LoaderComponent isLoader={false} loaderText={loaderText} isButtonEnable={false} /> : null}
+      {isLoading === true ? <LoaderComponent isLoader={false} loaderText={'Please Wait...'} isButtonEnable={false} /> : null}
 
       {isPopUp ? <View style={CommonStyles.customPopUpStyle}>
         <AlertComponent
@@ -1032,6 +996,7 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
 export default PetImageCaptureComponent;
 
 const styles = StyleSheet.create({
+
   mainContainer: {
     flex: 1,
     alignItems: 'center',
@@ -1046,20 +1011,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     marginTop: hp('1%')
   },
-  heading: {
-    fontSize: 25,
-    textAlign: 'center',
-    marginVertical: 10,
-  },
-  textStyle: {
-    textAlign: 'center',
-    fontSize: 16,
-    marginVertical: 10,
-  },
+
   infoImageStyle: {
     width: wp('25%'),
     height: hp('13%'),
-    // marginVertical: 5,
   },
 
   infoImageStyle1: {
@@ -1068,54 +1023,6 @@ const styles = StyleSheet.create({
     marginVertical: 5
   },
 
-  buttonTextStyle: {
-    color: 'black',
-    fontSize: fonts.fontMedium,
-    ...CommonStyles.textStyleExtraBold,
-  },
-
-  input: {
-    flexDirection: 'row',
-    width: wp('80%'),
-    height: hp('6%'),
-    borderRadius: wp('1%'),
-    borderWidth: 1,
-    borderColor: '#dedede',
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  textInputContainerStyle: {
-    flexDirection: 'row',
-    margin: hp('1%'),
-    borderColor: '#dedede',
-    backgroundColor: 'white',
-  },
-
-  loginBtn: {
-    width: "60%",
-    borderRadius: 5,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#1338BE",
-  },
-  submitBtn: {
-    width: "70%",
-    borderRadius: 5,
-    height: 45,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f4511e",
-    marginTop: 20
-  },
-  submitText: {
-    color: '#000',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
   imageStyle: {
     width: wp('35%'),
     height: hp('23%'),
@@ -1123,21 +1030,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderRadius: 5,
   },
+
   imageStyleLandScape: {
     width: wp('60%'),
     height: hp('18%'),
     resizeMode: 'contain',
     borderRadius: 5,
-  },
-  crossImageStyle: {
-    width: wp('6%'),
-    height: hp('5%'),
-    resizeMode: 'contain',
-    alignSelf: 'flex-end',
-    top: -15,
-    right: -5,
-    position: 'absolute',
-    // backgroundColor: "#f4511e",
   },
 
   viewBtnStylePortrait: {
@@ -1170,36 +1068,6 @@ const styles = StyleSheet.create({
     marginEnd: wp('2%')
   },
 
-  mediaViewUIStyle: {
-    marginTop: hp('2%'),
-    height: hp('30%'),
-    width: wp('90%'),
-    borderColor: 'grey',
-    borderWidth: 2,
-    borderRadius: 5,
-    borderStyle: 'dotted',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-
-  imageBackViewStyle: {
-    width: wp('50%'),
-    height: hp('25%'),
-    alignItems: 'center',
-    marginTop: hp('5%')
-    // justifyContent:'center'
-  },
-
-  loader: {
-    width: wp('35%'),
-    height: hp('10%'),
-    flexDirection: 'row',
-    alignContent: 'center',
-    justifyContent: 'space-around',
-    backgroundColor: "#add8e6",
-    alignItems: 'center'
-  },
-
   imageItemSmall: {
     width: wp('40%'),
     height: hp('25%'),
@@ -1214,7 +1082,13 @@ const styles = StyleSheet.create({
   },
 
   imageItemLarge: {
-    width: wp('85%'), height: hp('20%'), marginLeft: wp('1%'), alignItems: 'center', justifyContent: 'center', backgroundColor: '#F6FAFD', margin: wp('2%'),
+    width: wp('85%'),
+    height: hp('20%'),
+    marginLeft: wp('1%'),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F6FAFD',
+    margin: wp('2%'),
     borderColor: '#CBCBCB',
     borderRadius: wp('2%'),
     borderWidth: 1.0,

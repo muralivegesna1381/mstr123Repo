@@ -11,12 +11,13 @@ import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 
-let rightArrowImg = require('./../../../../assets/images/otherImages/svg/downArrowGrey.svg');
-let searchImg = require('./../../../../assets/images/otherImages/svg/searchIcon.svg');
+import RightArrowImg from "./../../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import SearchImg from "./../../../../assets/images/otherImages/svg/searchIcon.svg";
+
 let xImg = require('./../../../../assets/images/otherImages/png/xImg.png');
 
 let trace_inPetBreedScreen;
@@ -100,47 +101,41 @@ const PetBreedComponent = ({ route, ...props }) => {
 
     const getBreedDetailsNew = async (id) => {
 
+        trace_PetBreed_API_Complete = await perf().startTrace('t_getPetBreeds_API');
         set_isLoading(true);
         isLoadingdRef.current = 1;
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        trace_PetBreed_API_Complete = await perf().startTrace('t_getPetBreeds_API');
 
-        let getPetBreedServiceObj = await ServiceCalls.getPetBreeds(id,token);
+        let apiMethod = apiMethodManager.GET_PET_BREEDS + id;
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
         stopFBTrace();
-
-        if(getPetBreedServiceObj && getPetBreedServiceObj.logoutData){
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_petBreed_api_fail, firebaseHelper.screen_SOB_petBreed, "Gettind breeds from backend Api Fail", 'Unautherised');
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-            
-        if(getPetBreedServiceObj && !getPetBreedServiceObj.isInternet){
-            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_petBreed_api_fail, firebaseHelper.screen_SOB_petBreed, "Gettind breeds from backend Api Fail", 'Internet : false');
-            return;
-        }
-      
-        if(getPetBreedServiceObj && getPetBreedServiceObj.statusData){
-            if(getPetBreedServiceObj.responseData) {
-                set_breedsArray(getPetBreedServiceObj.responseData);
-                set_filterBreedsArray(getPetBreedServiceObj.responseData);
+                
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+                
+            if(apiService.data.petBreedList) {
+                set_breedsArray(apiService.data.petBreedList);
+                set_filterBreedsArray(apiService.data.petBreedList);
             } else {
                 createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
                 firebaseHelper.logEvent(firebaseHelper.event_SOB_petBreed_api_fail, firebaseHelper.screen_SOB_petBreed, "Gettind breeds from backend Api Fail", 'No data found');
             }
-                           
+        
+        } else if(apiService && apiService.isInternet === false) {
+
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_petBreed_api_fail, firebaseHelper.screen_SOB_petBreed, "Gettind breeds from backend Api Fail", 'Internet : false');
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);              
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_petBreed_api_fail, firebaseHelper.screen_SOB_petBreed, "Gettind breeds from backend Api Fail", 'error : '+apiService.error.errorMsg);
+            
         } else {
+
             createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
             firebaseHelper.logEvent(firebaseHelper.event_SOB_petBreed_api_fail, firebaseHelper.screen_SOB_petBreed, "Gettind breeds from backend Api Fail", 'Service Status : false');
-        }
-      
-        if(getPetBreedServiceObj && getPetBreedServiceObj.error) {
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);              
-            let errors = getPetBreedServiceObj.error.length > 0 ? getPetBreedServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_petBreed_api_fail, firebaseHelper.screen_SOB_petBreed, "Gettind breeds from backend Api Fail", 'error : '+errors);
+
         }
             
     };
@@ -269,7 +264,7 @@ const PetBreedComponent = ({ route, ...props }) => {
                         </View>
 
                         <View style={{ justifyContent: 'center' }}>
-                            <Image source={rightArrowImg} style={styles.imageStyle} />
+                            <RightArrowImg width={wp('5%')} height={hp('5%')}/>
                         </View>
 
                     </TouchableOpacity>
@@ -298,13 +293,12 @@ const PetBreedComponent = ({ route, ...props }) => {
                     leftBtnTilte={'Cancel'}
                     rightBtnTilte={'OK'}
                     popUpRightBtnAction={() => popOkBtnAction()}
-                // popUpLeftBtnAction = {() => popCancelBtnAction()}
                 />
             </View> : null}
             {isSearchView ? <View style={styles.popSearchViewStyle}>
                 <View style={{flexDirection:'row',alignItems:'center',width:wp('90%'),}}>
                     <View style={styles.topView}>
-                        <Image source={searchImg} style={styles.searchImageStyle} />
+                        <SearchImg width={wp('3%')} height={hp('3%')} style={styles.searchImageStyle} />
                         <TextInput
                             style={styles.textInputStyle}
                             onChangeText={(text) => searchFilterFunction(text)}
@@ -365,13 +359,6 @@ const styles = StyleSheet.create({
         marginRight: hp("2%"),
         height: hp("5%"),
         color: "black",
-    },
-
-    imageStyle: {
-        margin: "4%",
-        height: 20,
-        width: 20,
-        resizeMode: "contain",
     },
 
     xImageStyle: {

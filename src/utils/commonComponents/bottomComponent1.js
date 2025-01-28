@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import {SafeAreaView,ScrollView,StatusBar,StyleSheet,Text,TouchableOpacity, View,} from 'react-native';
+import React, { useEffect } from 'react';
+import {StyleSheet,Text,TouchableOpacity, View,} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
 
 const BottomComponent1 = ({navigation, topBtnTitle, bottomBtnTitle, isDelete, bottomBtnEnable,...props }) => {
-
-    useEffect (() => {
-    },[]);
 
     const topButtonAction = () => {
         props.topButtonAction();
@@ -70,7 +67,6 @@ const styles = StyleSheet.create({
         borderRadius: hp("0.5%"),
         justifyContent: "center",
         alignItems:'center',
-        // borderColor:'red',
         borderWidth:1.0,
         marginVertical:wp('2%'),
       },

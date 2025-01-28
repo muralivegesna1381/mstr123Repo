@@ -1,29 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {View,TouchableOpacity,Text,Image,Platform,ScrollView,ImageBackground,FlatList,ActivityIndicator} from 'react-native';
+import {View,TouchableOpacity,Text,Platform,ScrollView,ImageBackground,FlatList,ActivityIndicator} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import DashBoardStyles from './../dashBoardStyles';
 import LeaderBoardService from './../../pointTracking/leaderBoard/leaderBoardService';
 
-let leftSignImg = require("../../../../assets/images/dashBoardImages/svg/leftSign.svg");
-let rightSignImg = require("../../../../assets/images/dashBoardImages/svg/rightSign.svg");
+import DashTimerImg from "../../../../assets/images/dashBoardImages/svg/dashTimerIcon.svg";
+import DashQuickVideoImg from "../../../../assets/images/dashBoardImages/svg/dashQuickVideo.svg";
+import DashChatImg from "../../../../assets/images/dashBoardImages/svg/chatIcon.svg";
+import DashChatQSettingsImg from "../../../../assets/images/dashBoardImages/svg/chatQuickIcon.svg";
+import LeftSignImg from "../../../../assets/images/dashBoardImages/svg/leftSign.svg";
+import RightSignImg from "../../../../assets/images/dashBoardImages/svg/rightSign.svg";
+import RightArrowImg from "./../../../../assets/images/dashBoardImages/svg/arrow-black-right.svg";
+import LeftArrowImg from "./../../../../assets/images/dashBoardImages/svg/arrow-black-left.svg";
 
 const  DashboardTasksUI = ({
-    isTimerEnable,
     setQuickSetupAction,
     obsVideoUploadStatus,
     obsImgUploadStatus,
     questUploadStatus,
-    isDeviceMissing,
-    isDeviceSetupDone,
     dbrdFeatureArrayProp,
     uploadStatus,
-    isTimer,
     isScrollEndReachedProp,
     questionnaireData,
     questSubmitLength,
     isQuestionnaireEnable,
     questionnaireDataLength,
-    isPTEnable,
     leaderBoardArray,
     leaderBoardPetId,
     campagainName,
@@ -35,21 +36,20 @@ const  DashboardTasksUI = ({
     ptActivityLimits,
     isPTLoading,
     isModularityService,
-    isObsEnable,
     leaderBoardCurrent,
     bfiUploadStatus,
     quickQuestionnaireAction,
     featureActions,
     showSearch,
+    petPermissionsData,
+    dashboardPetsData,
     route, ...props
 }) => {
 
     const [isScrollEndReached, set_isScrollEndReached] = useState(false);
-
     const flatDBRef = useRef(null);
 
     useEffect(() => {
-
     }, [dbrdFeatureArrayProp]);
 
     const handleEndReached = (event) => {
@@ -101,12 +101,12 @@ const  DashboardTasksUI = ({
                             <Text style={[sliderTextStyle,{color:item.brColor}]}>{item.text3}</Text>
                         </View>
                                                     
-                        <Image source={require('./../../../../assets/images/dashBoardImages/svg/right-arrow.svg')} style={[questArrowImgStyle,{tintColor : item.brColor,marginTop:hp('0.5%')}]}></Image>
+                        <RightArrowImg fill={item.brColor} style={[questArrowImgStyle,{marginTop:hp('0.5%')}]}/>
                 
                     </View>
                 
                     <View style={{flex:1,justifyContent:'flex-end',justifyContent:'flex-end',marginBottom:item.id === 3 ? hp('1.2%') : hp('2.5%')}}>
-                        <Image source={item.imgPath} style={[questDogImgStyle,{marginLeft:wp('-4%')}]}></Image>
+                        <item.imgPath width = {wp("5.5%")} height = {hp("5.5%")} style={[questDogImgStyle,{marginLeft:wp('-4%')}]}/>
                     </View>
                 
                 </View>
@@ -120,7 +120,7 @@ const  DashboardTasksUI = ({
                     
         <ScrollView showsVerticalScrollIndicator={false}>
 
-            {(dbrdFeatureArrayProp.length > 0) ? <View style={[tylebckViewStyle,{alignItems:'center', marginTop: (isTimer && (!uploadStatus) && (!questUploadStatus) ? hp('2%') : hp('0%')),}]}>
+            {(dbrdFeatureArrayProp.length > 0) ? <View style={[tylebckViewStyle,{alignItems:'center', marginTop: (petPermissionsData && petPermissionsData.isTimer && (!uploadStatus) && (!questUploadStatus) ? hp('0%') : hp('0%')),}]}>
 
                 <View style ={{flexDirection:'row'}}>
                     <FlatList
@@ -142,9 +142,9 @@ const  DashboardTasksUI = ({
             {dbrdFeatureArrayProp && dbrdFeatureArrayProp.length > 2 ? <View>
                         {/* {getPagination()} */}
                 <View style = {{flexDirection:'row',width:wp('93.5%'),alignSelf:'center',justifyContent:'center', marginTop:Platform.isPad ? hp('1%') : hp('0.5%')}}>
-                    {<Image source={require('./../../../../assets/images/dashBoardImages/svg/arrow-black-left.svg')} style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),tintColor:'black',marginRight:wp('1.5%')}] : [questArrowImgStyle,{tintColor:'black',marginRight:wp('1.5%')}]}></Image>}
-                    <Image source={!isScrollEndReached ? leftSignImg : rightSignImg} style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),tintColor:'black',marginRight:wp('1.5%')}] : [questArrowImgStyle,{tintColor:'black'}]}></Image>
-                    { <Image source={require('./../../../../assets/images/dashBoardImages/svg/arrow-black-right.svg')} style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),tintColor:'black',marginLeft:wp('1.5%'),marginRight:wp('0.5%')}] : [questArrowImgStyle,{tintColor:'black',marginLeft:wp('1.5%')}]}></Image>}
+                    <LeftArrowImg  style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),tintColor:'black',marginRight:wp('1.5%')}] : [questArrowImgStyle,{tintColor:'black',marginRight:wp('1.5%')}]}/>
+                    {!isScrollEndReached ? <LeftSignImg style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),tintColor:'black',marginRight:wp('1.5%')}] : [questArrowImgStyle,{tintColor:'black'}]}/> : <RightSignImg style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),tintColor:'black',marginRight:wp('1.5%')}] : [questArrowImgStyle,{tintColor:'black'}]}/>}
+                    <RightArrowImg fill={'black'} style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),marginLeft:wp('1.5%'),marginRight:wp('0.5%')}] : [questArrowImgStyle,{marginLeft:wp('1.5%')}]}/>
                 </View>
             </View> : null}
 
@@ -177,7 +177,7 @@ const  DashboardTasksUI = ({
                     <View style={questArrowStyle}>
 
                         <TouchableOpacity style={{width:wp("15%"),marginTop : Platform.isPad ? hp("1%") : hp("1.6%")}} onPress={() => {quickQuestionnaireAction()}}>
-                            <Image source={require('./../../../../assets/images/dashBoardImages/svg/right-arrow.svg')} style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),}] : [questArrowImgStyle, {marginLeft: wp("-2%"),}]}></Image>
+                            <RightArrowImg fill={'black'} style={Platform.isPad ? [questArrowImgStyle ,{width: wp("5%"),height: hp("1.5%"),}] : [questArrowImgStyle, {marginLeft: wp("-2%"),}]}/>
                         </TouchableOpacity>
                     
                     </View>
@@ -186,7 +186,7 @@ const  DashboardTasksUI = ({
                         
             </View> : null}
 
-            {isPTEnable ? <View style={Platform.isPad ? [leadeBoardStyle,{height:hp('38%'),}] : [leadeBoardStyle]}>
+            {petPermissionsData && petPermissionsData.isPTEnable ? <View style={Platform.isPad ? [leadeBoardStyle,{height:hp('38%'),}] : [leadeBoardStyle]}>
                 <LeaderBoardService
                     leaderBoardArray = {leaderBoardArray}
                     leaderBoardPetId = {leaderBoardPetId}
@@ -202,34 +202,34 @@ const  DashboardTasksUI = ({
 
             </View> : (isPTLoading ? <View style={{height:hp('3%'),justifyContent:'center'}}><ActivityIndicator size="small" color="gray"/></View> : null)} 
 
-            <View style={{marginTop : isTimer ? hp('2%') : hp('0%')}}>
+            <View style={{marginTop : petPermissionsData && petPermissionsData.isTimer ? hp('2%') : hp('0%')}}>
 
                 <ImageBackground style={quickselctionViewStyle} resizeMode="stretch" source={require("../../../../assets/images/dashBoardImages/png/quicActionsBk.png")}>
 
-                    {isTimerEnable && !isModularityService ? <View style={quickActionsInnerViewStyle}>
+                    {petPermissionsData && petPermissionsData.isTimerEnable && !isModularityService ? <View style={quickActionsInnerViewStyle}>
                         <TouchableOpacity style={{alignItems:'center'}} onPress={() => {setQuickSetupAction('Timer')}}>
-                            <Image source={require("../../../../assets/images/dashBoardImages/svg/dashTimerIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                            <DashTimerImg width = {wp('5%')} height = {hp('3%')} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
                             <Text style={[quickbtnInnerTextStyle]}>{"TIMER"}</Text>
                         </TouchableOpacity>                          
                     </View> : (isModularityService ? <View style={quickActionsInnerViewStyle}><ActivityIndicator size="small" color="gray"/></View> : null)}
 
-                    {isObsEnable && !isModularityService ? <View style={quickActionsInnerViewStyle}>
+                    {petPermissionsData && petPermissionsData.isObsEnable && !isModularityService ? <View style={quickActionsInnerViewStyle}>
                         <TouchableOpacity style={{alignItems:'center'}} onPress={() => {setQuickSetupAction('Quick Video')}}>
-                            <Image source={require("../../../../assets/images/dashBoardImages/svg/dashQuickVideo.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle,{width:wp('5%')}]}/>
+                            <DashQuickVideoImg width = {wp('5%')} height = {hp('3%')} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle,{width:wp('5%')}]}/>
                             <Text style={quickbtnInnerTextStyle}>{"QUICK VIDEO"}</Text>
                         </TouchableOpacity>                          
                     </View> : (isModularityService ? <View style={quickActionsInnerViewStyle}><ActivityIndicator size="small" color="gray"/></View> : null)}
 
                     <View style={quickActionsInnerViewStyle}>
                         <TouchableOpacity style={{alignItems:'center'}} onPress={() => {setQuickSetupAction('Chat')}}>
-                            <Image source={require("../../../../assets/images/dashBoardImages/svg/chatIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                            <DashChatImg width = {wp('5%')} height = {hp('3%')} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
                             <Text style={quickbtnInnerTextStyle}>{"CHAT"}</Text>
                         </TouchableOpacity>                          
                     </View>
 
                     <View style={quickActionsInnerViewStyle}>
                         <TouchableOpacity style={{alignItems:'center'}} onPress={() => {setQuickSetupAction('Support')}}>
-                            <Image source={require("../../../../assets/images/dashBoardImages/svg/chatQuickIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                            <DashChatQSettingsImg width = {wp('5%')} height = {hp('3%')} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
                             <Text style={quickbtnInnerTextStyle}>{"SUPPORT"}</Text>
                         </TouchableOpacity>                          
                     </View>

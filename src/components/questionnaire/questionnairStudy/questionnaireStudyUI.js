@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TouchableOpacity,ScrollView,Image,FlatList,ImageBackground,TextInput,Keyboard} from 'react-native';
+import {View,StyleSheet,Text,TouchableOpacity,ScrollView} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import fonts from '../../../utils/commonStyles/fonts'
@@ -11,8 +11,8 @@ import moment from "moment";
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 
-let noLogsDogImg = require("./../../../../assets/images/dogImages/noRecordsDog.svg");
-let noLogsCatImg = require("./../../../../assets/images/dogImages/noRecordsCat.svg");
+import NoLogsDogImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
+import NoLogsCatImg from "./../../../../assets/images/dogImages/noRecordsCat.svg";
 
 const  QuestionnaireStudyUI = ({route, ...props }) => {
 
@@ -136,7 +136,7 @@ const  QuestionnaireStudyUI = ({route, ...props }) => {
           {_renderStudyItems()}
         </View> : 
         (!isLoading && !questionnaireData  ? <View style={{justifyContent:'center', alignItems:'center',marginTop: hp("15%"),}}>
-          <Image style= {[CommonStyles.nologsDogStyle]} source={defaultPetObj && defaultPetObj.speciesId && parseInt(defaultPetObj.speciesId) === 1 ? noLogsDogImg : noLogsCatImg}></Image>
+          {defaultPetObj && defaultPetObj.speciesId && parseInt(defaultPetObj.speciesId) === 1 ? <NoLogsDogImg style= {[CommonStyles.nologsDogStyle]}/> : <NoLogsCatImg style= {[CommonStyles.nologsDogStyle]}/>}
           <Text style={[CommonStyles.noRecordsTextStyle,{marginTop: hp("2%")}]}>{Constant.NO_RECORDS_LOGS}</Text>
           <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
         </View> : null)}

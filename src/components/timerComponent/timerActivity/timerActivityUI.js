@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {View,StyleSheet,Text,TouchableWithoutFeedback, ImageBackground,ScrollView} from 'react-native';
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import fonts from '../../../utils/commonStyles/fonts'
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
+
+import RunningImg from "./../../../../assets/images/timerImages/svg/running.svg";
+import WalkingImg from "./../../../../assets/images/timerImages/svg/ta_walking.svg";
+import PlayingImg from "./../../../../assets/images/timerImages/svg/ta_playing.svg";
+import RopeTug from "./../../../../assets/images/timerImages/svg/ropeTug.svg";
 
 const  TimerActivityUI = ({route, ...props }) => {
 
@@ -55,14 +60,8 @@ const  TimerActivityUI = ({route, ...props }) => {
                             <View style={selectedIndex === 0 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                                 <View style={styles.imgBckViewStyle}>
-                                    <ImageBackground
-                                        source={require("./../../../../assets/images/timerImages/svg/running.svg")}
-                                        style={styles.petImgStyle}
-                                        resizeMode = 'contain'
-                                        >
-                                    </ImageBackground>
+                                    <RunningImg width={wp('8%')} height={hp('8%')}/>
                                 </View>
-
                                 <Text style={[styles.name]}>{'Running'}</Text>
                             </View>
                         </TouchableWithoutFeedback>
@@ -71,14 +70,8 @@ const  TimerActivityUI = ({route, ...props }) => {
                             <View style={selectedIndex === 1 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                                 <View style={styles.imgBckViewStyle}>
-                                    <ImageBackground
-                                        source={require("./../../../../assets/images/timerImages/svg/ta_walking.svg")}
-                                        style={styles.petImgStyle}
-                                        resizeMode = 'contain'
-                                        >
-                                    </ImageBackground>
+                                    <WalkingImg width={wp('8%')} height={hp('8%')}/>
                                 </View>
-
                                 <Text style={[styles.name]}>{'Walking'}</Text>
                             </View>
                         </TouchableWithoutFeedback>
@@ -91,14 +84,8 @@ const  TimerActivityUI = ({route, ...props }) => {
                             <View style={selectedIndex === 2 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                                 <View style={styles.imgBckViewStyle}>
-                                    <ImageBackground
-                                        source={require("./../../../../assets/images/timerImages/svg/ta_playing.svg")}
-                                        style={styles.petImgStyle}
-                                        resizeMode = 'contain'
-                                        >
-                                    </ImageBackground>
+                                    <PlayingImg width={wp('8%')} height={hp('8%')}/>
                                 </View>
-
                                 <Text style={[styles.name]}>{'Fetch'}</Text>
                             </View>
                         </TouchableWithoutFeedback>
@@ -107,14 +94,8 @@ const  TimerActivityUI = ({route, ...props }) => {
                             <View style={selectedIndex === 3 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                                 <View style={styles.imgBckViewStyle}>
-                                    <ImageBackground
-                                        source={require("./../../../../assets/images/timerImages/svg/ropeTug.svg")}
-                                        style={styles.petImgStyle}
-                                        resizeMode = 'contain'
-                                        >
-                                    </ImageBackground>
+                                    <RopeTug width={wp('8%')} height={hp('8%')}/>
                                 </View>
-
                                 <Text style={[styles.name]}>{'Rope Tug'}</Text>
                             </View>
                         </TouchableWithoutFeedback>
@@ -178,11 +159,6 @@ const  TimerActivityUI = ({route, ...props }) => {
         textAlign: "center",
         color:'black',
         marginTop: hp("1%"),
-    },
-
-    petImgStyle: {
-        width: wp("8%"),
-        aspectRatio :1,
     },
 
     imgBckViewStyle : {

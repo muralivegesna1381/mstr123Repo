@@ -3,7 +3,7 @@ import {View,StyleSheet,Text,ImageBackground,ActivityIndicator,TouchableOpacity,
 import fonts from './../../../../utils/commonStyles/fonts';
 import {widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import CommonStyles from './../../../../utils/commonStyles/commonStyles';
- import Slider from "react-native-slider";
+// import Slider from "react-native-slider";
 import SliderSmooth from "react-native-smooth-slider";
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import * as Constant from './../../../../utils/constants/constant';
@@ -82,7 +82,7 @@ import ImageView from "react-native-image-viewing";
 
             <GestureHandlerRootView style={styles.container}>
 
-              {Platform.OS === 'ios' ? <SliderSmooth style = {[styles.track1,{width:wp('80%')}]}
+              {/* {Platform.OS === 'ios' ? <SliderSmooth style = {[styles.track1,{width:wp('80%')}]}
                     value={valueSlider}
                     disabled={status_QID === 'Submitted' ? true : false}
                     useNativeDriver={true}
@@ -115,7 +115,23 @@ import ImageView from "react-native-image-viewing";
                   disabled = {status_QID === 'Submitted' ? true : false}
                   
               /> 
-              }
+              } */}
+              <SliderSmooth style = {[styles.track1,{width:wp('80%')}]}
+                    value={valueSlider}
+                    disabled={status_QID === 'Submitted' ? true : false}
+                    useNativeDriver={true}
+                    minimumValue = {minValue}
+                    maximumValue = {maxValue}
+                    vertical = {false}
+                    // animationType = {'spring' }
+                    minimumTrackTintColor={'gray'}
+                    maximumTrackTintColor={'#D3D3D3'}
+                    step = {stepValue}
+                    trackStyle = {{height: hp('2%'),borderRadius: 15, }}
+                    thumbTintColor = {'#6BC105'}
+                    thumbStyle = {{width: 25, height: 25,borderRadius: 100,}}
+                    onSlidingComplete={value => {selectAction(value)}}
+              />
             </GestureHandlerRootView>
 
             </View>

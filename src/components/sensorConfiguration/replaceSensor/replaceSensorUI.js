@@ -11,9 +11,9 @@ import TextInputComponent from './../../../utils/commonComponents/textInputCompo
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 import DropdownComponent from '../../../utils/commonComponents/dropDownComponent';
 
-let downArrowImg = require('./../../../../assets/images/otherImages/svg/downArrowGrey.svg');
-let radioCheckImg = require('./../../../../assets/images/otherImages/svg/radioBtnSelectedImg.svg');
-let radioUnCheckImg = require('./../../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg');
+import DownArrowImg from "./../../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import RadioCheckImg from "./../../../../assets/images/otherImages/svg/radioBtnSelectedImg.svg";
+import RadioUnCheckImg from "./../../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg";
 
 const ReplaceSensorUI = ({route, ...props }) => {
 
@@ -83,7 +83,7 @@ const ReplaceSensorUI = ({route, ...props }) => {
                 <TouchableOpacity onPress={() => {updateReason(item,index)}}>
                     <View style={styles.optionsSubViewStyle}>
                         <View>
-                            <Image style= {[styles.iconImgStyle]} source={props.selectedIndex === index ? radioCheckImg : radioUnCheckImg}></Image>
+                            {props.selectedIndex === index ? <RadioCheckImg style= {[styles.iconImgStyle]}/> : <RadioUnCheckImg style= {[styles.iconImgStyle]}/>}
                         </View>
                         <View style={{marginLeft:hp('1%')}}>
                             <Text style={[styles.headerTextStyle]}>{item.reasonName}</Text>
@@ -152,7 +152,7 @@ const ReplaceSensorUI = ({route, ...props }) => {
                         </View>
 
                         <View style={{justifyContent:'center'}}>
-                            <Image source={downArrowImg} style={styles.imageStyle} />
+                            <DownArrowImg style={styles.imageStyle}/>
                         </View>
      
                     </TouchableOpacity>
@@ -207,7 +207,7 @@ const ReplaceSensorUI = ({route, ...props }) => {
                 isLeftBtnEnable = {props.isPopLeftBtnEnable}
                 isRightBtnEnable = {true}
                 leftBtnTilte = {'NO'}
-                rightBtnTilte = {'YES'}
+                rightBtnTilte = {props.rbtnTitle}
                 popUpRightBtnAction = {() => popOkBtnAction()}
                 popUpLeftBtnAction = {() => popCancelBtnAction()}
             />

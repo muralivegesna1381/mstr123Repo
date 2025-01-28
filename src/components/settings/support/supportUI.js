@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, Platform } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Platform } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
 import fonts from './../../../utils/commonStyles/fonts'
 import CommonStyles from './../../../utils/commonStyles/commonStyles';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
-import * as DataStorageLocal from "../../../utils/storage/dataStorageLocal";
-import * as Constant from "../../../utils/constants/constant";
+
+import SupportCatImg from "./../../../../assets/images/otherImages/svg/supportCat.svg";
 
 const SupportUI = ({ route, ...props }) => {
 
@@ -45,7 +45,7 @@ const SupportUI = ({ route, ...props }) => {
                 <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => selectSupportAction(item)}>
 
                   <View style={{ minHeight: hp('10%'), flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    <Image source={item.img} style={[styles.imgStyle]} />
+                    <item.img style={[styles.imgStyle]} />
                   </View>
 
                   <View style={{ minHeight: hp('10%'), flex: 4, justifyContent: 'center' }}>
@@ -81,9 +81,12 @@ const SupportUI = ({ route, ...props }) => {
       </View>
 
       <View style={{ alignItems: 'center', height: hp('90%') }}>
-        <Image source={require("./../../../../assets/images/otherImages/svg/supportCat.svg")} style={Platform.isPad ? [styles.headerImgStyle, { height: hp('30%'), }] : [styles.headerImgStyle]} />
+        <View style={{zIndex:99,width: wp('90%'),alignItems:'center'}}>
+          <SupportCatImg width= {wp('100%')} height= {Platform.isPad ? hp('30%') : hp('22%')}/>
+        </View>
+        
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ marginTop: hp('2%'), marginBottom: hp('5%') }}>
+          <View style={{  marginTop: hp('2%'),marginBottom: hp('5%') }}>
             {_renderSupportItems()}
           </View>
         </KeyboardAwareScrollView>
@@ -94,9 +97,9 @@ const SupportUI = ({ route, ...props }) => {
           header={props.popUpTitle}
           message={props.popUpMessage}
           isRightBtnEnable={true}
-          rightBtnTilte={'YES'}
+          rightBtnTilte={'OK'}
           leftBtnTilte={'NO'}
-          isLeftBtnEnable={true}
+          isLeftBtnEnable={false}
           popUpRightBtnAction={() => popOkBtnAction()}
           popUpLeftBtnAction={() => popCancelBtnAction()}
         />
@@ -130,12 +133,6 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginLeft: hp('3%'),
     marginRight: wp('5%'),
-  },
-
-  headerImgStyle: {
-    width: wp('100%'),
-    height: hp('22%'),
-    resizeMode: 'stretch',
   },
 
   headerText: {

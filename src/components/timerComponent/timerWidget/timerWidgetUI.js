@@ -6,6 +6,7 @@ import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import * as Constant from "./../../../utils/constants/constant";
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
+import * as UserDetailsModel from "./../../../utils/appDataModels/userDetailsModel.js";
 
 const  TimerWidgetUI = ({route, ...props }) => {
 
@@ -38,8 +39,8 @@ const  TimerWidgetUI = ({route, ...props }) => {
     }, [props.seconds]);
 
     const getUserMenu = async () => {
-        let userRoleDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
-        userRoleDetails = JSON.parse(userRoleDetails);
+
+        let userRoleDetails = UserDetailsModel.userDetailsData.userRole;
         if(userRoleDetails && (userRoleDetails.RoleName === "Hill's Vet Technician")) {
             set_showSearch(true);
         } else {
@@ -90,7 +91,7 @@ const  TimerWidgetUI = ({route, ...props }) => {
 
     return (
         <>
-        {props.isTimerVisible ? 
+        {props.isTimerVisible === true ? 
             <View style={{
                 position: 'absolute',
                 flexDirection: 'row',
@@ -102,7 +103,7 @@ const  TimerWidgetUI = ({route, ...props }) => {
                 bottom: hp('45%'),
                 // top:showSearch ? hp('27%') : (adjustTimer === 'adjust' ? (Platform.isPad ? hp('27.0%') : (adjustTimerDev === 'deviceStat' ? hp('33%') : hp('26%'))) : (adjustTimerDev === 'deviceStat' ? hp('27.5%') : hp('20.5%'))),}}>
                 top:showSearch ? (adjustTimer === 'adjust' ? (adjustTimerDev === 'deviceStat' ? hp('39.5%') : hp('32.5%')) : (adjustTimerDev === 'deviceStat' ? hp('34%') : hp('27%'))) : (Platform.isPad ? (adjustTimer === 'adjust' ? (adjustTimerDev === 'deviceStat' ? hp('33%') : hp('26.0%')) : (adjustTimerDev === 'deviceStat' ? hp('27.5%') : hp('20.5%'))) : 
-                (adjustTimer === 'adjust' ? (adjustTimerDev === 'deviceStat' ? hp('33.0%') : hp('26.0%')) : (adjustTimerDev === 'deviceStat' ? hp('32.5.0%') : hp('20.5%'))))}}>
+                (adjustTimer === 'adjust' ? (adjustTimerDev === 'deviceStat' ? hp('33.0%') : hp('26.0%')) : (adjustTimerDev === 'deviceStat' ? hp('28.5.0%') : hp('20.5%'))))}}>
 
                 <View>
 

@@ -3,8 +3,9 @@ import { BackHandler } from 'react-native';
 import PetParentAddressUi from "./petParentAddressUI"
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
 import * as Constant from "./../../utils/constants/constant";
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 
 let trace_inPetParentAddressScreen;
 let trace_Email_Verification_API_Complete;
@@ -53,6 +54,7 @@ const PetParentAddressComponent = ({ navigation, route, ...props }) => {
     }, []);
 
     useEffect(() => {
+
         if (route.params?.isFromScreen) {
             set_isFromScreen(route.params?.isFromScreen);
         }
@@ -66,7 +68,7 @@ const PetParentAddressComponent = ({ navigation, route, ...props }) => {
             set_isNotificationEnable(route.params?.isNotificationEnable);
         }
 
-        if(route.params?.parentObj){
+        if(route.params?.parentObj && route.params?.parentObj.PetParentAddress){
 
             if(Object.keys(route.params?.parentObj.PetParentAddress).length !== 0){
                 set_parentObj(route.params?.parentObj);
@@ -112,37 +114,26 @@ const PetParentAddressComponent = ({ navigation, route, ...props }) => {
         set_isLoading(true);
         isLoadingdRef.current = 1;
 
-        let addressServiceObj = await ServiceCalls.validateAddress(obj);
+        let apiMethod = apiMethodManager.VALIDATE_ADDRESS;
+        let apiService = await apiRequest.postData(apiMethod,obj,Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
-        stopAddFBTrace();
-
-        if (addressServiceObj && addressServiceObj.invalidData) {
-            firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'Entered Invalid Address ');
-            createPopup(Constant.ALERT_DEFAULT_TITLE, 'Invalid Address', true);
-            return;
-        }
-
-        if (addressServiceObj && !addressServiceObj.isInternet) {
-            firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'IsInternet ' + addressServiceObj.isInternet);
-            createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
-            return;
-        }
-
-        if (addressServiceObj && addressServiceObj.statusData) {
-
-            if(addressServiceObj.responseData && addressServiceObj.responseData.isValidAddress === 1)  {
+       // stopAddFBTrace();
+                        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            
+            if(apiService.data.isValidAddress === 1 && apiService.data.address)  {
 
                 let addObj = {
                     "addressId" : null,
-                    "address1" : addressServiceObj.responseData.address.address1,
+                    "address1" : apiService.data.address.address1,
                     "address2" : '',
-                    "city" : addressServiceObj.responseData.address.city,
-                    "state" : addressServiceObj.responseData.address.state,
-                    "country" : addressServiceObj.responseData.address.country,
-                    "zipCode" : addressServiceObj.responseData.address.zipCode,
-                    "timeZoneId" : addressServiceObj.responseData.address.timeZone.timeZoneId,
-                    "timeZone" : addressServiceObj.responseData.address.timeZone.timeZoneName,
+                    "city" : apiService.data.address.city,
+                    "state" : apiService.data.address.state,
+                    "country" : apiService.data.address.country,
+                    "zipCode" : apiService.data.address.zipCode,
+                    "timeZoneId" : apiService.data.address.timeZone.timeZoneId,
+                    "timeZone" : apiService.data.address.timeZoneName,
                     "addressType" : 1,
                     "isPreludeAddress" : 0
                }
@@ -153,16 +144,22 @@ const PetParentAddressComponent = ({ navigation, route, ...props }) => {
                 firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'error : Invalid Address');
                 createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
             }
+    
+        } else if(apiService && apiService.isInternet === false) {
+
+            firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'IsInternet ' + 'No Internet');
+            createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true);
+            firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'error : ' + apiService.error.errorMsg);
 
         } else {
-            firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'Service Status : false' );
-            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
-        }
 
-        if (addressServiceObj && addressServiceObj.error) {
+            firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'error : Invalid Address');
             createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
-            let errors = addressServiceObj.error.length > 0 ? addressServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'error : ',errors);
+
         }
 
     };
@@ -182,27 +179,34 @@ const PetParentAddressComponent = ({ navigation, route, ...props }) => {
 
         set_isLoading(true);
         isLoadingdRef.current = 1;
-        let pRequestServiceObj = await ServiceCalls.registerUserSendEmailVerificationCode(json);
+
+        let apiMethod = apiMethodManager.REGISTER_SEND_EMAIL_CODE;
+        let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
         stopEVFBTrace();
+                        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
 
-        if (pRequestServiceObj && !pRequestServiceObj.isInternet) {
+            if(apiService.data.Key) {
+                navigation.navigate('OTPComponent', { isFromScreen: 'registration', eMailValue: email, secondaryEmail: secondaryEmail, isNotificationEnable:isNotificationEnable, addressObj:addObj });
+            }
+            
+        } else if(apiService && apiService.isInternet === false) {
+
             firebaseHelper.logEvent(firebaseHelper.event_registration_otp_api_fail, firebaseHelper.screen_register_parent_address, "Requesting OTP API Failed", 'error : No Internet');
             createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
-            return;
-        }
 
-        if (pRequestServiceObj && pRequestServiceObj.statusData) {
-            navigation.navigate('OTPComponent', { isFromScreen: 'registration', eMailValue: email, secondaryEmail: secondaryEmail, isNotificationEnable:isNotificationEnable, addressObj:addObj });
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            firebaseHelper.logEvent(firebaseHelper.event_registration_otp_api_fail, firebaseHelper.screen_register_parent_address, "Requesting OTP API Failed", 'Email : ' + email);
+            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
+
         } else {
-            firebaseHelper.logEvent(firebaseHelper.event_registration_otp_api_fail, firebaseHelper.screen_register_parent_address, "Requesting OTP API Failed", 'Email : ' + email);
-            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
-        }
 
-        if (pRequestServiceObj && pRequestServiceObj.error) {
             firebaseHelper.logEvent(firebaseHelper.event_registration_otp_api_fail, firebaseHelper.screen_register_parent_address, "Requesting OTP API Failed", 'Email : ' + email);
             createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
+
         }
 
     };

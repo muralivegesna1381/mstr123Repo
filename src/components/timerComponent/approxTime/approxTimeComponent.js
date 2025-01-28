@@ -42,7 +42,6 @@ const ApproxTimeComponent = ({navigation, route, ...props }) => {
 
         return () => {
             initialSessionStop();
-            focus();
             BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
         };
 

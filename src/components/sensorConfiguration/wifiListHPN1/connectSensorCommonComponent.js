@@ -11,6 +11,7 @@ import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import ImageSequence from 'react-native-image-sequence';
 import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
+import * as AppPetsData from '../../../utils/appDataModels/appPetsModel.js';
 import perf from '@react-native-firebase/perf';
 
 let trace_inSensorConnectSensorCommandScreen;
@@ -118,8 +119,7 @@ const  ConnectSensorCommonComponent = ({navigation, route, ...props }) => {
         
         set_isLoading(true);
         isLoadingRef.current = 1;
-        let defaultObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT,);
-        defaultObj = JSON.parse(defaultObj);
+        let defaultObj = AppPetsData.petsData.defaultPet;
         let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
         let devNumber = defaultObj.devices[parseInt(sensorIndex)].deviceNumber;
         let deviceType =  defaultObj.devices[parseInt(sensorIndex)].deviceModel;

@@ -31,12 +31,12 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
   const [rightpopupBtnTitle, set_rightpopupBtnTitle] = useState(undefined);
   const [popupId, set_popupId] = useState(0);
   const [date, set_Date] = useState(new Date());
-  const [defaultPetObj, set_defaultPetObj] = useState(undefined);
   const [loaderText, set_loaderText] = useState('');
   const [isLoading, set_isLoading] = useState(false);
   const [wifiList, set_wifiList] = useState([{ 'wifiName': 'Add Network Manually', 'status': '' }]);
   const [retryCount, set_retryCount] = useState(0);
   const [btnName, set_btnName] = useState('');
+  const [isBckBtnEnable, set_isBckBtnEnable] = useState(false);
 
   const [fetchedList, set_fetchedList] = useState(0);
   const [totalList, set_totalList] = useState(0);
@@ -83,24 +83,6 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
     };
 
   }, []);
-
-  // useEffect(() => {
-
-  //   if (route.params?.defaultPetObj) {
-  //     set_defaultPetObj(route.params?.defaultPetObj);
-  //   }
-  //   if (route.params?.isFromScreen) {
-  //     isFromScreen.current = route.params?.isFromScreen;
-  //   }
-  //   if (route.params?.periId) {
-  //     peripharal.current = route.params?.periId;
-  //   };
-
-  //   if (route.params?.devNumber) {
-  //     devNumber.current = route.params?.devNumber;
-  //   };
-
-  // }, [route.params?.periId, route.params?.defaultPetObj, route.params?.isFromScreen,route.params?.devNumber]);
 
   useEffect(() => {
 
@@ -241,7 +223,6 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
   const handleWifiListCallback = ({ data, error }) => {
 
     if (data && data.wifiData) {
-
       if (data.status && data.status === 500) {
         let tempArray = [];
         if (sensorType.current === 'HPN1Sensor') {
@@ -261,8 +242,7 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
             obj = { 'wifiName': 'Add Network Manually', 'status': '' };
             tempArray.push(obj);
             nearByWiFiCount.current = data.wifiDataCount - 1;
-
-            set_wifiList(tempArray);
+            //set_wifiList(tempArray);
             firebaseHelper.logEvent(firebaseHelper.event_sensor_nearby_wifi_count, firebaseHelper.screen_sensor_nearby_wifi, "No of Nearby Wifi Count : "+nearByWiFiCount.current, 'Device Number : '+devNumber.current);
             set_loaderText('Total Nearby Wi-Fi SSIDs found: ' + nearByWiFiCount.current.toString());
             SensorHandler.getInstance().retrieceWifiListAfterCount(data.wifiData, readWiFiNames);
@@ -328,7 +308,7 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
       if (data.wifiList.length > 0) {
         set_btnName('STOP SCANNING');
       }
-      if (nearByWiFiCount.current - data.failedNamesCount === data.wifiList.length) {
+      if ((nearByWiFiCount.current - data.failedNamesCount === data.wifiList.length)) {
         set_isLoading(false);
         isLoadingdRef.current = 0;
         set_btnName('REFRESH NETWORK...');
@@ -355,7 +335,8 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
                
             }else if (i == data.wifiList.length){
                obj = { 'wifiName': '', 'status': 'fetching...' };
-            }else {
+            }
+            else {
               obj = { 'wifiName': '', 'status': 'awaiting..' };
             }
 
@@ -427,24 +408,7 @@ const SensorWiFiListComponent = ({ route, ...props }) => {
       firebaseHelper.logEvent(firebaseHelper.event_sensor_stop_scanning, firebaseHelper.screen_sensor_nearby_wifi, "User clicked on Stop Scanning button : "+devNumber.current, 'WiFi SSID count : '+tempArray.length);
 
     } else {
-
      checkBleStatus();
-      // let permissionsEnabled = await checkBleStatus();
-
-      // if(!permissionsEnabled) {
-      //   return
-      // }
-
-      // firebaseHelper.logEvent(firebaseHelper.event_sensor_refresh_scanning, firebaseHelper.screen_sensor_nearby_wifi, "User clicked on Refresh Scanning button", 'Device Number : '+devNumber.current);
-      // set_btnName(undefined);
-      // actionName.current = '';
-      // set_wifiList([]);
-      // set_fetchedList(0);
-      // set_totalList(parseInt(0));
-      // totalCount.current = 0;
-      // let tempArray = [{'wifiName': 'Add Network Manually', 'status': '' }];
-      // set_wifiList(tempArray);
-      // getWifiDetails();
     }
 
   };

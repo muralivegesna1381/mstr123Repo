@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TextInput,TouchableOpacity,Image, ImageBackground,FlatList} from 'react-native';
+import {View,StyleSheet,Text,TextInput,TouchableOpacity, ImageBackground,FlatList} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import BottomComponent from "./../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
@@ -11,6 +11,9 @@ import moment from 'moment';
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../../utils/constants/constant";
 import ImageView from "react-native-image-viewing";
+
+import ObsVideoImg from "./../../../../assets/images/otherImages/svg/observationVideoLogo.svg";
+import DefaultDogImg from "./../../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
 
 const  ViewObservationsUi = ({route, ...props }) => {
 
@@ -147,8 +150,7 @@ const  ViewObservationsUi = ({route, ...props }) => {
 
                         <View style={[styles.viewStyle,{}]}>
                             <Text style={styles.labelTextStyles}>{'Behavior'}</Text>
-
-                            <Text style={[styles.selectedDataTextStyles,{flex:3}]}>{behvText}</Text>
+                            <Text style={[styles.selectedDataTextStyles,{flex:3}]}>{obsObject&& obsObject.behaviorName ? obsObject.behaviorName : '--'}</Text>
                         </View>
 
                     </View>
@@ -167,16 +169,14 @@ const  ViewObservationsUi = ({route, ...props }) => {
                                         <View style={styles.flatview}>
                                             <Text style={[styles.name]}>{item.type==='image' ? item.fileName : item.videoName}</Text>
 
-                                            {item.type==='image' ? <ImageBackground source={{uri : item.filePath}} style={styles.media} imageStyle={{borderRadius:5}}>
-                                            </ImageBackground> : 
+                                            {item.type==='image' ? <ImageBackground source={{uri : item.filePath}} style={styles.media} imageStyle={{borderRadius:5}}></ImageBackground> : 
                                             (item.videoUrl && item.videoUrl!=='' ? (item.videoThumbnailUrl && item.videoThumbnailUrl!=='' ? <ImageBackground source={{uri : item.videoThumbnailUrl}} style={styles.media} imageStyle={{borderRadius:5}}>
-                                                {item.type==='video' ? <Image source={require("./../../../../assets/images/otherImages/svg/observationVideoLogo.svg")} style={[styles.videoLogoStyle]}/> : null}
+                                                {item.type==='video' ? <ObsVideoImg style={[styles.videoLogoStyle]}/> : null}
 
-                                            </ImageBackground> : <ImageBackground source={require("./../../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg")} style={styles.media} imageStyle={{borderRadius:5}}>
-                                                {item.type==='video' ? <Image source={require("./../../../../assets/images/otherImages/svg/observationVideoLogo.svg")} style={[styles.videoLogoStyle]}/> : null}
+                                            </ImageBackground> : <ImageBackground source={DefaultDogImg} style={styles.media} imageStyle={{borderRadius:5}}>
+                                                {item.type==='video' ? <ObsVideoImg style={[styles.videoLogoStyle,{}]}/> : null}
 
                                             </ImageBackground>): null)}
-
                                         </View>
                                     </TouchableOpacity>
                                 )}
@@ -316,7 +316,7 @@ const  ViewObservationsUi = ({route, ...props }) => {
         aspectRatio:1,
         resizeMode:'contain',
         alignItems:'center',
-        justifyContent:'center'
+        justifyContent:'center',
     },
 
     videoLogoStyle : {

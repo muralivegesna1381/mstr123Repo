@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, BackHandler, ScrollView } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
@@ -7,21 +7,30 @@ import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import fonts from '../../../utils/commonStyles/fonts';
 import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
+import perf from '@react-native-firebase/perf';
+import { useNavigation } from "@react-navigation/native";
 
 let trace_bfi_petInfo_Screen;
 
-const PetInformationUI = ({ navigation, route, ...props }) => {
+const PetInformationUI = ({ route, ...props }) => {
+
+    const navigation = useNavigation();
+    const [date, set_Date] = useState(new Date());
 
     // Android Physical back button action
     useEffect(() => {
 
-        initialSessionStart();
-        firebaseHelper.reportScreen(firebaseHelper.screen_bfi_pet_information);
-        firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_pet_information, "User in BFI Pet Info Screen", '');
+        const focus = navigation.addListener("focus", () => {
+            set_Date(new Date());
+            initialSessionStart();
+            firebaseHelper.reportScreen(firebaseHelper.screen_bfi_pet_information);
+            firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_pet_information, "User in BFI Pet Info Screen", '');
+        });
 
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
         return () => {
             initialSessionStop();
+            focus();
             BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
         };
     }, []);
@@ -86,7 +95,7 @@ const PetInformationUI = ({ navigation, route, ...props }) => {
                         <View style={styles.dataViewStyle}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('80%'), }}>
                                 <Text style={styles.labelTextStyles}>{'Date of birth'}</Text>
-                                <Text style={styles.selectedDataTextStyles}>{props.petObj && props.petObj.birthday ? (props.petObj.birthday ? moment(new Date(props.petObj.birthday)).format("MM-DD-YYYY") : '--') : '--'}</Text>
+                                <Text style={styles.selectedDataTextStyles}>{props.birthDay}</Text>
                             </View>
                         </View>
 

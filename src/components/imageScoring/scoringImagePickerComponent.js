@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useRef } from 'react';
-import { View, BackHandler, Platform } from 'react-native';
+import { BackHandler, Platform } from 'react-native';
 import ScoringImagePickerUI from './scoringImagePickerUI';
 import * as Constant from "./../../utils/constants/constant";
 import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
@@ -8,15 +8,16 @@ import * as internetCheck from "./../../utils/internetCheck/internetCheck";
 import moment from 'moment';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
 import * as PermissionsiOS from './../../utils/permissionsComponents/permissionsiOS';
+import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
 import Highlighter from "react-native-highlight-words";
 import * as ImagePicker from 'react-native-image-picker';
 import PhotoEditor from 'react-native-photo-editor'
 import CameraRoll from "@react-native-community/cameraroll";
 import * as CheckPermissionsAndroid from './../../utils/permissionsComponents/permissionsAndroid';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 
 var RNFS = require('react-native-fs');
 
@@ -76,7 +77,7 @@ const ScoringImagePickerComponent = ({ navigation, route, ...props }) => {
             set_imageScoringId(route.params?.imageScoringId);
         }
 
-    }, [route.params?.selectedObj, route.params?.scoreObj,route.params?.scoringTypeId,route.params?.imageScoringId]);
+    }, []);
 
     const handleBackButtonClick = () => {
         navigateToPrevious();
@@ -136,7 +137,7 @@ const ScoringImagePickerComponent = ({ navigation, route, ...props }) => {
         if (response) {
           set_imagePath(response.path);
           set_imagePath1(response.path);
-          addEditedImg(response.path);
+          // addEditedImg(response.path);
           set_isLoading(false);
           isLoadingdRef.current = 0;
           set_loadingMsg(undefined);
@@ -181,7 +182,7 @@ const ScoringImagePickerComponent = ({ navigation, route, ...props }) => {
           if(response && response.assets){
               set_imagePath(response.assets[0].uri);
               set_imagePath1(response.assets[0].uri);
-              addEditedImg(response.assets[0].uri);
+              // addEditedImg(response.assets[0].uri);
               set_isLoading(false);
             } else {
               set_isLoading(false);
@@ -251,7 +252,7 @@ const ScoringImagePickerComponent = ({ navigation, route, ...props }) => {
           if(response.assets[0].type.includes('image')){
             set_imagePath(response.assets[0].uri);
             set_imagePath1(response.assets[0].uri);
-            addEditedImg(response.assets[0].uri);
+            // addEditedImg(response.assets[0].uri);
             editPhoto(mArray);
           } 
         }
@@ -272,17 +273,16 @@ const ScoringImagePickerComponent = ({ navigation, route, ...props }) => {
         set_isLoading(true);
         isLoadingdRef.current = 1;
         let client = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let petObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        petObj = JSON.parse(petObj);
+        let petObj = AppPetsData.petsData.defaultPet;
 
         firebaseHelper.logEvent(firebaseHelper.event_image_scoring_image_upload_api, firebaseHelper.screen_image_based_score_image_upload, "Image based scoring image upload Api", "");
         let dte = moment(new Date()).format("YYYYMMDDHHmmss");
         let filename = "Wearables_Scoring_Images/" + petObj.petID.toString() + client.toString() + dte + "." + 'jpg';
         let reference = storage().ref(filename); // 2
         let task = reference.putFile(fileUrl); // 3
-        task.on('state_changed', taskSnapshot => {
-          set_loadingMsg("Uploading Image..." + '\n' +  + (Math.round(`${taskSnapshot.bytesTransferred}` / `${taskSnapshot.totalBytes}` * 100)) + ' % Completed');
-        });
+        // task.on('state_changed', taskSnapshot => {
+        //   set_loadingMsg("Uploading Image..." + '\n' +  + (Math.round(`${taskSnapshot.bytesTransferred}` / `${taskSnapshot.totalBytes}` * 100)) + ' % Completed');
+        // });
 
         task.then(() => {
           storage().ref(filename).getDownloadURL().then((url) => {
@@ -320,27 +320,18 @@ const ScoringImagePickerComponent = ({ navigation, route, ...props }) => {
         ],
         "petParentId": client
       }
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        sendScoringDetailsToBackend(jsonScoring,token);
+        sendScoringDetailsToBackend(jsonScoring);
     };
 
-    const sendScoringDetailsToBackend = async (jsonScoring,token) => {
+    const sendScoringDetailsToBackend = async (jsonScoring) => {
 
-      let submitScoreServiceObj = await ServiceCalls.addPetImageScoring(jsonScoring,token);
+      let apiMethod = apiMethodManager.ADD_PETIMAGE_SCORING;
+      let apiService = await apiRequest.postData(apiMethod,jsonScoring,Constant.SERVICE_JAVA,navigation);
       set_isLoading(false);
       isLoadingdRef.current = 0;
       set_loadingMsg(undefined);
-
-      if(submitScoreServiceObj && submitScoreServiceObj.logoutData){
-        AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
-        return;
-      }
-      if(submitScoreServiceObj && !submitScoreServiceObj.isInternet){
-        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,'OK',false);
-        return;
-      }
-      if(submitScoreServiceObj && submitScoreServiceObj.statusData){
+            
+      if(apiService && apiService.data && apiService.status) {
             
         let msg = '';
         if(title==='BFI Scoring'){
@@ -351,16 +342,23 @@ const ScoringImagePickerComponent = ({ navigation, route, ...props }) => {
           msg = Constant.STOOL_SCORING_SUCCESS_MSG;
         }   
         createPopup('Success',msg,true,'OK',false);
+            
+      } else if(apiService && apiService.isInternet === false) {
         
-        } else {
-          firebaseHelper.logEvent(firebaseHelper.event_image_scoring_page_api_final_failure, firebaseHelper.screen_image_based_score_measurements, "Final image based scoring Api failed", "");
-          createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,'OK');
-        }
-  
-        if(submitScoreServiceObj && submitScoreServiceObj.error) {
-          firebaseHelper.logEvent(firebaseHelper.event_image_scoring_page_api_final_failure, firebaseHelper.screen_image_based_score_measurements, "Final image based scoring Api failed", "");
-          createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,'OK',false);
-        }
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,'OK',false);
+        return;
+
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+        firebaseHelper.logEvent(firebaseHelper.event_image_scoring_page_api_final_failure, firebaseHelper.screen_image_based_score_measurements, "Final image based scoring Api failed", "");
+        createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true,'OK',false);
+            
+      } else {
+
+        firebaseHelper.logEvent(firebaseHelper.event_image_scoring_page_api_final_failure, firebaseHelper.screen_image_based_score_measurements, "Final image based scoring Api failed", "");
+        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,'OK');
+
+      }
 
     };
 
@@ -416,7 +414,11 @@ const ScoringImagePickerComponent = ({ navigation, route, ...props }) => {
         if(Platform.OS === 'ios') {
           chooseImage()
         } else {
-          chooseMultipleMedia();
+          if (Platform.Version > 31) {
+            chooseImage()
+          } else {
+            chooseMultipleMedia();
+          }
         }
       } 
       if (item === 'CAMERA') {
@@ -471,6 +473,7 @@ const ScoringImagePickerComponent = ({ navigation, route, ...props }) => {
         chooseCamera();
       }  
     }
+  
 
     return (
 

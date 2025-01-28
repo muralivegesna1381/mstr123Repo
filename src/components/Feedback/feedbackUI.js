@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, FlatList, ImageBackground } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList, ImageBackground } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from './../../utils/commonComponents/headerComponent';
 import fonts from './../../utils/commonStyles/fonts'
@@ -10,6 +10,12 @@ import moment from "moment";
 import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import BottomComponent from "./../../utils/commonComponents/bottomComponent";
 import DatePicker from 'react-native-date-picker';
+
+import FillGradiantImg from "./../../../assets/images/otherImages/svg/filterGradientImg.svg";
+import FilterIcon from "./../../../assets/images/otherImages/svg/filterIcon.svg";
+import FilterBckView from "./../../../assets/images/otherImages/png/bgTimerFilter.png";
+import DogCatImg from "./../../../assets/images/dogImages/dogCatImg.svg";
+import CloseImg from "./../../../assets/images/otherImages/svg/timerCloseIcon.svg";
 
 const FeedbackUI = ({ route, ...props }) => {
 
@@ -163,25 +169,22 @@ const FeedbackUI = ({ route, ...props }) => {
 
                 {(!noLogsShow && !props.isLoading) || feedbackArray.length > 0 ? <View style={styles.mainViewStyle}>
 
-                    <ImageBackground style={[styles.filterBtnStyle]} imageStyle={{ borderRadius: 5 }} source={require("./../../../assets/images/otherImages/svg/filterGradientImg.svg")}>
+                    <FillGradiantImg width={wp('90%')} height={hp('5%')} imageStyle={{ borderRadius: 100 }}/>
 
-                        <TouchableOpacity style={styles.filterBtnStyle} onPress={() => { set_ListOpen(!isListOpen) }}>
-                            <View>
+                    <TouchableOpacity style={styles.filterBtnStyle} onPress={() => { set_ListOpen(!isListOpen) }}>
 
-                                <View onLayout={(event) => {
-                                    const layout = event.nativeEvent.layout;
-                                    const postionDetails = { x: layout.x, y: layout.y, width: layout.width, height: layout.height, };
-                                    set_DropDownPostion(postionDetails);
-                                }} style={[styles.SectionStyle]}>
+                        <View onLayout={(event) => {
+                            const layout = event.nativeEvent.layout;
+                            const postionDetails = { x: layout.x, y: layout.y, width: layout.width, height: layout.height, };
+                            set_DropDownPostion(postionDetails);
+                         }} style={[styles.SectionStyle]}>
 
-                                    {<Text style={styles.hTextextStyle}>{'Filter'}</Text>}
-                                    <Image style={[styles.filterIconStyle]} imageStyle={{ borderRadius: 5 }} source={require("./../../../assets/images/otherImages/svg/filterIcon.svg")}></Image>
+                            {<Text style={styles.hTextextStyle}>{'Filter'}</Text>}
+                            <FilterIcon style={[styles.filterIconStyle]} width = {wp('4%')} height = {hp('4%')} imageStyle={{ borderRadius: 5 }} />
 
-                                </View>
-                            </View>
-                        </TouchableOpacity>
+                        </View>
 
-                    </ImageBackground>
+                    </TouchableOpacity>
 
                 </View> : null}
 
@@ -201,14 +204,14 @@ const FeedbackUI = ({ route, ...props }) => {
                 </View> :
 
                     (!props.isLoading ? <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("15%"), }}>
-                        <Image style={[styles.nologsDogStyle, { width: wp("55%"), height: hp("25%"), resizeMode: 'contain' }]} source={require("./../../../assets/images/dogImages/dogCatImg.svg")}></Image>
+                        <DogCatImg style={[styles.nologsDogStyle, { width: wp("55%"), height: hp("25%"), resizeMode: 'contain' }]}/>
                         <Text style={[CommonStyles.noRecordsTextStyle]}>{Constant.NO_RECORDS_LOGS}</Text>
                         <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
                     </View> : null)}
 
                 {isListOpen ? <View style={[styles.timerFilterListStyle, { top: dropDownPostion.y + dropDownPostion.height },]}>
 
-                    <ImageBackground style={{ alignItems: "center", justifyContent: "center", }} imageStyle={{ borderRadius: 25 }} source={require("./../../../assets/images/otherImages/svg/bgTimerFilter.svg")}>
+                    <ImageBackground style={{ alignItems: "center", justifyContent: "center", }} imageStyle={{ borderRadius: 25 }} source={FilterBckView}>
 
                         <TouchableOpacity style={styles.filterViewBtnStyle} onPress={() => { set_isFromDate(!isFromDate); set_isToDate(false); }}>
                             <Text style={fromDate ? [styles.dropTextStyle, { color: 'black' }] : [styles.dropTextStyle]}>{fromDate ? fromDate.toString() : 'From Date'}</Text>
@@ -233,7 +236,7 @@ const FeedbackUI = ({ route, ...props }) => {
                         <View style={[styles.dropCloseImgStyle]}>
 
                             <TouchableOpacity onPress={() => closeAction()}>
-                                <Image style={[styles.closeIconStyle]} source={require("./../../../assets/images/otherImages/svg/timerCloseIcon.svg")}></Image>
+                                <CloseImg height={hp("4%")} width={wp("10%")}/>
                             </TouchableOpacity>
 
                         </View>
@@ -286,6 +289,7 @@ const FeedbackUI = ({ route, ...props }) => {
                             onDateChange={(date) => set_datePickerDate(date)}
                             mode={"date"}
                             textColor={'black'}
+                            theme = {'light'}
                             maximumDate={datePickerDateTo}
                             style={styles.datePickeStyle}
                         />
@@ -397,7 +401,8 @@ const styles = StyleSheet.create({
         borderColor: '#dedede',
         borderWidth: 0.5,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        position:'absolute'
     },
 
     SectionStyle: {
@@ -411,8 +416,6 @@ const styles = StyleSheet.create({
     },
 
     filterIconStyle: {
-        width: wp('4%'),
-        height: hp('4%'),
         resizeMode: 'contain',
         marginLeft: hp('2%'),
     },
@@ -422,7 +425,8 @@ const styles = StyleSheet.create({
         width: wp("100%"),
         minHeight: hp("40%"),
         borderRadius: 15,
-        alignSelf: 'center'
+        alignSelf: 'center',
+        marginTop: hp("1.0%"),
     },
 
     filterViewBtnStyle: {
@@ -474,11 +478,9 @@ const styles = StyleSheet.create({
     },
 
     dropCloseImgStyle: {
-        width: wp('10%'),
-        height: hp('5%'),
         bottom: -10,
-        alignItems: 'flex-end',
-        justifyContent: 'flex-end'
+        alignItems: 'center',
+        justifyContent: 'flex-end',
     },
 
     popSearchViewStyle: {

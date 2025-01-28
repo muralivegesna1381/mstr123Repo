@@ -14,28 +14,41 @@ import * as Constant from "../../utils/constants/constant";
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview'
 import * as Queries from "./../../config/apollo/queries";
 import { useQuery } from "@apollo/react-hooks";
+import LoginVerifyUI from "./loginVerifyUI";
 
-let hideImg = require('./../../../assets/images/otherImages/png/hide-password.png');
-let openImg = require('./../../../assets/images/otherImages/png/show-password.png');
-let faceImg = require('./../../../assets/images/otherImages/svg/faceIDIcon.svg');
-let touchImg = require('./../../../assets/images/otherImages/svg/touchIDIcon.svg');
+import FaceImg from "./../../../assets/images/otherImages/svg/faceIDIcon.svg";
+import TouchImg from "./../../../assets/images/otherImages/svg/touchIDIcon.svg";
+import HideImg from "./../../../assets/images/otherImages/png/hide-password.png";
+import OpenImg from "./../../../assets/images/otherImages/png/show-password.png";
 
 const  LoginUI = ({route, ...props }) => {
 
-  const { loading:logOutLoading, data:logOutdata } = useQuery(Queries.LOG_OUT_APP, { fetchPolicy: "cache-only" });
+  // const { loading:logOutLoading, data:logOutdata } = useQuery(Queries.LOG_OUT_APP, { fetchPolicy: "cache-only" });
 
-    const [userEmail, set_userEmail] = useState(undefined);
-    const [userPswd, set_userPswd] = useState(undefined);
-    const [isHidePassword, set_isHidePassword] = useState(true);
-    const [isEmailValid, set_isEmailValid] = useState(false);
+    // const [userEmail, set_userEmail] = useState(undefined);
+    // const [userPswd, set_userPswd] = useState(undefined);
+    // const [isHidePassword, set_isHidePassword] = useState(true);
+    // const [isEmailValid, set_isEmailValid] = useState(false);
     const [isLoading, set_isLoading] = useState(false);
     const navigation = useNavigation();
     const [isPopUp, set_isPopUp] = useState(false);
     const [popUpMessage, set_popUpMessage] = useState(undefined);
     const [popUpAlert, set_popUpAlert] = useState(undefined);
     const [date, set_Date] = useState(new Date());
-
+    const [isUserLoggedIn, set_isUserLoggedIn] = useState(null);
+    const [backBtnEnable, set_backBtnEnable] = useState(undefined);
+    
     // Setting the values from login COmponent to local variables
+
+    useEffect(() => {
+
+      // if(props.forgotPsd) {
+      //   set_userPswd(null)
+      // }
+      set_isUserLoggedIn(props.isUserLoggedIn);
+      set_backBtnEnable(props.backBtnEnable)
+
+    }, [props.forgotPsd,props.isUserLoggedIn,props.backBtnEnable]);
 
     useEffect(() => {
 
@@ -46,8 +59,6 @@ const  LoginUI = ({route, ...props }) => {
 
     }, [props.isLoading,props.isPopUp,props.popUpMessage,props.popUpAlert,props.popUpRgtBtnTitle,props.popUpisRgtBtn,props.popUpisLftBtn]);
 
-    
-
     React.useEffect(() => {
       const focus = navigation.addListener("focus", () => {
         set_Date(new Date());
@@ -55,35 +66,21 @@ const  LoginUI = ({route, ...props }) => {
       });
 
       return () => {
-          focus();
-        };
+        focus();
+      };
     }, [navigation]);
-
-    useEffect(() => {
-      if (logOutdata && logOutdata.data.__typename === 'LogOutApp' && logOutdata.data.isLogOut === 'logOut') {
-        set_userEmail(null);
-        set_userPswd(null);
-        set_isHidePassword(true);
-      }
-    }, [logOutdata]);
 
     // getting user email details
     const getUserEmail = async () => {
-      let tempMail = await DataStorageLocal.getDataFromAsync(Constant.USER_EMAIL_LOGIN_TEMP);
-      if(tempMail){
-        set_userEmail(tempMail.replace(/ /g, ''));
-        await DataStorageLocal.removeDataFromAsync(Constant.USER_EMAIL_LOGIN_TEMP);
-      }     
-      
+      props.getUserEmail();
     };
 
     const rightButtonAction = async () => {
-      props.loginAction(userEmail,userPswd);
+      props.loginAction(props.userEmail,props.userPswd);
     };
 
     const leftButtonAction = async () => {
-      set_userEmail(undefined);
-      set_userPswd(undefined);
+      props.leftButtonAction();
     };
 
     const backBtnAction = () => {
@@ -91,7 +88,7 @@ const  LoginUI = ({route, ...props }) => {
     }
 
     const forgotPswdAction = () => {
-      props.forgotPswdAction(userEmail);     
+      props.forgotPswdAction(props.userEmail);     
     }
 
     const registerAction = () => {
@@ -100,29 +97,12 @@ const  LoginUI = ({route, ...props }) => {
 
     // Email format validation
     const validateEmail = (email) => {
-
-      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      if(re.test(email.replace(/ /g, '')) && userPswd){
-          set_isEmailValid(true);
-      }else {
-          set_isEmailValid(false);
-      }
-      set_userEmail(email.replace(/ /g, ''));
-
+      props.validateEmail(email);
     }; 
     
     // Password validation
     const validatePassword = (value) => {
-
-      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-      if(re.test(userEmail) && value.length>7){
-        set_isEmailValid(true);
-      }else {
-        set_isEmailValid(false);
-      }
-
-      set_userPswd(value);
+      props.validatePassword(value);
     };
 
   const popOkBtnAction = () => {
@@ -137,46 +117,64 @@ const  LoginUI = ({route, ...props }) => {
     props.validateAuthentication();
   };
 
+  const anotherLoginAction = () => {
+    props.anotherLoginAction();
+  };
+
+  const autoLoginAction = () => {
+    props.autoLoginAction();
+  };
+
+  const hidePsdAction = () => {
+    props.hidePsdAction();
+  };
+
   return (
     <View style={[styles.mainComponentStyle]}>
 
       <View style={CommonStyles.headerView}>
         <HeaderComponent
-          isBackBtnEnable={true}
+          isBackBtnEnable={backBtnEnable}
           isSettingsEnable={false}
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Login'}
+          title={isUserLoggedIn ? '' : 'Login'}
           headerColor = {'white'}
+          moduleName = {isUserLoggedIn ? 'hide' : ''}
           backBtnAction = {() => backBtnAction()}
         />
       </View>
 
-      <View style={{alignItems:'center',justifyContent:'center',height:hp('70%'),}}>
+      <View style={{alignItems:'center',justifyContent:'center',height: isUserLoggedIn ? hp('85%') : hp('70%')}}>
 
-        <KeyboardAwareScrollView bounces={false} showsVerticalScrollIndicator={false} enableOnAndroid={true} scrollEnabled={true} scrollToOverflowEnabled={true} enableAutomaticScroll={true}>
+        {isUserLoggedIn ? <LoginVerifyUI 
+          authenticationType = {props.authenticationType}
+          isAuthEnabled = {props.isAuthEnabled}
+          autoLoginAction = {autoLoginAction}
+          anotherLoginAction = {anotherLoginAction}
+          validateAuthentication = {validateAuthentication}
+        /> : <KeyboardAwareScrollView bounces={false} showsVerticalScrollIndicator={false} enableOnAndroid={true} scrollEnabled={true} scrollToOverflowEnabled={true} enableAutomaticScroll={true}>
                     
           <View style={{width:wp('80%'),height:hp('70%'),marginTop:hp('4%')}}>
-
             <Text style={[CommonStyles.headerTextStyle]}>{'Login to your'}</Text>
             <Text style={[CommonStyles.headerTextStyle]}>{'Wearables'} <Text style={[CommonStyles.headerTextStyle1]}>{'Account'}</Text> </Text>
 
             <View style={{justifyContent:'center',marginTop:hp('4%')}}>
-              {props.isAuthEnabled ? <View>
+              {/* {props.isAuthEnabled ? <View>
                 <TouchableOpacity style={[styles.authBtnStyle]} onPress={() => {validateAuthentication()}}>
                   <View style = {{flexDirection : 'row',justifyContent:'center'}}>
-                    <Image source={props.authenticationType && props.authenticationType === 'Face ID' ? faceImg : touchImg} style={CommonStyles.authIconStyle} />
+                    {props.authenticationType && props.authenticationType === 'Face ID' ? <View><FaceImg style={CommonStyles.authIconStyle} /></View> : <View><TouchImg style={CommonStyles.authIconStyle}/></View>}                    
                     <Text style={[styles.authTextStyle,{alignSelf:'center',color:'white',marginLeft:hp('1%')}]}>{props.authenticationType ? props.authenticationType : ''}</Text>
                   </View>
                 </TouchableOpacity>
                 <Text style={[CommonStyles.headerTextStyle,{alignSelf:'center',justifyContent:'center',color:'#6BC100'}]}>{'or'}</Text>
-              </View> : null}
+              </View> : null} */}
 
               <View style={{alignItems:'center',justifyContent:'center',marginTop:hp('1%')}} >
 
                 <TextInputComponent 
-                  inputText = {userEmail} 
+                  inputText = {props.userEmail} 
                   labelText = {'Email'} 
                   isEditable = {true}
                   maxLengthVal = {50}
@@ -193,13 +191,13 @@ const  LoginUI = ({route, ...props }) => {
                   placeholder="Password"
                   placeholderTextColor="#7F7F81"
                   autoCapitalize="none"
-                  secureTextEntry={isHidePassword}
-                  value = {userPswd}
+                  secureTextEntry={props.isHidePassword}
+                  value = {props.userPswd}
                   onChangeText={(userPswd) => {validatePassword(userPswd)}}
                 />
 
-                <TouchableOpacity  onPress={() => {set_isHidePassword(!isHidePassword);}}>
-                  <Image source={isHidePassword ? hideImg : openImg } style={[CommonStyles.hideOpenIconStyle,{width: Platform.isPad ? wp('4%') : wp('6%'),}]}/>
+                <TouchableOpacity  onPress={() => {hidePsdAction()}}>
+                  <Image source={props.isHidePassword ? HideImg : OpenImg } style={[CommonStyles.hideOpenIconStyle,{width: Platform.isPad ? wp('4%') : wp('6%'),}]}/>
                 </TouchableOpacity>
 
               </View> 
@@ -211,28 +209,28 @@ const  LoginUI = ({route, ...props }) => {
 
           </View>
 
-        </KeyboardAwareScrollView>
+        </KeyboardAwareScrollView>}
                   
-          <View style={{alignItems:'center',justifyContent:'center',height:hp('5%'),position:'absolute',bottom:0}}>
+          <View style={{alignItems:'center',justifyContent:'center',height:hp('5%')}}>
             <TouchableOpacity style={{height:hp('5%'),justifyContent:'center'}}  onPress={() => {registerAction()}}>
               <Text style={[styles.forgotPaswdTextStyle,{color:'black'}]}>Don't have an account?
-              <Text style={styles.registerTextStyle}> Register</Text></Text>
+              <Text style={styles.registerTextStyle}> {"Register"}</Text></Text>
             </TouchableOpacity>  
           </View>
                 
       </View> 
 
-      <View style={CommonStyles.bottomViewComponentStyle}>
+      {isUserLoggedIn ? null : <View style={CommonStyles.bottomViewComponentStyle}>
         <BottomComponent
           rightBtnTitle = {'LOGIN'}
           leftBtnTitle  = {'RESET'}
-          rigthBtnState = {isEmailValid ? true : false}
+          rigthBtnState = {props.isEmailValid ? true : false}
           isLeftBtnEnable = {false}
           isRightBtnEnable = {true}
           rightButtonAction = {async () => rightButtonAction()}
           leftButtonAction = {async () => leftButtonAction()}
         ></BottomComponent>
-      </View>   
+      </View>} 
 
       {isPopUp ? <View style={CommonStyles.customPopUpStyle}>
         <AlertComponent

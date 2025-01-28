@@ -102,7 +102,8 @@ const PetSubmittedImagesScreen = ({ route, navigation }) => {
 
   // Back button action defined here
   const backBtnAction = () => {
-    navigation.navigate('PetListBFIScoringScreen');
+    // navigation.navigate('PetListBFIScoringScreen');
+    navigation.goBack();
 
   };
 
@@ -135,7 +136,7 @@ const PetSubmittedImagesScreen = ({ route, navigation }) => {
         <View style={[styles.dateTextRowStyle]}>
           <Text style={styles.dateTextStyle}>{item.index ? (item.index ? moment(moment.utc(item.index).toDate()).local().format('DD MMM, YYYY   hh:mm a') : '') : ''}</Text>
           <TouchableOpacity style={[styles.rightButtonstyleEnable]} onPress={() => {
-            navigation.navigate("BFIScoreMain", { bfiInfoData: imgData[index], petName: petName, from: 'setImages' });
+            navigation.navigate("BFIScoreMain", { bfiInfoData: [imgData[index]], petName: petName, from: 'setImages' });
           }}>
             <Text style={styles.smallTextStyle}>{'SCORE NOW  -->'}</Text>
           </TouchableOpacity>
@@ -182,8 +183,8 @@ const PetSubmittedImagesScreen = ({ route, navigation }) => {
         imgPos.current = index;
         viewImage(item.index)
       }}>
-        <ImageBackground style={[imagePositionStyle]} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => set_imgLoader(false)} source={{ uri: item.thumbnailUrl }}>
-          {imgLoader === true && item && item.thumbnailUrl ? (<View style={[CommonStyles.spinnerStyle]}><ActivityIndicator size="large" color="#37B57C" /></View>) : null}
+        <ImageBackground style={[imagePositionStyle]} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => set_imgLoader(false)} source={{ uri: item.imageUrl }}>
+          {imgLoader === true && item && item.imageUrl ? (<View style={[CommonStyles.spinnerStyle]}><ActivityIndicator size="large" color="#37B57C" /></View>) : null}
         </ImageBackground>
       </TouchableOpacity>
     );

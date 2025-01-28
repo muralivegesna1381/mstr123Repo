@@ -1,9 +1,11 @@
 import React, {useState,useEffect} from 'react';
-import {StyleSheet,Text, View,Image,ImageBackground,TouchableOpacity, Platform} from 'react-native';
+import {StyleSheet,Text, View,ImageBackground,TouchableOpacity, Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import Fonts from './../../utils/commonStyles/fonts'
 import CommonStyles from './../../utils/commonStyles/commonStyles';
 import * as Constant from "./../../utils/constants/constant";
+
+import SplashLogo from "./../../../assets/images/otherImages/svg/splashLogo.svg";
 
 const InitialScreenUI = ({navigation, route, ...props }) => {
 
@@ -26,19 +28,17 @@ const InitialScreenUI = ({navigation, route, ...props }) => {
 
         <View style={styles.mainComponentStyle}>
 
-            {props.internetStaus ? <ImageBackground source={Platform.isPad ? require("./../../../assets/images/otherImages/png/splashScreenImg.png") : require("./../../../assets/images/otherImages/png/splashScreenImgPhone.png")} style={[styles.splashImgStyle]} resizeMode='stretch'>
+            {props.internetStaus ? <ImageBackground source={Platform.isPad ? require("./../../../assets/images/otherImages/png/splashScreenImg.png") : require("./../../../assets/images/otherImages/png/splashScreenImgPhone.png")} style={[styles.splashImgStyle,{height:Platform.OS === 'android' ? hp('105%') : hp('100%')}]} resizeMode='cover'>
 
-                    <View style={styles.mainViewStyle}>
- 
-                    </View>
+                <View style={styles.mainViewStyle}></View>
 
-                <View style={{alignItems: "center",flex:1.1}}>
+                <View style={{alignItems: "center",flex:1.4}}>
 
                         <View  style={{flex:1}}>
-                            <Image source={require("./../../../assets/images/otherImages/svg/splashLogo.svg")} style={styles.headerImgStyle}/>
+                            <SplashLogo width = {wp("77%")} height = {hp("30%")} style={styles.headerImgStyle}/>
                         </View>
 
-                        {loaderPercent > 10 ? <View style={{flex:1, alignItems:'center',marginTop : hp('5%'),}}>
+                        {loaderPercent > 10 ? <View style={{flex:1.4, alignItems:'center',marginTop : hp('5%'),}}>
                             <View style={styles.progressViewStyle}>               
                                 <View style={{backgroundColor:'#6BC105',alignItems: "center",flex:calculateQuestionsPercentage(),borderRadius:10}}></View>
                             </View>
@@ -75,13 +75,13 @@ export default InitialScreenUI;
 const styles = StyleSheet.create({
 
     mainComponentStyle : {
-        flex:1,
+        // flex:1,
         backgroundColor:'white',
         // alignItems:'center'
     },
 
     mainViewStyle :{
-        flex:2,
+       flex:2,
     },
 
     textStyle : {
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     },
 
     splashImgStyle : {
-        height:hp('105%'),
+        height:hp('100%'),
         width: wp("100%"),
     },
 

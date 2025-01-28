@@ -4,28 +4,31 @@ import QuestionnaireStudyUI from './questionnaireStudyUI';
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+import * as Queries from "./../../../config/apollo/queries";
+import { useQuery} from "@apollo/react-hooks";
 
 let trace_inQuestionnaireScreen;
 let trace_Questionnaire_API_Complete;
 
 const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
 
+  const { loading:questLoading, data : questData } = useQuery(Queries.UPDATE_Quest_LIST, { fetchPolicy: "cache-only" });
     const [popUpMessage, set_popUpMessage] = useState(undefined);
     const [popUpTitle, set_popUpTitle] = useState(undefined);
     const [isPopUp, set_isPopUp] = useState(false);
     const [defaultPetObj, set_defaultPetObj] = useState(undefined);
     const [petsArray, set_petsArray] = useState(undefined);
-    const [isLoading, set_isLoading] = useState(false);
+    const [isLoading, set_isLoading] = useState(true);
     const [questionnaireData, set_questionnaireData] = useState(undefined);
     const [date, set_Date] = useState(new Date());
     const [isSearchDropdown, set_isSearchDropdown] = useState(undefined);
     const [isFrom, set_isFrom] = useState(undefined);
 
     let popIdRef = useRef(0);
-    let isLoadingdRef = useRef(0);
+    let isLoadingdRef = useRef(1);
 
      /**
    * This Useeffect calls when there is cahnge in API responce
@@ -34,13 +37,13 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
     React.useEffect(() => {
       
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
-
+        getQuestPets();
         const focus = navigation.addListener("focus", () => {
           set_Date(new Date());
           initialSessionStart();
           firebaseHelper.reportScreen(firebaseHelper.screen_questionnaire_study);  
           firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_questionnaire_study, "User in Questionnaire Study Screen", '');
-          getQuestPets();
+          
         });
 
         const unsubscribe = navigation.addListener('blur', () => {
@@ -63,6 +66,15 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
       }
 
     }, [route.params?.isFrom]);
+
+    useEffect(() => {
+
+      if(questData && questData.data.__typename === 'UpdateQuestList'){
+        set_isLoading(true)
+        getQuestPets();
+      }
+        
+    }, [questData]);
 
     const handleBackButtonClick = () => {
         navigateToPrevious();
@@ -103,47 +115,37 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
 
       trace_Questionnaire_API_Complete = await perf().startTrace('t_GetQuestionnaireByPetId_API');
       firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api, firebaseHelper.screen_questionnaire_study, "Initiated API to get Questionnaires", 'Pet Id : '+petId);
-      let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 
       if(petId){
-            
-        set_isLoading(true);
-        isLoadingdRef.current = 1;
-        let questServiceObj = await ServiceCalls.getQuestionnaireData(petId,token);
+        // set_isLoading(true);
+        let apiMethod = apiMethodManager.GET_QUESTIONNAIRE_LIST + petId + '?isDateSupported=true';
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
+
         set_isLoading(false);
         stopFBTrace();
         isLoadingdRef.current = 0;
-
-        if(questServiceObj && questServiceObj.logoutData){
-          firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api_fail, firebaseHelper.screen_questionnaire_study, "Get Questionnaires API Fail", 'Duplicate login');
-          AuthoriseCheck.authoriseCheck();
-          navigation.navigate('WelcomeComponent');
-          return;
-        }
-
-        if(questServiceObj && !questServiceObj.isInternet){
-          firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api_fail, firebaseHelper.screen_questionnaire_study, "Get Questionnaires API Fail", 'No Internet');
-          createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK', false,true);
-          return;
-        }
-
-        if(questServiceObj && questServiceObj.statusData){
-          firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api_success, firebaseHelper.screen_questionnaire_study, "Get Questionnaires API success", '');
-          if(questServiceObj && questServiceObj.responseData && questServiceObj.responseData.length > 0){
-            firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api_success, firebaseHelper.screen_questionnaire_study, "Get Questionnaires API success", 'Questionnaires : '+questServiceObj.responseData.length);        
-            set_questionnaireData(questServiceObj.responseData);
+                        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+          if(apiService.data.questionnaireList && apiService.data.questionnaireList.length > 0){
+            set_questionnaireData(apiService.data.questionnaireList);
           } else {
-            firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api_success, firebaseHelper.screen_questionnaire_study, "Get Questionnaires API success", 'Questionnaires : '+questServiceObj.responseData.length); 
             set_questionnaireData(undefined);
           } 
+    
+        } else if(apiService && apiService.isInternet === false) {
+
+          firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api_fail, firebaseHelper.screen_questionnaire_study, "Get Questionnaires API Fail", 'No Internet');
+          createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK', false,true);
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+          createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);   
+          firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api_fail, firebaseHelper.screen_questionnaire_study, "Get Questionnaires API Fail", 'error : ' + apiService.error);
+          
         } else {
           firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api_fail, firebaseHelper.screen_questionnaire_study, "Get Questionnaires API Fail", '');
           createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-        }
 
-        if(questServiceObj && questServiceObj.error) {
-          firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api_fail, firebaseHelper.screen_questionnaire_study, "Get Questionnaires API Fail", 'error : ');
-          createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
         }
 
       } else {
@@ -180,13 +182,14 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
 
     // Pet selection action
     const questPetSelection = (pObject) => {
+      set_isLoading(true)
+      isLoadingdRef.current = 1;
       firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_pet_swipe_button_trigger, firebaseHelper.screen_questionnaire_study, "User selected another Pet for Questionnaires", 'Pet Id : '+pObject.petID);
       getQuestPets();       
     };
 
     // Navigates to Questionnaire question section
     const selectQuetionnaireAction = async (item) => {
-      
       searchDropAction();
       let selectedQuest = await DataStorageLocal.getDataFromAsync(Constant.SELECTED_QUESTIONNAIRE);
       selectedQuest = JSON.parse(selectedQuest);

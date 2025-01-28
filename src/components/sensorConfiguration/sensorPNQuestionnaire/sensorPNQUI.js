@@ -1,5 +1,5 @@
 import React, {useState,useEffect} from 'react';
-import {StyleSheet,Text,TouchableOpacity, View,Image,ImageBackground,TextInput,FlatList} from 'react-native';
+import {StyleSheet,Text,TouchableOpacity, View,FlatList} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import fonts from '../../../utils/commonStyles/fonts'
@@ -10,7 +10,9 @@ import moment from "moment";
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../../utils/constants/constant";
 
-let downArrowImg = require('./../../../../assets/images/otherImages/svg/downArrowGrey.svg');
+import DownArrowImg from "./../../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import RadioBtnSelectedImg from "./../../../../assets/images/otherImages/svg/radioBtnSelectedImg.svg";
+import RadioBtnUnSelectedImg from "./../../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg";
 
 const SensorPNQUI = ({navigation, route, ...props }) => {
 
@@ -119,14 +121,7 @@ return (
                             <TouchableOpacity  onPress={() => selectAction('Weekly',0)}>
                                 
                                 <View style={selectedIndex === 0 ? [styles.activityBckView] : [styles.unActivityBckView]}>
-
-                                    <ImageBackground
-                                            source={selectedIndex === 0 ? require("./../../../../assets/images/otherImages/svg/radioBtnSelectedImg.svg") : require("./../../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg")}
-                                            style={styles.petImgStyle}
-                                            resizeMode = 'contain'
-                                            >
-                                        </ImageBackground>
-
+                                    {selectedIndex === 0 ? <RadioBtnSelectedImg style={styles.petImgStyle}/> : <RadioBtnUnSelectedImg style={styles.petImgStyle}/>}
                                     <Text style={[styles.name]}>{'Weekly'}</Text>
                                 </View>
                             </TouchableOpacity>
@@ -134,14 +129,7 @@ return (
                             <TouchableOpacity  onPress={() => selectAction('Bi-Weekly',1)}>
 
                                 <View style={selectedIndex === 1 ? [styles.activityBckView] : [styles.unActivityBckView]}>
-
-                                        <ImageBackground
-                                            source={selectedIndex === 1 ? require("./../../../../assets/images/otherImages/svg/radioBtnSelectedImg.svg") : require("./../../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg")}
-                                            style={styles.petImgStyle}
-                                            resizeMode = 'contain'
-                                            >
-                                        </ImageBackground>
-
+                                    {selectedIndex === 1 ? <RadioBtnSelectedImg style={styles.petImgStyle}/> : <RadioBtnUnSelectedImg style={styles.petImgStyle}/>}
                                     <Text style={[styles.name]}>{'Bi-Weekly'}</Text>
                                 </View>
 
@@ -150,14 +138,7 @@ return (
                             <TouchableOpacity  onPress={() => selectAction('Monthly',2)}>
 
                                 <View style={selectedIndex === 2 ? [styles.activityBckView] : [styles.unActivityBckView]}>
-
-                                    <ImageBackground
-                                            source={selectedIndex === 2 ? require("./../../../../assets/images/otherImages/svg/radioBtnSelectedImg.svg") : require("./../../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg")}
-                                            style={styles.petImgStyle}
-                                            resizeMode = 'contain'
-                                            >
-                                        </ImageBackground>
-
+                                    {selectedIndex === 2 ? <RadioBtnSelectedImg style={styles.petImgStyle}/> : <RadioBtnUnSelectedImg style={styles.petImgStyle}/>}
                                     <Text style={[styles.name]}>{'Monthly'}</Text>
                                 </View>
 
@@ -185,7 +166,7 @@ return (
                       </View>
 
                       <View style={{justifyContent:'center'}}>
-                          <Image source={downArrowImg} style={styles.imageStyle} />
+                          <DownArrowImg style={styles.imageStyle}/>
                       </View>
      
                     </TouchableOpacity>

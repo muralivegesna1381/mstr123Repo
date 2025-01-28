@@ -7,17 +7,18 @@ import HeaderComponent from './../../utils/commonComponents/headerComponent';
 import fonts from './../../utils/commonStyles/fonts'
 import CommonStyles from './../../utils/commonStyles/commonStyles';
 import * as Constant from "./../../utils/constants/constant";
-import * as DataStorageLocal from "../../utils/storage/dataStorageLocal";
 import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 import Highlighter from 'react-native-highlight-words';
+import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
 
-let dogSetupMissingImg = require("../../../assets/images/dogImages/dogImg5.svg");
-let catSetupMissingImg = require("../../../assets/images/dogImages/catImg5.svg");
+import DogSetupMissingImg from "../../../assets/images/dogImages/dogImg5.svg";
+import CatSetupMissingImg from "../../../assets/images/dogImages/catImg5.svg";
+
 let trace_dt_Screen;
 
 let popId = 1;
@@ -100,45 +101,59 @@ const  DeviceTutorialComponent = ({route, ...props }) => {
    */
     const getsupportMeterials = async (id) => {
 
-        let defaultPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        defaultPet = JSON.parse(defaultPet);
+        let defaultPet = AppPetsData.petsData.defaultPet;
         set_petObj(defaultPet)
-
         set_isLoading(true);
         isLoadingdRef.current = 1;
 
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let supportMetObj = await ServiceCalls.getAppSupportDocs(id,token);
+        let apiMethod = apiMethodManager.GET_APP_SUPPORT_DOCS + id;
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
-        isLoadingdRef.current = 0;
-
-        if(supportMetObj && supportMetObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-      
-          if(supportMetObj && !supportMetObj.isInternet){
-            createPopup(true,Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,1,0);
-            return;
-          }
-      
-          if(supportMetObj && supportMetObj.statusData){
-            if(supportMetObj.responseData && supportMetObj.responseData.length > 0){
-                set_supportMetialsArray(supportMetObj.responseData);
+        isLoadingdRef.current = 0; 
+        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            if(apiService.data.supportMaterials){
+                fetchSupportDocs(apiService.data.supportMaterials);
             } else {
               set_supportMetialsArray([]);
             }
-          } else {
-            firebaseHelper.logEvent(firebaseHelper.event_get_Support_Met_api_fail, firebaseHelper.screen_D_Tutorial_Units, "Get Support Meterials Api Failed : ", 'Service Status : false');
-          }
-      
-          if(supportMetObj && supportMetObj.error) {
+            
+        } else if(apiService && apiService.isInternet === false) {
+            createPopup(true,Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,1,0);
+               
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
             set_isLoading(false);
-            firebaseHelper.logEvent(firebaseHelper.event_get_Support_Met_api_fail, firebaseHelper.screen_D_Tutorial_Units, "Get Support Meterials Api Failed : ", 'Service Status : Service Status');
-          }
+            createPopup(true,Constant.ALERT_NETWORK,apiService.error.errorMsg,1,0);
+            firebaseHelper.logEvent(firebaseHelper.event_get_Support_Met_api_fail, firebaseHelper.screen_D_Tutorial_Units, "Get Support Meterials Api Failed : ", 'Service Status : ' + apiService.error.errorMsg);
+            
+        } else if(apiService && apiService.logoutError !== null) {
+            
+        }else {
+            firebaseHelper.logEvent(firebaseHelper.event_get_Support_Met_api_fail, firebaseHelper.screen_D_Tutorial_Units, "Get Support Meterials Api Failed : ", 'Service Status : false');
+        }
     
     };
+
+    const fetchSupportDocs = (sDocs) => {
+
+        let dataArray = [];
+        if (sDocs.userGuides && sDocs.userGuides.length > 0) {
+
+            for (let i = 0; i < sDocs.userGuides.length; i++) {
+                dataArray.push(sDocs.userGuides[i]);
+            }
+
+        }
+
+        if (sDocs.videos && sDocs.videos.length > 0) {
+
+            for (let i = 0; i < sDocs.videos.length; i++) {
+                dataArray.push(sDocs.videos[i]);
+            }
+
+        }
+        set_supportMetialsArray(dataArray);
+    }
 
     const backBtnAction = () => {
 
@@ -228,7 +243,7 @@ const  DeviceTutorialComponent = ({route, ...props }) => {
 
             <View style={{width:wp('90%'), alignSelf:'center',justifyContent:'center',marginTop: hp("5%"),}}>
 
-                <Image source={petObj && petObj.speciesId && parseInt(petObj.speciesId) === 1 ? dogSetupMissingImg : catSetupMissingImg} style={petObj && petObj.speciesId && parseInt(petObj.speciesId) === 1 ? [styles.missingDogImgStyle,{height:Platform.isPad ? wp('25%') : wp('35%')}] : [styles.missingCatImgStyle,{height:Platform.isPad ? wp('25%') : wp('35%')}]}/>
+                {petObj && petObj.speciesId && parseInt(petObj.speciesId) === 1 ? <DogSetupMissingImg style={[styles.missingDogImgStyle,{height:Platform.isPad ? wp('25%') : wp('35%')}]}/> : <CatSetupMissingImg style={[styles.missingCatImgStyle,{height:Platform.isPad ? wp('25%') : wp('35%')}]}/>}
                    
                 <View style={[styles.buttonstyle]}>
                     <Text style={[styles.btnTextStyle]}>{valueType === 'AddDevice' ? 'DEVICE MISSING' : valueType === 'SetupPending' ? 'SETUP PENDING' : ''}</Text>

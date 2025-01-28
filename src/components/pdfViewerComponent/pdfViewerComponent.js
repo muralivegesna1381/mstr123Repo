@@ -51,17 +51,7 @@ const PDFViewerComponent = ({ route, ...props }) => {
     };
 
     const backBtnAction = () => {
-
         navigation.pop();
-
-        // if(fromScreen === 'settings'){
-        //     navigation.navigate('LearningCenterComponent');
-        // } else if(fromScreen === 'support'){
-        //     navigation.navigate('SupportComponent');
-        // }else {
-        //     navigation.navigate('DashBoardService');
-        // }
-        
     };
 
     return (

@@ -1,8 +1,8 @@
-import React, { useState, useEffect,useRef,PropsWithChildren } from 'react';
-import {AppRegistry,StyleSheet,Text,View,Platform} from 'react-native';
+import {StyleSheet,Text,View,Platform} from 'react-native';
 import { BarChart } from "react-native-gifted-charts";
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import Fonts from '../../../utils/commonStyles/fonts'
+import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 
 const GroupBarChartScreen = ({chartData,selectdCategoryUnit, route, ...props }) => {
 
@@ -34,13 +34,6 @@ const GroupBarChartScreen = ({chartData,selectdCategoryUnit, route, ...props }) 
     },
     {value: 40, frontColor: '#FF8A00', gradientColor: '#93FCF8'},
 
-    {
-      value: 52,
-      frontColor: '#54D86F',
-      gradientColor: '#009FFF',
-      spacing: 0,
-      label: '25 Sep',
-    },
     {value: 49, frontColor: '#FF8A00', gradientColor: '#93FCF8'},
 
     {
@@ -50,51 +43,40 @@ const GroupBarChartScreen = ({chartData,selectdCategoryUnit, route, ...props }) 
       spacing: 0,
       label: 'May',
     },
-    {value: 28, frontColor: '#FF8A00', gradientColor: '#93FCF8'},
-    {
-      value: 30,
-      frontColor: '#54D86F',
-      gradientColor: '#009FFF',
-      spacing: 0,
-      label: '26 Sep',
-    },
-    {value: 28, frontColor: '#FF8A00', gradientColor: '#93FCF8'},
-    {
-      value: 30,
-      frontColor: '#54D86F',
-      gradientColor: '#009FFF',
-      spacing: 0,
-      label: '27 Sep',
-    },
-    {value: 28, frontColor: '#FF8A00', gradientColor: '#93FCF8'},
+
   ];
  
   return(
-    <View style={{   marginBottom:0}}>
+    <View style={{marginBottom:0,width:wp('90%')}}>
       <View style={{flexDirection:'row'}}>
 
         <View style={{ alignItems: 'center', justifyContent: 'center',width:20 }}><Text numberOfLines={1} style={{width:250,textAlign:'center',transform: [{ rotate: '-90deg'}]}}>{selectdCategoryUnit == "grams" ? "GRAMS": "CUPS"}</Text></View>
 
-       <BarChart
-         height={250}
-          data={chartData}
-          barWidth={Platform.isPad ? 45 : 15}
-          initialSpacing={10}
-          spacing={14}
-          barBorderRadius={0}
-          xAxisLabelTextStyle={{color: 'black', textAlign: 'center',fontSize: 10}}
-          xAxisColor={'#D0D0D3'}
-          yAxisColor={'#D0D0D3'}
-        //  stepValue={10}
-          // maxValue={100}
-         // noOfSections={6}
-          yAxisTextStyle={{fontSize: 10}}
-          yAxisLabelWidth={28}
-          // yAxisSide={yAxisSides.RIGHT}
-          // yAxisLabelTexts={['0', '1k', '2k', '3k', '4k', '5k', '6k']}
-          labelWidth={40}
-           
-        />
+        <View style={{width:wp('90%')}}>
+
+          <BarChart
+          height={250}
+            data={chartData}
+            barWidth={Platform.isPad ? 45 : 15}
+            initialSpacing={10}
+            spacing={14}
+            barBorderRadius={0}
+            xAxisLabelTextStyle={{color: 'black', textAlign: 'center',fontSize: 10}}
+            xAxisColor={'#D0D0D3'}
+            yAxisColor={'#D0D0D3'}
+          //  stepValue={10}
+            // maxValue={100}
+          // noOfSections={6}
+            yAxisTextStyle={{fontSize: 10}}
+            yAxisLabelWidth={28}
+            // yAxisSide={yAxisSides.RIGHT}
+            // yAxisLabelTexts={['0', '1k', '2k', '3k', '4k', '5k', '6k']}
+            labelWidth={40}
+            
+          />
+
+        </View>
+       
       </View>
         <View style={{ flexDirection: 'row' , marginTop:20, alignSelf:'center' }}>
 

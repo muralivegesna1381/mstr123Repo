@@ -1,6 +1,8 @@
 // @flow
-import ApolloClient from 'apollo-client';
-import { InMemoryCache } from 'apollo-cache-inmemory';
+//import ApolloClient from 'apollo-client';
+// import ApolloClient from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
+// import { InMemoryCache } from 'apollo-cache-inmemory';
 import { setContext } from 'apollo-link-context';
 import { onError } from "apollo-link-error";
 import { RestLink } from 'apollo-link-rest';
@@ -9,9 +11,9 @@ import BuildEnv from '../environment/environmentConfig';
 import {Alert} from 'react-native';
 import * as DataStorageLocal from "../../utils/storage/dataStorageLocal";
 import * as Constant from "../../utils/constants/constant";
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
+//import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import * as Queries from "./../../config/apollo/queries";
-import * as Apolloclient from './../../config/apollo/apolloConfig';
+// import * as Apolloclient from './../../config/apollo/apolloConfig';
 
 const Environment=  JSON.parse(BuildEnv.Environment());
 
@@ -59,20 +61,24 @@ let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 export const cache = new InMemoryCache();
 
 export const client = new ApolloClient({
-  
-  link:authLink.concat(restLink),
-  cache: new InMemoryCache({
-    dataIdFromObject: object => object.id,
-  }),
-  disableNetworkFetches:false,
 
-  defaultOptions: {
-    query: {
-      fetchPolicy: 'no-cache',
-    },
-    watchQuery: {
-      fetchPolicy: 'no-cache',
-    }}});
+  uri: authLink.concat(restLink),
+  cache: new InMemoryCache(),
+  
+  // link:authLink.concat(restLink),
+  // cache: new InMemoryCache({
+  //   dataIdFromObject: object => object.id,
+  // }),
+  // disableNetworkFetches:false,
+
+  // defaultOptions: {
+  //   query: {
+  //     fetchPolicy: 'no-cache',
+  //   },
+  //   watchQuery: {
+  //     fetchPolicy: 'no-cache',
+  //   }}
+  });
 
 
 

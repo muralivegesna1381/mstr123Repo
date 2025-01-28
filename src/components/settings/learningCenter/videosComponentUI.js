@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, ImageBackground, TouchableOpacity, Image, FlatList, Linking } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image, FlatList, Linking, ImageBackground} from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import fonts from '../../../utils/commonStyles/fonts'
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 import * as Constant from "./../../../utils/constants/constant";
+
+import GradientImg from "../../../../assets/images/otherImages/svg/filterGradientImg.svg";
+import FilterImg from "../../../../assets/images/otherImages/svg/filterIcon.svg";
+import NoLogsDogImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
+import FilterBckImg from "../../../../assets/images/otherImages/png/bgTimerFilter.png";
+import CloseImg from "../../../../assets/images/otherImages/svg/timerCloseIcon.svg";
+import CameraImg from "./../../../../assets/images/otherImages/svg/cameraImg.svg";
+import RightArrowImg from "../../../../assets/images/otherImages/svg/rightArrowBlack.svg";
 
 const FILTER_ID = 1;
 
@@ -31,6 +39,8 @@ const VideosComponentUI = ({ route, ...props }) => {
   const [assetsModelArray, set_assetsModelArray] = useState([]);
   const [noRecordsFound, set_noRecordsFound] = useState(false);
   const [isAppsListOpen, set_isAppsListOpen] = useState(false);
+  const [assetSensorModels, set_assetSensorModels] = useState(undefined);
+  const [assetBeaconsModels, set_assetBeaconsModels] = useState(undefined);
 
   let trace_tutorial_videos_Screen;
 
@@ -64,6 +74,8 @@ const VideosComponentUI = ({ route, ...props }) => {
     let appArray = [];
     let assetTypeArray = [];
     let assetModelArray = [];
+    let sensorModels = [];
+    let beaconsModels = []
 
     for (let i = 0; i < videosArray.length; i++) {
 
@@ -75,7 +87,11 @@ const VideosComponentUI = ({ route, ...props }) => {
 
       if (videosArray[i].categoryId === 2) {
         assetTypeArray.push(videosArray[i].assetType);
-        assetModelArray.push(videosArray[i].assetModel);
+        if(videosArray[i].assetType === "Beacon") {
+          beaconsModels.push(videosArray[i].assetModel);
+        } else if(videosArray[i].assetType === "Sensor") {
+          sensorModels.push(videosArray[i].assetModel);
+        }
       }
 
     }
@@ -85,10 +101,15 @@ const VideosComponentUI = ({ route, ...props }) => {
     const uniqueAssetType = Array.from(new Set(assetTypeArray));
     const uniqueAssetModel = Array.from(new Set(assetModelArray));
 
+    const uniqueAssetSensors = Array.from(new Set(sensorModels));
+    const uniqueAssetBeacons = Array.from(new Set(beaconsModels));
+    
     set_categoryArray(uniqueNames.sort((a, b) => a.localeCompare(b)));
     set_appsArray(uniqueAppArray.sort((a, b) => a.localeCompare(b)));
     set_assetsTypeArray(uniqueAssetType.sort((a, b) => a.localeCompare(b)));
     set_assetsModelArray(uniqueAssetModel.sort((a, b) => a.localeCompare(b)));
+    set_assetSensorModels(uniqueAssetSensors.sort((a, b) => a.localeCompare(b)));
+    set_assetBeaconsModels(uniqueAssetBeacons.sort((a, b) => a.localeCompare(b)));
 
   };
 
@@ -124,6 +145,11 @@ const VideosComponentUI = ({ route, ...props }) => {
       set_isAssetListOpen(false);
       set_assetTypeText(item);
       set_appText(undefined);
+      if(item === "Sensor") {
+        set_assetsModelArray(assetSensorModels)
+      } else if(item === "Beacon") {
+        set_assetsModelArray(assetBeaconsModels)
+      }
     }
 
     if (isAssetModelListOpen) {
@@ -172,7 +198,8 @@ const VideosComponentUI = ({ route, ...props }) => {
     set_isAppListOpen(false);
     set_isAssetListOpen(false);
     set_isAssetModelListOpen(false);
-    
+    set_isAppsListOpen(false);
+
     if(value !== FILTER_ID) {
       set_appText(undefined);
       set_dropCatText(undefined);
@@ -208,7 +235,7 @@ const VideosComponentUI = ({ route, ...props }) => {
       }      
       
     }
-    set_assetsModelArray(modelsArray);
+    // set_assetsModelArray(modelsArray);
     set_isAssetModelListOpen(true);
     set_isCListOpen(false);
     set_isAppListOpen(false);
@@ -246,13 +273,13 @@ const VideosComponentUI = ({ route, ...props }) => {
 
           <View style={{ padding: 5, backgroundColor: "white", flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <View>
-              {item.thumbnailUrl ? <Image source={{ uri: item.thumbnailUrl }} style={styles.imgStyle} /> : <Image source={require('./../../../../assets/images/otherImages/svg/cameraImg.svg')} style={styles.imgStyle} />}
+              {item.thumbnailUrl ? <Image source={{ uri: item.thumbnailUrl }} style={styles.imgStyle} /> : <CameraImg style={styles.imgStyle}/>}
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.textStyle}>{item.titleOrQuestion}</Text>
             </View>
             <View style={{ marginRight: wp("1%"), width: wp('10%'), height: wp('10%'), backgroundColor: '#f6f5f8', alignItems: 'center', justifyContent: 'center', borderRadius: 15 }}>
-              <Image source={require("../../../../assets/images/otherImages/svg/rightArrowBlack.svg")} style={{ marginLeft: wp("2%"), marginRight: wp("1%"), width: wp('3%'), height: wp('3%') }} />
+              <RightArrowImg style={{ marginLeft: wp("2%"), marginRight: wp("1%"), width: wp('3%'), height: wp('3%') }}/>
             </View>
           </View>
 
@@ -268,25 +295,21 @@ const VideosComponentUI = ({ route, ...props }) => {
 
       <View style={styles.mainViewStyle}>
 
-        <ImageBackground style={[styles.filterBtnStyle]} imageStyle={{ borderRadius: 5 }} source={require("../../../../assets/images/otherImages/svg/filterGradientImg.svg")}>
+        <GradientImg width={wp('90%')} height={hp('5%')} style={[styles.filterBtnStyle]}/>
 
-          <TouchableOpacity style={styles.filterBtnStyle} onPress={() => { {set_isListOpen(!isListOpen),resetAction(1)} }}>
-            <View>
+        <TouchableOpacity style={[styles.filterBtnStyle, {position:'absolute'}]} onPress={() => { {set_isListOpen(!isListOpen),resetAction(1)} }}>
 
-              <View onLayout={(event) => {
-                const layout = event.nativeEvent.layout;
-                const postionDetails = { x: layout.x, y: layout.y, width: layout.width, height: layout.height, };
-                set_DropDownPostion(postionDetails);
-              }} style={[styles.SectionStyle]}>
+          <View onLayout={(event) => {
+            const layout = event.nativeEvent.layout;
+            const postionDetails = { x: layout.x, y: layout.y, width: layout.width, height: layout.height, };
+            set_DropDownPostion(postionDetails);
+          }} style={[styles.SectionStyle]}>
 
-                {<Text style={styles.hTextextStyle}>{'Filter'}</Text>}
-                <Image style={[styles.filterIconStyle]} imageStyle={{ borderRadius: 5 }} source={require("../../../../assets/images/otherImages/svg/filterIcon.svg")}></Image>
+            <Text style={styles.hTextextStyle}>{'Filter'}</Text>
+            <FilterImg style={[styles.filterIconStyle]}/>
 
-              </View>
-            </View>
-          </TouchableOpacity>
-
-        </ImageBackground>
+          </View>
+        </TouchableOpacity>
 
       </View>
       {!noRecordsFound ? <FlatList
@@ -294,14 +317,16 @@ const VideosComponentUI = ({ route, ...props }) => {
         renderItem={renderFAQItem}
         keyExtractor={(item, index) => "" + index}
       /> : <View style={{justifyContent:'center',alignItems:'center',height:hp('58%')}}>
-      <Image style= {[styles.nologsDogStyle]} source={require("./../../../../assets/images/dogImages/noRecordsDog.svg")}></Image>
-      <Text style={CommonStyles.noRecordsTextStyle}>{Constant.NO_RECORDS_LOGS}</Text>
-      <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
+       
+          <NoLogsDogImg style= {[styles.nologsDogStyle]}/>
+          <Text style={CommonStyles.noRecordsTextStyle}>{Constant.NO_RECORDS_LOGS}</Text>
+          <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
+          
     </View>}
 
       {isListOpen ? <View style={[styles.filterListStyle, { top: dropDownPostion.y + dropDownPostion.height },]}>
 
-        <ImageBackground style={[styles.filterListStyle, { alignItems: 'center', justifyContent: 'center' }]} imageStyle={{ borderRadius: 25 }} source={require("../../../../assets/images/otherImages/svg/bgTimerFilter.svg")}>
+        <ImageBackground style={[styles.filterListStyle, { alignItems: 'center', justifyContent: 'center' }]} imageStyle={{ borderRadius: 25 }} source={FilterBckImg}>
 
           <TouchableOpacity style={styles.filterAppBtnStyle} onPress={() => { set_isCListOpen(!isCListOpen), set_isAppListOpen(false) }}>
 
@@ -342,7 +367,7 @@ const VideosComponentUI = ({ route, ...props }) => {
           <View style={[styles.dropCloseImgStyle]}>
 
             <TouchableOpacity onPress={() => {set_isListOpen(false),resetAction(1)}}>
-              <Image style={[styles.closeIconStyle]} source={require("../../../../assets/images/otherImages/svg/timerCloseIcon.svg")}></Image>
+              <CloseImg height={hp("5%")} width={wp("10%")}/>
             </TouchableOpacity>
 
           </View>
@@ -378,10 +403,11 @@ const styles = StyleSheet.create({
 
   filterListStyle: {
     position: "absolute",
-    width: wp("90%"),
+    width: wp("100%"),
     minHeight: hp("10%"),
     borderRadius: 15,
-    alignSelf: 'center'
+    alignSelf: 'center',
+    marginTop: hp('0.6%'),
   },
 
   mainViewStyle: {
@@ -489,14 +515,8 @@ const styles = StyleSheet.create({
 
   dropCloseImgStyle: {
     bottom: -10,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'flex-end'
-  },
-
-  closeIconStyle: {
-    width: wp('10%'),
-    height: hp('5%'),
-    resizeMode: 'contain',
   },
 
   imgStyle: {
@@ -504,7 +524,9 @@ const styles = StyleSheet.create({
     width: wp('10%'),
     aspectRatio: 1,
     resizeMode: 'contain',
-    borderRadius: 5
+    borderRadius: 5,
+    borderWidth : 1,
+    borderColor:'#45a934'
   },
 
 });

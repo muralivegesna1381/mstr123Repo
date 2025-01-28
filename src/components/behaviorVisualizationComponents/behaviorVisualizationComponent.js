@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,BackHandler,ScrollView,Platform,ImageBackground,Image} from 'react-native';
+import {View,StyleSheet,Text,BackHandler} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from '../../utils/commonStyles/fonts.js'
 import CommonStyles from '../../utils/commonStyles/commonStyles.js';
@@ -7,9 +7,9 @@ import HeaderComponent from '../../utils/commonComponents/headerComponent.js';
 import DeviceInfo from 'react-native-device-info';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 
-const POP_SUCCESS = 1;
-let fmUpImg  = require("../../../assets/images/dashBoardImages/svg/fmUpImg.svg");
-let fmDownImg  = require("../../../assets/images/dashBoardImages/svg/fmDownImg.svg");
+import FMUPImg from "../../../assets/images/dashBoardImages/svg/fmUpImg.svg";
+import FMDownImg from "../../../assets/images/dashBoardImages/svg/fmDownImg.svg";
+
 let trace_bv_Screen;
 
 const BehaviorVisualizationComponent = ({navigation,route, ...props }) => {
@@ -210,7 +210,7 @@ const BehaviorVisualizationComponent = ({navigation,route, ...props }) => {
 
                             <View style={{flexDirection:'row',marginTop:hp('0.5%')}}>
                                 <Text style={[styles.sliderSubHTextStyle,]}>{previousFMText ? previousFMText+ " " + (' ('+perText1 + '%') : ''}</Text>
-                                {perText1 === 0 ? null : <Image source={isUpArrow ? fmUpImg : fmDownImg} style={Platform.isPad ? [styles.upDownImgStyle,{width:wp('2%'),tintColor:isUpArrow ? '#6BC100' : '#FF9203'}] : [styles.upDownImgStyle]}/>}
+                                {perText1 === 0 ? null : (isUpArrow ? <FMUPImg width={wp('4%')} height={wp('4%')}/> : <FMDownImg width={wp('4%')} height={wp('4%')}/>)}
                                 <Text style={[styles.sliderSubHTextStyle,]}>{')'}</Text>
                             </View>
 
@@ -224,7 +224,7 @@ const BehaviorVisualizationComponent = ({navigation,route, ...props }) => {
 
                             <View style={{flexDirection:'row',marginTop:hp('0.5%')}}>
                                 <Text style={[styles.sliderSubHTextStyle,]}>{tFMsofar ? tFMsofar+ " " + (' ('+perText2 + '%') : ''}</Text>
-                                {perText2 === 0 ? null : <Image source={isTFUpArrow ? fmUpImg : fmDownImg} style={Platform.isPad ? [styles.upDownImgStyle,{width:wp('2%'),tintColor:isTFUpArrow ? '#6BC100' : '#FF9203'}] : [styles.upDownImgStyle]}/>}
+                                {perText2 === 0 ? null : (isTFUpArrow ? <FMUPImg width={wp('4%')} height={wp('4%')}/> : <FMDownImg width={wp('4%')} height={wp('4%')}/>)}
                                 <Text style={[styles.sliderSubHTextStyle,]}>{')'}</Text>
                             </View>
 

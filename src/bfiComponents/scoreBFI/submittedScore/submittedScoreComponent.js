@@ -3,6 +3,14 @@ import SubmittedScoreUI from './submittedScoreUI';
 import moment from 'moment';
 import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
 
+import BFI20Img from "./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_20.svg";
+import BFI30Img from "./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_30.svg";
+import BFI40Img from "./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_40.svg";
+import BFI50Img from "./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_50.svg";
+import BFI60Img from "./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_60.svg";
+import BFI70Img from "./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_70.svg";
+import BFIOtherImg from "./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_other.svg";
+
 const SubmittedScoreComponent = ({ navigation, route, ...props }) => {
 
   const [instructions, set_instructions] = useState(undefined);
@@ -15,6 +23,7 @@ const SubmittedScoreComponent = ({ navigation, route, ...props }) => {
   let localDeviceDate = moment(new Date(new Date())).utcOffset("+00:00").format("YYYY-MM-DD")
 
   useEffect(() => {
+
     if (route.params?.imagesArray) {
       firebaseHelper.reportScreen(firebaseHelper.screen_submitted_scores);
       firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_submitted_scores, "User in Submitted scores Screen", '');
@@ -36,7 +45,7 @@ const SubmittedScoreComponent = ({ navigation, route, ...props }) => {
 
 
   const navigateToScorePage = (item, index) => {
-    navigation.navigate("BFIScoreMain", { bfiInfoData: dataMain.current[index], petName: petName.current, isEditable: true, from: 'setImages' });
+    navigation.navigate("BFIScoreMain", { bfiInfoData: [dataMain.current[index]], petName: petName.current, isEditable: true, from: 'setImages' });
   };
 
   const navigateToPrevious = () => {
@@ -55,25 +64,25 @@ const SubmittedScoreComponent = ({ navigation, route, ...props }) => {
         switch (dataMain.current[k].bfiScore) {
 
           case "20":
-            scoreImg.current = require("./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_20.svg");
+            scoreImg.current = BFI20Img;
             break;
           case "30":
-            scoreImg.current = require("./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_30.svg");
+            scoreImg.current = BFI30Img;
             break;
           case "40":
-            scoreImg.current = require("./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_40.svg");
+            scoreImg.current = BFI40Img;
             break;
           case "50":
-            scoreImg.current = require("./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_50.svg");
+            scoreImg.current = BFI50Img;
             break;
           case "60":
-            scoreImg.current = require("./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_60.svg");
+            scoreImg.current = BFI60Img;
             break;
           case "70":
-            scoreImg.current = require("./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_70.svg");
+            scoreImg.current = BFI70Img;
             break;
           default:
-            scoreImg.current = require("./../../../../assets/images/bfiGuide/svg/ic_bfi_bg_other.svg");
+            scoreImg.current = BFIOtherImg;
             break;
         }
         if (dataMain.current[k].submittedOn) {

@@ -5,8 +5,8 @@ import ChangePasswordUI from './changePasswordUI';
 import * as DataStorageLocal from '../../utils/storage/dataStorageLocal';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 
 let trace_inChangePswd_Screen;
 let trace_ChangePswd_API_Complete;
@@ -19,6 +19,7 @@ const ChangePasswordComponent = ({ navigation, route, ...props }) => {
     const [isLoading, set_isLoading] = useState(false);
     const [isNavigate, set_isNavigate] = useState(undefined);
     const [userPs, set_userPs] = useState(undefined);
+    const [popupId, set_popupId] = useState(0);
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
 
@@ -73,8 +74,6 @@ const ChangePasswordComponent = ({ navigation, route, ...props }) => {
     const submitAction = async (currentPsdEncrypt, newPsdEncrypt) => {
 
         set_userPs(newPsdEncrypt);
-        set_isLoading(true);
-        isLoadingdRef.current = 1;
         let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
         let json = {
             ClientID: "" + clientIdTemp,
@@ -83,64 +82,58 @@ const ChangePasswordComponent = ({ navigation, route, ...props }) => {
         };
 
         trace_ChangePswd_API_Complete = await perf().startTrace('t_ChangePassword_API');
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        changePswd(json,token);
+        changePswd(json);
 
     };
 
-    const changePswd = async (json,token) => {
+    const changePswd = async (json) => {
 
-        let cPSWDServiceObj = await ServiceCalls.changePassword(json,token);
+        set_isLoading(true);
+        isLoadingdRef.current = 1;
+
+        let apiMethodManage = apiMethodManager.CHANGE_PASSWORD;
+        let apiService  = await apiRequest.postData(apiMethodManage,json,Constant.SERVICE_MIGRATED,navigation);
         set_isLoading(false);
-        isLoadingdRef.current = 0; 
+        isLoadingdRef.current = 0;
         stopFBTrace();
-        if(cPSWDServiceObj && cPSWDServiceObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-          
-        if(cPSWDServiceObj && !cPSWDServiceObj.isInternet){
-            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);  
-            return;
-        }
-          
-        if(cPSWDServiceObj && cPSWDServiceObj.statusData){
-            if(cPSWDServiceObj.responseData && cPSWDServiceObj.responseData.key){
-                // firebaseHelper.logEvent(firebaseHelper.event_change_password_api_success, firebaseHelper.screen_change_password, "Change Password Api Success : ", 'Other_Info : ');
+        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            if(apiService.data.Key) {
+
                 set_isNavigate(true);
                 await DataStorageLocal.removeDataFromAsync(Constant.USER_PSD_LOGIN);
-                createPopup('Success',Constant.CHANGE_PSWD_SUCCESS,true);  
-                savePs(userPs);                
-            } else {
-                firebaseHelper.logEvent(firebaseHelper.event_change_password_api_fail, firebaseHelper.screen_change_password, "Change Password Api Failed : ", 'Other_Info : Invalid Password');
-                set_isNavigate(false);
-                createPopup('Alert','Invalid current password',true);                
-            }
-          
-        } else {
-            firebaseHelper.logEvent(firebaseHelper.event_change_password_api_fail, firebaseHelper.screen_change_password, "Change Password Api Failed : ", 'Other_Info : Status : false');
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_UPDATE_ERROR_MSG,true);              
-        }
-          
-        if(cPSWDServiceObj && cPSWDServiceObj.error) {
+                createPopup('Success',Constant.CHANGE_PSWD_SUCCESS,true,0); 
+                savePs(userPs);  
 
-            firebaseHelper.logEvent(firebaseHelper.event_change_password_api_fail, firebaseHelper.screen_change_password, "Change Password Api Failed : ", 'Other_Info : Service error');
-            set_isNavigate(false);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-                
+            } else {
+                createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.data.Value,true,0);   
+            }
+        } else if(apiService && apiService.isInternet === false) {
+
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,0);             
+            firebaseHelper.logEvent(firebaseHelper.event_change_password_api_fail, firebaseHelper.screen_change_password, "Change Password Api Failed : ", 'Other_Info : Internet : No Internet');
+            
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true,0);
+            firebaseHelper.logEvent(firebaseHelper.event_account_main_api_fail, firebaseHelper.screen_account_main, "Account Api Failed", 'error : '+apiService.error.errorMsg);
+            
+        } else {
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_UPDATE_ERROR_MSG,true,0); 
         }
     }
 
-    const createPopup = (title,msg,value) => {
+    const createPopup = (title,msg,value,popId) => {
         popIdRef.current = 1;
         set_popUpTitle(title);
         set_popUpMessage(msg);
         set_isPopUp(value);
+        set_popupId(popId);
     };
 
     // Popup Ok button action
-    const popOkBtnAction = (value,) => {
+    const popOkBtnAction = async (value,) => {
+
         set_isPopUp(value);
         popIdRef.current = 0;
         set_popUpTitle(undefined);

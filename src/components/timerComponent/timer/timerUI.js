@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TouchableOpacity,Image} from 'react-native';
+import {View,StyleSheet,Text,TouchableOpacity} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import fonts from '../../../utils/commonStyles/fonts'
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
+
+import TimerAnimationImg from "../../../../assets/images/timerImages/svg/timeranimation.svg";
 
 const  TimerUI = ({route, ...props }) => {
 
@@ -68,9 +69,9 @@ const  TimerUI = ({route, ...props }) => {
 
                     </View>
 
-                    <View style={{width:wp('100%'),height:hp('14%')}}>
+                    <View style={{width:wp('100%'),height:hp('14%'), alignItems:'center'}}>
 
-                        <Image source={require("../../../../assets/images/timerImages/svg/timeranimation.svg")} style={styles.timerSpreadStyle}/>
+                        <TimerAnimationImg width={wp('100%')} style={styles.timerSpreadStyle}/>
 
                     </View>
                 </View>
@@ -191,7 +192,7 @@ const  TimerUI = ({route, ...props }) => {
 
     timerTextStyle : {
         fontSize: fonts.fontXXXXXLarge,
-        ...CommonStyles.textStyleExtraBold,
+        ...CommonStyles.textStyleBold,
         color: '#0d00c1', 
         marginBottom:wp('1%'),
         textAlign:'center'
@@ -213,7 +214,7 @@ const  TimerUI = ({route, ...props }) => {
     },
 
     btnsBckStyle : {
-        width : wp('25%'),
+        width : wp('30%'),
         aspectRatio:1,
         backgroundColor:'#6ac100',
         borderRadius:wp('15%'),
@@ -223,16 +224,14 @@ const  TimerUI = ({route, ...props }) => {
     },
 
     btnTextStyle : {
-        fontSize: fonts.fontLarge,
-        ...CommonStyles.textStyleExtraBold,
+        fontSize: fonts.fontXLarge,
+        ...CommonStyles.textStyleBold,
         color: '#6ac100', 
         textAlign:'center'
     },
 
     timerSpreadStyle : {
-        width:wp('100%'),
         marginTop:wp('12%'),
-        resizeMode:'contain'
     }
 
   });

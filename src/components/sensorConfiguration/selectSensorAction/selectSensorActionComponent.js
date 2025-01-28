@@ -1,5 +1,5 @@
 import React, {useState,useEffect} from 'react';
-import {StyleSheet,Text,TouchableOpacity, View,Image,BackHandler,FlatList} from 'react-native';
+import {StyleSheet,Text,TouchableOpacity, View,BackHandler,FlatList} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from '../../../utils/commonStyles/fonts'
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
@@ -8,18 +8,27 @@ import AlertComponent from './../../../utils/commonComponents/alertComponent';
 import * as Constant from "./../../../utils/constants/constant";
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
+import * as AppPetsData from '../../../utils/appDataModels/appPetsModel.js';
 import perf from '@react-native-firebase/perf';
+
+import RightArrowImg from "./../../../../assets/images/otherImages/svg/rightArrowLightImg.svg";
+import AddWifiImg from "./../../../../assets/images/sensorImages/svg/SensorConfiguregreen.svg";
+import ForceSyncImg from "./../../../../assets/images/sensorImages/svg/sensorForceSyncgreen.svg";
+import FirmwareImg from "./../../../../assets/images/sensorImages/svg/firmware.svg";
+import EraseDataImg from "./../../../../assets/images/sensorImages/svg/sensorEraseIconGreen.svg";
+import ResetImg from "./../../../../assets/images/sensorImages/svg/SensorRestoreFactoryNetworkgreen.svg";
+import HPN1WiFiListImg from "./../../../../assets/images/sensorImages/svg/hpn1WIFIIcon.svg";
 
 let trace_inSensorSensorActionscreen;
 
 const SelectSensorActionComponent = ({navigation, route, ...props }) => {
 
     const [actionArray, set_actionArray] = useState([
-        {'actionName' :'Add Wi-Fi Network', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/SensorConfiguregreen.svg")},
-        {'actionName' :'Force Sync', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/sensorForceSyncgreen.svg")},
-        {'actionName' :'Firmware', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/firmware.svg")},
-        {'actionName' :'Erase Data', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/sensorEraseIconGreen.svg")},
-        {'actionName' :'Restore Factory Settings', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/SensorRestoreFactoryNetworkgreen.svg")},]);
+        {'actionName' :'Add Wi-Fi Network', 'iconImg' :AddWifiImg},
+        {'actionName' :'Force Sync', 'iconImg' :ForceSyncImg},
+        {'actionName' :'Firmware', 'iconImg' :FirmwareImg},
+        {'actionName' :'Erase Data', 'iconImg' :EraseDataImg},
+        {'actionName' :'Restore Factory Settings', 'iconImg' :ResetImg}]);
     const [sensorStatus, set_sensorStatus] = useState(undefined);
     const [defaultPet, set_defaultPet] = useState(undefined);
     const [isPopUp, set_isPopUp] = useState(false);
@@ -86,25 +95,25 @@ const SelectSensorActionComponent = ({navigation, route, ...props }) => {
 
         if(sensorType1 && sensorType1.includes('HPN1')){
 
-          set_actionArray([{'actionName' :'Add Wi-Fi Network', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/SensorConfiguregreen.svg")},
-            {'actionName' :'Wi-Fi List', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/hpn1WIFIIcon.svg")},
-            {'actionName' :'Force Sync', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/sensorForceSyncgreen.svg")}
+          set_actionArray([{'actionName' :'Add Wi-Fi Network', 'iconImg' :AddWifiImg},
+            {'actionName' :'Wi-Fi List', 'iconImg' :HPN1WiFiListImg},
+            {'actionName' :'Force Sync', 'iconImg' :ForceSyncImg}
           ])
         
 
         } else {
 
-          set_actionArray([{'actionName' :'Change Wi-Fi Network', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/SensorConfiguregreen.svg")},
-          {'actionName' :'Force Sync', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/sensorForceSyncgreen.svg")},
-          {'actionName' :'Firmware', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/firmware.svg")},
-          {'actionName' :'Erase Data', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/sensorEraseIconGreen.svg")},
-          {'actionName' :'Restore Factory Settings', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/SensorRestoreFactoryNetworkgreen.svg")},])
+          set_actionArray([{'actionName' :'Change Wi-Fi Network', 'iconImg' :AddWifiImg},
+          {'actionName' :'Force Sync', 'iconImg' :ForceSyncImg},
+          {'actionName' :'Firmware', 'iconImg' :FirmwareImg},
+          {'actionName' :'Erase Data', 'iconImg' :EraseDataImg},
+          {'actionName' :'Restore Factory Settings', 'iconImg' :ResetImg},])
 
         }
       }else {
 
         if(sensorType1 && sensorType1.includes('HPN1')){
-          set_actionArray([{'actionName' :'Add Wi-Fi Network', 'iconImg' :require("./../../../../assets/images/sensorImages/svg/SensorConfiguregreen.svg")},])
+          set_actionArray([{'actionName' :'Add Wi-Fi Network', 'iconImg' :AddWifiImg},])
         } 
       }
     };
@@ -123,8 +132,7 @@ const SelectSensorActionComponent = ({navigation, route, ...props }) => {
       } else if(item === 'Firmware'){
         
           let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
-          let defaultObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-          defaultObj = JSON.parse(defaultObj);
+          let defaultObj = AppPetsData.petsData.defaultPet;
       
           if(defaultObj.devices[parseInt(sensorIndex)].isFirmwareVersionUpdateRequired){
             navigation.navigate('ConnectSensorCommonComponent',{commandType:'Firmware',navType:'SensorFirmware'});
@@ -155,7 +163,7 @@ const SelectSensorActionComponent = ({navigation, route, ...props }) => {
             <View style={styles.actionsCellViewStyle}>
 
               <View style={{flex:0.2}}>
-                <Image style={sensorStatus === "pending" ? (item.actionName === "Force Sync" || item.actionName === "Firmware" ? [styles.sensorsStyles,{tintColor:'white'}] : [styles.sensorsStyles]) : styles.sensorsStyles} source={item.iconImg}/>
+                <item.iconImg style={sensorStatus === "pending" ? (item.actionName === "Force Sync" || item.actionName === "Firmware" ? [styles.sensorsStyles,{tintColor:'white'}] : [styles.sensorsStyles]) : styles.sensorsStyles}/>
               </View>
 
               <View style={{flex:1}}>
@@ -163,7 +171,7 @@ const SelectSensorActionComponent = ({navigation, route, ...props }) => {
               </View>
 
               <View style={{flex:0.3}}>
-                <Image style={sensorStatus === "pending" ? (item.actionName === "Force Sync" || item.actionName === "Firmware" ? [styles.moreImgStyels,{tintColor:'#dedede'}] : [styles.moreImgStyels]) : styles.moreImgStyels} source={require("./../../../../assets/images/otherImages/svg/rightArrowLightImg.svg")}/>
+                {<RightArrowImg style={sensorStatus === "pending" ? (item.actionName === "Force Sync" || item.actionName === "Firmware" ? [styles.moreImgStyels,{tintColor:'#dedede'}] : [styles.moreImgStyels]) : styles.moreImgStyels}/>}
               </View>
 
             </View>

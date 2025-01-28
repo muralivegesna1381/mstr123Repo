@@ -5,6 +5,7 @@ import * as Constant from "./../../../utils/constants/constant";
 import TimerData from './timerData';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
+import * as AppPetsDate from "./../../../utils/appDataModels/appPetsModel"
 
 let trace_inTimerMainActivityScreen;
 
@@ -22,7 +23,7 @@ const TimerComponent = ({navigation, route, ...props }) => {
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
         const focus = navigation.addListener("focus", () => {
             set_Date(new Date());
-            // initialSessionStart();
+            initialSessionStart();
             firebaseHelper.reportScreen(firebaseHelper.screen_timer_main);
             firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_timer_main, "User in Main Timer selection Screen", '');
         });
@@ -95,8 +96,8 @@ const TimerComponent = ({navigation, route, ...props }) => {
 
         let timerPets = await DataStorageLocal.getDataFromAsync(Constant.TIMER_PETS_ARRAY);
         timerPets = JSON.parse(timerPets);
-        let timerPetObj = await DataStorageLocal.getDataFromAsync(Constant.TIMER_SELECTED_PET);
-        timerPetObj = JSON.parse(timerPetObj);
+        let timerPetObj = AppPetsDate.petsData.defaultPet//await DataStorageLocal.getDataFromAsync(Constant.TIMER_SELECTED_PET);
+        //timerPetObj = JSON.parse(timerPetObj);
         firebaseHelper.logEvent(firebaseHelper.event_timer_go_action, firebaseHelper.screen_timer_main, "Timer Go button clicked", "");
         if(timerPets && timerPets.length>1){
             navigation.navigate('TimerPetSelectionComponent',{petsArray : timerPets,defaultPetObj:timerPetObj});

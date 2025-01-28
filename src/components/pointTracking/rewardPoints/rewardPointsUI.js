@@ -7,14 +7,17 @@ import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import moment from "moment";
-import * as Constant from "./../../../utils/constants/constant"
+import * as Constant from "./../../../utils/constants/constant";
 
-import deniedImg from "./../../../../assets/images/pointTracking/svg/ptDeniedImg.svg";
-import approvedImg from "./../../../../assets/images/pointTracking/svg/ptTickGreeen.svg";
-import pendingImg from "./../../../../assets/images/pointTracking/svg/ptPendingImg.svg";
-let defaultPetImg = require( "../../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
-let noLogsDogImg = require("./../../../../assets/images/dogImages/noRecordsDog.svg");
-let noLogsCatImg = require("./../../../../assets/images/dogImages/noRecordsCat.svg");
+import DefaultPetImg from  "../../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
+import DeniedImg from "./../../../../assets/images/pointTracking/svg/ptDeniedImg.svg";
+import ApprovedImg from "./../../../../assets/images/pointTracking/svg/ptTickGreeen.svg";
+import PendingImg from "./../../../../assets/images/pointTracking/svg/ptPendingImg.svg";
+import NoLogsDogImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
+import NoLogsCatImg from "./../../../../assets/images/dogImages/noRecordsCat.svg";
+import PtPointBackGreenImg from "./../../../../assets/images/pointTracking/svg/ptPointsBckImgGreen.svg";
+import PtPointBackGreyImg from "./../../../../assets/images/pointTracking/svg/ptPointsBckImgGrey.svg";
+import RewardHeaderImg from "./../../../../assets/images/pointTracking/svg/rewardsHeaderBackImg.svg";
 
 const  RewardPointsUi = ({route, ...props }) => {
 
@@ -61,14 +64,12 @@ const  RewardPointsUi = ({route, ...props }) => {
 
       return (
         <TouchableOpacity key={index} style={{backgroundColor:'#EFEFEF', width: wp("90%"), alignSelf:'center', borderBottomWidth:0.5, borderBottomColor:'grey'}} onPress={() => { }}>
-          <View style={{flexDirection: "row", width:wp('100%'), backgroundColor: "white", justifyContent:'center'}}>
-            <View style={{ flexDirection: "row",alignItems:'center',width:wp('90%'), height: hp("8%"),justifyContent:'center'  }}>
-              <ImageBackground style={[styles.redeemImgStyle]} source={require("./../../../../assets/images/pointTracking/svg/ptPointsBckImgGreen.svg")}>
-                <Text style={styles.rankText}>{item.pointsRedeemed ? '-'+item.pointsRedeemed : 'N/A'}</Text>
-              </ImageBackground>
+          <View style={{flexDirection: "row", width:wp('100%'), backgroundColor: "white", justifyContent:'center',alignSelf:'center',}}>
+            <View style={{ flexDirection: "row",alignItems:'center',width:wp('90%'), height: hp("8%"),justifyContent:'center'}}>
+              <PtPointBackGreenImg width={wp("10%")} height={hp("5%")} style={[styles.redeemImgStyle]}/>
               <Text style={[styles.actiNameStyle,{flex:1.5,marginLeft:wp('5%')}]}>{moment(item.createdDate).format("MM-DD-YYYY")}</Text>
               <View style={{flexDirection:'row',flex:1}}>
-                <Image source={approvedImg} style={[styles.statusImgStyle]}/>
+                <ApprovedImg style={[styles.statusImgStyle]}/>
                   <Text style={styles.actiNameStyle}>{'Redeemed'}</Text>
               </View>   
             </View>
@@ -81,17 +82,25 @@ const  RewardPointsUi = ({route, ...props }) => {
 
       return (
           
-          <TouchableOpacity key={index} style={{ backgroundColor:'#EFEFEF', width: wp("90%"), alignSelf:'center', borderBottomWidth:0.5, borderBottomColor:'grey'}}onPress={() => {}}>
+          <TouchableOpacity disabled={true} key={index} style={{ backgroundColor:'#EFEFEF', width: wp("90%"), alignSelf:'center', borderBottomWidth:0.5, borderBottomColor:'grey'}}onPress={() => {}}>
 
             <View style={{backgroundColor: "#FFFFFF",flexDirection: "row", minHeight: hp("8%")}}>
 
               <View style={{flex: 0.3 ,alignItems: "center",justifyContent:'center',marginRight: wp("2%"), }}>
-                {item.status === 'Approved' ? <ImageBackground style={styles.rankImgStyle} source={require("./../../../../assets/images/pointTracking/svg/ptPointsBckImgGreen.svg")}>
-                  <Text style={styles.rankText}>{item.points ? "+"+item.points : 'N/A'}</Text>
-                </ImageBackground> : 
-                <ImageBackground style={styles.rankImgStyle} source={require("./../../../../assets/images/pointTracking/svg/ptPointsBckImgGrey.svg")}>
-                  <Text style={styles.rankText}>{item.points ? item.points : 'N/A'}</Text>
-                </ImageBackground>}
+                {item.status === 'Approved' ? <View>
+                  <PtPointBackGreenImg width={wp("10%")} height={hp("5%")} style={[styles.rankImgStyle]}/>
+                  <View style={{width: wp("10%"),height: hp("5%"),position:'absolute', alignItems:'center',justifyContent:'center'}}>
+                    <Text style={[styles.rankText,{}]}>{item.points ? "+"+item.points : 'N/A'}</Text>
+                  </View>
+                </View>
+                : 
+
+                <View>
+                  <PtPointBackGreyImg width={wp("10%")} height={hp("5%")} style={[styles.rankImgStyle]}/>
+                  <View style={{width: wp("10%"),height: hp("5%"),position:'absolute', alignItems:'center',justifyContent:'center'}}>
+                    <Text style={styles.rankText}>{item.points ? item.points : 'N/A'}</Text>
+                  </View>
+                </View>}
               </View>
 
               <View style={{ flex: 1 ,justifyContent:'center'}}>
@@ -103,7 +112,7 @@ const  RewardPointsUi = ({route, ...props }) => {
 
                 <Text>{moment(item.createdDate).format("MM-DD-YYYY")}</Text>
                 <View style={{ flexDirection: "row", alignItems:'center' }}>
-                  <Image source={ item.status === "Approved" ? approvedImg : item.status === "Pending" ? pendingImg : deniedImg} style={[styles.statusImgStyle]}/>
+                  {item.status === "Approved" ?< ApprovedImg style={[styles.statusImgStyle]}/> : item.status === "Pending" ? <PendingImg style={[styles.statusImgStyle]}/> : <DeniedImg style={[styles.statusImgStyle]}/>}
                   <Text style={styles.actiNameStyle}>{item.status}</Text>
                 </View>
 
@@ -131,15 +140,14 @@ const  RewardPointsUi = ({route, ...props }) => {
 
         <View style={[styles.topContainer,{marginTop:Platform.isPad ? hp('5%') : hp('0%')}]}>
 
-          <ImageBackground style={styles.rewardImgStyle} source={require("./../../../../assets/images/pointTracking/svg/rewardsHeaderBackImg.svg")}>
-
+          <RewardHeaderImg style={[styles.rewardImgStyle]}/>
+          <View style={{alignSelf:'center',top:91.5, position:'absolute'}}>
             {petImg.current && petImg.current !== null && petImg.current !== '' ? <ImageBackground style={styles.imgStyle} imageStyle={{borderRadius:200}} resizeMode='cover' onLoadStart={() => {set_imgLoader(true),set_isImgFailed(false)}} onLoadEnd={() => {set_imgLoader(false),set_isImgFailed(false)}}
               source={{ uri: petImg.current }} onError = {() => set_isImgFailed(true)}>
               {imgLoader ? <ActivityIndicator size='large' color="grey"/> : null}
             </ImageBackground> 
-            : <ImageBackground style={styles.imgStyle} imageStyle={{borderRadius:200}}  source={defaultPetImg}></ImageBackground>}
-
-          </ImageBackground>
+            :<ImageBackground style={[styles.imgStyle]} source={DefaultPetImg}></ImageBackground> }
+          </View>
 
         </View>
 
@@ -181,7 +189,7 @@ const  RewardPointsUi = ({route, ...props }) => {
                   
             : 
             (props.isLoading === false ?<View style={{justifyContent:'center', alignItems:'center',marginTop: hp("1%"),}}>
-              <Image style= {[CommonStyles.nologsDogStyle]} source={props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? noLogsDogImg : noLogsCatImg}></Image>
+              {props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? <NoLogsDogImg style= {[CommonStyles.nologsDogStyle]}/> : <NoLogsCatImg style= {[CommonStyles.nologsDogStyle]}/>}
               <Text style={[CommonStyles.noRecordsTextStyle,{marginTop: hp("2%")}]}>{Constant.NO_RECORDS_LOGS}</Text>
               <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
             </View> : null) ) : null}
@@ -196,7 +204,7 @@ const  RewardPointsUi = ({route, ...props }) => {
               </View>
                 
             : (props.isLoading === false ?<View style={{justifyContent:'center', alignItems:'center',marginTop: hp("1%"),}}>
-              <Image style= {[CommonStyles.nologsDogStyle]} source={props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? noLogsDogImg : noLogsCatImg}></Image>
+              {props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? <NoLogsDogImg style= {[CommonStyles.nologsDogStyle]}/> : <NoLogsCatImg style= {[CommonStyles.nologsDogStyle]}/>}
               <Text style={[CommonStyles.noRecordsTextStyle,{marginTop: hp("2%")}]}>{Constant.NO_RECORDS_LOGS}</Text>
               <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
             </View> : null) ) : null}
@@ -253,7 +261,7 @@ const  RewardPointsUi = ({route, ...props }) => {
     },
 
     imgStyle: {
-      width: wp("35%"),
+      width: wp("33%"),
       aspectRatio:1,
       resizeMode: "contain",
       overflow: "hidden",
@@ -305,8 +313,6 @@ const  RewardPointsUi = ({route, ...props }) => {
     },
 
     redeemImgStyle: {
-      height: hp("5%"),
-      width: wp("10%"),
       resizeMode: "contain",
       alignItems: 'center',
       justifyContent: "center",

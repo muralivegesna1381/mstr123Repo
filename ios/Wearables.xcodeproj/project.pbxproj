@@ -7,69 +7,60 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E282F01FC842A4BACDDC55 /* Barlow-ExtraLightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5BB11AD447D14846B2815E72 /* Barlow-ExtraLightItalic.ttf */; };
 		00E356F31AD99517003FC87E /* WearablesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* WearablesTests.m */; };
-		0347109C56E6411CBD425E75 /* Barlow-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1ECD759AF9974F6B95C40B9C /* Barlow-Light.ttf */; };
-		0622989EE7D84F5B910D1FEC /* Poppins-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB0BAD2986994887902291BF /* Poppins-LightItalic.ttf */; };
-		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
+		0EBD51C33E4447C090202C30 /* Poppins-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E5AE1B2EFEB3422C9765B521 /* Poppins-ExtraBold.ttf */; };
+		133FA369D17148778463255C /* Poppins-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 934ABA28925B497E92F1C21C /* Poppins-Italic.ttf */; };
+		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		16D91817DF1241238C5F9DA0 /* Poppins-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0F84DDF7645E4B9C8ED1B524 /* Poppins-BoldItalic.ttf */; };
-		1BF3F9B12C094BA9B85D04B3 /* Barlow-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BE4DFFEFD2D942CCAE8A01FC /* Barlow-Regular.ttf */; };
-		1D7B4701DE044FD2AF647A54 /* Poppins-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 37C7A3302F2F48F3B4B277A2 /* Poppins-SemiBoldItalic.ttf */; };
-		20AB2C2D4B3142C0B327E4B6 /* Barlow-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 468D6C0C12F945C4ADA6F693 /* Barlow-Italic.ttf */; };
-		2CC5A512E8AC421ABDBDE663 /* Barlow-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F624704C82A84ACFA060B06E /* Barlow-ThinItalic.ttf */; };
-		33D42E6DFB4D1824CADB8027 /* Pods_Wearables_WearablesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE333480FD34C06BB9BB3AE3 /* Pods_Wearables_WearablesTests.framework */; };
-		38F8375F7F8246739DC5DD31 /* Poppins-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9F97FE06375F4C558CB7A0BE /* Poppins-BlackItalic.ttf */; };
-		396F2E1BC5DD48B8B041D36D /* Poppins-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5597E25965D7411F90B3BF50 /* Poppins-Italic.ttf */; };
-		3A8C0871D8264A91B0C4161E /* Poppins-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0D2E0CFFE1CB4D26AA9D22AF /* Poppins-ThinItalic.ttf */; };
-		46526AF25BFC4CD88CDF0DB9 /* Barlow-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0BA25BE14AF7405F91445BB6 /* Barlow-SemiBoldItalic.ttf */; };
-		46D5A7ED78264234AE2529D4 /* Barlow-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B23BAA5AD2944BDB8CE01896 /* Barlow-BlackItalic.ttf */; };
-		4C4C39750C954F9EB4A9B685 /* Barlow-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A41E151EFE934C1181FA9ED2 /* Barlow-Medium.ttf */; };
-		5866980C7A28478197491CF5 /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BEC3A601E0514E3CB9C41294 /* Poppins-ExtraLight.ttf */; };
-		5ABDE411FFA343C9965DA65A /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0AF66368076F4E59BE02FDE8 /* Poppins-Medium.ttf */; };
-		5B70CBC6E759458797ABE86B /* Poppins-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9252F49433C34087BEFA8620 /* Poppins-MediumItalic.ttf */; };
-		5DA033E300644547884ACA74 /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 24B1551E5F184E4CA351A3A0 /* Poppins-Regular.ttf */; };
-		6A3D3E7C35054361A04D8458 /* Barlow-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 99A05D50F8354ED3B4C4CFD7 /* Barlow-Bold.ttf */; };
-		7757672B34DD4EF099C0DF59 /* Poppins-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CC9C2EFDC2704D5EA4990562 /* Poppins-ExtraBold.ttf */; };
-		7EE529E5D0CB47C997C6B18E /* Barlow-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB54B0D284C44A39923D818B /* Barlow-ExtraBold.ttf */; };
-		8B1C619FE74E4DE2B893EF3C /* Barlow-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 67651A7BC02B4D7B8F869D6E /* Barlow-Black.ttf */; };
-		8BE01122035741A3A13F4A33 /* Barlow-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 78718EAB4464432DB060DC05 /* Barlow-LightItalic.ttf */; };
-		94CEC7EBF4C5401785911AB7 /* Barlow-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AC4DD8611A6F47F387A87AB3 /* Barlow-Thin.ttf */; };
-		9756BDF1A58981B86912A245 /* Pods_Wearables.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5FC92E637C1E1581E56002FD /* Pods_Wearables.framework */; };
-		9A6D02C5299A6ECF0063B054 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* SplashScreen.storyboard */; };
-		9A9F96412BAB47AA00E460DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A9F96402BAB47AA00E460DC /* GoogleService-Info.plist */; };
-		9D61E8E6C3BD47C8A1A428FE /* Poppins-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6B8C333FB2F743E7A206D5CE /* Poppins-Black.ttf */; };
-		A3A946CB4DA645B8ACD3D522 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FB5BEFEFD6804D77A507BAA8 /* Poppins-Bold.ttf */; };
-		A644D0D4F3EE4E9EA250DCEF /* Poppins-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8DD9BDA7E25743B0AE0A33E3 /* Poppins-ExtraBoldItalic.ttf */; };
-		A81871F82B27452A00540DA7 /* RNOpenCvLibrary.mm in Sources */ = {isa = PBXBuildFile; fileRef = A81871F72B27452A00540DA7 /* RNOpenCvLibrary.mm */; };
-		A81871FB2B2745B800540DA7 /* ObjectDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A81871F92B2745B700540DA7 /* ObjectDetection.swift */; };
-		A81871FC2B2745B800540DA7 /* ObjectDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = A81871FA2B2745B800540DA7 /* ObjectDetection.m */; };
-		A853CA052A1B31E800E5FB1D /* VideoMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A853CA042A1B31E800E5FB1D /* VideoMainViewController.m */; };
-		A853CA082A1B8B7900E5FB1D /* ChangeViewBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = A853CA072A1B8B7900E5FB1D /* ChangeViewBridge.m */; };
-		A853CA0A2A1B8C7700E5FB1D /* NativeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A853CA092A1B8C7700E5FB1D /* NativeViewController.swift */; };
-		A853CA0C2A1B8CBC00E5FB1D /* NativeViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A853CA0B2A1B8CBC00E5FB1D /* NativeViewController.storyboard */; };
-		A859FD342A1253EC00501E26 /* RangeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A859FD312A1253EC00501E26 /* RangeSlider.swift */; };
-		A859FD352A1253EC00501E26 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A859FD322A1253EC00501E26 /* Main.storyboard */; };
-		A859FD362A1253EC00501E26 /* VideoMainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A859FD332A1253EC00501E26 /* VideoMainViewController.swift */; };
-		A8E7EDF92AFB7F170005F973 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8E7EDF82AFB7F160005F973 /* opencv2.framework */; };
-		A8E7EDFB2AFB7F190005F973 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8E7EDFA2AFB7F190005F973 /* opencv2.framework */; };
-		B8EB1EA14B8A44C39F892D8C /* Barlow-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 360E0FDDB5114B9C9C400248 /* Barlow-SemiBold.ttf */; };
-		BA49B9A1E16E4D079C93FBA1 /* Barlow-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5005D8C917C84EC48459D80C /* Barlow-BoldItalic.ttf */; };
-		BC44F84F163D4200A088F504 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0EC143F801CF48EA85711D40 /* Poppins-SemiBold.ttf */; };
-		C7155F434ED84358ACFC98A3 /* Barlow-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CC291E98099C47D2A5FC297D /* Barlow-ExtraBoldItalic.ttf */; };
-		CF299DC74CB540DE835AAD15 /* Poppins-ExtraLightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0D8CE792B8784F16B39BA6BF /* Poppins-ExtraLightItalic.ttf */; };
-		DBFC461FF70B4C4597744D20 /* Poppins-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 66D21442A7524F0EB1537A7F /* Poppins-Thin.ttf */; };
-		E11F5F9BBF2A47B7A7E0A640 /* Poppins-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 48CC57DF5CDC4414A755B24B /* Poppins-Light.ttf */; };
-		E341614021FB4219BA1CCE37 /* Barlow-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 791D189A4F33419F92EABF4D /* Barlow-ExtraLight.ttf */; };
-		E92486B1EFC94B338E8B899C /* Barlow-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83F821C0D2A943C3986AE8DA /* Barlow-MediumItalic.ttf */; };
-		F4CDF5C72B26395900D87B40 /* ZendeskChatbot.m in Sources */ = {isa = PBXBuildFile; fileRef = F4CDF5C52B26395900D87B40 /* ZendeskChatbot.m */; };
-		F4CDF5C82B26395900D87B40 /* ZendeskChatbot.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CDF5C62B26395900D87B40 /* ZendeskChatbot.swift */; };
-		FB47ED652770ED5700E06521 /* EncryptPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB47ED602770ED5600E06521 /* EncryptPassword.swift */; };
-		FB47ED662770ED5700E06521 /* GTMBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = FB47ED612770ED5700E06521 /* GTMBase64.m */; };
-		FB47ED672770ED5700E06521 /* NSString+TripleDES.m in Sources */ = {isa = PBXBuildFile; fileRef = FB47ED632770ED5700E06521 /* NSString+TripleDES.m */; };
-		FB47ED682770ED5700E06521 /* EncryptPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = FB47ED642770ED5700E06521 /* EncryptPassword.m */; };
-		FB7B99D427CD2CBF00B8AAE7 /* RNThumbnail.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7B99D227CD2CBF00B8AAE7 /* RNThumbnail.m */; };
+		217AE803F89E44BEA4AA4AE7 /* Poppins-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 57CF89D8C0A64755B38ADCF0 /* Poppins-BoldItalic.ttf */; };
+		23E4FFC0D580BE91C0CFACE2 /* Pods_Wearables_WearablesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D9E0B59E36C2C97227CC8BC /* Pods_Wearables_WearablesTests.framework */; };
+		3851E55345484E118C431B76 /* Barlow-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B559D120C9344BC7B6520F77 /* Barlow-LightItalic.ttf */; };
+		44B1B91E44DE42158EACA6DE /* Barlow-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C34F6B634C754F4FBE7275D8 /* Barlow-MediumItalic.ttf */; };
+		4985794E38C548CE8C8D4B87 /* Barlow-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CEB7452482A34CC5B3935D43 /* Barlow-Black.ttf */; };
+		504C22E2455E49E58E5C24B2 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 47285D747E184EA88C15C950 /* Poppins-Bold.ttf */; };
+		54469A415CB94F8AB94DC4AB /* Barlow-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3ED205B08E5C45BAB131C9CD /* Barlow-BoldItalic.ttf */; };
+		5E94C0A9744647B0A2A78C13 /* Poppins-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EA85246B73DC46C68A072914 /* Poppins-LightItalic.ttf */; };
+		66411465DD7A4DAF924CA060 /* Poppins-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C20978B2FEAC4AE1A378ADAA /* Poppins-Black.ttf */; };
+		6D97ED24783441D48417C734 /* Barlow-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6788F5B171464697BBF62D7D /* Barlow-ExtraLight.ttf */; };
+		730D32035363447280EAA9EB /* Poppins-ExtraLightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1ECD5FDB94F9470487950773 /* Poppins-ExtraLightItalic.ttf */; };
+		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		85235A49B88243299E466429 /* Barlow-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22444DF5D43C4E72AF7D534F /* Barlow-SemiBoldItalic.ttf */; };
+		87B8F9E82F525DC79E29837B /* Pods_Wearables.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19D0C9E76F7A336BF2EFABD0 /* Pods_Wearables.framework */; };
+		8D2443B294EC47DABDA3E5B8 /* Barlow-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A4076C60D3744E61ABDE5E6A /* Barlow-Regular.ttf */; };
+		8D26CACA9C7D4EC98243FE20 /* Barlow-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 80D700878B8743BBBC573E55 /* Barlow-Thin.ttf */; };
+		97FAC2D0C5E74436995C657E /* Poppins-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DA6EE797C2E94BC28628E751 /* Poppins-ExtraBoldItalic.ttf */; };
+		9A0428E82CA6C9AF00770F3E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A0428E72CA6C9AF00770F3E /* GoogleService-Info.plist */; };
+		9A3892F52C7F1C29007A53E8 /* EncryptPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A3892F22C7F1C29007A53E8 /* EncryptPassword.swift */; };
+		9A3892F62C7F1C29007A53E8 /* EncryptPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3892F42C7F1C29007A53E8 /* EncryptPassword.m */; };
+		9A3892FB2C7F1C35007A53E8 /* NSString+TripleDES.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3892F72C7F1C34007A53E8 /* NSString+TripleDES.m */; };
+		9A3892FC2C7F1C35007A53E8 /* GTMBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3892F92C7F1C35007A53E8 /* GTMBase64.m */; };
+		9A4B7B0B2C7DCE9F00039E79 /* Barlow-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9ACDAE052C761311007CC0F1 /* Barlow-ExtraBold.ttf */; };
+		9A5CB12C2CB2CF42005E3943 /* ObjectDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC7DA442CA552E500224E36 /* ObjectDetection.m */; };
+		9A5CB12D2CB2CF48005E3943 /* ObjectDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC7DA452CA552E500224E36 /* ObjectDetection.swift */; };
+		9A9C3DDA2CA71D2400ABA5B8 /* ZendeskChatbot.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8C19C12CA31B0300542844 /* ZendeskChatbot.m */; };
+		9A9C3DDB2CA71D2A00ABA5B8 /* ZendeskChatbot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A8C19C02CA31B0300542844 /* ZendeskChatbot.swift */; };
+		9A9C3DDE2CA71DEE00ABA5B8 /* NativeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC7DA492CA554CC00224E36 /* NativeViewController.swift */; };
+		9A9C3DDF2CA71EB500ABA5B8 /* ChangeViewBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC7DA4B2CA554CD00224E36 /* ChangeViewBridge.m */; };
+		9A9C3DE02CA7200500ABA5B8 /* VideoMainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC7DA412CA552CA00224E36 /* VideoMainViewController.swift */; };
+		9A9C3DE22CA7203300ABA5B8 /* VideoMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9C3DE12CA7203000ABA5B8 /* VideoMainViewController.m */; };
+		9A9C3DE42CA7206D00ABA5B8 /* RangeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9C3DE32CA7206600ABA5B8 /* RangeSlider.swift */; };
+		9AB2E6B82CAD75F7006AC9E2 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AB2E6B72CAD75F7006AC9E2 /* opencv2.framework */; };
+		9AB2E6BE2CAD7645006AC9E2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AB2E6BD2CAD7645006AC9E2 /* Main.storyboard */; };
+		9AB2E6BF2CAD7944006AC9E2 /* RNOpenCvLibrary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9AC7DA432CA552D900224E36 /* RNOpenCvLibrary.mm */; };
+		9ABE57322D1424A800CF9680 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ABE57312D1424A800CF9680 /* opencv2.framework */; };
+		9F5AF07C1A31448290D517D6 /* Barlow-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1AB251AC4F2549AE9C2FC352 /* Barlow-ExtraBoldItalic.ttf */; };
+		A34A624DAFD24C49A1E85B0D /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C4E7AC4115FE40D39B133991 /* Poppins-ExtraLight.ttf */; };
+		AA9F71D22D994F67AFC01522 /* Barlow-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0E54D45B67374FEDBEFC7BB8 /* Barlow-SemiBold.ttf */; };
+		AECA38CE4BC94B608F366F7F /* Barlow-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7885A5B663444FB399394256 /* Barlow-Light.ttf */; };
+		B0B2723914894E2A80DA501A /* Poppins-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DFB62479AF324489A2CDC457 /* Poppins-BlackItalic.ttf */; };
+		C2CC10B6F7AD490FAF53720E /* Barlow-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D98BC191983645E5980EDB49 /* Barlow-ThinItalic.ttf */; };
+		D4C5A72FF6E944DF85E45480 /* Barlow-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 11212E08BB0E44D591AF41F1 /* Barlow-BlackItalic.ttf */; };
+		E9C6D9666E474FE1BF6008EE /* Barlow-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 56073D49BDE644C6930DF940 /* Barlow-Italic.ttf */; };
+		EC70770B5A274F57969157E9 /* Barlow-ExtraLightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1FE8FEB65FC94390AFBCAB90 /* Barlow-ExtraLightItalic.ttf */; };
+		F19985B252F24FB5A625B67B /* Barlow-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0B80CE8EA1034ED0B8BF6AA7 /* Barlow-Medium.ttf */; };
+		F983D6DFB669491B813B9160 /* Poppins-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1E830BC4A18942A38ED98520 /* Poppins-Light.ttf */; };
+		FDF9A82365804E338F6C5FF7 /* Barlow-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C635DEFBC108420B9E7542E0 /* Barlow-Bold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,85 +77,113 @@
 		00E356EE1AD99517003FC87E /* WearablesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WearablesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* WearablesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WearablesTests.m; sourceTree = "<group>"; };
-		0AF66368076F4E59BE02FDE8 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Medium.ttf"; path = "../assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; };
-		0BA25BE14AF7405F91445BB6 /* Barlow-SemiBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-SemiBoldItalic.ttf"; path = "../assets/fonts/Barlow-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
-		0D2E0CFFE1CB4D26AA9D22AF /* Poppins-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ThinItalic.ttf"; path = "../assets/fonts/Poppins-ThinItalic.ttf"; sourceTree = "<group>"; };
-		0D8CE792B8784F16B39BA6BF /* Poppins-ExtraLightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLightItalic.ttf"; path = "../assets/fonts/Poppins-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
-		0EC143F801CF48EA85711D40 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBold.ttf"; path = "../assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
-		0F84DDF7645E4B9C8ED1B524 /* Poppins-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-BoldItalic.ttf"; path = "../assets/fonts/Poppins-BoldItalic.ttf"; sourceTree = "<group>"; };
+		0B80CE8EA1034ED0B8BF6AA7 /* Barlow-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Medium.ttf"; path = "../assets/fonts/Barlow-Medium.ttf"; sourceTree = "<group>"; };
+		0E54D45B67374FEDBEFC7BB8 /* Barlow-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-SemiBold.ttf"; path = "../assets/fonts/Barlow-SemiBold.ttf"; sourceTree = "<group>"; };
+		11212E08BB0E44D591AF41F1 /* Barlow-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-BlackItalic.ttf"; path = "../assets/fonts/Barlow-BlackItalic.ttf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Wearables.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wearables.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Wearables/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Wearables/AppDelegate.m; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = Wearables/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Wearables/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Wearables/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Wearables/main.m; sourceTree = "<group>"; };
-		1ECD759AF9974F6B95C40B9C /* Barlow-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Light.ttf"; path = "../assets/fonts/Barlow-Light.ttf"; sourceTree = "<group>"; };
-		24B1551E5F184E4CA351A3A0 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Regular.ttf"; path = "../assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; };
-		2C03224222068B7F742D7108 /* Pods-Wearables-WearablesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wearables-WearablesTests.release.xcconfig"; path = "Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests.release.xcconfig"; sourceTree = "<group>"; };
-		360E0FDDB5114B9C9C400248 /* Barlow-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-SemiBold.ttf"; path = "../assets/fonts/Barlow-SemiBold.ttf"; sourceTree = "<group>"; };
-		37C7A3302F2F48F3B4B277A2 /* Poppins-SemiBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBoldItalic.ttf"; path = "../assets/fonts/Poppins-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
-		468D6C0C12F945C4ADA6F693 /* Barlow-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Italic.ttf"; path = "../assets/fonts/Barlow-Italic.ttf"; sourceTree = "<group>"; };
-		48CC57DF5CDC4414A755B24B /* Poppins-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Light.ttf"; path = "../assets/fonts/Poppins-Light.ttf"; sourceTree = "<group>"; };
-		5005D8C917C84EC48459D80C /* Barlow-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-BoldItalic.ttf"; path = "../assets/fonts/Barlow-BoldItalic.ttf"; sourceTree = "<group>"; };
-		5597E25965D7411F90B3BF50 /* Poppins-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Italic.ttf"; path = "../assets/fonts/Poppins-Italic.ttf"; sourceTree = "<group>"; };
-		5BB11AD447D14846B2815E72 /* Barlow-ExtraLightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-ExtraLightItalic.ttf"; path = "../assets/fonts/Barlow-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
-		5FC92E637C1E1581E56002FD /* Pods_Wearables.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wearables.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		66D21442A7524F0EB1537A7F /* Poppins-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Thin.ttf"; path = "../assets/fonts/Poppins-Thin.ttf"; sourceTree = "<group>"; };
-		67651A7BC02B4D7B8F869D6E /* Barlow-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Black.ttf"; path = "../assets/fonts/Barlow-Black.ttf"; sourceTree = "<group>"; };
-		6B8C333FB2F743E7A206D5CE /* Poppins-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Black.ttf"; path = "../assets/fonts/Poppins-Black.ttf"; sourceTree = "<group>"; };
-		78718EAB4464432DB060DC05 /* Barlow-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-LightItalic.ttf"; path = "../assets/fonts/Barlow-LightItalic.ttf"; sourceTree = "<group>"; };
-		791D189A4F33419F92EABF4D /* Barlow-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-ExtraLight.ttf"; path = "../assets/fonts/Barlow-ExtraLight.ttf"; sourceTree = "<group>"; };
-		7FA9B3A3870A0CDA8BCF3F58 /* Pods-Wearables-WearablesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wearables-WearablesTests.debug.xcconfig"; path = "Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests.debug.xcconfig"; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = Wearables/SplashScreen.storyboard; sourceTree = "<group>"; };
-		83F821C0D2A943C3986AE8DA /* Barlow-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-MediumItalic.ttf"; path = "../assets/fonts/Barlow-MediumItalic.ttf"; sourceTree = "<group>"; };
-		8DBF391509C10AE0AD265BD1 /* Pods-Wearables.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wearables.release.xcconfig"; path = "Target Support Files/Pods-Wearables/Pods-Wearables.release.xcconfig"; sourceTree = "<group>"; };
-		8DD9BDA7E25743B0AE0A33E3 /* Poppins-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBoldItalic.ttf"; path = "../assets/fonts/Poppins-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
-		9252F49433C34087BEFA8620 /* Poppins-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-MediumItalic.ttf"; path = "../assets/fonts/Poppins-MediumItalic.ttf"; sourceTree = "<group>"; };
-		99A05D50F8354ED3B4C4CFD7 /* Barlow-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Bold.ttf"; path = "../assets/fonts/Barlow-Bold.ttf"; sourceTree = "<group>"; };
-		9A9F96402BAB47AA00E460DC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		9F97FE06375F4C558CB7A0BE /* Poppins-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-BlackItalic.ttf"; path = "../assets/fonts/Poppins-BlackItalic.ttf"; sourceTree = "<group>"; };
-		A41E151EFE934C1181FA9ED2 /* Barlow-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Medium.ttf"; path = "../assets/fonts/Barlow-Medium.ttf"; sourceTree = "<group>"; };
-		A81871F62B27452A00540DA7 /* RNOpenCvLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenCvLibrary.h; sourceTree = "<group>"; };
-		A81871F72B27452A00540DA7 /* RNOpenCvLibrary.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RNOpenCvLibrary.mm; sourceTree = "<group>"; };
-		A81871F92B2745B700540DA7 /* ObjectDetection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectDetection.swift; sourceTree = "<group>"; };
-		A81871FA2B2745B800540DA7 /* ObjectDetection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectDetection.m; sourceTree = "<group>"; };
-		A853CA042A1B31E800E5FB1D /* VideoMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoMainViewController.m; sourceTree = "<group>"; };
-		A853CA062A1B8B5E00E5FB1D /* ChangeViewBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChangeViewBridge.h; sourceTree = "<group>"; };
-		A853CA072A1B8B7900E5FB1D /* ChangeViewBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ChangeViewBridge.m; sourceTree = "<group>"; };
-		A853CA092A1B8C7700E5FB1D /* NativeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeViewController.swift; sourceTree = "<group>"; };
-		A853CA0B2A1B8CBC00E5FB1D /* NativeViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NativeViewController.storyboard; sourceTree = "<group>"; };
-		A859FD312A1253EC00501E26 /* RangeSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RangeSlider.swift; sourceTree = "<group>"; };
-		A859FD322A1253EC00501E26 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
-		A859FD332A1253EC00501E26 /* VideoMainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoMainViewController.swift; sourceTree = "<group>"; };
-		A8E7EDF82AFB7F160005F973 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
-		A8E7EDFA2AFB7F190005F973 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
-		AB0BAD2986994887902291BF /* Poppins-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-LightItalic.ttf"; path = "../assets/fonts/Poppins-LightItalic.ttf"; sourceTree = "<group>"; };
-		AB54B0D284C44A39923D818B /* Barlow-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-ExtraBold.ttf"; path = "../assets/fonts/Barlow-ExtraBold.ttf"; sourceTree = "<group>"; };
-		AC4DD8611A6F47F387A87AB3 /* Barlow-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Thin.ttf"; path = "../assets/fonts/Barlow-Thin.ttf"; sourceTree = "<group>"; };
-		B23BAA5AD2944BDB8CE01896 /* Barlow-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-BlackItalic.ttf"; path = "../assets/fonts/Barlow-BlackItalic.ttf"; sourceTree = "<group>"; };
-		BE4DFFEFD2D942CCAE8A01FC /* Barlow-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Regular.ttf"; path = "../assets/fonts/Barlow-Regular.ttf"; sourceTree = "<group>"; };
-		BEC3A601E0514E3CB9C41294 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLight.ttf"; path = "../assets/fonts/Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
-		CC291E98099C47D2A5FC297D /* Barlow-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-ExtraBoldItalic.ttf"; path = "../assets/fonts/Barlow-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
-		CC9C2EFDC2704D5EA4990562 /* Poppins-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBold.ttf"; path = "../assets/fonts/Poppins-ExtraBold.ttf"; sourceTree = "<group>"; };
+		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Wearables/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		19D0C9E76F7A336BF2EFABD0 /* Pods_Wearables.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wearables.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1AB251AC4F2549AE9C2FC352 /* Barlow-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-ExtraBoldItalic.ttf"; path = "../assets/fonts/Barlow-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
+		1E830BC4A18942A38ED98520 /* Poppins-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Light.ttf"; path = "../assets/fonts/Poppins-Light.ttf"; sourceTree = "<group>"; };
+		1ECD5FDB94F9470487950773 /* Poppins-ExtraLightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLightItalic.ttf"; path = "../assets/fonts/Poppins-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
+		1FE8FEB65FC94390AFBCAB90 /* Barlow-ExtraLightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-ExtraLightItalic.ttf"; path = "../assets/fonts/Barlow-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
+		22444DF5D43C4E72AF7D534F /* Barlow-SemiBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-SemiBoldItalic.ttf"; path = "../assets/fonts/Barlow-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
+		3B4392A12AC88292D35C810B /* Pods-Wearables.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wearables.debug.xcconfig"; path = "Target Support Files/Pods-Wearables/Pods-Wearables.debug.xcconfig"; sourceTree = "<group>"; };
+		3ED205B08E5C45BAB131C9CD /* Barlow-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-BoldItalic.ttf"; path = "../assets/fonts/Barlow-BoldItalic.ttf"; sourceTree = "<group>"; };
+		47285D747E184EA88C15C950 /* Poppins-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Bold.ttf"; path = "../assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; };
+		56073D49BDE644C6930DF940 /* Barlow-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Italic.ttf"; path = "../assets/fonts/Barlow-Italic.ttf"; sourceTree = "<group>"; };
+		5709B34CF0A7D63546082F79 /* Pods-Wearables.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wearables.release.xcconfig"; path = "Target Support Files/Pods-Wearables/Pods-Wearables.release.xcconfig"; sourceTree = "<group>"; };
+		57CF89D8C0A64755B38ADCF0 /* Poppins-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-BoldItalic.ttf"; path = "../assets/fonts/Poppins-BoldItalic.ttf"; sourceTree = "<group>"; };
+		5B7EB9410499542E8C5724F5 /* Pods-Wearables-WearablesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wearables-WearablesTests.debug.xcconfig"; path = "Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests.debug.xcconfig"; sourceTree = "<group>"; };
+		5D9E0B59E36C2C97227CC8BC /* Pods_Wearables_WearablesTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wearables_WearablesTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6788F5B171464697BBF62D7D /* Barlow-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-ExtraLight.ttf"; path = "../assets/fonts/Barlow-ExtraLight.ttf"; sourceTree = "<group>"; };
+		7885A5B663444FB399394256 /* Barlow-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Light.ttf"; path = "../assets/fonts/Barlow-Light.ttf"; sourceTree = "<group>"; };
+		80D700878B8743BBBC573E55 /* Barlow-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Thin.ttf"; path = "../assets/fonts/Barlow-Thin.ttf"; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Wearables/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		89C6BE57DB24E9ADA2F236DE /* Pods-Wearables-WearablesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wearables-WearablesTests.release.xcconfig"; path = "Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests.release.xcconfig"; sourceTree = "<group>"; };
+		934ABA28925B497E92F1C21C /* Poppins-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Italic.ttf"; path = "../assets/fonts/Poppins-Italic.ttf"; sourceTree = "<group>"; };
+		9A0428E72CA6C9AF00770F3E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9A3269E72CA718B30012D98B /* CoreAudioTypes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudioTypes.framework; path = System/Library/Frameworks/CoreAudioTypes.framework; sourceTree = SDKROOT; };
+		9A3892EC2C7F1BFA007A53E8 /* Wearables-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Wearables-Bridging-Header.h"; sourceTree = "<group>"; };
+		9A3892ED2C7F1BFB007A53E8 /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		9A3892F22C7F1C29007A53E8 /* EncryptPassword.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptPassword.swift; sourceTree = "<group>"; };
+		9A3892F32C7F1C29007A53E8 /* GTMBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMBase64.h; sourceTree = "<group>"; };
+		9A3892F42C7F1C29007A53E8 /* EncryptPassword.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncryptPassword.m; sourceTree = "<group>"; };
+		9A3892F72C7F1C34007A53E8 /* NSString+TripleDES.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+TripleDES.m"; sourceTree = "<group>"; };
+		9A3892F82C7F1C35007A53E8 /* NSString+TripleDES.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+TripleDES.h"; sourceTree = "<group>"; };
+		9A3892F92C7F1C35007A53E8 /* GTMBase64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMBase64.m; sourceTree = "<group>"; };
+		9A3892FA2C7F1C35007A53E8 /* GTMDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMDefines.h; sourceTree = "<group>"; };
+		9A8C19C02CA31B0300542844 /* ZendeskChatbot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZendeskChatbot.swift; sourceTree = "<group>"; };
+		9A8C19C12CA31B0300542844 /* ZendeskChatbot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZendeskChatbot.m; sourceTree = "<group>"; };
+		9A9C3DE12CA7203000ABA5B8 /* VideoMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoMainViewController.m; sourceTree = "<group>"; };
+		9A9C3DE32CA7206600ABA5B8 /* RangeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSlider.swift; sourceTree = "<group>"; };
+		9AB2E6B72CAD75F7006AC9E2 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = opencv2.framework; path = ../../opencv2.framework; sourceTree = "<group>"; };
+		9AB2E6BD2CAD7645006AC9E2 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		9ABE57312D1424A800CF9680 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
+		9AC7DA412CA552CA00224E36 /* VideoMainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoMainViewController.swift; sourceTree = "<group>"; };
+		9AC7DA422CA552D900224E36 /* RNOpenCvLibrary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNOpenCvLibrary.h; sourceTree = "<group>"; };
+		9AC7DA432CA552D900224E36 /* RNOpenCvLibrary.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RNOpenCvLibrary.mm; sourceTree = "<group>"; };
+		9AC7DA442CA552E500224E36 /* ObjectDetection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ObjectDetection.m; sourceTree = "<group>"; };
+		9AC7DA452CA552E500224E36 /* ObjectDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetection.swift; sourceTree = "<group>"; };
+		9AC7DA492CA554CC00224E36 /* NativeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeViewController.swift; sourceTree = "<group>"; };
+		9AC7DA4A2CA554CD00224E36 /* NativeViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NativeViewController.storyboard; sourceTree = "<group>"; };
+		9AC7DA4B2CA554CD00224E36 /* ChangeViewBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ChangeViewBridge.m; sourceTree = "<group>"; };
+		9AC7DA4C2CA554CD00224E36 /* ChangeViewBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChangeViewBridge.h; sourceTree = "<group>"; };
+		9ACDADFF2C7612FF007CC0F1 /* Barlow-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-Light.ttf"; sourceTree = "<group>"; };
+		9ACDAE002C761301007CC0F1 /* Poppins-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE012C761303007CC0F1 /* Poppins-ExtraLightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE022C761305007CC0F1 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
+		9ACDAE032C761309007CC0F1 /* Poppins-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Thin.ttf"; sourceTree = "<group>"; };
+		9ACDAE042C76130D007CC0F1 /* Poppins-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Black.ttf"; sourceTree = "<group>"; };
+		9ACDAE052C761311007CC0F1 /* Barlow-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-ExtraBold.ttf"; sourceTree = "<group>"; };
+		9ACDAE062C761315007CC0F1 /* Poppins-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-BoldItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE072C761319007CC0F1 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
+		9ACDAE082C76131D007CC0F1 /* Barlow-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-LightItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE092C761321007CC0F1 /* Barlow-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-SemiBold.ttf"; sourceTree = "<group>"; };
+		9ACDAE0A2C761325007CC0F1 /* Barlow-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-Black.ttf"; sourceTree = "<group>"; };
+		9ACDAE0B2C761329007CC0F1 /* Poppins-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Bold.ttf"; sourceTree = "<group>"; };
+		9ACDAE0C2C76132D007CC0F1 /* Poppins-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Italic.ttf"; sourceTree = "<group>"; };
+		9ACDAE0D2C761332007CC0F1 /* Poppins-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-LightItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE0E2C761336007CC0F1 /* Poppins-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ThinItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE0F2C76133B007CC0F1 /* Poppins-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ExtraBold.ttf"; sourceTree = "<group>"; };
+		9ACDAE102C76133F007CC0F1 /* Barlow-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-ThinItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE112C761343007CC0F1 /* Barlow-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-ExtraLight.ttf"; sourceTree = "<group>"; };
+		9ACDAE122C761347007CC0F1 /* Poppins-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-BlackItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE132C76134B007CC0F1 /* Barlow-ExtraLightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE142C76134F007CC0F1 /* Barlow-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-Bold.ttf"; sourceTree = "<group>"; };
+		9ACDAE152C761353007CC0F1 /* Poppins-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-MediumItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE162C761357007CC0F1 /* Barlow-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-BoldItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE172C76135B007CC0F1 /* Barlow-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-BlackItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE182C76135F007CC0F1 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Regular.ttf"; sourceTree = "<group>"; };
+		9ACDAE192C761364007CC0F1 /* Poppins-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE1A2C761368007CC0F1 /* Barlow-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-Regular.ttf"; sourceTree = "<group>"; };
+		9ACDAE1B2C76136C007CC0F1 /* Barlow-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-Medium.ttf"; sourceTree = "<group>"; };
+		9ACDAE1C2C761370007CC0F1 /* Barlow-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-MediumItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE1D2C761374007CC0F1 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Medium.ttf"; sourceTree = "<group>"; };
+		9ACDAE1E2C761378007CC0F1 /* Barlow-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE1F2C76137C007CC0F1 /* Barlow-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-Thin.ttf"; sourceTree = "<group>"; };
+		9ACDAE202C761380007CC0F1 /* Barlow-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
+		9ACDAE212C761384007CC0F1 /* Barlow-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Barlow-Italic.ttf"; sourceTree = "<group>"; };
+		9ACDAE222C761388007CC0F1 /* Poppins-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Light.ttf"; sourceTree = "<group>"; };
+		9AEF91C62C611DCC005F27DB /* Wearables.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Wearables.entitlements; path = Wearables/Wearables.entitlements; sourceTree = "<group>"; };
+		A4076C60D3744E61ABDE5E6A /* Barlow-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Regular.ttf"; path = "../assets/fonts/Barlow-Regular.ttf"; sourceTree = "<group>"; };
+		B559D120C9344BC7B6520F77 /* Barlow-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-LightItalic.ttf"; path = "../assets/fonts/Barlow-LightItalic.ttf"; sourceTree = "<group>"; };
+		C20978B2FEAC4AE1A378ADAA /* Poppins-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Black.ttf"; path = "../assets/fonts/Poppins-Black.ttf"; sourceTree = "<group>"; };
+		C34F6B634C754F4FBE7275D8 /* Barlow-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-MediumItalic.ttf"; path = "../assets/fonts/Barlow-MediumItalic.ttf"; sourceTree = "<group>"; };
+		C4E7AC4115FE40D39B133991 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLight.ttf"; path = "../assets/fonts/Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
+		C635DEFBC108420B9E7542E0 /* Barlow-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Bold.ttf"; path = "../assets/fonts/Barlow-Bold.ttf"; sourceTree = "<group>"; };
+		CEB7452482A34CC5B3935D43 /* Barlow-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-Black.ttf"; path = "../assets/fonts/Barlow-Black.ttf"; sourceTree = "<group>"; };
+		D98BC191983645E5980EDB49 /* Barlow-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-ThinItalic.ttf"; path = "../assets/fonts/Barlow-ThinItalic.ttf"; sourceTree = "<group>"; };
+		DA6EE797C2E94BC28628E751 /* Poppins-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBoldItalic.ttf"; path = "../assets/fonts/Poppins-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
+		DFB62479AF324489A2CDC457 /* Poppins-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-BlackItalic.ttf"; path = "../assets/fonts/Poppins-BlackItalic.ttf"; sourceTree = "<group>"; };
+		E5AE1B2EFEB3422C9765B521 /* Poppins-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBold.ttf"; path = "../assets/fonts/Poppins-ExtraBold.ttf"; sourceTree = "<group>"; };
+		EA85246B73DC46C68A072914 /* Poppins-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-LightItalic.ttf"; path = "../assets/fonts/Poppins-LightItalic.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		EE333480FD34C06BB9BB3AE3 /* Pods_Wearables_WearablesTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wearables_WearablesTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F173630C47AA4308921659A5 /* Pods-Wearables.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wearables.debug.xcconfig"; path = "Target Support Files/Pods-Wearables/Pods-Wearables.debug.xcconfig"; sourceTree = "<group>"; };
-		F461D15C2B0B458E003B0536 /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
-		F4CDF5C52B26395900D87B40 /* ZendeskChatbot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZendeskChatbot.m; sourceTree = "<group>"; };
-		F4CDF5C62B26395900D87B40 /* ZendeskChatbot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZendeskChatbot.swift; sourceTree = "<group>"; };
-		F624704C82A84ACFA060B06E /* Barlow-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Barlow-ThinItalic.ttf"; path = "../assets/fonts/Barlow-ThinItalic.ttf"; sourceTree = "<group>"; };
-		FB47ED5E2770ED5600E06521 /* Wearables-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Wearables-Bridging-Header.h"; sourceTree = "<group>"; };
-		FB47ED5F2770ED5600E06521 /* GTMBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMBase64.h; sourceTree = "<group>"; };
-		FB47ED602770ED5600E06521 /* EncryptPassword.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptPassword.swift; sourceTree = "<group>"; };
-		FB47ED612770ED5700E06521 /* GTMBase64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GTMBase64.m; sourceTree = "<group>"; };
-		FB47ED622770ED5700E06521 /* NSString+TripleDES.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+TripleDES.h"; sourceTree = "<group>"; };
-		FB47ED632770ED5700E06521 /* NSString+TripleDES.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+TripleDES.m"; sourceTree = "<group>"; };
-		FB47ED642770ED5700E06521 /* EncryptPassword.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncryptPassword.m; sourceTree = "<group>"; };
-		FB47ED692770ED8200E06521 /* GTMDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GTMDefines.h; sourceTree = "<group>"; };
-		FB5BEFEFD6804D77A507BAA8 /* Poppins-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Bold.ttf"; path = "../assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; };
-		FB5C4CEF27C1452E000BA5AD /* Wearables.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Wearables.entitlements; path = Wearables/Wearables.entitlements; sourceTree = "<group>"; };
-		FB7B99D227CD2CBF00B8AAE7 /* RNThumbnail.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNThumbnail.m; sourceTree = "<group>"; };
-		FB7B99D327CD2CBF00B8AAE7 /* RNThumbnail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNThumbnail.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,8 +191,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A8E7EDF92AFB7F170005F973 /* opencv2.framework in Frameworks */,
-				33D42E6DFB4D1824CADB8027 /* Pods_Wearables_WearablesTests.framework in Frameworks */,
+				23E4FFC0D580BE91C0CFACE2 /* Pods_Wearables_WearablesTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -181,8 +199,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A8E7EDFB2AFB7F190005F973 /* opencv2.framework in Frameworks */,
-				9756BDF1A58981B86912A245 /* Pods_Wearables.framework in Frameworks */,
+				9ABE57322D1424A800CF9680 /* opencv2.framework in Frameworks */,
+				9AB2E6B82CAD75F7006AC9E2 /* opencv2.framework in Frameworks */,
+				87B8F9E82F525DC79E29837B /* Pods_Wearables.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,91 +228,50 @@
 		13B07FAE1A68108700A75B9A /* Wearables */ = {
 			isa = PBXGroup;
 			children = (
-				F4CDF5C52B26395900D87B40 /* ZendeskChatbot.m */,
-				F4CDF5C62B26395900D87B40 /* ZendeskChatbot.swift */,
-				F461D15C2B0B458E003B0536 /* PrefixHeader.pch */,
-				A8E7EDFA2AFB7F190005F973 /* opencv2.framework */,
-				A859FD322A1253EC00501E26 /* Main.storyboard */,
-				A859FD312A1253EC00501E26 /* RangeSlider.swift */,
-				A859FD332A1253EC00501E26 /* VideoMainViewController.swift */,
-				A81871F62B27452A00540DA7 /* RNOpenCvLibrary.h */,
-				A81871F72B27452A00540DA7 /* RNOpenCvLibrary.mm */,
-				FB5C4CEF27C1452E000BA5AD /* Wearables.entitlements */,
-				FB47ED642770ED5700E06521 /* EncryptPassword.m */,
-				FB47ED602770ED5600E06521 /* EncryptPassword.swift */,
-				FB47ED5F2770ED5600E06521 /* GTMBase64.h */,
-				A81871FA2B2745B800540DA7 /* ObjectDetection.m */,
-				A81871F92B2745B700540DA7 /* ObjectDetection.swift */,
-				FB47ED612770ED5700E06521 /* GTMBase64.m */,
-				FB47ED622770ED5700E06521 /* NSString+TripleDES.h */,
-				FB47ED692770ED8200E06521 /* GTMDefines.h */,
-				FB47ED632770ED5700E06521 /* NSString+TripleDES.m */,
+				9AEF91C62C611DCC005F27DB /* Wearables.entitlements */,
+				9ABE57312D1424A800CF9680 /* opencv2.framework */,
+				9A3892ED2C7F1BFB007A53E8 /* PrefixHeader.pch */,
+				9A3892F42C7F1C29007A53E8 /* EncryptPassword.m */,
+				9A3892F22C7F1C29007A53E8 /* EncryptPassword.swift */,
+				9AC7DA4C2CA554CD00224E36 /* ChangeViewBridge.h */,
+				9AC7DA4B2CA554CD00224E36 /* ChangeViewBridge.m */,
+				9AC7DA4A2CA554CD00224E36 /* NativeViewController.storyboard */,
+				9AC7DA492CA554CC00224E36 /* NativeViewController.swift */,
+				9AC7DA422CA552D900224E36 /* RNOpenCvLibrary.h */,
+				9AC7DA432CA552D900224E36 /* RNOpenCvLibrary.mm */,
+				9AC7DA442CA552E500224E36 /* ObjectDetection.m */,
+				9AC7DA452CA552E500224E36 /* ObjectDetection.swift */,
+				9A8C19C12CA31B0300542844 /* ZendeskChatbot.m */,
+				9A8C19C02CA31B0300542844 /* ZendeskChatbot.swift */,
+				9A3892F92C7F1C35007A53E8 /* GTMBase64.m */,
+				9A3892FA2C7F1C35007A53E8 /* GTMDefines.h */,
+				9A3892F82C7F1C35007A53E8 /* NSString+TripleDES.h */,
+				9A3892F72C7F1C34007A53E8 /* NSString+TripleDES.m */,
+				9A3892F32C7F1C29007A53E8 /* GTMBase64.h */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
-				13B07FB01A68108700A75B9A /* AppDelegate.m */,
+				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
+				9AB2E6BD2CAD7645006AC9E2 /* Main.storyboard */,
+				13B07FB71A68108700A75B9A /* main.m */,
+				9A9C3DE12CA7203000ABA5B8 /* VideoMainViewController.m */,
+				9AC7DA412CA552CA00224E36 /* VideoMainViewController.swift */,
+				9A9C3DE32CA7206600ABA5B8 /* RangeSlider.swift */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				81AB9BB72411601600AC10FF /* SplashScreen.storyboard */,
-				13B07FB71A68108700A75B9A /* main.m */,
-				FB47ED5E2770ED5600E06521 /* Wearables-Bridging-Header.h */,
-				A853CA042A1B31E800E5FB1D /* VideoMainViewController.m */,
-				A853CA062A1B8B5E00E5FB1D /* ChangeViewBridge.h */,
-				A853CA072A1B8B7900E5FB1D /* ChangeViewBridge.m */,
-				A853CA092A1B8C7700E5FB1D /* NativeViewController.swift */,
-				A853CA0B2A1B8CBC00E5FB1D /* NativeViewController.storyboard */,
+				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
+				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				9A3892EC2C7F1BFA007A53E8 /* Wearables-Bridging-Header.h */,
 			);
 			name = Wearables;
-			sourceTree = "<group>";
-		};
-		26AD27A5D82046029398A0FE /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				67651A7BC02B4D7B8F869D6E /* Barlow-Black.ttf */,
-				B23BAA5AD2944BDB8CE01896 /* Barlow-BlackItalic.ttf */,
-				99A05D50F8354ED3B4C4CFD7 /* Barlow-Bold.ttf */,
-				5005D8C917C84EC48459D80C /* Barlow-BoldItalic.ttf */,
-				AB54B0D284C44A39923D818B /* Barlow-ExtraBold.ttf */,
-				CC291E98099C47D2A5FC297D /* Barlow-ExtraBoldItalic.ttf */,
-				791D189A4F33419F92EABF4D /* Barlow-ExtraLight.ttf */,
-				5BB11AD447D14846B2815E72 /* Barlow-ExtraLightItalic.ttf */,
-				468D6C0C12F945C4ADA6F693 /* Barlow-Italic.ttf */,
-				1ECD759AF9974F6B95C40B9C /* Barlow-Light.ttf */,
-				78718EAB4464432DB060DC05 /* Barlow-LightItalic.ttf */,
-				A41E151EFE934C1181FA9ED2 /* Barlow-Medium.ttf */,
-				83F821C0D2A943C3986AE8DA /* Barlow-MediumItalic.ttf */,
-				BE4DFFEFD2D942CCAE8A01FC /* Barlow-Regular.ttf */,
-				360E0FDDB5114B9C9C400248 /* Barlow-SemiBold.ttf */,
-				0BA25BE14AF7405F91445BB6 /* Barlow-SemiBoldItalic.ttf */,
-				AC4DD8611A6F47F387A87AB3 /* Barlow-Thin.ttf */,
-				F624704C82A84ACFA060B06E /* Barlow-ThinItalic.ttf */,
-				6B8C333FB2F743E7A206D5CE /* Poppins-Black.ttf */,
-				9F97FE06375F4C558CB7A0BE /* Poppins-BlackItalic.ttf */,
-				FB5BEFEFD6804D77A507BAA8 /* Poppins-Bold.ttf */,
-				0F84DDF7645E4B9C8ED1B524 /* Poppins-BoldItalic.ttf */,
-				CC9C2EFDC2704D5EA4990562 /* Poppins-ExtraBold.ttf */,
-				8DD9BDA7E25743B0AE0A33E3 /* Poppins-ExtraBoldItalic.ttf */,
-				BEC3A601E0514E3CB9C41294 /* Poppins-ExtraLight.ttf */,
-				0D8CE792B8784F16B39BA6BF /* Poppins-ExtraLightItalic.ttf */,
-				5597E25965D7411F90B3BF50 /* Poppins-Italic.ttf */,
-				48CC57DF5CDC4414A755B24B /* Poppins-Light.ttf */,
-				AB0BAD2986994887902291BF /* Poppins-LightItalic.ttf */,
-				0AF66368076F4E59BE02FDE8 /* Poppins-Medium.ttf */,
-				9252F49433C34087BEFA8620 /* Poppins-MediumItalic.ttf */,
-				24B1551E5F184E4CA351A3A0 /* Poppins-Regular.ttf */,
-				0EC143F801CF48EA85711D40 /* Poppins-SemiBold.ttf */,
-				37C7A3302F2F48F3B4B277A2 /* Poppins-SemiBoldItalic.ttf */,
-				66D21442A7524F0EB1537A7F /* Poppins-Thin.ttf */,
-				0D2E0CFFE1CB4D26AA9D22AF /* Poppins-ThinItalic.ttf */,
-			);
-			name = Resources;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A8E7EDF82AFB7F160005F973 /* opencv2.framework */,
+				9AB2E6B72CAD75F7006AC9E2 /* opencv2.framework */,
+				9A3269E72CA718B30012D98B /* CoreAudioTypes.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				5FC92E637C1E1581E56002FD /* Pods_Wearables.framework */,
-				EE333480FD34C06BB9BB3AE3 /* Pods_Wearables_WearablesTests.framework */,
+				19D0C9E76F7A336BF2EFABD0 /* Pods_Wearables.framework */,
+				5D9E0B59E36C2C97227CC8BC /* Pods_Wearables_WearablesTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -301,8 +279,6 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				FB7B99D327CD2CBF00B8AAE7 /* RNThumbnail.h */,
-				FB7B99D227CD2CBF00B8AAE7 /* RNThumbnail.m */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -310,15 +286,14 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				9A9F96402BAB47AA00E460DC /* GoogleService-Info.plist */,
+				9A0428E72CA6C9AF00770F3E /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* Wearables */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* WearablesTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				98552C1BE7F246B841176025 /* Pods */,
-				26AD27A5D82046029398A0FE /* Resources */,
-				FB1711BB279ABED5008CDAA6 /* Recovered References */,
+				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				D5CB102755A2469EA5B6286B /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -334,22 +309,86 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		98552C1BE7F246B841176025 /* Pods */ = {
+		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				F173630C47AA4308921659A5 /* Pods-Wearables.debug.xcconfig */,
-				8DBF391509C10AE0AD265BD1 /* Pods-Wearables.release.xcconfig */,
-				7FA9B3A3870A0CDA8BCF3F58 /* Pods-Wearables-WearablesTests.debug.xcconfig */,
-				2C03224222068B7F742D7108 /* Pods-Wearables-WearablesTests.release.xcconfig */,
+				3B4392A12AC88292D35C810B /* Pods-Wearables.debug.xcconfig */,
+				5709B34CF0A7D63546082F79 /* Pods-Wearables.release.xcconfig */,
+				5B7EB9410499542E8C5724F5 /* Pods-Wearables-WearablesTests.debug.xcconfig */,
+				89C6BE57DB24E9ADA2F236DE /* Pods-Wearables-WearablesTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		FB1711BB279ABED5008CDAA6 /* Recovered References */ = {
+		D5CB102755A2469EA5B6286B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9ACDAE0A2C761325007CC0F1 /* Barlow-Black.ttf */,
+				9ACDAE172C76135B007CC0F1 /* Barlow-BlackItalic.ttf */,
+				9ACDAE142C76134F007CC0F1 /* Barlow-Bold.ttf */,
+				9ACDAE162C761357007CC0F1 /* Barlow-BoldItalic.ttf */,
+				9ACDAE052C761311007CC0F1 /* Barlow-ExtraBold.ttf */,
+				9ACDAE202C761380007CC0F1 /* Barlow-ExtraBoldItalic.ttf */,
+				9ACDAE112C761343007CC0F1 /* Barlow-ExtraLight.ttf */,
+				9ACDAE132C76134B007CC0F1 /* Barlow-ExtraLightItalic.ttf */,
+				9ACDAE212C761384007CC0F1 /* Barlow-Italic.ttf */,
+				9ACDADFF2C7612FF007CC0F1 /* Barlow-Light.ttf */,
+				9ACDAE082C76131D007CC0F1 /* Barlow-LightItalic.ttf */,
+				9ACDAE1B2C76136C007CC0F1 /* Barlow-Medium.ttf */,
+				9ACDAE1C2C761370007CC0F1 /* Barlow-MediumItalic.ttf */,
+				9ACDAE1A2C761368007CC0F1 /* Barlow-Regular.ttf */,
+				9ACDAE092C761321007CC0F1 /* Barlow-SemiBold.ttf */,
+				9ACDAE1E2C761378007CC0F1 /* Barlow-SemiBoldItalic.ttf */,
+				9ACDAE1F2C76137C007CC0F1 /* Barlow-Thin.ttf */,
+				9ACDAE102C76133F007CC0F1 /* Barlow-ThinItalic.ttf */,
+				9ACDAE042C76130D007CC0F1 /* Poppins-Black.ttf */,
+				9ACDAE122C761347007CC0F1 /* Poppins-BlackItalic.ttf */,
+				9ACDAE0B2C761329007CC0F1 /* Poppins-Bold.ttf */,
+				9ACDAE062C761315007CC0F1 /* Poppins-BoldItalic.ttf */,
+				9ACDAE0F2C76133B007CC0F1 /* Poppins-ExtraBold.ttf */,
+				9ACDAE002C761301007CC0F1 /* Poppins-ExtraBoldItalic.ttf */,
+				9ACDAE022C761305007CC0F1 /* Poppins-ExtraLight.ttf */,
+				9ACDAE012C761303007CC0F1 /* Poppins-ExtraLightItalic.ttf */,
+				9ACDAE0C2C76132D007CC0F1 /* Poppins-Italic.ttf */,
+				9ACDAE222C761388007CC0F1 /* Poppins-Light.ttf */,
+				9ACDAE0D2C761332007CC0F1 /* Poppins-LightItalic.ttf */,
+				9ACDAE1D2C761374007CC0F1 /* Poppins-Medium.ttf */,
+				9ACDAE152C761353007CC0F1 /* Poppins-MediumItalic.ttf */,
+				9ACDAE182C76135F007CC0F1 /* Poppins-Regular.ttf */,
+				9ACDAE072C761319007CC0F1 /* Poppins-SemiBold.ttf */,
+				9ACDAE192C761364007CC0F1 /* Poppins-SemiBoldItalic.ttf */,
+				9ACDAE032C761309007CC0F1 /* Poppins-Thin.ttf */,
+				9ACDAE0E2C761336007CC0F1 /* Poppins-ThinItalic.ttf */,
+				CEB7452482A34CC5B3935D43 /* Barlow-Black.ttf */,
+				11212E08BB0E44D591AF41F1 /* Barlow-BlackItalic.ttf */,
+				C635DEFBC108420B9E7542E0 /* Barlow-Bold.ttf */,
+				3ED205B08E5C45BAB131C9CD /* Barlow-BoldItalic.ttf */,
+				1AB251AC4F2549AE9C2FC352 /* Barlow-ExtraBoldItalic.ttf */,
+				6788F5B171464697BBF62D7D /* Barlow-ExtraLight.ttf */,
+				1FE8FEB65FC94390AFBCAB90 /* Barlow-ExtraLightItalic.ttf */,
+				56073D49BDE644C6930DF940 /* Barlow-Italic.ttf */,
+				7885A5B663444FB399394256 /* Barlow-Light.ttf */,
+				B559D120C9344BC7B6520F77 /* Barlow-LightItalic.ttf */,
+				0B80CE8EA1034ED0B8BF6AA7 /* Barlow-Medium.ttf */,
+				C34F6B634C754F4FBE7275D8 /* Barlow-MediumItalic.ttf */,
+				A4076C60D3744E61ABDE5E6A /* Barlow-Regular.ttf */,
+				0E54D45B67374FEDBEFC7BB8 /* Barlow-SemiBold.ttf */,
+				22444DF5D43C4E72AF7D534F /* Barlow-SemiBoldItalic.ttf */,
+				80D700878B8743BBBC573E55 /* Barlow-Thin.ttf */,
+				D98BC191983645E5980EDB49 /* Barlow-ThinItalic.ttf */,
+				C20978B2FEAC4AE1A378ADAA /* Poppins-Black.ttf */,
+				DFB62479AF324489A2CDC457 /* Poppins-BlackItalic.ttf */,
+				47285D747E184EA88C15C950 /* Poppins-Bold.ttf */,
+				57CF89D8C0A64755B38ADCF0 /* Poppins-BoldItalic.ttf */,
+				E5AE1B2EFEB3422C9765B521 /* Poppins-ExtraBold.ttf */,
+				DA6EE797C2E94BC28628E751 /* Poppins-ExtraBoldItalic.ttf */,
+				C4E7AC4115FE40D39B133991 /* Poppins-ExtraLight.ttf */,
+				1ECD5FDB94F9470487950773 /* Poppins-ExtraLightItalic.ttf */,
+				934ABA28925B497E92F1C21C /* Poppins-Italic.ttf */,
+				1E830BC4A18942A38ED98520 /* Poppins-Light.ttf */,
+				EA85246B73DC46C68A072914 /* Poppins-LightItalic.ttf */,
 			);
-			name = "Recovered References";
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -359,12 +398,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "WearablesTests" */;
 			buildPhases = (
-				85A36AB1E20EE610CA67662E /* [CP] Check Pods Manifest.lock */,
+				A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				6873C94AD4209703EAE1E881 /* [CP] Copy Pods Resources */,
-				AA13282574F35B29998B7FFB /* [CP] Embed Pods Frameworks */,
+				C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */,
+				F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -380,16 +419,15 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Wearables" */;
 			buildPhases = (
-				FA22B225A8B97DE16AACE542 /* [CP] Check Pods Manifest.lock */,
-				FD10A7F022414F080027D42C /* Start Packager */,
+				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
+				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				25A19CCC1F71A2517011126D /* [CP] Copy Pods Resources */,
-				383045B9919F6792BE581D87 /* [CP-User] [RNFB] Core Configuration */,
-				5742CC333E94AF3C4A893F62 /* [CP] Embed Pods Frameworks */,
-				3E4D6BE81919385EF532A11F /* [CP-User] [RNFB] Crashlytics Configuration */,
+				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
+				B02D943660A8C95E7626D71F /* [CP-User] [RNFB] Crashlytics Configuration */,
+				849B008F1EFCE5CA08A6EA32 /* [CP-User] [RNFB] Core Configuration */,
 			);
 			buildRules = (
 			);
@@ -413,7 +451,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1250;
+						LastSwiftMigration = 1500;
 					};
 				};
 			};
@@ -448,47 +486,39 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A4B7B0B2C7DCE9F00039E79 /* Barlow-ExtraBold.ttf in Resources */,
+				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				8B1C619FE74E4DE2B893EF3C /* Barlow-Black.ttf in Resources */,
-				A859FD352A1253EC00501E26 /* Main.storyboard in Resources */,
-				46D5A7ED78264234AE2529D4 /* Barlow-BlackItalic.ttf in Resources */,
-				6A3D3E7C35054361A04D8458 /* Barlow-Bold.ttf in Resources */,
-				BA49B9A1E16E4D079C93FBA1 /* Barlow-BoldItalic.ttf in Resources */,
-				7EE529E5D0CB47C997C6B18E /* Barlow-ExtraBold.ttf in Resources */,
-				C7155F434ED84358ACFC98A3 /* Barlow-ExtraBoldItalic.ttf in Resources */,
-				A853CA0C2A1B8CBC00E5FB1D /* NativeViewController.storyboard in Resources */,
-				E341614021FB4219BA1CCE37 /* Barlow-ExtraLight.ttf in Resources */,
-				00E282F01FC842A4BACDDC55 /* Barlow-ExtraLightItalic.ttf in Resources */,
-				20AB2C2D4B3142C0B327E4B6 /* Barlow-Italic.ttf in Resources */,
-				0347109C56E6411CBD425E75 /* Barlow-Light.ttf in Resources */,
-				8BE01122035741A3A13F4A33 /* Barlow-LightItalic.ttf in Resources */,
-				4C4C39750C954F9EB4A9B685 /* Barlow-Medium.ttf in Resources */,
-				E92486B1EFC94B338E8B899C /* Barlow-MediumItalic.ttf in Resources */,
-				1BF3F9B12C094BA9B85D04B3 /* Barlow-Regular.ttf in Resources */,
-				B8EB1EA14B8A44C39F892D8C /* Barlow-SemiBold.ttf in Resources */,
-				46526AF25BFC4CD88CDF0DB9 /* Barlow-SemiBoldItalic.ttf in Resources */,
-				94CEC7EBF4C5401785911AB7 /* Barlow-Thin.ttf in Resources */,
-				2CC5A512E8AC421ABDBDE663 /* Barlow-ThinItalic.ttf in Resources */,
-				9D61E8E6C3BD47C8A1A428FE /* Poppins-Black.ttf in Resources */,
-				38F8375F7F8246739DC5DD31 /* Poppins-BlackItalic.ttf in Resources */,
-				A3A946CB4DA645B8ACD3D522 /* Poppins-Bold.ttf in Resources */,
-				16D91817DF1241238C5F9DA0 /* Poppins-BoldItalic.ttf in Resources */,
-				7757672B34DD4EF099C0DF59 /* Poppins-ExtraBold.ttf in Resources */,
-				A644D0D4F3EE4E9EA250DCEF /* Poppins-ExtraBoldItalic.ttf in Resources */,
-				5866980C7A28478197491CF5 /* Poppins-ExtraLight.ttf in Resources */,
-				CF299DC74CB540DE835AAD15 /* Poppins-ExtraLightItalic.ttf in Resources */,
-				396F2E1BC5DD48B8B041D36D /* Poppins-Italic.ttf in Resources */,
-				E11F5F9BBF2A47B7A7E0A640 /* Poppins-Light.ttf in Resources */,
-				0622989EE7D84F5B910D1FEC /* Poppins-LightItalic.ttf in Resources */,
-				5ABDE411FFA343C9965DA65A /* Poppins-Medium.ttf in Resources */,
-				9A6D02C5299A6ECF0063B054 /* SplashScreen.storyboard in Resources */,
-				5B70CBC6E759458797ABE86B /* Poppins-MediumItalic.ttf in Resources */,
-				5DA033E300644547884ACA74 /* Poppins-Regular.ttf in Resources */,
-				BC44F84F163D4200A088F504 /* Poppins-SemiBold.ttf in Resources */,
-				1D7B4701DE044FD2AF647A54 /* Poppins-SemiBoldItalic.ttf in Resources */,
-				DBFC461FF70B4C4597744D20 /* Poppins-Thin.ttf in Resources */,
-				9A9F96412BAB47AA00E460DC /* GoogleService-Info.plist in Resources */,
-				3A8C0871D8264A91B0C4161E /* Poppins-ThinItalic.ttf in Resources */,
+				4985794E38C548CE8C8D4B87 /* Barlow-Black.ttf in Resources */,
+				D4C5A72FF6E944DF85E45480 /* Barlow-BlackItalic.ttf in Resources */,
+				FDF9A82365804E338F6C5FF7 /* Barlow-Bold.ttf in Resources */,
+				54469A415CB94F8AB94DC4AB /* Barlow-BoldItalic.ttf in Resources */,
+				9F5AF07C1A31448290D517D6 /* Barlow-ExtraBoldItalic.ttf in Resources */,
+				6D97ED24783441D48417C734 /* Barlow-ExtraLight.ttf in Resources */,
+				EC70770B5A274F57969157E9 /* Barlow-ExtraLightItalic.ttf in Resources */,
+				E9C6D9666E474FE1BF6008EE /* Barlow-Italic.ttf in Resources */,
+				AECA38CE4BC94B608F366F7F /* Barlow-Light.ttf in Resources */,
+				3851E55345484E118C431B76 /* Barlow-LightItalic.ttf in Resources */,
+				F19985B252F24FB5A625B67B /* Barlow-Medium.ttf in Resources */,
+				44B1B91E44DE42158EACA6DE /* Barlow-MediumItalic.ttf in Resources */,
+				8D2443B294EC47DABDA3E5B8 /* Barlow-Regular.ttf in Resources */,
+				AA9F71D22D994F67AFC01522 /* Barlow-SemiBold.ttf in Resources */,
+				85235A49B88243299E466429 /* Barlow-SemiBoldItalic.ttf in Resources */,
+				8D26CACA9C7D4EC98243FE20 /* Barlow-Thin.ttf in Resources */,
+				C2CC10B6F7AD490FAF53720E /* Barlow-ThinItalic.ttf in Resources */,
+				66411465DD7A4DAF924CA060 /* Poppins-Black.ttf in Resources */,
+				B0B2723914894E2A80DA501A /* Poppins-BlackItalic.ttf in Resources */,
+				504C22E2455E49E58E5C24B2 /* Poppins-Bold.ttf in Resources */,
+				217AE803F89E44BEA4AA4AE7 /* Poppins-BoldItalic.ttf in Resources */,
+				0EBD51C33E4447C090202C30 /* Poppins-ExtraBold.ttf in Resources */,
+				9A0428E82CA6C9AF00770F3E /* GoogleService-Info.plist in Resources */,
+				97FAC2D0C5E74436995C657E /* Poppins-ExtraBoldItalic.ttf in Resources */,
+				9AB2E6BE2CAD7645006AC9E2 /* Main.storyboard in Resources */,
+				A34A624DAFD24C49A1E85B0D /* Poppins-ExtraLight.ttf in Resources */,
+				730D32035363447280EAA9EB /* Poppins-ExtraLightItalic.ttf in Resources */,
+				133FA369D17148778463255C /* Poppins-Italic.ttf in Resources */,
+				F983D6DFB669491B813B9160 /* Poppins-Light.ttf in Resources */,
+				5E94C0A9744647B0A2A78C13 /* Poppins-LightItalic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -501,61 +531,19 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/.xcode.env.local",
+				"$(SRCROOT)/.xcode.env",
 			);
 			name = "Bundle React Native code and images";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
+			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		25A19CCC1F71A2517011126D /* [CP] Copy Pods Resources */ = {
+		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Wearables/Pods-Wearables-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Wearables/Pods-Wearables-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wearables/Pods-Wearables-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		383045B9919F6792BE581D87 /* [CP-User] [RNFB] Core Configuration */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
-			);
-			name = "[CP-User] [RNFB] Core Configuration";
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "#!/usr/bin/env bash\n#\n# Copyright (c) 2016-present Invertase Limited & Contributors\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this library except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#   http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n#\nset -e\n\n_MAX_LOOKUPS=2;\n_SEARCH_RESULT=''\n_RN_ROOT_EXISTS=''\n_CURRENT_LOOKUPS=1\n_JSON_ROOT=\"'react-native'\"\n_JSON_FILE_NAME='firebase.json'\n_JSON_OUTPUT_BASE64='e30=' # { }\n_CURRENT_SEARCH_DIR=${PROJECT_DIR}\n_PLIST_BUDDY=/usr/libexec/PlistBuddy\n_TARGET_PLIST=\"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n_DSYM_PLIST=\"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist\"\n\n# plist arrays\n_PLIST_ENTRY_KEYS=()\n_PLIST_ENTRY_TYPES=()\n_PLIST_ENTRY_VALUES=()\n\nfunction setPlistValue {\n  echo \"info:      setting plist entry '$1' of type '$2' in file '$4'\"\n  ${_PLIST_BUDDY} -c \"Add :$1 $2 '$3'\" $4 || echo \"info:      '$1' already exists\"\n}\n\nfunction getFirebaseJsonKeyValue () {\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    ruby -e \"require 'rubygems';require 'json'; output=JSON.parse('$1'); puts output[$_JSON_ROOT]['$2']\"\n  else\n    echo \"\"\n  fi;\n}\n\nfunction jsonBoolToYesNo () {\n  if [[ $1 == \"false\" ]]; then\n    echo \"NO\"\n  elif [[ $1 == \"true\" ]]; then\n    echo \"YES\"\n  else echo \"NO\"\n  fi\n}\n\necho \"info: -> RNFB build script started\"\necho \"info: 1) Locating ${_JSON_FILE_NAME} file:\"\n\nif [[ -z ${_CURRENT_SEARCH_DIR} ]]; then\n  _CURRENT_SEARCH_DIR=$(pwd)\nfi;\n\nwhile true; do\n  _CURRENT_SEARCH_DIR=$(dirname \"$_CURRENT_SEARCH_DIR\")\n  if [[ \"$_CURRENT_SEARCH_DIR\" == \"/\" ]] || [[ ${_CURRENT_LOOKUPS} -gt ${_MAX_LOOKUPS} ]]; then break; fi;\n  echo \"info:      ($_CURRENT_LOOKUPS of $_MAX_LOOKUPS) Searching in '$_CURRENT_SEARCH_DIR' for a ${_JSON_FILE_NAME} file.\"\n  _SEARCH_RESULT=$(find \"$_CURRENT_SEARCH_DIR\" -maxdepth 2 -name ${_JSON_FILE_NAME} -print | /usr/bin/head -n 1)\n  if [[ ${_SEARCH_RESULT} ]]; then\n    echo \"info:      ${_JSON_FILE_NAME} found at $_SEARCH_RESULT\"\n    break;\n  fi;\n  _CURRENT_LOOKUPS=$((_CURRENT_LOOKUPS+1))\ndone\n\nif [[ ${_SEARCH_RESULT} ]]; then\n  _JSON_OUTPUT_RAW=$(cat \"${_SEARCH_RESULT}\")\n  _RN_ROOT_EXISTS=$(ruby -e \"require 'rubygems';require 'json'; output=JSON.parse('$_JSON_OUTPUT_RAW'); puts output[$_JSON_ROOT]\" || echo '')\n\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    _JSON_OUTPUT_BASE64=$(python -c 'import json,sys,base64;print(base64.b64encode(json.dumps(json.loads(open('\"'${_SEARCH_RESULT}'\"').read())['${_JSON_ROOT}'])))' || echo \"e30=\")\n  fi\n\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n\n  # config.app_data_collection_default_enabled\n  _APP_DATA_COLLECTION_ENABLED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"app_data_collection_default_enabled\")\n  if [[ $_APP_DATA_COLLECTION_ENABLED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseDataCollectionDefaultEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_APP_DATA_COLLECTION_ENABLED\")\")\n  fi\n\n  # config.analytics_auto_collection_enabled\n  _ANALYTICS_AUTO_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_auto_collection_enabled\")\n  if [[ $_ANALYTICS_AUTO_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FIREBASE_ANALYTICS_COLLECTION_ENABLED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AUTO_COLLECTION\")\")\n  fi\n\n  # config.analytics_collection_deactivated\n  _ANALYTICS_DEACTIVATED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_collection_deactivated\")\n  if [[ $_ANALYTICS_DEACTIVATED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_DEACTIVATED\")\")\n  fi\n\n  # config.analytics_idfv_collection_enabled\n  _ANALYTICS_IDFV_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_idfv_collection_enabled\")\n  if [[ $_ANALYTICS_IDFV_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_IDFV_COLLECTION_ENABLED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_IDFV_COLLECTION\")\")\n  fi\n\n  # config.analytics_default_allow_ad_personalization_signals\n  _ANALYTICS_PERSONALIZATION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_ad_personalization_signals\")\n  if [[ $_ANALYTICS_PERSONALIZATION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_PERSONALIZATION_SIGNALS\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_PERSONALIZATION\")\")\n  fi\n\n  # config.google_analytics_automatic_screen_reporting_enabled\n  _ANALYTICS_AUTO_SCREEN_REPORTING=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"google_analytics_automatic_screen_reporting_enabled\")\n  if [[ $_ANALYTICS_AUTO_SCREEN_REPORTING ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseAutomaticScreenReportingEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AUTO_SCREEN_REPORTING\")\")\n  fi\n\n  # config.perf_auto_collection_enabled\n  _PERF_AUTO_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"perf_auto_collection_enabled\")\n  if [[ $_PERF_AUTO_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"firebase_performance_collection_enabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_PERF_AUTO_COLLECTION\")\")\n  fi\n\n  # config.perf_collection_deactivated\n  _PERF_DEACTIVATED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"perf_collection_deactivated\")\n  if [[ $_PERF_DEACTIVATED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"firebase_performance_collection_deactivated\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_PERF_DEACTIVATED\")\")\n  fi\n\n  # config.messaging_auto_init_enabled\n  _MESSAGING_AUTO_INIT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"messaging_auto_init_enabled\")\n  if [[ $_MESSAGING_AUTO_INIT ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseMessagingAutoInitEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_MESSAGING_AUTO_INIT\")\")\n  fi\n\n  # config.in_app_messaging_auto_colllection_enabled\n  _FIAM_AUTO_INIT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"in_app_messaging_auto_collection_enabled\")\n  if [[ $_FIAM_AUTO_INIT ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseInAppMessagingAutomaticDataCollectionEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_FIAM_AUTO_INIT\")\")\n  fi\n\n  # config.app_check_token_auto_refresh\n  _APP_CHECK_TOKEN_AUTO_REFRESH=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"app_check_token_auto_refresh\")\n  if [[ $_APP_CHECK_TOKEN_AUTO_REFRESH ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseAppCheckTokenAutoRefreshEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_APP_CHECK_TOKEN_AUTO_REFRESH\")\")\n  fi\n\n  # config.crashlytics_disable_auto_disabler - undocumented for now - mainly for debugging, document if becomes useful\n  _CRASHLYTICS_AUTO_DISABLE_ENABLED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"crashlytics_disable_auto_disabler\")\n  if [[ $_CRASHLYTICS_AUTO_DISABLE_ENABLED == \"true\" ]]; then\n    echo \"Disabled Crashlytics auto disabler.\" # do nothing\n  else\n    _PLIST_ENTRY_KEYS+=(\"FirebaseCrashlyticsCollectionEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"NO\")\n  fi\nelse\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n  echo \"warning:   A firebase.json file was not found, whilst this file is optional it is recommended to include it to configure firebase services in React Native Firebase.\"\nfi;\n\necho \"info: 2) Injecting Info.plist entries: \"\n\n# Log out the keys we're adding\nfor i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n  echo \"    ->  $i) ${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\"\ndone\n\nfor plist in \"${_TARGET_PLIST}\" \"${_DSYM_PLIST}\" ; do\n  if [[ -f \"${plist}\" ]]; then\n\n    # paths with spaces break the call to setPlistValue. temporarily modify\n    # the shell internal field separator variable (IFS), which normally\n    # includes spaces, to consist only of line breaks\n    oldifs=$IFS\n    IFS=\"\n\"\n\n    for i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n      setPlistValue \"${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\" \"${plist}\"\n    done\n\n    # restore the original internal field separator value\n    IFS=$oldifs\n  else\n    echo \"warning:   A Info.plist build output file was not found (${plist})\"\n  fi\ndone\n\necho \"info: <- RNFB build script finished\"\n";
-		};
-		3E4D6BE81919385EF532A11F /* [CP-User] [RNFB] Crashlytics Configuration */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
-				"$(SRCROOT)/$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
-			);
-			name = "[CP-User] [RNFB] Crashlytics Configuration";
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "#!/usr/bin/env bash\n#\n# Copyright (c) 2016-present Invertase Limited & Contributors\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this library except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#   http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n#\nset -e\n\nif [[ ${PODS_ROOT} ]]; then\n  echo \"info: Exec FirebaseCrashlytics Run from Pods\"\n  \"${PODS_ROOT}/FirebaseCrashlytics/run\"\nelse\n  echo \"info: Exec FirebaseCrashlytics Run from framework\"\n  \"${PROJECT_DIR}/FirebaseCrashlytics.framework/run\"\nfi\n";
-		};
-		5742CC333E94AF3C4A893F62 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputFileListPaths = (
@@ -570,24 +558,20 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wearables/Pods-Wearables-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6873C94AD4209703EAE1E881 /* [CP] Copy Pods Resources */ = {
+		849B008F1EFCE5CA08A6EA32 /* [CP-User] [RNFB] Core Configuration */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
 			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
+			name = "[CP-User] [RNFB] Core Configuration";
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
+			shellScript = "#!/usr/bin/env bash\n#\n# Copyright (c) 2016-present Invertase Limited & Contributors\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this library except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#   http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n#\n\n##########################################################################\n##########################################################################\n#\n#  NOTE THAT IF YOU CHANGE THIS FILE YOU MUST RUN pod install AFTERWARDS\n#\n#  This file is installed as an Xcode build script in the project file\n#  by cocoapods, and you will not see your changes until you pod install\n#\n##########################################################################\n##########################################################################\n\nset -e\n\n_MAX_LOOKUPS=2;\n_SEARCH_RESULT=''\n_RN_ROOT_EXISTS=''\n_CURRENT_LOOKUPS=1\n_JSON_ROOT=\"'react-native'\"\n_JSON_FILE_NAME='firebase.json'\n_JSON_OUTPUT_BASE64='e30=' # { }\n_CURRENT_SEARCH_DIR=${PROJECT_DIR}\n_PLIST_BUDDY=/usr/libexec/PlistBuddy\n_TARGET_PLIST=\"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n_DSYM_PLIST=\"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist\"\n\n# plist arrays\n_PLIST_ENTRY_KEYS=()\n_PLIST_ENTRY_TYPES=()\n_PLIST_ENTRY_VALUES=()\n\nfunction setPlistValue {\n  echo \"info:      setting plist entry '$1' of type '$2' in file '$4'\"\n  ${_PLIST_BUDDY} -c \"Add :$1 $2 '$3'\" $4 || echo \"info:      '$1' already exists\"\n}\n\nfunction getFirebaseJsonKeyValue () {\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    ruby -Ku -e \"require 'rubygems';require 'json'; output=JSON.parse('$1'); puts output[$_JSON_ROOT]['$2']\"\n  else\n    echo \"\"\n  fi;\n}\n\nfunction jsonBoolToYesNo () {\n  if [[ $1 == \"false\" ]]; then\n    echo \"NO\"\n  elif [[ $1 == \"true\" ]]; then\n    echo \"YES\"\n  else echo \"NO\"\n  fi\n}\n\necho \"info: -> RNFB build script started\"\necho \"info: 1) Locating ${_JSON_FILE_NAME} file:\"\n\nif [[ -z ${_CURRENT_SEARCH_DIR} ]]; then\n  _CURRENT_SEARCH_DIR=$(pwd)\nfi;\n\nwhile true; do\n  _CURRENT_SEARCH_DIR=$(dirname \"$_CURRENT_SEARCH_DIR\")\n  if [[ \"$_CURRENT_SEARCH_DIR\" == \"/\" ]] || [[ ${_CURRENT_LOOKUPS} -gt ${_MAX_LOOKUPS} ]]; then break; fi;\n  echo \"info:      ($_CURRENT_LOOKUPS of $_MAX_LOOKUPS) Searching in '$_CURRENT_SEARCH_DIR' for a ${_JSON_FILE_NAME} file.\"\n  _SEARCH_RESULT=$(find \"$_CURRENT_SEARCH_DIR\" -maxdepth 2 -name ${_JSON_FILE_NAME} -print | /usr/bin/head -n 1)\n  if [[ ${_SEARCH_RESULT} ]]; then\n    echo \"info:      ${_JSON_FILE_NAME} found at $_SEARCH_RESULT\"\n    break;\n  fi;\n  _CURRENT_LOOKUPS=$((_CURRENT_LOOKUPS+1))\ndone\n\nif [[ ${_SEARCH_RESULT} ]]; then\n  _JSON_OUTPUT_RAW=$(cat \"${_SEARCH_RESULT}\")\n  _RN_ROOT_EXISTS=$(ruby -Ku -e \"require 'rubygems';require 'json'; output=JSON.parse('$_JSON_OUTPUT_RAW'); puts output[$_JSON_ROOT]\" || echo '')\n\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    if ! python3 --version >/dev/null 2>&1; then echo \"python3 not found, firebase.json file processing error.\" && exit 1; fi\n    _JSON_OUTPUT_BASE64=$(python3 -c 'import json,sys,base64;print(base64.b64encode(bytes(json.dumps(json.loads(open('\"'${_SEARCH_RESULT}'\"', '\"'rb'\"').read())['${_JSON_ROOT}']), '\"'utf-8'\"')).decode())' || echo \"e30=\")\n  fi\n\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n\n  # config.app_data_collection_default_enabled\n  _APP_DATA_COLLECTION_ENABLED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"app_data_collection_default_enabled\")\n  if [[ $_APP_DATA_COLLECTION_ENABLED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseDataCollectionDefaultEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_APP_DATA_COLLECTION_ENABLED\")\")\n  fi\n\n  # config.analytics_auto_collection_enabled\n  _ANALYTICS_AUTO_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_auto_collection_enabled\")\n  if [[ $_ANALYTICS_AUTO_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FIREBASE_ANALYTICS_COLLECTION_ENABLED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AUTO_COLLECTION\")\")\n  fi\n\n  # config.analytics_collection_deactivated\n  _ANALYTICS_DEACTIVATED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_collection_deactivated\")\n  if [[ $_ANALYTICS_DEACTIVATED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_DEACTIVATED\")\")\n  fi\n\n  # config.analytics_idfv_collection_enabled\n  _ANALYTICS_IDFV_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_idfv_collection_enabled\")\n  if [[ $_ANALYTICS_IDFV_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_IDFV_COLLECTION_ENABLED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_IDFV_COLLECTION\")\")\n  fi\n\n  # config.analytics_default_allow_analytics_storage\n  _ANALYTICS_STORAGE=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_analytics_storage\")\n  if [[ $_ANALYTICS_STORAGE ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_ANALYTICS_STORAGE\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_STORAGE\")\")\n  fi\n\n  # config.analytics_default_allow_ad_storage\n  _ANALYTICS_AD_STORAGE=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_ad_storage\")\n  if [[ $_ANALYTICS_AD_STORAGE ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_STORAGE\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AD_STORAGE\")\")\n  fi\n\n  # config.analytics_default_allow_ad_user_data\n  _ANALYTICS_AD_USER_DATA=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_ad_user_data\")\n  if [[ $_ANALYTICS_AD_USER_DATA ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_USER_DATA\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AD_USER_DATA\")\")\n  fi\n\n  # config.analytics_default_allow_ad_personalization_signals\n  _ANALYTICS_PERSONALIZATION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"analytics_default_allow_ad_personalization_signals\")\n  if [[ $_ANALYTICS_PERSONALIZATION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_DEFAULT_ALLOW_AD_PERSONALIZATION_SIGNALS\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_PERSONALIZATION\")\")\n  fi\n\n  # config.analytics_registration_with_ad_network_enabled\n  _ANALYTICS_REGISTRATION_WITH_AD_NETWORK=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"google_analytics_registration_with_ad_network_enabled\")\n  if [[ $_ANALYTICS_REGISTRATION_WITH_AD_NETWORK ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GOOGLE_ANALYTICS_REGISTRATION_WITH_AD_NETWORK_ENABLED\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_REGISTRATION_WITH_AD_NETWORK\")\")\n  fi\n\n  # config.google_analytics_automatic_screen_reporting_enabled\n  _ANALYTICS_AUTO_SCREEN_REPORTING=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"google_analytics_automatic_screen_reporting_enabled\")\n  if [[ $_ANALYTICS_AUTO_SCREEN_REPORTING ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseAutomaticScreenReportingEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_ANALYTICS_AUTO_SCREEN_REPORTING\")\")\n  fi\n\n  # config.perf_auto_collection_enabled\n  _PERF_AUTO_COLLECTION=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"perf_auto_collection_enabled\")\n  if [[ $_PERF_AUTO_COLLECTION ]]; then\n    _PLIST_ENTRY_KEYS+=(\"firebase_performance_collection_enabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_PERF_AUTO_COLLECTION\")\")\n  fi\n\n  # config.perf_collection_deactivated\n  _PERF_DEACTIVATED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"perf_collection_deactivated\")\n  if [[ $_PERF_DEACTIVATED ]]; then\n    _PLIST_ENTRY_KEYS+=(\"firebase_performance_collection_deactivated\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_PERF_DEACTIVATED\")\")\n  fi\n\n  # config.messaging_auto_init_enabled\n  _MESSAGING_AUTO_INIT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"messaging_auto_init_enabled\")\n  if [[ $_MESSAGING_AUTO_INIT ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseMessagingAutoInitEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_MESSAGING_AUTO_INIT\")\")\n  fi\n\n  # config.in_app_messaging_auto_colllection_enabled\n  _FIAM_AUTO_INIT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"in_app_messaging_auto_collection_enabled\")\n  if [[ $_FIAM_AUTO_INIT ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseInAppMessagingAutomaticDataCollectionEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_FIAM_AUTO_INIT\")\")\n  fi\n\n  # config.app_check_token_auto_refresh\n  _APP_CHECK_TOKEN_AUTO_REFRESH=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"app_check_token_auto_refresh\")\n  if [[ $_APP_CHECK_TOKEN_AUTO_REFRESH ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseAppCheckTokenAutoRefreshEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_APP_CHECK_TOKEN_AUTO_REFRESH\")\")\n  fi\n\n  # config.crashlytics_disable_auto_disabler - undocumented for now - mainly for debugging, document if becomes useful\n  _CRASHLYTICS_AUTO_DISABLE_ENABLED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"crashlytics_disable_auto_disabler\")\n  if [[ $_CRASHLYTICS_AUTO_DISABLE_ENABLED == \"true\" ]]; then\n    echo \"Disabled Crashlytics auto disabler.\" # do nothing\n  else\n    _PLIST_ENTRY_KEYS+=(\"FirebaseCrashlyticsCollectionEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"NO\")\n  fi\nelse\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n  echo \"warning:   A firebase.json file was not found, whilst this file is optional it is recommended to include it to configure firebase services in React Native Firebase.\"\nfi;\n\necho \"info: 2) Injecting Info.plist entries: \"\n\n# Log out the keys we're adding\nfor i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n  echo \"    ->  $i) ${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\"\ndone\n\nfor plist in \"${_TARGET_PLIST}\" \"${_DSYM_PLIST}\" ; do\n  if [[ -f \"${plist}\" ]]; then\n\n    # paths with spaces break the call to setPlistValue. temporarily modify\n    # the shell internal field separator variable (IFS), which normally\n    # includes spaces, to consist only of line breaks\n    oldifs=$IFS\n    IFS=\"\n\"\n\n    for i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n      setPlistValue \"${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\" \"${plist}\"\n    done\n\n    # restore the original internal field separator value\n    IFS=$oldifs\n  else\n    echo \"warning:   A Info.plist build output file was not found (${plist})\"\n  fi\ndone\n\necho \"info: <- RNFB build script finished\"\n";
 		};
-		85A36AB1E20EE610CA67662E /* [CP] Check Pods Manifest.lock */ = {
+		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -609,24 +593,21 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		AA13282574F35B29998B7FFB /* [CP] Embed Pods Frameworks */ = {
+		B02D943660A8C95E7626D71F /* [CP-User] [RNFB] Crashlytics Configuration */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
+				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
 			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
+			name = "[CP-User] [RNFB] Crashlytics Configuration";
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
+			shellScript = "#!/usr/bin/env bash\n#\n# Copyright (c) 2016-present Invertase Limited & Contributors\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this library except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#   http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n#\nset -e\n\nif [[ ${PODS_ROOT} ]]; then\n  echo \"info: Exec FirebaseCrashlytics Run from Pods\"\n  \"${PODS_ROOT}/FirebaseCrashlytics/run\"\nelse\n  echo \"info: Exec FirebaseCrashlytics Run from framework\"\n  \"${PROJECT_DIR}/FirebaseCrashlytics.framework/run\"\nfi\n";
 		};
-		FA22B225A8B97DE16AACE542 /* [CP] Check Pods Manifest.lock */ = {
+		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -648,23 +629,55 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		FD10A7F022414F080027D42C /* Start Packager */ = {
+		C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
-			name = "Start Packager";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-			);
-			outputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Wearables/Pods-Wearables-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Wearables/Pods-Wearables-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wearables/Pods-Wearables-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -682,23 +695,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A853CA052A1B31E800E5FB1D /* VideoMainViewController.m in Sources */,
-				FB7B99D427CD2CBF00B8AAE7 /* RNThumbnail.m in Sources */,
-				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
-				A853CA0A2A1B8C7700E5FB1D /* NativeViewController.swift in Sources */,
+				9A5CB12C2CB2CF42005E3943 /* ObjectDetection.m in Sources */,
+				9A9C3DDB2CA71D2A00ABA5B8 /* ZendeskChatbot.swift in Sources */,
+				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
+				9A3892FC2C7F1C35007A53E8 /* GTMBase64.m in Sources */,
+				9A9C3DDA2CA71D2400ABA5B8 /* ZendeskChatbot.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
-				A859FD362A1253EC00501E26 /* VideoMainViewController.swift in Sources */,
-				A81871FB2B2745B800540DA7 /* ObjectDetection.swift in Sources */,
-				FB47ED652770ED5700E06521 /* EncryptPassword.swift in Sources */,
-				A81871F82B27452A00540DA7 /* RNOpenCvLibrary.mm in Sources */,
-				F4CDF5C82B26395900D87B40 /* ZendeskChatbot.swift in Sources */,
-				FB47ED662770ED5700E06521 /* GTMBase64.m in Sources */,
-				A853CA082A1B8B7900E5FB1D /* ChangeViewBridge.m in Sources */,
-				A81871FC2B2745B800540DA7 /* ObjectDetection.m in Sources */,
-				A859FD342A1253EC00501E26 /* RangeSlider.swift in Sources */,
-				FB47ED682770ED5700E06521 /* EncryptPassword.m in Sources */,
-				F4CDF5C72B26395900D87B40 /* ZendeskChatbot.m in Sources */,
-				FB47ED672770ED5700E06521 /* NSString+TripleDES.m in Sources */,
+				9A5CB12D2CB2CF48005E3943 /* ObjectDetection.swift in Sources */,
+				9A9C3DE42CA7206D00ABA5B8 /* RangeSlider.swift in Sources */,
+				9AB2E6BF2CAD7944006AC9E2 /* RNOpenCvLibrary.mm in Sources */,
+				9A3892FB2C7F1C35007A53E8 /* NSString+TripleDES.m in Sources */,
+				9A9C3DDE2CA71DEE00ABA5B8 /* NativeViewController.swift in Sources */,
+				9A9C3DE22CA7203300ABA5B8 /* VideoMainViewController.m in Sources */,
+				9A9C3DE02CA7200500ABA5B8 /* VideoMainViewController.swift in Sources */,
+				9A3892F62C7F1C29007A53E8 /* EncryptPassword.m in Sources */,
+				9A3892F52C7F1C29007A53E8 /* EncryptPassword.swift in Sources */,
+				9A9C3DDF2CA71EB500ABA5B8 /* ChangeViewBridge.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -715,29 +727,20 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7FA9B3A3870A0CDA8BCF3F58 /* Pods-Wearables-WearablesTests.debug.xcconfig */;
+			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-Wearables-WearablesTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = WearablesTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(SDKROOT)/usr/lib/swift$(inherited)",
-					"$(PROJECT_DIR)/opencv2.framework/Versions/A",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -752,26 +755,17 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2C03224222068B7F742D7108 /* Pods-Wearables-WearablesTests.release.xcconfig */;
+			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-Wearables-WearablesTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = WearablesTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(SDKROOT)/usr/lib/swift$(inherited)",
-					"$(PROJECT_DIR)/opencv2.framework/Versions/A",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -786,98 +780,108 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F173630C47AA4308921659A5 /* Pods-Wearables.debug.xcconfig */;
+			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-Wearables.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Wearables/Wearables.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Cambridge Technology Inc (GUTBJ785HC)";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 4.1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GUTBJ785HC;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4.9;
+				DEVELOPMENT_TEAM = GUTBJ785HC;
 				ENABLE_BITCODE = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				GCC_NO_COMMON_BLOCKS = NO;
-				HEADER_SEARCH_PATHS = "$(inherited)";
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Wearables/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Wearables;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				INFOPLIST_KEY_CFBundleDisplayName = WAG;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "To connect to your pet's sensor, We need to enable Bluetooth on your device.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "To connect to your pet's sensor, We need to enable Bluetooth on your device.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This lets you take photos which can be used to record your pet’s activities or for your pet’s profile picture.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "This app uses your Bio Metrics";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "WAG App uses your location to locate and get directions to your veterinary practice";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "The app uses your phone microphone while recording the observation video";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app requires Photo Library permissions";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires Photo Library permissions";
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.1;
-				ONLY_ACTIVE_ARCH = YES;
+				MARKETING_VERSION = 4.9;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.HPN.wearablesclinicaltrials;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ctepl.wearablesclinicaltrialsdev;
 				PRODUCT_NAME = Wearables;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wearables_AppStore_Profile;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Wearables-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8DBF391509C10AE0AD265BD1 /* Pods-Wearables.release.xcconfig */;
+			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-Wearables.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Wearables/Wearables.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Cambridge Technology Inc (GUTBJ785HC)";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 4.1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = GUTBJ785HC;
-				ENABLE_BITCODE = NO;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4.9;
+				DEVELOPMENT_TEAM = GUTBJ785HC;
+				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				GCC_NO_COMMON_BLOCKS = NO;
-				HEADER_SEARCH_PATHS = "$(inherited)";
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Wearables/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Wearables;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				INFOPLIST_KEY_CFBundleDisplayName = WAG;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "To connect to your pet's sensor, We need to enable Bluetooth on your device.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "To connect to your pet's sensor, We need to enable Bluetooth on your device.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This lets you take photos which can be used to record your pet’s activities or for your pet’s profile picture.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "This app uses your Bio Metrics";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "WAG App uses your location to locate and get directions to your veterinary practice";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "The app uses your phone microphone while recording the observation video";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app requires Photo Library permissions";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires Photo Library permissions";
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.1;
+				MARKETING_VERSION = 4.9;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.HPN.wearablesclinicaltrials;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ctepl.wearablesclinicaltrialsdev;
 				PRODUCT_NAME = Wearables;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wearables_AppStore_Profile;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Wearables-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -886,8 +890,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CC = "";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -913,7 +918,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				ENABLE_BITCODE = NO;
+				CXX = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
@@ -932,7 +937,20 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers/react/nativemodule/core",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers/platform/ios",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-Fabric/React_Fabric.framework/Headers/react/renderer/components/view/platform/cxx",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-NativeModulesApple/React_NativeModulesApple.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers/react/renderer/graphics/platform/ios",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD = "";
+				LDPLUSPLUS = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -944,8 +962,22 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DFOLLY_NO_CONFIG",
+					"-DFOLLY_MOBILE=1",
+					"-DFOLLY_USE_LIBCPP=1",
+					"-DFOLLY_CFG_NO_COROUTINES=1",
+					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-Wl",
+					"-ld_classic",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				USE_HERMES = true;
 			};
 			name = Debug;
 		};
@@ -953,8 +985,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CC = "";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -980,20 +1013,32 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
-				ENABLE_BITCODE = NO;
+				CXX = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers/react/nativemodule/core",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers/platform/ios",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-Fabric/React_Fabric.framework/Headers/react/renderer/components/view/platform/cxx",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-NativeModulesApple/React_NativeModulesApple.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers/react/renderer/graphics/platform/ios",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD = "";
+				LDPLUSPLUS = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -1004,9 +1049,22 @@
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
-				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DFOLLY_NO_CONFIG",
+					"-DFOLLY_MOBILE=1",
+					"-DFOLLY_USE_LIBCPP=1",
+					"-DFOLLY_CFG_NO_COROUTINES=1",
+					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-Wl",
+					"-ld_classic",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

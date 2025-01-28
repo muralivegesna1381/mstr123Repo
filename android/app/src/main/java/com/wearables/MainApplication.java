@@ -2,6 +2,7 @@ package com.wearables;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
@@ -13,7 +14,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 
-import org.opencv.android.OpenCVLoader;
+//import org.opencv.android.OpenCVLoader;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -66,11 +67,17 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
         SoLoader.init(this, /* native exopackage */ false);
         initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
 
-        if (!OpenCVLoader.initDebug()) {
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, getApplicationContext(), null);
-        } else {
-            //mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS)
-        }
+//        if (!OpenCVLoader.initDebug()) {
+//            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, getApplicationContext(), null);
+//        } else {
+//            //mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS)
+//        }
+
+//        if (!OpenCVLoader.initDebug()) {
+//            Log.e("OpenCV", "Initialization Failed!");
+//        } else {
+//            Log.d("OpenCV", "OpenCV Initialization Successful!");
+//        }
     }
 
     /**

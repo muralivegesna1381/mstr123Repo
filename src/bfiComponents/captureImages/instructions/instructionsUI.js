@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { BackHandler, FlatList, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
+import { BackHandler, FlatList, ImageBackground, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import fonts from '../../../utils/commonStyles/fonts';
 import * as Constant from "../../../utils/constants/constant";
 import ImageView from "react-native-image-viewing";
-import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
+import perf from '@react-native-firebase/perf';
 
+import NoLogsDogImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
 
 const InstructionsUI = ({ route, ...props }) => {
   const [isRecords, set_isRecords] = useState(true);
@@ -18,6 +19,7 @@ const InstructionsUI = ({ route, ...props }) => {
   const [currentImageViewPos, set_CurrentImageViewPos] = useState(0);
   let urlArr = []
   let trace_instructions_Screen;
+  
   //Android Physical back button action
   useEffect(() => {
     initialSessionStart();
@@ -123,7 +125,7 @@ const InstructionsUI = ({ route, ...props }) => {
           keyExtractor={(item, index) => `${index}`} />
           :
           <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("15%"), }}>
-            <Image style={[CommonStyles.nologsDogStyle]} source={require("./../../../../assets/images/dogImages/noRecordsDog.svg")}></Image>
+            <NoLogsDogImg style={[CommonStyles.nologsDogStyle]}/>
             <Text style={[CommonStyles.noRecordsTextStyle, { marginTop: hp("2%") }]}>{Constant.NO_RECORDS_LOGS}</Text>
             <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
           </View>}

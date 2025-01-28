@@ -4,9 +4,9 @@ import ReplaceSensorUI from './replaceSensorUI.js';
 import * as DataStorageLocal from "../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 
 const POP_SYNC = 1;
 const INVALID_DEVICE = 2;
@@ -30,7 +30,8 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
     const [selectedIndex, set_selectedIndex] = useState(null);
     const [isSensorType, set_isSensorType] = useState(false);
     const [sensorType, set_sensorType] = useState(null);
-    const [reasonsArray, set_reasonsArray] = useState([])
+    const [reasonsArray, set_reasonsArray] = useState([]);
+    const [rbtnTitle,set_rbtnTitle] = useState("OK")
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
@@ -167,7 +168,7 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
       // validateDeviceInitiation(deviceNo)
     } else {
       // set_isDeviceValidated(false);
-      createPopup(Constant.ALERT_DEFAULT_TITLE,"Please enter Valid Device Number (DN)",true,false,2);
+      createPopup(Constant.ALERT_DEFAULT_TITLE,"Please enter Valid Device Number (DN)",true,false,2,'OK');
     }
 
   };
@@ -207,97 +208,24 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
       validateDeviceFromBackend(json,token,deviceNo)
   
     };
-
-    // const prepareReasons = (rData) => {
-
-    //   let tempReasons = rData;
-    //   if(rData && rData.length > 0) {
-        
-    //     for (let reason = 0; reason < rData.length; reason++) {
-
-    //       if(rData[reason].reasonId === 1) {
-    //         tempReasons[reason].reasonSubName = 'For charging or hardware issue'
-    //       }
-  
-    //       if(rData[reason].reasonId === 2) {
-    //         tempReasons[reason].reasonSubName = 'Due to breakage or water immersion'
-    //       }
-  
-    //       if(rData[reason].reasonId === 3) {
-    //         tempReasons[reason].reasonSubName = 'For sensor version upgrades'
-    //       }
-
-    //     }
-
-    //   }
-
-    //   set_reasonsArray(tempReasons)
-
-    // };
-
-    // const getReplaceReasonsAPI = async () => {
-
-    //   // set_isLoading(true);
-    //   let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-    //   let reasonsServiceObj = await ServiceCalls.replaceSensorReasons(token);
-    //   set_isLoading(false);
-    //   isLoadingdRef.current = 0;
-
-    //   if(reasonsServiceObj && reasonsServiceObj.logoutData){
-    //     // firebaseHelper.logEvent(firebaseHelper.event_SOB_device_number_api_fail, firebaseHelper.screen_SOB_deviceNumber, "Device number Api fail", 'error : Duplicate login');
-    //     AuthoriseCheck.authoriseCheck();
-    //     navigation.navigate('WelcomeComponent');
-    //     return;
-    //   }
-        
-    //   if(reasonsServiceObj && !reasonsServiceObj.isInternet){
-    //     createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,false,1);
-    //     return;
-    //   }
-  
-    //   if(reasonsServiceObj && reasonsServiceObj.statusData){
-
-    //     prepareReasons(reasonsServiceObj.responseData);
-        
-    //   } else {
-    //     // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,false,0);
-    //   }
-  
-    //   if(reasonsServiceObj && reasonsServiceObj.error) {
-    //     // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,false,0);
-    //   }
-  
-    // };
   
     const validateDeviceFromBackend = async (json,token,deviceNo) => {
 
-      let vDeviceServiceObj = await ServiceCalls.validateDeviceNumber(json,token);
+      let apiMethod = apiMethodManager.VALIDATE_DEVICE_NUMBER;
+      let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
       set_isLoading(false);
       isLoadingdRef.current = 0;
-      if(vDeviceServiceObj && vDeviceServiceObj.logoutData){
-        firebaseHelper.logEvent(firebaseHelper.event_SOB_device_number_api_fail, firebaseHelper.screen_SOB_deviceNumber, "Device number Api fail", 'error : Duplicate login');
-        AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
-        return;
-      }
-        
-      if(vDeviceServiceObj && !vDeviceServiceObj.isInternet){
-        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,false,1);
-        return;
-      }
-  
-      if(vDeviceServiceObj && vDeviceServiceObj.statusData){
-        
-        if(vDeviceServiceObj.responseData && vDeviceServiceObj.responseData.error){
-          createPopup(Constant.ALERT_DEFAULT_TITLE,vDeviceServiceObj.responseData.message,true,false,0);
-        } else {
+            
+      if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            
+        if(apiService.data.isValidDeviceNumber){
 
           if(reasonId === 3) {
 
             let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
             configObj = JSON.parse(configObj);
             if(configObj.petItemObj.isDeviceSetupDone) {
-              createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.CONFIRN_FORCE_SYNC,true,true,1);
+              createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.CONFIRN_FORCE_SYNC,true,true,1,'YES');
             } else {
               replaceSensorNavi('newSensor',0,deviceNo);
             }
@@ -306,23 +234,31 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
             replaceSensorNavi('newSensor',0,deviceNo);
           }
           
+        } else {
+          createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.data.message,true,false,0,'OK');
         }
-        
+    
+      } else if(apiService && apiService.isInternet === false) {
+
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,false,1,'OK');
+
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+        createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true,false,0,'OK');
+
       } else {
-        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,false,0);
-      }
-  
-      if(vDeviceServiceObj && vDeviceServiceObj.error) {
-        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,false,0);
+        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,false,0,'OK');
+
       }
   
     };
 
-    const createPopup = (title,msg,isPop,isLeftBtn,refId) => {
+    const createPopup = (title,msg,isPop,isLeftBtn,refId,rbtnTitle) => {
       set_popupAlert(title);
       set_popupMessage(msg);
       set_isPopUp(isPop);
-      set_isPopLftBtnEnable(isLeftBtn)
+      set_isPopLftBtnEnable(isLeftBtn);
+      set_rbtnTitle(rbtnTitle);
       popIdRef.current = refId;
     };
 
@@ -339,7 +275,7 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
         set_nextBtnEnable(false);
         set_deviceNumberNew('');
       }
-      createPopup('','',false,false,0);
+      createPopup('','',false,false,0,'OK');
     };
 
     const replaceSensorNavi = async (value,isForceSync,deviceNo) => {
@@ -365,7 +301,7 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
 
     const popCancelBtnAction = () => {
       replaceSensorNavi('newSensor',0);
-      createPopup('','',false,false,0);     
+      createPopup('','',false,false,0,'OK');     
     };
 
     const actionOnSensortype = (value) => {
@@ -471,6 +407,7 @@ const ReplaceSensorComponent = ({navigation, route, ...props }) => {
         isSensorType = {isSensorType}
         sensorType = {sensorType}
         reasonsArray = {reasonsArray}
+        rbtnTitle = {rbtnTitle}
         navigateToPrevious = {navigateToPrevious}
         popOkBtnAction = {popOkBtnAction}
         validateNewDevice = {validateNewDevice}

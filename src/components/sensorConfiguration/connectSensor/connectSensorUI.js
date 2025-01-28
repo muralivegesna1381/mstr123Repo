@@ -6,7 +6,6 @@ import fonts from './../../../utils/commonStyles/fonts'
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
 import CommonStyles from './../../../utils/commonStyles/commonStyles';
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
-import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 import ImageSequence from 'react-native-image-sequence';
 
@@ -18,7 +17,6 @@ const ConnectSensorUI = ({navigation, route, ...props }) => {
     const [popUpTitle, set_popUpTitle] = useState(undefined);
     const [btnTitle, set_btnTitle] = useState(undefined);
     const [popupRBtnTitle, set_popupRBtnTitle] = useState(undefined);
-    const [deviceNumber, set_deviceNumber] = useState(undefined);
 
     const cSImages = [
         require("./../../../../assets/images/sequenceImgs/connectSensorAni/connectSensorAni00.png"),
@@ -52,16 +50,8 @@ const ConnectSensorUI = ({navigation, route, ...props }) => {
         set_isLoading(props.isLoading);
         set_btnTitle(props.btnTitle);
         set_popupRBtnTitle(props.popupRBtnTitle);
-        // getDevice();
 
     }, [props.isPopUp,props.popUpMessage,props.popUpTitle,props.isLoading,props.btnTitle,props.popupRBtnTitle,props.isFirstTime]);
-    
-    const getDevice = async () => {
-        // let defaultObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        // let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
-        // let devNumber = JSON.parse(defaultObj).devices[parseInt(sensorIndex)].deviceNumber;
-        // set_deviceNumber(devNumber);
-    }
 
     const nextButtonAction = () => {
         props.nextBtnAction();
@@ -115,12 +105,12 @@ return (
 
            {btnTitle ? <View style={CommonStyles.bottomViewComponentStyle}>
                 <BottomComponent
-                    leftBtnTitle = {btnTitle}
-                    isLeftBtnEnable = {true}
-                    rigthBtnState = {false}                   
-                    isRightBtnEnable = {false}
-                    leftButtonAction = {async () => nextButtonAction()}
-
+                    //leftBtnTitle = {btnTitle}
+                    rightBtnTitle  = {btnTitle}
+                    isLeftBtnEnable = {false}
+                    rigthBtnState = {true}                   
+                    isRightBtnEnable = {true}
+                    rightButtonAction= {async () => nextButtonAction()}
                 ></BottomComponent>
             </View> : null}
 

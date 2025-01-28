@@ -6,8 +6,9 @@ import * as DataStorageLocal from './../../utils/storage/dataStorageLocal';
 import * as internetCheck from "./../../utils/internetCheck/internetCheck"
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 
 let trace_inPasswordConponentScreen;
 let trace_Password_API_Complete;
@@ -93,6 +94,7 @@ const PswdComponent = ({ navigation, route, ...props }) => {
      */
     const navigateToPrevious = () => {
         // navigation.navigate('OTPComponent');
+        navigation.pop();
     }
 
     /**
@@ -139,7 +141,6 @@ const PswdComponent = ({ navigation, route, ...props }) => {
 
         trace_Password_API_Complete = await perf().startTrace('t_SetPassword_API');
         set_isLoading(true);
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
         let json = {};
         if(isFromScreen === 'registration') {
 
@@ -162,7 +163,7 @@ const PswdComponent = ({ navigation, route, ...props }) => {
             };
         }
         // await psdRequest({ variables: { input: json } });
-        creatPsd(json,token);
+        creatPsd(json);
 
     };
 
@@ -172,45 +173,49 @@ const PswdComponent = ({ navigation, route, ...props }) => {
      * Failure : returns  value as false
      * When Failure alert, message will be shown to user
      */
-    const creatPsd = async (json,token) => {
+    const creatPsd = async (json) => {
 
         let apiName = '';
         if (isFromScreen === 'registration') {
-            apiName = 'RegisterUser';
+            apiName = apiMethodManager.PASSWORD_REGISTRATION;
         } else {
-            apiName = 'ResetForgotPassword';
+            apiName = apiMethodManager.PASSWORD_RESET;
         }
 
-        let psdServiceObj = await ServiceCalls.createPassword(json,apiName);
+        let apiMethod = apiName;
+        let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
         set_isLoading(false);
         stopFBTrace();
+                        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            
+            if(apiService.data.Key){
+                await DataStorageLocal.removeDataFromAsync(Constant.IS_USER_LOGGEDIN);
+                await DataStorageLocal.removeDataFromAsync(Constant.USER_PSD_LOGIN);
+                setTempUserId();  
+                createPopup('Congratulations',isFromScreen === "forgotPassword" ? Constant.PASSWORD_CREATION_SUCCESS : Constant.REGISTRATION_SUCCESS,true,'LOGIN');        
+            } else {
+                firebaseHelper.logEvent(firebaseHelper.event_password_api_fail, firebaseHelper.screen_pswd, "Password api failed" + isFromScreen, 'Email : ' + eMailValue);
+                createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,'OK'); 
+            }
+    
+        } else if(apiService && apiService.isInternet === false) {
 
-        if(psdServiceObj && psdServiceObj.logoutData){
-            firebaseHelper.logEvent(firebaseHelper.event_password_api_fail, firebaseHelper.screen_pswd, "Password api failed" + isFromScreen, 'Unautherised');
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-        
-        if(psdServiceObj && !psdServiceObj.isInternet){
             createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,'OK');
             firebaseHelper.logEvent(firebaseHelper.event_password_api_fail, firebaseHelper.screen_pswd, "Password api failed" + isFromScreen, 'Internet : false');
-            return;
-        }
 
-        if(psdServiceObj && psdServiceObj.statusData){
-            await DataStorageLocal.removeDataFromAsync(Constant.USER_PSD_LOGIN);
-            setTempUserId();  
-            createPopup('Congratulations',isFromScreen === "forgotPassword" ? Constant.PASSWORD_CREATION_SUCCESS : Constant.REGISTRATION_SUCCESS,true,'LOGIN');        
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true,'OK');   
+            firebaseHelper.logEvent(firebaseHelper.event_password_api_fail, firebaseHelper.screen_pswd, "Password api failed" + isFromScreen, 'error : ' + apiService.error.errorMsg);
+            
         } else {
+
             firebaseHelper.logEvent(firebaseHelper.event_password_api_fail, firebaseHelper.screen_pswd, "Password api failed" + isFromScreen, 'Email : ' + eMailValue);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,'OK'); 
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,'OK');
+
         }
 
-        if(psdServiceObj && psdServiceObj.error) {
-            firebaseHelper.logEvent(firebaseHelper.event_password_api_fail, firebaseHelper.screen_pswd, "Password api failed" + isFromScreen, 'Email : ' + eMailValue);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,'OK'); 
-        }
     };
 
     const createPopup = (title,msg,isPop,btnTitle) => {
@@ -223,10 +228,14 @@ const PswdComponent = ({ navigation, route, ...props }) => {
     /**
      * by resetting the values, Pet parent will be navigated to Login Page
      */
-    const popOkBtnAction = (value,) => {
+    const popOkBtnAction = async (value,) => {
 
         if (popUpMessage === Constant.PASSWORD_CREATION_SUCCESS || popUpMessage === Constant.REGISTRATION_SUCCESS) {
-            navigation.navigate('LoginComponent');
+            let userEmail = await DataStorageLocal.getDataFromAsync(Constant.USER_EMAIL_LOGIN)
+            if(eMailValue === userEmail) {
+                await DataStorageLocal.saveDataToAsync(Constant.IS_USER_LOGGEDIN, JSON.stringify(false));
+            }
+            navigation.navigate('LoginComponent',{"isFrom":'PasswordScreen'});
         }
         set_isPopUp(value);
         set_popUpBtnTitle(undefined);
@@ -265,6 +274,13 @@ const PswdComponent = ({ navigation, route, ...props }) => {
 
     const setTempUserId = async () => {
         await DataStorageLocal.saveDataToAsync(Constant.USER_EMAIL_LOGIN_TEMP, eMailValue);
+        const rnBiometrics = new ReactNativeBiometrics();
+        rnBiometrics.deleteKeys().then((resultObject) => {
+          const { keysDeleted } = resultObject
+          if (keysDeleted) {
+          } else {
+          }
+        })
     }
 
     return (

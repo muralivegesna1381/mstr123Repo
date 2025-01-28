@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useRef } from 'react';
-import {View,Text,FlatList, TouchableOpacity,StyleSheet, Image} from 'react-native';
+import {View,Text} from 'react-native';
 import BottomComponent from "../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../utils/commonComponents/headerComponent';
@@ -10,8 +10,6 @@ import AlertComponent from '../../utils/commonComponents/alertComponent';
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../utils/constants/constant";
 import GooglePlacesComponent from "./../../utils/googlePlacesComponent/googlePlacesComponent";
-
-let downArrowImg = require('./../../../assets/images/otherImages/svg/downArrowGrey.svg');
 
 const  PetParentAddressUi = ({route, ...props }) => {
 

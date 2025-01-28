@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { BackHandler } from 'react-native';
 import FoodIntakeUI from './foodIntakeUI.js';
 import * as DataStorageLocal from "../../../utils/storage/dataStorageLocal.js";
 import * as Constant from "../../../utils/constants/constant.js";
-import * as AuthoriseCheck from '../../../utils/authorisedComponent/authorisedComponent.js';
-import * as ServiceCalls from '../../../utils/getServicesData/getServicesData.js';
 import moment from "moment";
 import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 import perf from '@react-native-firebase/perf';
+import * as UserDetailsModel from "./../../../utils/appDataModels/userDetailsModel.js"
 
 let trace_inFoodIntakeScreen;
 const SUBMIT_INTAKE = 2;
@@ -124,40 +125,33 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
     set_isLoading(true);
     isLoadingdRef.current = 1;
     let dataValue = moment(dte).format('YYYY-MM-DD').toString();
-
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
     let client = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-    let fIntakeListServiceObj = await ServiceCalls.getFoodIntakeConfigDataApi(petId, client, dataValue, token);
+
+    let apiMethod = apiMethodManager.GET_FOODINTAKE_CONFIG + petId + "/" + client + "/" + dataValue;
+    let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
     set_isLoading(false);
     isLoadingdRef.current = 0;
-
-    if (fIntakeListServiceObj && fIntakeListServiceObj.logoutData) {
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
-
-    if (fIntakeListServiceObj && !fIntakeListServiceObj.isInternet) {
-      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 0);
-      return;
-    }
-
-    if (fIntakeListServiceObj && fIntakeListServiceObj.statusData) {
-      if (fIntakeListServiceObj.responseData && fIntakeListServiceObj.responseData) {
-        prepareFoodIntakeData(fIntakeListServiceObj.responseData);
+        
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+        
+      if (apiService.data) {
+        prepareFoodIntakeData(apiService.data);
         set_noLogsShow(false);
       } else {
         set_noLogsShow(true);
       }
+            
+    } else if(apiService && apiService.isInternet === false) {
+      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 0);
+               
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+      firebaseHelper.logEvent(firebaseHelper.event_Get_Food_Inatke_Config_api_fail, firebaseHelper.screen_Food_Intake, "Get Food Intake Config Api Failed : ", 'error : '+apiService.error.errorMsg);
+      createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true, 0);
+        
     } else {
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true, 0);
       firebaseHelper.logEvent(firebaseHelper.event_Get_Food_Inatke_Config_api_fail, firebaseHelper.screen_Food_Intake, "Get Food Intake Config Api Failed : ", 'Service Status : false');
-    }
 
-    if (fIntakeListServiceObj && fIntakeListServiceObj.error) {
-      let errors = getfeedbackServiceObj.error.length > 0 ? getfeedbackServiceObj.error[0].code : '';
-      firebaseHelper.logEvent(firebaseHelper.event_Get_Food_Inatke_Config_api_fail, firebaseHelper.screen_Food_Intake, "Get Food Intake Config Api Failed : ", 'error : '+errors);
-      createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true, 0);
     }
 
   };
@@ -444,9 +438,7 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
 
       if (fData && fData.otherFoods && fData.otherFoods.length > 0) {
 
-        let userPref = await DataStorageLocal.getDataFromAsync(Constant.PET_PARENT_OBJ);
-        userPref = JSON.parse(userPref)
-        // set_preferredFoodRecUnit(userDetailsServiceObj.responseData.preferredFoodRecUnit);
+        let userPref = UserDetailsModel.userDetailsData.user; 
 
         for (let i = 0; i < fData.otherFoods.length; i++) {
 
@@ -515,7 +507,7 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
 
   const saveOrUpdatePetFoodIntake = async () => {
 
-    let userId = await DataStorageLocal.getDataFromAsync(Constant.USER_ID);
+    let userId = UserDetailsModel.userDetailsData.userRole.UserId;
     let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
     let petId = petObj.petID;
     let dataValue = moment(selectedDate).format('MM-DD-YYYY HH:mm:ss');
@@ -589,6 +581,29 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
             }
             recOtherArray.push(obj);
 
+          } else {
+
+            if (foodHistoryIntakeObj.otherFoods[i].foofDetails[k].isDeleted > 0) {
+
+              let obj = {
+                "foodHistoryId": foodHistoryIntakeObj.otherFoods[i].foofDetails[k].FOODHISTORY_ID,
+                "intakeId": intakeId,
+                "dietName": "OTHER_FOOD",
+                "otherFoodtypeId": foodHistoryIntakeObj.otherFoods[i].otherFoodId,
+                "otherFoodTypeName": foodHistoryIntakeObj.otherFoods[i].otherFoodType,
+                "foodName": foodHistoryIntakeObj.otherFoods[i].foofDetails[k].FOOD_NAME,
+                "quantityOffered": null,
+                "quantityConsumed": foodHistoryIntakeObj.otherFoods[i].foofDetails[k].QUANTITY_CONSUMED_NEW,
+                "percentConsumed": foodHistoryIntakeObj.otherFoods[i].foofDetails[k].PERCENT_CONSUMED,
+                "calDensity": foodHistoryIntakeObj.otherFoods[i].foofDetails[k].QUANTITY_CONSUMED,
+                "calDensityUnitId": foodHistoryIntakeObj.otherFoods[i].foofDetails[k].QUANTITY_UNIT_ID,
+                "quantityUnitId": foodHistoryIntakeObj.otherFoods[i].foofDetails[k].QUANTITY_CONSUMED_UNIT_ID,
+                "quantityUnitName": foodHistoryIntakeObj.otherFoods[i].foofDetails[k].QUANTITY_CONSUMED_UNIT,
+                "isDeleted": 1
+              }
+              recOtherArray.push(obj);
+            }
+
           }
 
         }
@@ -622,6 +637,7 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
       }
 
     }
+
     jsonValue.foodIntakeHistory = recOtherArray;
     if (foodHistoryIntakeObj && foodHistoryIntakeObj.dietFeedback) {
 
@@ -656,7 +672,8 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
       }
     }
 
-    jsonValue.dietFeedback = feedbackArray
+    jsonValue.dietFeedback = feedbackArray;
+
     if (recOtherArray.length === 0 && otherArray.length === 0) {
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.NO_CHANGES, true, 0);
       return
@@ -669,41 +686,32 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
 
     set_isLoading(true);
     isLoadingdRef.current = 1;
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-    let fIntakeListServiceObj = await ServiceCalls.saveOrUpdatePetFoodIntake(jsonValue, token);
 
+    let apiMethod = apiMethodManager.SAVE_UPDATE_FOODINTAKE;
+    let apiService = await apiRequest.postData(apiMethod,jsonValue,Constant.SERVICE_JAVA,navigation);
     set_isLoading(false);
     isLoadingdRef.current = 0;
-
-    if (fIntakeListServiceObj && fIntakeListServiceObj.logoutData) {
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
-
-    if (fIntakeListServiceObj && !fIntakeListServiceObj.isInternet) {
-      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 0);
-      return;
-    }
-
-    if (fIntakeListServiceObj && fIntakeListServiceObj.statusData) {
-      // navigateToPrevious();
+        
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
       navigation.navigate('FoodIntakeMainComponent',{selectedDateMain : selectedDate});
+            
+    } else if(apiService && apiService.isInternet === false) {               
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+      createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg, true, 0);
+      firebaseHelper.logEvent(firebaseHelper.event_save_Food_Inatke_api_fail, firebaseHelper.screen_Food_Intake, "SaveUpdate Food Intake Api Failed : ", 'error : '+apiService.error.errorMsg);
+      
     } else {
+
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true, 0);
       firebaseHelper.logEvent(firebaseHelper.event_save_Food_Inatke_api_fail, firebaseHelper.screen_Food_Intake, "SaveUpdate Food Intake Api Failed : ", 'Service Status : false');
-    }
-
-    if (fIntakeListServiceObj && fIntakeListServiceObj.error) {
-      let errors = getfeedbackServiceObj.error.length > 0 ? getfeedbackServiceObj.error[0].code : '';
-      firebaseHelper.logEvent(firebaseHelper.event_save_Food_Inatke_api_fail, firebaseHelper.screen_Food_Intake, "SaveUpdate Food Intake Api Failed : ", 'error : '+errors);
-      createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true, 0);
+      
     }
 
   };
 
   // Navigates to Submit New feedback
-  const nextButtonAction = () => {
+  const nextButtonAction = async () => {
 
     let isFilled = true;
     let isRecFilled = true;
@@ -727,18 +735,19 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
       }
 
       if (isFilled) {
+
         if (foodHistoryIntakeObj && foodHistoryIntakeObj.otherFoods.length > 0) {
 
           for (let i = 0; i < foodHistoryIntakeObj.otherFoods.length; i++) {
+
             for (let k = 0; k < foodHistoryIntakeObj.otherFoods[i].foofDetails.length; k++) {
+
               if (foodHistoryIntakeObj.otherFoods[i].foofDetails[k].FOOD_NAME || foodHistoryIntakeObj.otherFoods[i].foofDetails[k].PERCENT_CONSUMED || foodHistoryIntakeObj.otherFoods[i].foofDetails[k].QUANTITY_CONSUMED) {
-                // if(foodHistoryIntakeObj.otherFoods[i].foofDetails[k].FOOD_NAME && foodHistoryIntakeObj.otherFoods[i].foofDetails[k].PERCENT_CONSUMED && foodHistoryIntakeObj.otherFoods[i].foofDetails[k].QUANTITY_CONSUMED){
+
                 if (foodHistoryIntakeObj.otherFoods[i].foofDetails[k].FOOD_NAME && foodHistoryIntakeObj.otherFoods[i].foofDetails[k].PERCENT_CONSUMED) {
                   isFilled = true;
                 }
-                // else if(!foodHistoryIntakeObj.foodIntake.otherFood[i].foofDetails[k].FOOD_NAME && !foodHistoryIntakeObj.foodIntake.otherFood[i].foofDetails[k].PERCENT_CONSUMED && !foodHistoryIntakeObj.foodIntake.otherFood[i].foofDetails[k].QUANTITY_CONSUMED){
-                //   isFilled = true;
-                // }  
+
                 else {
                   isFilled = false;
                   break;
@@ -782,10 +791,33 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
     } else if (!isFeedOtherFilled) {
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.FEEDBACK_OTHER_POP_TEXT, true, 0);
     }else {
-      saveOrUpdatePetFoodIntake();
+
+      checkforEmptyFood();
+      // saveOrUpdatePetFoodIntake();
     }
 
   };
+
+  const checkforEmptyFood = () => {
+
+    if (foodHistoryIntakeObj && foodHistoryIntakeObj.otherFoods.length > 0) {
+
+      for (let i = 0; i < foodHistoryIntakeObj.otherFoods.length; i++) {
+
+        for (let k = 0; k < foodHistoryIntakeObj.otherFoods[i].foofDetails.length; k++) {
+
+          if (foodHistoryIntakeObj.otherFoods[i].foofDetails[k].FOOD_NAME === '' && foodHistoryIntakeObj.otherFoods[i].foofDetails[k].PERCENT_CONSUMED === '' && foodHistoryIntakeObj.otherFoods[i].foofDetails[k].FOODHISTORY_ID > 0) {
+            foodHistoryIntakeObj.otherFoods[i].foofDetails[k].isDeleted = 1
+          }
+
+        }
+        
+      }
+    }
+
+    saveOrUpdatePetFoodIntake();
+
+  }
 
   const createPopup = (title, msg, isPop, pId) => {
     set_popupAlert(title);
@@ -810,7 +842,6 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
   const updateOtherFoodItems = async (textValue, id, index, parentItemIndex, unitId) => {
 
     let tempRec = foodHistoryIntakeObj.otherFoods[parentItemIndex].foofDetails[index];
-
     if (id === 1) {
 
       let text = textValue.replace(/[^A-Za-z ]/g, '')
@@ -826,7 +857,7 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
       var perTotal = 0;
       for (var foodItemIndex = 0; foodItemIndex < foodHistoryIntakeObj.otherFoods[parentItemIndex].foofDetails.length; foodItemIndex++) {
         let objTempFoodDetails = foodHistoryIntakeObj.otherFoods[parentItemIndex].foofDetails[foodItemIndex];
-        if (objTempFoodDetails.PERCENT_CONSUMED != "") {
+        if (objTempFoodDetails.PERCENT_CONSUMED && objTempFoodDetails.PERCENT_CONSUMED != "") {
           perTotal += parseFloat(objTempFoodDetails.PERCENT_CONSUMED);
         }
       }
@@ -847,7 +878,7 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
           var perTotal = 0;
           for (var foodItemIndex = 0; foodItemIndex < foodHistoryIntakeObj.otherFoods[parentItemIndex].foofDetails.length; foodItemIndex++) {
             let objTempFoodDetails = foodHistoryIntakeObj.otherFoods[parentItemIndex].foofDetails[foodItemIndex];
-            if (objTempFoodDetails.PERCENT_CONSUMED != "") {
+            if (objTempFoodDetails.PERCENT_CONSUMED && objTempFoodDetails.PERCENT_CONSUMED != "") {
               perTotal += parseFloat(objTempFoodDetails.PERCENT_CONSUMED);
             }
           }
@@ -954,7 +985,7 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
       let obj = fData.otherFoods[i];
       for (var fooDetailsIndex = 0; fooDetailsIndex < obj.foofDetails.length; fooDetailsIndex++) {
         let objFood = obj.foofDetails[fooDetailsIndex];
-        if (objFood.PERCENT_CONSUMED != "") {
+        if (objFood.PERCENT_CONSUMED  && objFood.PERCENT_CONSUMED != "") {
           per = per + parseFloat(objFood.PERCENT_CONSUMED);
         }
       }
@@ -1007,7 +1038,7 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
       let obj = fData.otherFoods[i];
       for (var fooDetailsIndex = 0; fooDetailsIndex < obj.foofDetails.length; fooDetailsIndex++) {
         let objFood = obj.foofDetails[fooDetailsIndex];
-        if (objFood.PERCENT_CONSUMED != "") {
+        if (objFood.PERCENT_CONSUMED && objFood.PERCENT_CONSUMED != "") {
           per = per + parseFloat(objFood.PERCENT_CONSUMED);
         }
 
@@ -1199,12 +1230,11 @@ const FoodIntakeComponent = ({ navigation, route, ...props }) => {
       var perTotal = 0;
       for (var foodItemIndex = 0; foodItemIndex < foodHistoryIntakeObj.otherFoods[parentItem].foofDetails.length; foodItemIndex++) {
         let objTempFoodDetails = foodHistoryIntakeObj.otherFoods[parentItem].foofDetails[foodItemIndex];
-        if (objTempFoodDetails.PERCENT_CONSUMED != "") {
+        if (objTempFoodDetails.PERCENT_CONSUMED && objTempFoodDetails.PERCENT_CONSUMED != "") {
           perTotal += parseFloat(objTempFoodDetails.PERCENT_CONSUMED);
         }
       }
       foodHistoryIntakeObj.otherFoods[parentItem].percentageRecord = perTotal;
-    
       let conPer = consumedPercentage(foodHistoryIntakeObj.otherFoods);
 
       if (conPer) {

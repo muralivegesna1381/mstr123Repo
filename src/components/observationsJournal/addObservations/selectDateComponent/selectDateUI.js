@@ -47,6 +47,7 @@ const  SelectDateUI = ({route, ...props }) => {
               onDateChange={(date) => set_selectedDate(date)} 
               mode = {"date"} 
               textColor = {'black'} 
+              theme = {'light'}
               maximumDate = {new Date()}
               style={styles.datePickeStyle}
             />

@@ -8,10 +8,11 @@ import AlertComponent from '../../utils/commonComponents/alertComponent';
 import CommonStyles from '../../utils/commonStyles/commonStyles';
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from "../../utils/constants/constant";
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 import fonts from './../../utils/commonStyles/fonts'
 
-let authImg = require("./../../../assets/images/otherImages/svg/app-or.svg");
+import AuthImg from "./../../../assets/images/otherImages/svg/app-or.svg";
+import EditImg from "./../../../assets/images/otherImages/svg/editImg.svg";
+
 let tickImg = require("./../../../assets/images/otherImages/png/checked.png");
 
 const AccountInfoUi = ({ route, ...props }) => {
@@ -91,7 +92,7 @@ const AccountInfoUi = ({ route, ...props }) => {
                     <TouchableOpacity style={{flexDirection:'row', alignItems:'center'}} onPress={() => selectAuthentication()}>
 
                         <View style={{minHeight: hp('10%'),flex:1, alignItems:'center',justifyContent:'center'}}>
-                          <Image source={authImg} style={[styles.imgStyle]}/>
+                          <AuthImg width={wp('10%')} height={hp('10%')}/>
                         </View>
 
                         <View style={{minHeight: hp('10%'),flex:4,justifyContent:'center' }}>
@@ -117,7 +118,7 @@ const AccountInfoUi = ({ route, ...props }) => {
                                     <Text style={fullName ? [styles.subHeaderTextStyle] : [styles.subHeaderTextStyle, { color: 'grey' }]}>{fullName ? fullName : '------'}</Text>
                                 </View>
                                 <View style={{ justifyContent: 'center' }}>
-                                    <Image source={require("./../../../assets/images/otherImages/svg/editImg.svg")} style={{ width: wp('5%'), height: hp('5%'), resizeMode: 'contain' }} />
+                                    <EditImg width={wp('5%')} height={hp('5%')}/>
                                 </View>
                             </View>
 
@@ -140,7 +141,7 @@ const AccountInfoUi = ({ route, ...props }) => {
 
                                 </View>
                                 <View style={{ justifyContent: 'center' }}>
-                                    <Image source={require("./../../../assets/images/otherImages/svg/editImg.svg")} style={{ width: wp('5%'), height: hp('5%'), resizeMode: 'contain' }} />
+                                    <EditImg width={wp('5%')} height={hp('5%')}/>
                                 </View>
                             </View>
                         </TouchableOpacity>
@@ -151,8 +152,8 @@ const AccountInfoUi = ({ route, ...props }) => {
                                     <Text style={styles.headerTextStyle}>{'Mobile'}</Text>
                                     <Text style={phoneNo ? [styles.subHeaderTextStyle] : [styles.subHeaderTextStyle, { color: 'grey' }]}>{phoneNo ? phoneNo : '------'}</Text>
                                 </View>
-                                <View style={{ justifyContent: 'center' }}>
-                                    <Image source={require("./../../../assets/images/otherImages/svg/editImg.svg")} style={{ width: wp('5%'), height: hp('5%'), resizeMode: 'contain' }} />
+                                <View style={{ justifyContent: 'center',width: wp('10%'), height: hp('10%') }}>
+                                    <EditImg width={wp('5%')} height={hp('5%')}/>
                                 </View>
                             </View>
 
@@ -166,7 +167,7 @@ const AccountInfoUi = ({ route, ...props }) => {
                                     <Text style={styles.subHeaderTextStyle}>{'------'}</Text>
                                 </View>
                                 <View style={{ justifyContent: 'center' }}>
-                                    <Image source={require("./../../../assets/images/otherImages/svg/editImg.svg")} style={{ width: wp('5%'), height: hp('5%'), resizeMode: 'contain' }} />
+                                    <EditImg width={wp('5%')} height={hp('5%')}/>
                                 </View>
                             </View>
 
@@ -180,7 +181,7 @@ const AccountInfoUi = ({ route, ...props }) => {
                                     <Text style={styles.subHeaderTextStyle}>{props.pAddress ? props.pAddress : '------'}</Text>
                                 </View>
                                 <View style={{ justifyContent: 'center' }}>
-                                    <Image source={require("./../../../assets/images/otherImages/svg/editImg.svg")} style={{ width: wp('5%'), height: hp('5%'), resizeMode: 'contain' }} />
+                                    <EditImg width={wp('5%')} height={hp('5%')}/>
                                 </View>
                             </View>
 
@@ -191,10 +192,10 @@ const AccountInfoUi = ({ route, ...props }) => {
                             <View style={{ flexDirection: 'row' ,marginTop: hp('1%')}}>
                                 <View style={[styles.backViewStyle,{minHeight: hp('6%')}]}>
                                     
-                                   <View style={{ flexDirection: 'row',justifyContent:'space-between'}}>
+                                   <View style={{width:wp('85%'), flexDirection: 'row',justifyContent:'space-between'}}>
                                         <Text style={styles.headerTextStyle}>{'Preferences'}</Text>
                                         <View style={{ justifyContent: 'center' }}>
-                                            <Image source={require("./../../../assets/images/otherImages/svg/editImg.svg")} style={{ width: wp('5%'), height: hp('3%'), resizeMode: 'contain' }} />
+                                            <EditImg width={wp('5%')} height={hp('5%')}/>
                                         </View>
                                    </View>
                                     <View style={{justifyContent:'space-between',marginTop: hp('0%')}}>
@@ -219,18 +220,6 @@ const AccountInfoUi = ({ route, ...props }) => {
             </View>
 
         </View>
-
-            {/* <View style={CommonStyles.bottomViewComponentStyle}>
-                <BottomComponent
-                    rightBtnTitle={'LOG OUT'}
-                    leftBtnTitle={'DELETE ACCOUNT'}
-                    rigthBtnState={true}
-                    isLeftBtnEnable={true}
-                    isRightBtnEnable={true}
-                    rightButtonAction={async () => rightButtonAction()}
-                    leftButtonAction={async () => deleteAccountAction()}
-                ></BottomComponent>
-            </View> */}
 
             <View style={[CommonStyles.bottomViewComponentStyle,{height: (props.clientId && props.clientId > 0 ) || (props.roleName === "External Vet Technician" || props.roleName === "Hill's Vet Technician") ? hp('25%') : hp('13%')}]}>
                 <BottomComponent

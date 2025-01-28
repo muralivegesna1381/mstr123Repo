@@ -2,21 +2,20 @@ import React, { useState, useEffect,useRef } from 'react';
 import {View,BackHandler} from 'react-native';
 import * as internetCheck from "./../../utils/internetCheck/internetCheck";
 import * as Constant from "./../../utils/constants/constant";
-import { useMutation } from "@apollo/react-hooks";
-import * as Queries from "./../../config/apollo/queries";
 import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
 import SendFeedbackUI from './sendFeedbackUI';
 import DeviceInfo from 'react-native-device-info';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
 
 let trace_in_SendFeedback_Screen;
 let trace_Submit_Feedback_Details_Api_Complete;
 let popId = 0;
 
 const  SendFeedbackComponent = ({navigation, route, ...props }) => {
-
-    const [sendFeedbackRequest,{loading: sendFeedbackLoading, error: sendFeedbackError, data: sendFeedbackData,}] = useMutation(Queries.SEND_FEEDBACK);
 
     const [isPopUp, set_isPopUp] = useState(false);
     const [popUpMessage, set_popUpMessage] = useState(undefined);
@@ -67,64 +66,36 @@ const  SendFeedbackComponent = ({navigation, route, ...props }) => {
     //setting firebase helper
     useEffect(() => {
 
-        sendFeedbackSessionStart();
-        firebaseHelper.reportScreen(firebaseHelper.screen_send_feedback);   
-        firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_send_feedback, "User in Send Feedback Screen", ''); 
-        set_deviceModel(DeviceInfo.getModel());
-        set_feedBackScreensData(feedBackScreensData.sort());
-        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+      sendFeedbackSessionStart();
+      firebaseHelper.reportScreen(firebaseHelper.screen_send_feedback);   
+      firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_send_feedback, "User in Send Feedback Screen", ''); 
+      set_deviceModel(DeviceInfo.getModel());
+      set_feedBackScreensData(feedBackScreensData.sort());
+      BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
      
-         return () => {
-            sendFeedbackSessionStop();
-            BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
-         };
+      return () => {
+        sendFeedbackSessionStop();
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+      };
 
     } , []);
 
-    // Responce after submitting the Feedback from the user
-    useEffect(() => {
-
-          if(sendFeedbackData){
-            // firebaseHelper.logEvent(firebaseHelper.event_send_feedback_details_api_success, firebaseHelper.screen_send_feedback, "Send Feedback details API success", '');
-            stopFBTraceSubmitFeedbackByPetParent();
-            set_isLoading(false);
-            isLoadingdRef.current = 0;
-            if(sendFeedbackData.sendFeedback.success){
-              createPopup(true,Constant.ALERT_INFO,'Your feedback has been submitted successfully',1,1);
-              
-            }else{ 
-                createPopup(true,Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,1,0);                    
-            }
-            
-          }
-    
-          if(sendFeedbackError) {
-            firebaseHelper.logEvent(firebaseHelper.event_send_feedback_details_api_failure, firebaseHelper.screen_send_feedback, "Send Feedback details API failed", ''+sendFeedbackError);
-            stopFBTraceSubmitFeedbackByPetParent();
-            set_isLoading(false);
-            isLoadingdRef.current = 0;
-            set_loaderMsg(undefined);
-            createPopup(true,Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,1,0);
-          }
-    
-    }, [sendFeedbackLoading, sendFeedbackError, sendFeedbackData]);
-
     const handleBackButtonClick = () => {
-        navigateToPrevious();
-        return true;
+      navigateToPrevious();
+      return true;
     };
 
     const sendFeedbackSessionStart = async () => {
-        trace_in_SendFeedback_Screen = await perf().startTrace('t_Send_Feedback_Screen');
-      };
+      trace_in_SendFeedback_Screen = await perf().startTrace('t_Send_Feedback_Screen');
+    };
     
-      const sendFeedbackSessionStop = async () => {
-        await trace_in_SendFeedback_Screen.stop();
-      };
+    const sendFeedbackSessionStop = async () => {
+      await trace_in_SendFeedback_Screen.stop();
+    };
   
-      const stopFBTraceSubmitFeedbackByPetParent = async () => {
-        await trace_Submit_Feedback_Details_Api_Complete.stop();
-      };
+    const stopFBTraceSubmitFeedbackByPetParent = async () => {
+      await trace_Submit_Feedback_Details_Api_Complete.stop();
+    };
 
     // API to submit the feedback
     const submitAction = async (fText,item) => {
@@ -143,8 +114,7 @@ const  SendFeedbackComponent = ({navigation, route, ...props }) => {
             isLoadingdRef.current = 1;
             set_loaderMsg(Constant.LOADER_WAIT_MESSAGE);
             let client = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-            let defaultPetObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-            defaultPetObj = JSON.parse(defaultPetObj);
+            let defaultPetObj = AppPetsData.petsData.defaultPet;
 
             let json = {
                 ClientID: ""+client,//parseInt(client),
@@ -155,11 +125,35 @@ const  SendFeedbackComponent = ({navigation, route, ...props }) => {
             };
             firebaseHelper.logEvent(firebaseHelper.event_send_feedback_details_api, firebaseHelper.screen_send_feedback, "Send Feedback details API Initiated", 'Client Id : '+client ? client : '');
             trace_Submit_Feedback_Details_Api_Complete = await perf().startTrace('t_Submit_Feedback_Details_Api');
-            await sendFeedbackRequest({ variables: { input: json } });
-
+            submitFeedback(json)
         }        
         
     };
+
+    const submitFeedback = async (json) => {
+
+      let apiMethod = apiMethodManager.SUBMIT_FEEDBACK;
+      let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      stopFBTraceSubmitFeedbackByPetParent();
+
+      if(apiService && apiService.data && apiService.status) {
+        createPopup(true,Constant.ALERT_INFO,'Your feedback has been submitted successfully',1,1);
+      } else if(apiService && apiService.isInternet === false) {
+        createPopup(true,Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,1,0);
+        return;
+
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+        createPopup(true,Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,1,0);
+        firebaseHelper.logEvent(firebaseHelper.event_send_feedback_details_api_failure, firebaseHelper.screen_send_feedback, "Send Feedback details API failed", ''+apiService.error.errorMsg);
+          
+      } else {
+        createPopup(true,Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,1,0);  
+        firebaseHelper.logEvent(firebaseHelper.event_send_feedback_details_api_failure, firebaseHelper.screen_send_feedback, "Send Feedback details API failed", 'error : '+'Status Failed');
+        
+      }
+    }
 
     // Navigate to previous screen
     const navigateToPrevious = () => { 

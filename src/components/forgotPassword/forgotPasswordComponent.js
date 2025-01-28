@@ -4,10 +4,11 @@ import ForgotPasswordUi from "./forgotPasswordUi";
 import * as Constant from "./../../utils/constants/constant";
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
 import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as clearAPIDAta from './../../utils/dataComponent/savedAPIData.js';
 
 let trace_inForgotPasswordcreen;
 let trace_Forgot_Password_API_Complete;
@@ -70,10 +71,6 @@ const ForgotPasswordComponent = ({ navigation, route, ...props }) => {
         await trace_inForgotPasswordcreen.stop();
     };
 
-    const fpSessionStop = async () => {
-        await trace_Forgot_Password_API_Complete.stop();
-    };
-
     // navigate back to the screen from where this screen is called
     const navigateToPrevious = async () => {
 
@@ -110,7 +107,7 @@ const ForgotPasswordComponent = ({ navigation, route, ...props }) => {
         let json = {
             Email: email,
         };
-        trace_Forgot_Password_API_Complete = await perf().startTrace('t_Forgot_Password_API');
+        // trace_Forgot_Password_API_Complete = await perf().startTrace('t_Forgot_Password_API');
         forgotPSWDRequest(json,token,email);
     };
 
@@ -122,33 +119,36 @@ const ForgotPasswordComponent = ({ navigation, route, ...props }) => {
      */
     const forgotPSWDRequest = async (json,token,email) => {
 
-        let fPSWDServiceObj = await ServiceCalls.forgotPasswordValidateEmail(json,token);
-        fpSessionStop();
+        let apiMethod = apiMethodManager.FORGOT_PASSWORD;
+        let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED);
         set_isLoading(false);
         isLoadingdRef.current = 0;
-        if(fPSWDServiceObj && fPSWDServiceObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
         
-        if(fPSWDServiceObj && !fPSWDServiceObj.isInternet){
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+        
+            if (apiService.data.Key) {
+                navigation.navigate('OTPComponent', { isFromScreen: 'forgotPassword', eMailValue: email });
+            } else if (apiService.data.Value && apiService.data.Value !== '') {
+                createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.data.Value,true); 
+            } else {
+                createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true); 
+                firebaseHelper.logEvent(firebaseHelper.event_forgot_password_api_fail, firebaseHelper.screen_forgrotPassword, "Forgot passwoed Api Failed - wrong emailid", 'Email : ' + eMail);
+            }
+          
+        } else if(apiService && apiService.isInternet === false) {
+
             createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
             return;
-        }
 
-        if(fPSWDServiceObj && fPSWDServiceObj.statusData){
-            navigation.navigate('OTPComponent', { isFromScreen: 'forgotPassword', eMailValue: email });
-        } else if(fPSWDServiceObj && fPSWDServiceObj.responseData){
-            createPopup(Constant.ALERT_DEFAULT_TITLE,fPSWDServiceObj.responseData,true); 
-        }else {
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true); 
+            firebaseHelper.logEvent(firebaseHelper.event_forgot_password_api_fail, firebaseHelper.screen_forgrotPassword, "Forgot passwoed Api Failed", 'error : ' + apiService.error.errorMsg);
+            
+        } else {
             createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true); 
             firebaseHelper.logEvent(firebaseHelper.event_forgot_password_api_fail, firebaseHelper.screen_forgrotPassword, "Forgot passwoed Api Failed - wrong emailid", 'Email : ' + eMail);
-        }
 
-        if(fPSWDServiceObj && fPSWDServiceObj.error) {
-            firebaseHelper.logEvent(firebaseHelper.event_forgot_password_api_fail, firebaseHelper.screen_forgrotPassword, "Forgot passwoed Api Failed", 'Email : ' + eMail);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true); 
         }
 
     };

@@ -5,8 +5,9 @@ import * as Constant from "./../../utils/constants/constant";
 import * as DataStorageLocal from './../../utils/storage/dataStorageLocal';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
 
 const  EatingEnthusiasticComponent = ({navigation, route, ...props }) => {
 
@@ -51,8 +52,8 @@ const  EatingEnthusiasticComponent = ({navigation, route, ...props }) => {
     }, []);
 
     const getDefaultPet = async () => {
-        let defaultPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        defaultPet = JSON.parse(defaultPet);
+
+        let defaultPet = AppPetsData.petsData.defaultPet;
         if(defaultPet){
             set_specieId(defaultPet.speciesId);
             set_isLoading(true);
@@ -71,40 +72,33 @@ const  EatingEnthusiasticComponent = ({navigation, route, ...props }) => {
 
     const getPetEatingEnthusiasmScale = async (sID) => {
 
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let getEnthusiasmServiceObj = await ServiceCalls.getPetEatingEnthusiasmScale(sID,token);
+        let apiMethod = apiMethodManager.GET_EATING_ENTHUSIASMSCALE + sID;
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
-        isLoadingdRef.current = 0;
+        isLoadingdRef.current = 0; 
         stopFBTraceGetScale();
-
-        if(getEnthusiasmServiceObj && getEnthusiasmServiceObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
         
-        if(getEnthusiasmServiceObj && !getEnthusiasmServiceObj.isInternet){
-            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
-            return;
-        }
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
 
-        if(getEnthusiasmServiceObj && getEnthusiasmServiceObj.statusData){
-
-            if(getEnthusiasmServiceObj.responseData && getEnthusiasmServiceObj.responseData.length > 0){
-                set_eatingEntArray(getEnthusiasmServiceObj.responseData);
+            if(apiService.data.eatingEnthusiasmScales && apiService.data.eatingEnthusiasmScales.length > 0){
+                set_eatingEntArray(apiService.data.eatingEnthusiasmScales);
             } else {
                 set_eatingEntArray([]);
             }
-        
+            
+        } else if(apiService && apiService.isInternet === false) {
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
+                    
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);
+            firebaseHelper.logEvent(firebaseHelper.event_get_pet_eating_enthusiasm_scale_api_failure, firebaseHelper.screen_eating_enthusiasm, "Get eating enthusiasm scale api failed", 'error : ', apiService.error.errorMsg);
+            
+        } else if(apiService && apiService.logoutError !== null) {            
         } else {
-            firebaseHelper.logEvent(firebaseHelper.event_get_pet_eating_enthusiasm_scale_api_failure, firebaseHelper.screen_eating_enthusiasm, "Get eating enthusiasm scale api failed", 'Service Status : false');
+
             createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-        }
-    
-        if(getEnthusiasmServiceObj && getEnthusiasmServiceObj.error) {
-            let errors = getEnthusiasmServiceObj.error.length > 0 ? getEnthusiasmServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_get_pet_eating_enthusiasm_scale_api_failure, firebaseHelper.screen_eating_enthusiasm, "Get eating enthusiasm scale api failed", 'error : ', errors);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+            firebaseHelper.logEvent(firebaseHelper.event_get_pet_eating_enthusiasm_scale_api_failure, firebaseHelper.screen_eating_enthusiasm, "Get eating enthusiasm scale api failed", 'error : ', 'Status Failed');
+
         }
 
     };

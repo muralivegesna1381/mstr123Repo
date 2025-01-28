@@ -14,6 +14,11 @@ import PushNotification from "react-native-push-notification";
 import * as PermissionsiOS from './../../utils/permissionsComponents/permissionsiOS';
 import Highlighter from "react-native-highlight-words";
 import * as CheckPermissionsAndroid from './../../utils/permissionsComponents/permissionsAndroid';
+import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
+import * as ObservationModel from "./../../components/observationsJournal/observationModel/observationModel.js";
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as clearAppDataModel from "./../../utils/appDataModels/clearAppDataModel.js";
 
 const  DasBoardComponent = ({route, ...props }) => {
 
@@ -61,10 +66,13 @@ const  DasBoardComponent = ({route, ...props }) => {
     React.useEffect(() => {
 
       removeNotifications();
+      autoNavigateNotifications();
       if(Platform.OS==='android'){
         requestStoragePermission();
+
+        requestNotificationPermission()
       } 
-      //Logging out Zendesk from here
+      // Logging out Zendesk from here
       // Calling android method from here for Zendesk logout
       if(Platform.OS === 'android') { 
         NativeModules.ZendeskChatModule.logOutFromZendeskWindow("logout" ,(convertedVal) => {
@@ -73,16 +81,20 @@ const  DasBoardComponent = ({route, ...props }) => {
       }
       // Calling iOS method from here for Zendesk logout
       else{
-        NativeModules.ZendeskChatbot.logOutFromZendeskMessagingWindow( "logout", (value) => {
-           //handle callback if needed
-        });
+
+        if(NativeModules.ZendeskChatbot && NativeModules.ZendeskChatbot.logOutFromZendeskMessagingWindow) {
+          NativeModules.ZendeskChatbot.logOutFromZendeskMessagingWindow( "logout", (value) => {
+            //handle callback if needed
+         });
+        }
+        
       }   
 
     }, []);
 
     useEffect(() => {
 
-      if(timerWidgetNavigationData && timerWidgetNavigationData.data.__typename === 'DashboardTimerWidget' && timerWidgetNavigationData.data.timerStatus==='StopTimer'){
+      if(timerWidgetNavigationData && timerWidgetNavigationData.data.__typename === 'DashboardTimerWidget' && timerWidgetNavigationData.data.timerStatus){
         updateTimer('Settings','Continue');
         props.setTimerValue(false);
       }
@@ -99,15 +111,16 @@ const  DasBoardComponent = ({route, ...props }) => {
         props.removeItems();
         props.clearObjects(); 
         AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
+        // navigation.navigate('WelcomeComponent');
+        navigation.navigate('LoginComponent',{"isAuthEnabled" : false}); 
       }
 
     }, [logoutNaviData]);
 
     useEffect(() => {
-      if (uploadDashboardData && uploadDashboardData.data.__typename === 'UpdateDashboardData' && uploadDashboardData.data.isRefresh === 'refresh') {
+      if (uploadDashboardData && uploadDashboardData.data.__typename === 'UpdateDashboardData' && uploadDashboardData.data.data === 'refresh') {
         props.refreshPT();
-      } else if (uploadDashboardData && uploadDashboardData.data.__typename === 'UpdateDashboardData' && uploadDashboardData.data.isRefresh === 'refreshModularity') {
+      } else if (uploadDashboardData && uploadDashboardData.data.__typename === 'UpdateDashboardData' && uploadDashboardData.data.data === 'refreshModularity') {
         props.updateModularitySetupDone();
       }
     }, [uploadDashboardData]);
@@ -286,6 +299,25 @@ const  DasBoardComponent = ({route, ...props }) => {
       } catch (err) {
       }
     };
+  
+    const requestNotificationPermission = async () => {
+      if (Platform.OS === 'android' && Platform.Version >= 33) {
+        try {
+          const result = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+          );
+          if (result === PermissionsAndroid.RESULTS.GRANTED) {
+            return true;
+          } else {
+            createPopup('Notification Permission Required', 'To receive important updates and notifications, please enable notifications in your app settings.', 'OK', false, true);
+            return false;
+          }
+        } catch (error) {
+          return false;
+        }
+      }
+      return true;
+    };
 
     const removeNotifications = () => {
       PushNotification.setApplicationIconBadgeNumber(0);
@@ -303,7 +335,7 @@ const  DasBoardComponent = ({route, ...props }) => {
       } else {
           props.clearObjects();
           updateTimer('Settings','Continue');
-          navigation.navigate('MenuComponent',{deviceType:props.defaultPetObj && props.defaultPetObj.devices.length > 0 ? props.defaultPetObj.devices[0].deviceModel : '', isConfigured:props.defaultPetObj && props.defaultPetObj.devices.length > 0 ? (props.defaultPetObj.devices[0].isDeviceSetupDone ? 'SetupDone' : 'SetupPending') : undefined});
+          navigation.navigate('MenuComponent',{deviceType:AppPetsData.petsData.defaultPet && AppPetsData.petsData.defaultPet.devices.length > 0 && AppPetsData.petsData.defaultPet.devices[0].deviceModel ? AppPetsData.petsData.defaultPet.devices[0].deviceModel : '', isConfigured:AppPetsData.petsData.defaultPet && AppPetsData.petsData.defaultPet.devices.length > 0 && AppPetsData.petsData.defaultPet.devices[0].isDeviceSetupDone ? 'SetupDone' : 'SetupPending'});
       }
     };
 
@@ -320,7 +352,7 @@ const  DasBoardComponent = ({route, ...props }) => {
     };
 
     const refreshDashBoardDetails = async (value,pObject) => {
-      await DataStorageLocal.saveDataToAsync(Constant.DEFAULT_PET_OBJECT,JSON.stringify(pObject));
+      AppPetsData.petsData.defaultPet = pObject;
       props.refreshDashBoardDetails(value,pObject);
     };
 
@@ -395,10 +427,12 @@ const  DasBoardComponent = ({route, ...props }) => {
           }
 
         } else if(value === 'Support'){
+
           props.clearObjects();
           updateTimer('Support','Continue');
           firebaseHelper.logEvent(firebaseHelper.event_dashboard_Support, firebaseHelper.screen_dashboard, "Support button clicked", "Internet Status: " + internet.toString());
           navigation.navigate('SupportComponent',{isFrom:'Dashboard'});
+
         } else if (value === 'Chat'){
           /*
           * Zendesk is implemented in native android and iOS. Based on platform that is using the app
@@ -406,16 +440,16 @@ const  DasBoardComponent = ({route, ...props }) => {
           * For android we call the launchZendeskChatWindow method and for iOS we call launchZendeskMessagingWindow
           */
           if(Platform.OS === 'android') {
-                NativeModules.ZendeskChatModule.launchZendeskChatWindow("chatstart" ,(convertedVal) => {
-                  //callback can be handled here
-          });
-        }
-        else{
-          NativeModules.ZendeskChatbot.launchZendeskMessagingWindow( "chatstart", (value) => {
-            //callback can be handled here
-             });
-        }
-         updateTimer('Chatboat','Continue');
+            NativeModules.ZendeskChatModule.launchZendeskChatWindow("chatstart" ,(convertedVal) => {
+              //callback can be handled here
+            });
+          }
+          else{
+            NativeModules.ZendeskChatbot.launchZendeskMessagingWindow( "chatstart", (value) => {
+              //callback can be handled here
+            });
+          }
+          updateTimer('Chatboat','Continue');
           //navigation.navigate('ChatBotComponent');
         }
             
@@ -433,8 +467,11 @@ const  DasBoardComponent = ({route, ...props }) => {
       } else {
         updateTimer('Timer','Stop');
         props.clearObjects();
-        await DataStorageLocal.saveDataToAsync(Constant.TIMER_SELECTED_PET, JSON.stringify(props.defaultPetObj));
-        await DataStorageLocal.saveDataToAsync(Constant.TIMER_PETS_ARRAY, JSON.stringify(props.timePetsArray));
+        // getFeedbackQuestionnaire();
+        await DataStorageLocal.saveDataToAsync(Constant.TIMER_SELECTED_PET, JSON.stringify(AppPetsData.petsData.defaultPet));
+        if(props.timePetsArray) {
+          await DataStorageLocal.saveDataToAsync(Constant.TIMER_PETS_ARRAY, JSON.stringify(props.timePetsArray));
+        }
         Apolloclient.client.writeQuery({query: Queries.TIMER_START_QUERY,data: {data: {timerStart:'',__typename: 'TimerStartQuery'}},});
         navigation.navigate('TimerComponent',{isFrom:'Dashboard'});           
       } 
@@ -449,25 +486,36 @@ const  DasBoardComponent = ({route, ...props }) => {
       if(!internet){
         createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
       } else {
-        let obsObj = {
-          selectedPet : props.defaultPetObj, 
-          obsText : '', 
-          obserItem : '', 
-          selectedDate : '', 
-          imagePath : '', 
-          videoPath: '',
-          imgName : '',
-          videoName : '',
-          thumbnailImage : '',
-          fromScreen : 'quickVideo',
-          isPets : false, 
+        
+        await clearAppDataModel.clearObservationData();
+        let obj = {
+          "selectedPet" : Object, 
+          "fromScreen" : String, 
+          "isPets" : Boolean, 
+          "isEdit" : Boolean,
+          "obsText" : String,
+          "obserItem" : Object,
+          "selectedDate" : String,
+          "mediaArray" : Array,
+          "behaviourItem" : Object,
+          "observationId" : Number,
+          "ctgNameId" : Number,
+          "ctgName" : String,
+          "quickVideoFileName" : String
         }
+        ObservationModel.observationData = obj;
+        ObservationModel.observationData.selectedPet = AppPetsData.petsData.defaultPet;
+        ObservationModel.observationData.selectedDate = new Date();
+        ObservationModel.observationData.fromScreen = 'quickVideo';
 
-        await DataStorageLocal.saveDataToAsync(Constant.OBSERVATION_DATA_OBJ,JSON.stringify(obsObj));
+
         props.clearObjects();
         updateTimer('Observations','Continue');
-        await DataStorageLocal.saveDataToAsync(Constant.OBS_SELECTED_PET, JSON.stringify(props.defaultPetObj));
+        
+        await DataStorageLocal.removeDataFromAsync(Constant.DELETE_MEDIA_RECORDS);
+        await DataStorageLocal.saveDataToAsync(Constant.OBS_SELECTED_PET, JSON.stringify(AppPetsData.petsData.defaultPet));
         navigation.navigate('QuickVideoComponent');
+        
       }
       
     };
@@ -496,57 +544,9 @@ const  DasBoardComponent = ({route, ...props }) => {
         updateTimer('Sensor','Continue');
         props.clearObjects();
         await DataStorageLocal.saveDataToAsync(Constant.SENOSR_INDEX_VALUE, ""+0);
-        navigation.navigate('SensorInitialComponent',{defaultPetObj:props.defaultPetObj});
+        navigation.navigate('SensorInitialComponent',{defaultPetObj:AppPetsData.petsData.defaultPet});
       }
       
-    };
-
-    // Edit Weight button action
-    const weightAction = async () => {
-
-      ptDropAction();
-      let internet = await internetCheck.internetCheck();
-      firebaseHelper.logEvent(firebaseHelper.event_dashboard_editpet, firebaseHelper.screen_dashboard, "Edit pet button clicked", "Internet Status: " + internet.toString());
-      if(!internet){
-        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true); 
-      } else {
-        updateTimer('WeighAction','Continue');
-        props.clearObjects();
-        navigation.navigate('PetWeightHistoryComponent',{petObject:props.defaultPetObj,petWeightUnit:props.petWeightUnit});
-      }
-    };
-
-    // EnthusiasticAction button action
-    const enthusiasticAction = async () => {
-
-      ptDropAction();
-      await DataStorageLocal.removeDataFromAsync(Constant.EATINGENTUSIASTIC_DATA_OBJ);
-      let internet = await internetCheck.internetCheck();
-      firebaseHelper.logEvent(firebaseHelper.event_dashboard_enthusiasm, firebaseHelper.screen_dashboard, "Eating Enthusiasm button clicked", "Internet Status: " + internet.toString());
-      if(!internet){
-        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
-      } else {
-        props.clearObjects();
-        updateTimer('EatingEnthusiasticComponent','Continue');
-        navigation.navigate('EatingEnthusiasticComponent');
-      }
-
-    };
-
-    // Imagebase scoring button action
-    const imageScoreAction = async () => {
-
-      ptDropAction();
-      let internet = await internetCheck.internetCheck();
-      firebaseHelper.logEvent(firebaseHelper.event_dashboard_imageScoring, firebaseHelper.screen_dashboard, "ImageScoring button clicked", "Internet Status: " + internet.toString());
-      if(!internet){
-        createPopup();
-      } else {
-        props.clearObjects();
-        updateTimer('SelectBSCScoringComponent','Continue');
-        navigation.navigate('SelectBSCScoringComponent');
-      }
-
     };
 
     // Questionnaire button action
@@ -567,7 +567,7 @@ const  DasBoardComponent = ({route, ...props }) => {
 
           let isTrue = false;
           for (let i = 0; i < selectedQuest.length ; i++) {
-            if(selectedQuest[i].petId === props.defaultPetObj.petID && selectedQuest[i].questId === questId) {           
+            if(selectedQuest[i].petId ===AppPetsData.petsData.defaultPet.petID && selectedQuest[i].questId === questId) {           
               isTrue = true;
             } 
           }
@@ -575,19 +575,19 @@ const  DasBoardComponent = ({route, ...props }) => {
           if(isTrue === false) {
             updateTimer('Questionnaire','Continue');
             props.clearObjects();
-            await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(props.defaultPetObj));
+            await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(AppPetsData.petsData.defaultPet));
             navigation.navigate('QuestionnaireStudyComponent');
-            navigation.navigate('QuestionnaireQuestionsService',{questionObject : item, petObj : props.defaultPetObj});
+            navigation.navigate('QuestionnaireQuestionsService',{questionObject : item, petObj : AppPetsData.petsData.defaultPet});
           } else {
             createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.QUEST_INPROGRESS_MSG,"OK",false,true); 
           }
 
         } else {
           updateTimer('Questionnaire','Continue');
-          await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(props.defaultPetObj));
+          await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringifyAppPetsData.petsData.defaultPet);
           props.clearObjects();
           navigation.navigate('QuestionnaireStudyComponent');
-          navigation.navigate('QuestionnaireQuestionsService',{questionObject : item, petObj : props.defaultPetObj});
+          navigation.navigate('QuestionnaireQuestionsService',{questionObject : item, petObj : AppPetsData.petsData.defaultPet});
         }
       }
     };
@@ -603,7 +603,7 @@ const  DasBoardComponent = ({route, ...props }) => {
       } else {
         updateTimer('Questionnaire','Continue');
         props.clearObjects();
-        await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(props.defaultPetObj));
+        await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(AppPetsData.petsData.defaultPet));
         navigation.navigate('QuestionnaireStudyComponent',{isFrom:'Dashboard'});
       }
 
@@ -611,7 +611,6 @@ const  DasBoardComponent = ({route, ...props }) => {
 
      // Navigation to Timer logs when Timer widget is enabled on the dashboard
      const navigateToTimerLogs = async () => {
-
       ptDropAction();
       firebaseHelper.logEvent(firebaseHelper.event_dashboard_timer_widget, firebaseHelper.screen_dashboard, "Timerlogs button in Widget clicked", "Internet Status: ");
       updateTimer('Settings','Continue');
@@ -633,26 +632,27 @@ const  DasBoardComponent = ({route, ...props }) => {
 
         updateTimer('Settings','Continue');
         props.clearObjects();
-
+        let defaultPet = AppPetsData.petsData.defaultPet;
+        await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(defaultPet));
         if(value === 17){
           firebaseHelper.logEvent(firebaseHelper.event_dashboard_sensor_setup, firebaseHelper.screen_dashboard, "Adding a Device button clicked", "Device Missing");
-          navigation.navigate('DeviceTutorialComponent',{value:'AddDevice', petName : props.defaultPetObj.petName,id:value});
+          navigation.navigate('DeviceTutorialComponent',{value:'AddDevice', petName : AppPetsData.petsData.defaultPet.petName,id:value});
         }else if(value === 16){
           firebaseHelper.logEvent(firebaseHelper.event_dashboard_sensor_setup, firebaseHelper.screen_dashboard, "Complete Setup button clicked", "Setup Pending");
           let objTemp = undefined;
           let index=0;
-          for (let i = 0; i < props.defaultPetObj.devices.length; i++){
-            if(props.defaultPetObj.devices[i].isDeviceSetupDone && index===0){
+          for (let i = 0; i < AppPetsData.petsData.defaultPet.devices.length; i++){
+            if(AppPetsData.petsData.defaultPet.devices[i].isDeviceSetupDone && index===0){
               index=index+1;
-              objTemp = props.defaultPetObj.devices[i];
+              objTemp = AppPetsData.petsData.defaultPet.devices[i];
             } 
           }
 
-          if(props.defaultPetObj && props.defaultPetObj.devices.length>0){
+          if(AppPetsData.petsData.defaultPet && AppPetsData.petsData.defaultPet.devices.length>0){
 
-            for(let i = 0; i < props.defaultPetObj.devices.length; i++){
-              if(props.defaultPetObj.devices[i].deviceNumber && props.defaultPetObj.devices[i].deviceNumber!==''){
-                if(props.defaultPetObj.devices[i].deviceModel && props.defaultPetObj.devices[i].deviceModel.includes('HPN1')){
+            for(let i = 0; i < AppPetsData.petsData.defaultPet.devices.length; i++){
+              if(AppPetsData.petsData.defaultPet.devices[i].deviceNumber && AppPetsData.petsData.defaultPet.devices[i].deviceNumber!==''){
+                if(AppPetsData.petsData.defaultPet.devices[i].deviceModel && AppPetsData.petsData.defaultPet.devices[i].deviceModel.includes('HPN1')){
                   await DataStorageLocal.saveDataToAsync(Constant.SENOSR_INDEX_VALUE,""+i);
                 } else {
                   await DataStorageLocal.saveDataToAsync(Constant.SENOSR_INDEX_VALUE,""+i);
@@ -669,7 +669,7 @@ const  DasBoardComponent = ({route, ...props }) => {
               await DataStorageLocal.saveDataToAsync(Constant.SENSOR_TYPE_CONFIGURATION,'Sensor');
             }
           } else {
-            if(props.defaultPetObj.devices[0].deviceModel && props.defaultPetObj.devices[0].deviceModel.includes("HPN1")){
+            if(AppPetsData.petsData.defaultPet.devices[0].deviceModel && AppPetsData.petsData.defaultPet.devices[0].deviceModel.includes("HPN1")){
               await DataStorageLocal.saveDataToAsync(Constant.SENSOR_TYPE_CONFIGURATION,'HPN1Sensor');
             } else {
               await DataStorageLocal.saveDataToAsync(Constant.SENSOR_TYPE_CONFIGURATION,'Sensor');
@@ -677,25 +677,25 @@ const  DasBoardComponent = ({route, ...props }) => {
           }
 
             let devObj = {
-              pObj : props.defaultPetObj, 
-              petItemObj : props.defaultPetObj.devices[0],
+              pObj : AppPetsData.petsData.defaultPet, 
+              petItemObj : AppPetsData.petsData.defaultPet.devices[0],
               actionType : 2,
               isReplaceSensor : 0,
               isForceSync : 0,
               syncDeviceNo : '',
               syncDeviceModel : '',
-              configDeviceNo: props.defaultPetObj.devices[0].deviceNumber,
-              configDeviceModel : props.defaultPetObj.devices[0].deviceModel,
+              configDeviceNo: AppPetsData.petsData.defaultPet.devices[0].deviceNumber,
+              configDeviceModel : AppPetsData.petsData.defaultPet.devices[0].deviceModel,
               reasonId : '',
-              petName : props.defaultPetObj.petName,
-              deviceNo : props.defaultPetObj.devices[0].deviceNumber,
-              isDeviceSetupDone : props.defaultPetObj.devices[0].isDeviceSetupDone,
-              petID: props.defaultPetObj.petID,
-              isFirmwareReq : props.defaultPetObj.devices[0].isFirmwareVersionUpdateRequired
+              petName : AppPetsData.petsData.defaultPet.petName,
+              deviceNo : AppPetsData.petsData.defaultPet.devices[0].deviceNumber,
+              isDeviceSetupDone : AppPetsData.petsData.defaultPet.devices[0].isDeviceSetupDone,
+              petID: AppPetsData.petsData.defaultPet.petID,
+              isFirmwareReq : AppPetsData.petsData.defaultPet.devices[0].isFirmwareVersionUpdateRequired
             }
         
             await DataStorageLocal.saveDataToAsync(Constant.CONFIG_SENSOR_OBJ, JSON.stringify(devObj));
-            navigation.navigate('DeviceTutorialComponent', { value:'SetupPending',defaultPetObj: props.defaultPetObj,id:value });
+            navigation.navigate('DeviceTutorialComponent', { value:'SetupPending',defaultPetObj: AppPetsData.petsData.defaultPet,id:value });
 
         } else if(value==='ONBOARD YOUR PET'){
           firebaseHelper.logEvent(firebaseHelper.event_dashboard_onBoaring, firebaseHelper.screen_dashboard, "Onboard your Pet button clicked", "New User");
@@ -786,7 +786,7 @@ const  DasBoardComponent = ({route, ...props }) => {
 
     // Default pet selection function
     const selectedPetAction = async (item) => {
-      await DataStorageLocal.saveDataToAsync(Constant.DEFAULT_PET_OBJECT,JSON.stringify(item));
+      AppPetsData.petsData.defaultPet = item;
       props.selectedPetAction(item);
     };
 
@@ -839,7 +839,7 @@ const  DasBoardComponent = ({route, ...props }) => {
         } else if(item.action === 'Pet Weight') {
 
           updateTimer('WeighAction','Continue');
-          navigation.navigate('PetWeightHistoryComponent',{petObject:props.defaultPetObj,petWeightUnit:props.petWeightUnit});
+          navigation.navigate('PetWeightHistoryComponent',{petObject:AppPetsData.petsData.defaultPet,petWeightUnit:props.petWeightUnit});
 
         }
         
@@ -859,11 +859,11 @@ const  DasBoardComponent = ({route, ...props }) => {
         props.clearObjects();
         let fhPets = await DataStorageLocal.getDataFromAsync(Constant.FH_PETS_ARRAY);
         fhPets = JSON.parse(fhPets);
-        navigation.navigate("FoodHistoryPetSelectionComponent",{petsArray:fhPets,defaultPetObj:props.defaultPetObj});
+        navigation.navigate("FoodHistoryPetSelectionComponent",{petsArray:fhPets,defaultPetObj:AppPetsData.petsData.defaultPet});
       }
     };
 
-    const goalSetAction = async (value) => {
+    const goalSetAction = async () => {
       
       ptDropAction();
       let internet = await internetCheck.internetCheck();
@@ -873,7 +873,7 @@ const  DasBoardComponent = ({route, ...props }) => {
       } else {
         updateTimer('GoalSetComponent','Continue');
         props.clearObjects();
-        navigation.navigate('GoalSetComponent',{goalSetValue: props.defaultPetObj.goalDurationInMins === 0 ? 30 : props.defaultPetObj.goalDurationInMins,petObject:props.defaultPetObj});
+        navigation.navigate('GoalSetComponent',{goalSetValue: AppPetsData.petsData.defaultPet.goalDurationInMins === 0 ? 30 : AppPetsData.petsData.defaultPet.goalDurationInMins,petObject:AppPetsData.petsData.defaultPet});
       }
 
     };
@@ -888,7 +888,7 @@ const  DasBoardComponent = ({route, ...props }) => {
       } else {
         updateTimer('GoalSetComponent','Continue');
         props.clearObjects();
-        navigation.navigate('BehaviorVisualizationComponent',{petObject:props.defaultPetObj, behData:props.behVisualData, value:value});
+        navigation.navigate('BehaviorVisualizationComponent',{petObject:AppPetsData.petsData.defaultPet, behData:props.behVisualData, value:value});
       }
     };
 
@@ -896,41 +896,48 @@ const  DasBoardComponent = ({route, ...props }) => {
       setupDeviceAction(value);
     };
 
+    const notificationAction = async () => {
+      // props.notificationAction();
+      ptDropAction();
+      let internet = await internetCheck.internetCheck();
+      // firebaseHelper.logEvent(firebaseHelper.event_dashboard_Goal_Vis, firebaseHelper.screen_dashboard, "Goal Visualization button clicked : ", "Internet Status: " + internet.toString());
+      if(!internet){
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true);
+      } else {
+        updateTimer('GoalSetComponent','Continue');
+        props.clearObjects();
+        navigation.navigate('NotificationsComponent',{isNotificationCount:props.isNotificationCount});
+      }
+
+    };
+
+    const autoNavigateNotifications = async () => {
+      let isNotificationClick = await DataStorageLocal.getDataFromAsync(Constant.IS_FROM_NOTIFICATION);
+      if(isNotificationClick) {
+        navigation.navigate('NotificationsComponent',{});
+      }
+    };
+
     return (
       <>
           <DashBoardUI 
             isLoading = {props.isLoading}
             loaderMsg = {props.loaderMsg}
-            petsArray = {props.petsArray}
-            isFirstUser = {props.isFirstUser}
-            defaultPetObj = {props.defaultPetObj}
+            tempPermissions = {props.tempPermissions}
+            changeInPetObj = {props.changeInPetObj}
             activeSlide = {props.activeSlide}
-            isDeviceMissing = {props.isDeviceMissing}
-            isDeviceSetupDone = {props.isDeviceSetupDone}
             deviceStatusText = {props.deviceStatusText}
             buttonTitle = {props.buttonTitle}
-            isObsEnable = {props.isObsEnable}
-            isTimer = {props.isTimer}
             isModularityService = {props.isModularityService}
-            weight = {props.weight}
-            weightUnit = {props.weightUnit}
-            isEatingEnthusiasm = {props.isEatingEnthusiasm}
-            isImageScoring = {props.isImageScoring}
-            isPetWeight = {props.isPetWeight}
-            isQuestionnaireEnable = {props.isQuestionnaireEnable}
             questionnaireData = {props.questionnaireData}
             isQuestLoading = {props.isQuestLoading}
-            isDeceased = {props.isDeceased}
             supportMetialsArray = {props.supportMetialsArray}
-            devicesCount = {props.devicesCount}
             popUpMessage = {props.popUpMessage}
             popUpAlert = {props.popUpAlert}
             popUpRBtnTitle = {props.popUpRBtnTitle}
             isPopLeft = {props.isPopLeft}
             isPopUp = {props.isPopUp}
             petWeightUnit = {props.petWeightUnit}
-            isPTEnable = {props.isPTEnable}
-            isTimerEnable = {props.isTimerEnable}
             isPTLoading = {props.isPTLoading}
             campagainName = {props.campagainName}
             campagainArray = {props.campagainArray}
@@ -942,9 +949,7 @@ const  DasBoardComponent = ({route, ...props }) => {
             questionnaireDataLength = {props.questionnaireDataLength}
             firstName = {props.firstName}
             secondName = {props.secondName}
-            supportID = {props.supportID}
-            supportDMissingArray = {props.supportDMissingArray}
-            supportSPendingArray = {props.supportSPendingArray}
+            petType = {props.petType}
             uploadStatus = {uploadStatus}
             observationText = {observationText}
             fileName = {fileName}
@@ -979,14 +984,8 @@ const  DasBoardComponent = ({route, ...props }) => {
             obsVideoUploadProgress = {obsVideoUploadProgress}
             obsVideoProgressTxt = {obsVideoProgressTxt}
             obsVideoInternetType = {obsVideoInternetType}
-            devModel = {props.devModel}
-            isFmGoalSet = {props.isFmGoalSet}
-            isFmGraph = {props.isFmGraph}
-            isWeightPer = {props.isWeightPer}
-            isFoodHistory = {props.isFoodHistory}
-            isFeedingReq = {props.isFeedingReq}
-            isSleepGraph = {props.isSleepGraph}
             foodHistoryObj = {props.foodHistoryObj}
+            isNotificationCount = {props.isNotificationCount}
             refreshDashBoardDetails = {refreshDashBoardDetails}
             popOkBtnAction = {popOkBtnAction}
             popCancelBtnAction = {popCancelBtnAction}
@@ -994,9 +993,6 @@ const  DasBoardComponent = ({route, ...props }) => {
             quickSetupAction = {quickSetupAction}
             editPetAction = {editPetAction}
             firmwareUpdateAction = {firmwareUpdateAction}
-            // weightAction = {weightAction}
-            // enthusiasticAction = {enthusiasticAction}
-            // imageScoreAction = {imageScoreAction}
             quickQuestionAction = {quickQuestionAction}
             quickQuestionnaireAction = {quickQuestionnaireAction}
             setupDeviceAction = {setupDeviceAction}
@@ -1012,6 +1008,7 @@ const  DasBoardComponent = ({route, ...props }) => {
             goalSetAction = {goalSetAction}
             goalVisualizationAction = {goalVisualizationAction}
             deviceSetupMissingActions = {deviceSetupMissingActions}
+            notificationAction = {notificationAction}
           />
       </>
        

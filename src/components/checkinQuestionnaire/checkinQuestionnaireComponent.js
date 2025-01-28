@@ -7,13 +7,13 @@ import * as Constant from "./../../utils/constants/constant";
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import * as Apolloclient from './../../config/apollo/apolloConfig';
 import * as Queries from "./../../config/apollo/queries";
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
-import * as ImageProgress from './../../utils/mediaProcessingComponents/imageProcessComponent/imageProcessComponent';
+import * as ImageProgress from './../../utils/questionnaireMediaUpload/imageProcessComponent/questImageProcessComponent.js';
 import moment from 'moment/moment';
 import { useQuery} from "@apollo/react-hooks";
 import * as internetCheck from "./../../utils/internetCheck/internetCheck";
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 
 let trace_inQuestionnaireQuestionsScreen;
 let trace_Questions_Submit_API_Complete;
@@ -428,16 +428,18 @@ const QuestionnaireQuestionsService = ({navigation, route,...props}) => {
                     // temp.questionId = completeQuestions[i].questionId;
                     // temp.questionType = completeQuestions[i].questionTypeId;
                     // temp.answer = newAns; 
+
+                    
                              
                     if(newAns !== "" && dict[QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONITEM].questionTypeId !== 7 && dict[QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONITEM].questionTypeId !== 8) {
                         answerArray.push(newAns);
+                        
                     }
                 }
                 
             }
 
         }
-        
         if(value === mandateValue){
 
             let answerDict  = {};
@@ -467,7 +469,6 @@ const QuestionnaireQuestionsService = ({navigation, route,...props}) => {
         let isImages = false;
         let imgArray = [];
         let videosArray = [];
-
         if(answers && answers.questionAnswers.length > 0){
             for (let i = 0; i < answers.questionAnswers.length; i++){
                 
@@ -552,7 +553,7 @@ const QuestionnaireQuestionsService = ({navigation, route,...props}) => {
     };
 
     const processImages = async (answers,imgArray,petId,clientId,QueestionnaireId) => {
-        
+
         let fbObj = await ImageProgress.prepareImages(imgArray[actualImagesCount.current],petId,clientId,QueestionnaireId,'foreGround',answers.questionnaireName);
         holdImagesArray.current.push(fbObj);
         actualImagesCount.current = actualImagesCount.current + 1;
@@ -605,33 +606,20 @@ const QuestionnaireQuestionsService = ({navigation, route,...props}) => {
         set_isLoading(true);
         set_loaderMsg(Constant.LOADER_WAIT_MESSAGE);
         isLoadingdRef.current = 1;
-        
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let answersServiceObj = await ServiceCalls.saveQuestionAnswers(answersDictToBackend,token);
+
+        let apiMethod = apiMethodManager.SAVE_QUESTION_ANSWERS;
+        let apiService = await apiRequest.postData(apiMethod,answersDictToBackend,Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
         stopFBTrace();
-
-        if(answersServiceObj && answersServiceObj.logoutData){
-            firebaseHelper.logEvent(firebaseHelper.event_questionnaire_questions_submit_api_fail, firebaseHelper.screen_questionnaire_questions, "Submit Questionnaire API Fail", 'Duplicate Login');
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-          
-        if(answersServiceObj && !answersServiceObj.isInternet){
-            firebaseHelper.logEvent(firebaseHelper.event_questionnaire_questions_submit_api_fail, firebaseHelper.screen_questionnaire_questions, "Submit Questionnaire API Fail", 'No Internet');
-            createPopup(Constant.NETWORK_STATUS,Alert_Network_Id,Constant.ALERT_NETWORK,'OK',false,true,1); 
-            return;
-        }
-          
-        if(answersServiceObj && answersServiceObj.statusData){
-
-            if(answersServiceObj.responseData){
+        await DataStorageLocal.removeDataFromAsync(Constant.QUESTIONNAIRE_SELECTED_PET);
+            
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            
+            if(apiService.data.message){
 
                 firebaseHelper.logEvent(firebaseHelper.event_questionnaire_questions_submit_api_success, firebaseHelper.screen_questionnaire_questions, "Submit Questionnaire API Success", '');
                 await QestionnaireDataObj.deleteQuestionnaire(questionnaireId,petId);
-                let tempQuest = QestionnaireDataObj.getAnswer(questionnaireId,petId);
                 updateDashboardData();
                 createPopup(Constant.QUESTIONS_SUBMIT_SUCCESS_MSG,Alert_Success_Id,Constant.ALERT_INFO,'OK',false,true,1);
 
@@ -639,15 +627,22 @@ const QuestionnaireQuestionsService = ({navigation, route,...props}) => {
                 firebaseHelper.logEvent(firebaseHelper.event_questionnaire_questions_submit_api_fail, firebaseHelper.screen_questionnaire_questions, "Submit Questionnaire API Fail", '');
                 createPopup(Constant.SERVICE_FAIL_MSG,Alert_Fail_Id,Constant.ALERT_DEFAULT_TITLE,'OK',false,true,1);
             }
+    
+        } else if(apiService && apiService.isInternet === false) {
+
+            firebaseHelper.logEvent(firebaseHelper.event_questionnaire_questions_submit_api_fail, firebaseHelper.screen_questionnaire_questions, "Submit Questionnaire API Fail", 'No Internet');
+            createPopup(Constant.NETWORK_STATUS,Alert_Network_Id,Constant.ALERT_NETWORK,'OK',false,true,1); 
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            firebaseHelper.logEvent(firebaseHelper.event_questionnaire_questions_submit_api_fail, firebaseHelper.screen_questionnaire_questions, "Submit Questionnaire API Fail", '');
+            createPopup(apiService.error.errorMsg,Alert_Fail_Id,Constant.ALERT_DEFAULT_TITLE,'OK',false,true,1);  
           
         } else {
+
             firebaseHelper.logEvent(firebaseHelper.event_questionnaire_questions_submit_api_fail, firebaseHelper.screen_questionnaire_questions, "Submit Questionnaire API Fail", '');
-            createPopup(Constant.SERVICE_FAIL_MSG,Alert_Fail_Id,Constant.ALERT_DEFAULT_TITLE,'OK',false,true,1);                        
-        }
-          
-        if(answersServiceObj && answersServiceObj.error) {
-            firebaseHelper.logEvent(firebaseHelper.event_questionnaire_questions_submit_api_fail, firebaseHelper.screen_questionnaire_questions, "Submit Questionnaire API Fail", '');
-            createPopup(Constant.SERVICE_FAIL_MSG,Alert_Fail_Id,Constant.ALERT_DEFAULT_TITLE,'OK',false,true,1);
+            createPopup(Constant.SERVICE_FAIL_MSG,Alert_Fail_Id,Constant.ALERT_DEFAULT_TITLE,'OK',false,true,1);     
+
         }
 
     };

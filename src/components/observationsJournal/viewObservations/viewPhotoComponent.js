@@ -36,11 +36,13 @@ const ViewPhotoComponent = ({navigation, route, ...props }) => {
 
     const backBtnAction = () => {
 
-        if(fromScreen === 'questionnaire') {
-            navigation.navigate('QuestionnaireQuestionsService');
-        } else {
-            navigation.navigate('ViewObservationService');
-        }
+        // if(fromScreen === 'questionnaire') {
+        //     navigation.navigate('QuestionnaireQuestionsService');
+        // } else {
+        //     navigation.navigate('ViewObservationService');
+        // }
+
+        navigation.pop()
         
     };
 

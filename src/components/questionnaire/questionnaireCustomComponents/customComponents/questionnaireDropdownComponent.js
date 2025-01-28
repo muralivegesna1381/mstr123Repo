@@ -1,13 +1,10 @@
 import React,{useState, useEffect, useRef} from 'react';
 import {View, StyleSheet,ImageBackground,ActivityIndicator, TextInput,Text, TouchableOpacity} from 'react-native';
 import {widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
-// import { Dropdown } from 'react-native-material-dropdown-v2-fixed';
 import CommonStyles from './../../../../utils/commonStyles/commonStyles';
 import * as Constant from "./../../../../utils/constants/constant";
 import ImageView from "react-native-image-viewing";
 import { Dropdown } from 'react-native-element-dropdown';
-
-let downArrowImg = require('./../../../../../assets/images/otherImages/svg/downArrowGrey.svg');
 
 const questionnaireDropdownComponent = ({navigation,dropdownAns,setValue, answerArray,status_QID,questionImageUrl,setSubmitValue,autoSubmitAction,setSkipValue,isAnsSubmitted,suffleOptionOrder,questionId,autoNoQid, route,...props}) => {
 
@@ -81,11 +78,6 @@ const questionnaireDropdownComponent = ({navigation,dropdownAns,setValue, answer
       let pinsArray = await pinPointOption(list,Constant.MSELECTION_OTHER_SPECIFY);
       let pinsNoneArray = await pinPointOption(pinsArray,Constant.MSELECTION_NONE_OF_THE_ABOVE);
 
-      // if(pinsNoneArray) {
-      //   set_answers(pinsNoneArray);
-      // } else {
-      //   set_answers(answersArray);
-      // }
       let tempArray = pinsNoneArray;
       let temp = [];
 
@@ -133,12 +125,6 @@ const questionnaireDropdownComponent = ({navigation,dropdownAns,setValue, answer
 
         if(dropdownAns) {
 
-          // if(autoSubmitAction === false || autoSubmitAction === null) {
-          //   set_Value(0);
-          // } else {
-          //   set_Value(dropdownAns.value);
-            
-          // }
           set_Value(dropdownAns.value);
           selectedDrop.current = dropdownAns;
           check.current = {option:dropdownAns.option, rAnswer: dropdownAns.option === Constant.MSELECTION_OTHER_SPECIFY ? dropdownAns.rAnswer : dropdownAns.option, submitQuestionnaire:false}
@@ -150,14 +136,12 @@ const questionnaireDropdownComponent = ({navigation,dropdownAns,setValue, answer
           set_Value(0);
         }
 
-        if(dropdownAns.option === Constant.MSELECTION_OTHER_SPECIFY) {
+        if(dropdownAns && (dropdownAns.option === Constant.MSELECTION_OTHER_SPECIFY)) {
           set_isOthers(true);
           set_textAnswer(dropdownAns.rAnswer);
         }
         
       }
-
-      
 
     };
 
@@ -168,7 +152,7 @@ const questionnaireDropdownComponent = ({navigation,dropdownAns,setValue, answer
       let list = tempArray;
 
       if(tempArray.length < questionsList.length ) {
-        tempArray = await addAfter(list,list.length,tempItem)
+        tempArray = addAfter(list,list.length,tempItem)
       }
       return tempArray;
 
@@ -262,17 +246,6 @@ const questionnaireDropdownComponent = ({navigation,dropdownAns,setValue, answer
                 });
                 check.current = {option:item.label,value:item.value, rAnswer: '', submitQuestionnaire: item.submitQuestionnaire}
                 setSubmitValue(item.submitQuestionnaire);
-                
-                // if (item.label === Constant.MSELECTION_OTHER_SPECIFY && check.current && check.current.option === Constant.MSELECTION_OTHER_SPECIFY && check.current.rAnswer === '') {
-                //   setValue('');
-                //   check.current = {option: item.label,value:item.value, rAnswer: check.current.rAnswer, submitQuestionnaire: check.current.submitQuestionnaire};
-                //   set_checkValue({option: item.label,value:item.value, rAnswer: check.current.rAnswer, submitQuestionnaire: check.current.submitQuestionnaire});
-                // } else {
-                //   set_textAnswer('')
-                //   setValue(''),
-                //   check.current = {option:item.label,value:item.value, rAnswer: item.label === Constant.MSELECTION_OTHER_SPECIFY ? '' : item.label, submitQuestionnaire: false}
-                //   set_checkValue({option:item.label,value:item.value, rAnswer: item.label === Constant.MSELECTION_OTHER_SPECIFY ? '' : item.label, submitQuestionnaire: false})
-                // }
 
               } else {
 
@@ -415,7 +388,6 @@ const styles = StyleSheet.create({
     },
     selectedTextStyle: {
       fontSize: 16,
-      // backgroundColor: 'red',
     },
     iconStyle: {
       width: 20,

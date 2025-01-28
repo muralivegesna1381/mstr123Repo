@@ -1,21 +1,18 @@
 import React, {useState,useEffect,useRef} from 'react';
-import {View,BackHandler} from 'react-native';
+import {BackHandler} from 'react-native';
 import SensorPNQUI from './sensorPNQUI';
-import * as Queries from "./../../../config/apollo/queries";
-import { useMutation, } from "@apollo/react-hooks";
 import * as Constant from "./../../../utils/constants/constant";
 import * as internetCheck from "./../../../utils/internetCheck/internetCheck";
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+import * as AppPetsData from '../../../utils/appDataModels/appPetsModel.js';
 
 let trace_inSensorPNQSelectioncreen;
 
 const SensorPNQComponent = ({navigation, route, ...props }) => {
-
-    const [notificationRequest,{ loading: notificationLoading, error: notificationError, data: notificationData },] = useMutation(Queries.SEND_SENSOR_NOTIFICATION_SETTINGS);
 
     const [isPopUp, set_isPopUp] = useState(false);
     const [popUpMessage, set_popUpMessage] = useState(undefined);
@@ -41,33 +38,6 @@ const SensorPNQComponent = ({navigation, route, ...props }) => {
         };
 
     }, []);
-
-    useEffect(() => { 
-
-          if(notificationData){
-    
-            if(notificationData && notificationData.sendSensorNotifications.success){
-                firebaseHelper.logEvent(firebaseHelper.event_sensor_PNP_api_Success, firebaseHelper.screen_sensor_pn_noti, "Push Notification Permissions API success", 'petId : ', petId);
-                set_isLoading(false);
-                isLoadingdRef.current = 0;
-                // navigateToNext();
-                getFeedbackQuestionnaire(petId);
-            }else{     
-              set_isLoading(false);
-              isLoadingdRef.current = 0;
-              createPopup(Constant.SERVICE_FAIL_MSG,Constant.ALERT_DEFAULT_TITLE,true); 
-            }
-            
-          }
-    
-          if(notificationError) {
-            firebaseHelper.logEvent(firebaseHelper.event_sensor_PNP_api_fail, firebaseHelper.screen_sensor_pn_noti, "Push Notification Permissions API Fail", 'error : '+notificationError);
-            set_isLoading(false);
-            isLoadingdRef.current = 0;
-            createPopup(Constant.SERVICE_FAIL_MSG,Constant.ALERT_DEFAULT_TITLE,true);  
-          }
-    
-    }, [notificationLoading, notificationError, notificationData]);
   
     const handleBackButtonClick = () => {
         backBtnAction();
@@ -83,11 +53,12 @@ const SensorPNQComponent = ({navigation, route, ...props }) => {
     };
 
     const getValues = async () => {
+
         set_isLoading(false);
         isLoadingdRef.current = 0;
         let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let petObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        petObj = JSON.parse(petObj);
+        let petObj = AppPetsData.petsData.defaultPet;   
+
         if(clientId){
             set_clientId(clientId);
         }
@@ -98,44 +69,40 @@ const SensorPNQComponent = ({navigation, route, ...props }) => {
 
     const getFeedbackQuestionnaire = async (pId) => {
 
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        // let petObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        // petObj = JSON.parse(petObj);
         let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
         configObj = JSON.parse(configObj);
 
-        let getFQuestServiceObj = await ServiceCalls.getFeedbackQuestionnaireByPetId(configObj.petID,configObj.configDeviceModel,token);
+        let apiMethod = apiMethodManager.GET_FEEDBACK_QUESTIONNAIRE + configObj.petID+ '/' + configObj.configDeviceModel + '?isDateSupported=true';
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
-        isLoadingdRef.current = 0;
+            
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            
+            if(apiService.data.questionnaireList && apiService.data.questionnaireList.length > 0) {
+                if(apiService.data.questionnaireList[0].questions && apiService.data.questionnaireList[0].questions.length > 0) {
+                    checkinQuestObj.current = apiService.data.questionnaireList[0];
+                    navigateToNext(apiService.data.questionnaireList[0])
+                }
+                
+            } else {
+                navigation.navigate('DashBoardService');
+            }
+        
+        } else if(apiService && apiService.isInternet === false) {
 
-        if(getFQuestServiceObj && getFQuestServiceObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-      
-        if(getFQuestServiceObj && !getFQuestServiceObj.isInternet){
             set_isLoading(false);
             createPopup(Constant.NETWORK_STATUS,Constant.ALERT_NETWORK,true);
-            return;
-        }
-      
-        if(getFQuestServiceObj && getFQuestServiceObj.statusData) {
 
-            if(getFQuestServiceObj.responseData) {
-                checkinQuestObj.current = getFQuestServiceObj.responseData;
-                navigateToNext(getFQuestServiceObj.responseData)
-            }
-            
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            navigateToNext();
+
         } else {
-            // createPopup(Constant.SERVICE_FAIL_MSG,Constant.ALERT_NETWORK,true);
+
             navigateToNext();
+
         }
-      
-        if(getFQuestServiceObj && getFQuestServiceObj.error) {
-            navigateToNext();
-            // createPopup(Constant.SERVICE_FAIL_MSG,Constant.ALERT_NETWORK,true);           
-        }
+
     };
 
     const navigateToNext = async (obJCheckin) => {
@@ -177,7 +144,35 @@ const SensorPNQComponent = ({navigation, route, ...props }) => {
                 NotificationDate: dateValue ? ""+dateValue : "",
                 Opt:''
              };
-             await notificationRequest({ variables: { input: json } });
+             //await notificationRequest({ variables: { input: json } });
+             await notficationRequest(json);
+        }
+
+    };
+
+    const notficationRequest = async (json) => {
+
+        let apiMethod = apiMethodManager.APP_NOTIFICATION_SETTINGS;
+        let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
+        set_isLoading(false);
+        isLoadingdRef.current = 0;
+            
+        if(apiService && apiService.status) {
+            set_isLoading(false);
+            getFeedbackQuestionnaire(petId);
+        
+        } else if(apiService && apiService.isInternet === false) {
+            createPopup(Constant.NETWORK_STATUS,Constant.ALERT_NETWORK,true);
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(apiService.error.errorMsg,Constant.ALERT_DEFAULT_TITLE,true);
+            firebaseHelper.logEvent(firebaseHelper.event_sensor_PNP_api_fail, firebaseHelper.screen_sensor_pn_noti, "Push Notification Permissions API Fail", 'error : '+apiService.error.errorMsg);
+
+        } else {
+            createPopup(Constant.SERVICE_FAIL_MSG,Constant.ALERT_DEFAULT_TITLE,true);
+            firebaseHelper.logEvent(firebaseHelper.event_sensor_PNP_api_fail, firebaseHelper.screen_sensor_pn_noti, "Push Notification Permissions API Fail", 'error : '+ 'Status Failed');
+
         }
 
     };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import PrivacyUi from './privacyUI'
 import perf from '@react-native-firebase/perf';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';

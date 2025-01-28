@@ -164,20 +164,20 @@ public class TrimmerMainActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_default_trim:
-                onDefaultTrimClicked();
-                break;
-            case R.id.btn_fixed_gap:
-                onFixedTrimClicked();
-                break;
-            case R.id.btn_min_gap:
-                onMinGapTrimClicked();
-                break;
-            case R.id.btn_min_max_gap:
-                onMinToMaxTrimClicked();
-                break;
-        }
+//        switch (v.getId()) {
+//            case R.id.btn_default_trim:
+//                onDefaultTrimClicked();
+//                break;
+//            case R.id.btn_fixed_gap:
+//                onFixedTrimClicked();
+//                break;
+//            case R.id.btn_min_gap:
+//                onMinGapTrimClicked();
+//                break;
+//            case R.id.btn_min_max_gap:
+//                onMinToMaxTrimClicked();
+//                break;
+//        }
     }
 
     private void onDefaultTrimClicked() {

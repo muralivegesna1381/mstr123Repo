@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, TouchableOpacity, BackHandler,Platform } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, BackHandler,Platform } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
@@ -10,6 +10,9 @@ import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
+
+import YesTickImg from "./../../../../assets/images/otherImages/svg/yesTick.svg";
+import NoTickImg from "./../../../../assets/images/otherImages/svg/noXImg.svg";
 
 let trace_inPetNeturedScreen;
 
@@ -117,12 +120,7 @@ const PetNeuteredComponent = ({ route, ...props }) => {
                         <View style={selectedIndex === 0 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                             <View style={styles.imgBckViewStyle}>
-                                <ImageBackground
-                                    source={require("./../../../../assets/images/otherImages/svg/yesTick.svg")}
-                                    style={Platform.isPad ? [styles.petImgStyle, {width: wp("6%")}] : [styles.petImgStyle]}
-                                    resizeMode='contain'
-                                >
-                                </ImageBackground>
+                                <YesTickImg width={Platform.isPad ? wp("6%") : wp("8%")} />
                             </View>
 
                             <Text style={[styles.name]}>{'YES'}</Text>
@@ -133,12 +131,7 @@ const PetNeuteredComponent = ({ route, ...props }) => {
                         <View style={selectedIndex === 1 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                             <View style={styles.imgBckViewStyle}>
-                                <ImageBackground
-                                    source={require("./../../../../assets/images/otherImages/svg/noXImg.svg")}
-                                    style={Platform.isPad ? [styles.petImgStyle, {width: wp("6%")}] : [styles.petImgStyle]}
-                                    resizeMode='contain'
-                                >
-                                </ImageBackground>
+                                <NoTickImg width={Platform.isPad ? wp("6%") : wp("8%")}/>
                             </View>
 
                             <Text style={[styles.name]}>{'NO'}</Text>
@@ -203,11 +196,6 @@ const styles = StyleSheet.create({
         textAlign: "center",
         color: 'black',
         marginTop: hp("1%"),
-    },
-
-    petImgStyle: {
-        width: wp("8%"),
-        aspectRatio: 1,
     },
 
     imgBckViewStyle: {

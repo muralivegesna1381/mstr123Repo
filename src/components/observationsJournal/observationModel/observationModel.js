@@ -1,0 +1,16 @@
+export const observationData = {
+    "selectedPet" : undefined, 
+    "fromScreen" : String, 
+    "isPets" : Boolean, 
+    "isEdit" : Boolean,
+    "obsText" : String,
+    "obserItem" : undefined,
+    "selectedDate" : String,
+    "mediaArray" : [],
+    "behaviourItem" : undefined,
+    "observationId" : Number,
+    "ctgNameId" : Number,
+    "ctgName" : String,
+    "quickVideoFileName" : String,
+    "quickVideoDateFile" : String,
+}

@@ -10,14 +10,15 @@ import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+
+import DogImg from "./../../../../assets/images/otherImages/svg/sobDogIcon.svg";
+import CatImg from "./../../../../assets/images/otherImages/svg/catPet.svg";
 
 let trace_inPetTypeScreen;
-let dog = require("./../../../../assets/images/otherImages/svg/sobDogIcon.svg");
-let cat = require("./../../../../assets/images/otherImages/svg/catPet.svg");
 
 const PetTypeComponent = ({ route, ...props }) => {
 
@@ -90,41 +91,35 @@ const PetTypeComponent = ({ route, ...props }) => {
         set_isLoading(true);
         isLoadingdRef.current = 1;
 
-        let getPetTypeServiceObj = await ServiceCalls.getPetSpecies(token);
+        let apiMethod = apiMethodManager.GET_PET_SPECIES;
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
-
-        if(getPetTypeServiceObj && getPetTypeServiceObj.logoutData){
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Species_API, firebaseHelper.screen_SOB_petType, "SOB Getting Species Api fail", 'Unautherised'); 
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-            
-        if(getPetTypeServiceObj && !getPetTypeServiceObj.isInternet){
-            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,1);
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Species_API, firebaseHelper.screen_SOB_petType, "SOB Getting Species Api fail", 'Internet : false'); 
-            return;
-        }
-      
-        if(getPetTypeServiceObj && getPetTypeServiceObj.statusData){
-            if(getPetTypeServiceObj.responseData) {
-                set_speciesArray(getPetTypeServiceObj.responseData);
+                
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+                
+            if(apiService.data.species) {
+                set_speciesArray(apiService.data.species);
                 getSOBDetails();
             } else {
                 createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,1);
                 firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Species_API, firebaseHelper.screen_SOB_petType, "SOB Getting Species Api fail", 'No data found'); 
             }
-                           
+        
+        } else if(apiService && apiService.isInternet === false) {
+
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,1);
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Species_API, firebaseHelper.screen_SOB_petType, "SOB Getting Species Api fail", 'Internet : false'); 
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true,1);     
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Species_API, firebaseHelper.screen_SOB_petType, "SOB Getting Species Api fail", 'error : '+apiService.error.errorMsg); 
+            
         } else {
             firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Species_API, firebaseHelper.screen_SOB_petType, "SOB Getting Species Api fail", 'Service Status : false'); 
             createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,1);
-        }
-      
-        if(getPetTypeServiceObj && getPetTypeServiceObj.error) {
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,1);     
-            let errors = getPetTypeServiceObj.error.length > 0 ? getPetTypeServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Species_API, firebaseHelper.screen_SOB_petType, "SOB Getting Species Api fail", 'error : '+errors); 
+
         }
 
     };
@@ -178,12 +173,7 @@ const PetTypeComponent = ({ route, ...props }) => {
                 <View style={selectedIndex === index ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                     <View style={styles.imgBckViewStyle}>
-                        <ImageBackground
-                            source={item.speciesName === 'Canine' ? dog : cat}
-                            style={Platform.isPad ? [styles.petImgStyle, {width: wp("6%")}] : [styles.petImgStyle]}
-                            resizeMode='contain'
-                        >
-                        </ImageBackground>
+                        {item.speciesName === 'Canine' ? <DogImg width={Platform.isPad ? wp("4%") : wp("8%")} height={Platform.isPad ? hp("4%") : hp("8%")}/> : <CatImg width={Platform.isPad ? wp("4%") : wp("8%")} height={Platform.isPad ? hp("4%") : hp("8%")}/>}
                     </View>
 
                     <Text style={[styles.name]}>{item.speciesName === 'Canine' ? 'Dog' : "Cat"}</Text>

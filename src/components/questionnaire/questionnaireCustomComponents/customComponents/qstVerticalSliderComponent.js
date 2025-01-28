@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import {View,StyleSheet,Text,ImageBackground,ActivityIndicator,TouchableOpacity, Platform} from 'react-native';
+import {View,StyleSheet,Text,ImageBackground,ActivityIndicator,TouchableOpacity} from 'react-native';
 import fonts from '../../../../utils/commonStyles/fonts';
 import {widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import CommonStyles from '../../../../utils/commonStyles/commonStyles';
@@ -8,8 +8,6 @@ import Slider from "react-native-smooth-slider";
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import * as Constant from './../../../../utils/constants/constant';
 import ImageView from "react-native-image-viewing";
-import { isTablet } from 'react-native-device-info';
-import DeviceInfo from 'react-native-device-info';
 // import { Slider } from '@sharcoux/slider'
    
   const QstVerticalSliderComponent = ({minValue,maxValue,value,breakValue,status_QID,desc,setValue,isContinuousScale,questionImageUrl,setScroll,floorDescription,ceilDescription,isAnsSubmitted,route,...props}) => {
@@ -205,7 +203,6 @@ const styles = StyleSheet.create({
       height:10,
       width : 250,
       marginBottom: 40,
-      // marginTop: 40,
     },
 
     gestureStyle:{
@@ -220,7 +217,6 @@ const styles = StyleSheet.create({
       color:'#000000',
       width:wp('80%'),
       textAlign:'center',
-      // marginBottom: wp('1%'),
     },
 
     valuesTextStyle: {

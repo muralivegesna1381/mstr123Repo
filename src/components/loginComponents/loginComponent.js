@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from 'react';
+import React, { useState,useRef, useEffect } from 'react';
 import { NativeModules, Platform,BackHandler,Linking } from 'react-native';
 import LoginUI from './loginUi';
 import * as DataStorageLocal from "../../utils/storage/dataStorageLocal";
@@ -7,14 +7,18 @@ import * as internetCheck from "../../utils/internetCheck/internetCheck";
 import messaging from '@react-native-firebase/messaging';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
 import VersionNumber from 'react-native-version-number';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
+import * as Queries from "./../../config/apollo/queries";
+import { useQuery } from "@apollo/react-hooks";
 
 var PushNotification = require("react-native-push-notification");
 let trace_inLoginScreen;
 let trace_Login_Get_Pets_API_Complete;
-let trace_Login_API_Complete;
 let trace_Login_Get_UserDetails_API_Complete;
 
 const APP_UPDATE = 100;
@@ -25,6 +29,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
    * Login API : Validates the user and returns user email, token and client Id
    * GetPetDetails : by passing the client id after login, returns the pets information.
    */
+  const { loading:logOutLoading, data:logOutdata } = useQuery(Queries.LOG_OUT_APP, { fetchPolicy: "cache-only" });
 
   const [clientId, set_clientId] = useState(undefined);
   const [petsArray, set_petsArray] = useState(undefined);
@@ -43,6 +48,13 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   const [authenticationType, set_authenticationType] = useState(undefined);
   const [appStatus, set_appStatus] = useState(null);
   const [popUpID, set_popUpID] = useState(0);
+  const [forgotPsd, set_forgotPsd] = useState('');
+  const [isUserLoggedIn, set_isUserLoggedIn] = useState(false);
+  const [backBtnEnable, set_backBtnEnable] = useState(undefined);
+  const [userEmail, set_userEmail] = useState(undefined);
+  const [userPswd, set_userPswd] = useState(undefined);
+  const [isEmailValid, set_isEmailValid] = useState(false);
+  const [isHidePassword, set_isHidePassword] = useState(true);
 
   let popIdRef = useRef(0);
   let isLoadingdRef = useRef(0);
@@ -67,20 +79,36 @@ const LoginComponent = ({ navigation, route, ...props }) => {
         set_appStatus(route.params?.appStatus);
         updateUserApp(route.params?.appStatus);
       }
+      if(route?.params.isFrom && route?.params.isFrom === 'PasswordScreen') {
+        set_forgotPsd('removePsd');
+        set_userPswd(null);
+      }
+      
     });
-
+    verifyLogin();
     const unsubscribe = navigation.addListener('blur', () => {
       loginSessionStop();
     });
 
+    //loginAction("mvegesna@ctepl.com","Apple@1234")
+
     return () => {
-      loginSessionStop();
       focus();
       unsubscribe();
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
     };
 
-  }, [route.params?.isAuthEnabled,route.params?.appStatus]);
+  }, [route.params?.isAuthEnabled,route.params?.appStatus,route?.params.isFrom]);
+
+  useEffect(() => {
+    if (logOutdata && logOutdata.data.__typename === 'LogOutApp' && logOutdata.data.isLogOut === 'logOut') {
+      set_userEmail(null);
+      set_userPswd(null);
+      set_isHidePassword(true);
+      set_backBtnEnable(false);
+      createPopup('Login Limit Exceeded',Constant.AUTO_LOGOUT_MSG,'OK',true,false,true,1,0); 
+    }
+  }, [logOutdata]);
 
   const loginSessionStart = async () => {
     trace_inLoginScreen = await perf().startTrace('t_inLoginScreen');
@@ -90,13 +118,15 @@ const LoginComponent = ({ navigation, route, ...props }) => {
     await trace_inLoginScreen.stop();
   };
 
-  const stopFBTraceLogin = async () => {
-    await trace_Login_API_Complete.stop();
-  };
-
   const stopFBTraceUserDetails = async () => {
     await trace_Login_Get_UserDetails_API_Complete.stop();
   };
+
+  const verifyLogin = async () => {
+    let userVerify = await DataStorageLocal.getDataFromAsync(Constant.IS_USER_LOGGEDIN);
+    userVerify = JSON.parse(userVerify);
+    set_isUserLoggedIn(userVerify);
+  }
 
   /**
    * Saving the email,Token,ClientId within the calss
@@ -127,17 +157,15 @@ const LoginComponent = ({ navigation, route, ...props }) => {
 
   const setBasicValues = async (userDetails,userP) => {
 
+    await DataStorageLocal.saveDataToAsync(Constant.IS_USER_LOGGEDIN,JSON.stringify(true));
     await DataStorageLocal.saveDataToAsync(Constant.APP_TOKEN, "" + userDetails.Token);
     await DataStorageLocal.saveDataToAsync(Constant.CLIENT_ID, "" + userDetails.ClientID);
     await DataStorageLocal.saveDataToAsync(Constant.USER_EMAIL_LOGIN, "" + userDetails.Email);
     await DataStorageLocal.saveDataToAsync(Constant.USER_PSD_LOGIN, userP);
-    await DataStorageLocal.saveDataToAsync(Constant.USER_ROLE_ID, userDetails.RoleId.toString());
-    await DataStorageLocal.saveDataToAsync(Constant.USER_ROLE_DETAILS, JSON.stringify(userDetails));
-    await DataStorageLocal.saveDataToAsync(Constant.USER_ID, userDetails.UserId.toString());
+    UserDetailsModel.userDetailsData.userRole = userDetails;
     
     if(userDetails && userDetails.RolePermissions && userDetails.RolePermissions.length > 0) {
 
-      
       let capturePermission = await userDetails.RolePermissions.filter(item => parseInt(item.menuId) === 67);
       let questionnairPer = await userDetails.RolePermissions.filter(item => parseInt(item.mobileAppConfigId) === 3);
 
@@ -161,7 +189,10 @@ const LoginComponent = ({ navigation, route, ...props }) => {
     firebaseHelper.setUserProperty(userDetails.Email + "", userDetails.ClientID + "");
 
     if(userDetails.ClientID > 0 ) {
+      // getUserDetailsDB(userDetails.ClientID,userDetails.UserId);
+      // navigation.navigate("DashBoardService", { loginPets: petsArray });
       getLoginPets(userDetails.ClientID,userDetails.UserId);
+
     } else {
 
       if(userDetails.RolePermissions) {
@@ -200,7 +231,6 @@ const LoginComponent = ({ navigation, route, ...props }) => {
           set_isLoading(false);
           navigation.navigate('PetListBFIScoringScreen');
         } else if(hasBFIImgCapture) {
-          // Only Capture
           isLoadingdRef.current = 0;
           set_isLoading(false);
           navigation.navigate('PetListComponent');
@@ -215,47 +245,52 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   const getLoginPets = async (client,userId) => {
     
     trace_Login_Get_Pets_API_Complete = await perf().startTrace('t_Login_Screen_Get_Pets_API');
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-    set_isLoading(true);
-    isLoadingdRef.current = 1;
 
-    let loginPetServiceCallsObj = await ServiceCalls.getPetParentPets(client,token);
-    set_isLoading(false);
-    isLoadingdRef.current = 0;
+    let apiMethod = apiMethodManager.GET_PETPARENT_PETS + client;
+    let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
     stopFBTraceGetPets();
+        
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
 
-    if(loginPetServiceCallsObj && loginPetServiceCallsObj.statusData){
-
-      if(loginPetServiceCallsObj && loginPetServiceCallsObj.responseData){
-
-        firebaseHelper.logEvent(firebaseHelper.event_login_getPets_success, firebaseHelper.screen_login, "Login Getpets Service Success", 'Getting pet details success in Login : ' + loginPetServiceCallsObj.statusData);
-        set_petsArray(loginPetServiceCallsObj.responseData);
-        if (loginPetServiceCallsObj.responseData.length > 0) {
-          set_firstTimeUser(false);
-          isFirstTime.current = false;
-          saveFirstTimeUser(false,client,token,userId);
-          set_isLoading(false);
-          isLoadingdRef.current = 0;
-          saveUserLogStatus(client,token,userId);
-          saveDefaultPet(loginPetServiceCallsObj.responseData);
-        } else {
-          firebaseHelper.logEvent(firebaseHelper.event_login_getPets_success, firebaseHelper.screen_login, "Login Getpets Service Success", 'User Total Pets : ' + '0');
-          isFirstTime.current = true;
-          set_firstTimeUser(true);
-          saveFirstTimeUser(true, client,token,userId);
-          saveUserLogStatus(client,token,userId);        
-        }
+      set_petsArray(apiService.data.petDevices);
+      if(apiService.data.petDevices.length > 0){
+        
+        set_firstTimeUser(false);
+        isFirstTime.current = false;
+        saveFirstTimeUser(false,client,userId);
+        set_isLoading(false);
+        isLoadingdRef.current = 0;
+        saveUserLogStatus(client,userId);
+        saveDefaultPet(apiService.data.petDevices);
       
       } else {
-        serviceFailedData(loginPetServiceCallsObj.statusData);
+
+        // await DataStorageLocal.saveDataToAsync(Constant.IS_USER_LOGGEDIN,JSON.stringify(true));
+        isFirstTime.current = true;
+        set_firstTimeUser(true);
+        saveFirstTimeUser(true, client,userId);
+        saveUserLogStatus(client,userId);   
+        
       }
+            
+    } else if(apiService && apiService.isInternet === false) {
 
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK', false,true);
+            
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      firebaseHelper.logEvent(firebaseHelper.event_dashboard_getPets_fail, firebaseHelper.screen_dashboard, "Dashboard Getpets Service failed", 'Service error : ' + apiService.error.errorMsg);
+    
     } else {
-      serviceFailedData(loginPetServiceCallsObj.statusData);
-    }
 
-    if(loginPetServiceCallsObj && loginPetServiceCallsObj.error) {
-      serviceFailedData(loginPetServiceCallsObj.error);
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      firebaseHelper.logEvent(firebaseHelper.event_dashboard_getPets_fail, firebaseHelper.screen_dashboard, "Dashboard Getpets Service failed", 'Service Status : false');
+
     }
 
   };
@@ -273,25 +308,16 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   const saveUserDetails = async (objUser) => {
 
     if (objUser) {
-
-      await DataStorageLocal.saveDataToAsync(Constant.PET_PARENT_OBJ, JSON.stringify(objUser));
-
-      if (objUser.firstName) {
-        await DataStorageLocal.saveDataToAsync(Constant.SAVE_FIRST_NAME, objUser.firstName);
-      }
-
-      if (objUser.lastName) {
-        await DataStorageLocal.saveDataToAsync(Constant.SAVE_SECOND_NAME, objUser.lastName);
-      }
-
+      UserDetailsModel.userDetailsData.user = objUser.user;
     }
-
+    await DataStorageLocal.saveDataToAsync(Constant.USER_NAME, JSON.stringify(objUser.user));
     set_isLoading(false);
     isLoadingdRef.current = 0;
     if (isFirstTime.current) {
       navigation.navigate("AppOrientationComponent", { loginPets: petsArray, isFromScreen: 'LoginPage' });
-    } else {
-      updateDashboardData(petsArray);
+    } 
+    else {
+      // updateDashboardData(petsArray);
     }
 
   };
@@ -299,18 +325,11 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   // Saves the pet that has Setup done as a default pet
   const saveDefaultPet = async (arrayOfAllPets) => {
 
-    let defaultPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-    defaultPet = JSON.parse(defaultPet);
-
-    let tempObj = undefined;
-    if (defaultPet) {
-      tempObj = defaultPet;
-    } else {
-      tempObj = arrayOfAllPets[0];
-    }
-
-    firebaseHelper.logEvent(firebaseHelper.event_initial_default_pet, firebaseHelper.screen_appInitial, "Default Pet", 'Pet id : ' + tempObj.petID);
-    await DataStorageLocal.saveDataToAsync(Constant.DEFAULT_PET_OBJECT, JSON.stringify(tempObj));
+    let defaultPet = AppPetsData.petsData.defaultPet;
+    if (!defaultPet || defaultPet === null) {
+      AppPetsData.petsData.defaultPet = arrayOfAllPets[0];
+    } 
+    AppPetsData.petsData.totalPets = arrayOfAllPets;
     if (isFirstTime.current) {
       navigation.navigate("AppOrientationComponent", { loginPets: arrayOfAllPets, isFromScreen: 'LoginPage' });
     } else {
@@ -321,46 +340,37 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   }
 
   // Saves the User details
-  const saveUserLogStatus = async (client,token,userId) => {
+  const saveUserLogStatus = async (client,userId) => {
     await DataStorageLocal.saveDataToAsync(Constant.IS_USER_LOGGED_INN, JSON.stringify(true));
-    getUserDetailsDB(client,token,userId);
+    getUserDetailsDB(client,userId);
   }
 
   // When user has no pets, saves the status as First time user
-  const saveFirstTimeUser = async (value, client,token,userId) => {
-
-    await DataStorageLocal.saveDataToAsync(Constant.IS_FIRST_TIME_USER, JSON.stringify(value));
-    getUserDetailsDB(client,token,userId);
-
+  const saveFirstTimeUser = async (value, client,userId) => {
+    AppPetsData.petsData.isFirstUser = value;
+    getUserDetailsDB(client,userId);
   };
 
   // Api to fetch the user details
   const getUserDetailsDB = async (client,token,userId) => {
 
-    set_isLoading(true);
-    isLoadingdRef.current = 1;
-    let json = {
-      ClientID: client,
-    };
     trace_Login_Get_UserDetails_API_Complete = await perf().startTrace('t_Login_Screen_Get_UserDetails_API');
-    let userDetailsServiceObj = await ServiceCalls.getClientInfo(json,token);
 
+    let apiMethodManage = apiMethodManager.GET_USER_PROFILE;
+    let apiService = await apiRequest.getData(apiMethodManage,'',Constant.SERVICE_JAVA,navigation);
     stopFBTraceUserDetails();
     set_isLoading(false);
+    isLoadingdRef.current = 0;
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
 
-    if(userDetailsServiceObj && userDetailsServiceObj.statusData){
+      saveUserDetails(apiService.data);     
 
-      if(userDetailsServiceObj.responseData){
-        saveUserDetails(userDetailsServiceObj.responseData);     
-      }
-  
+    } else if(apiService && apiService.isInternet === false) {
+      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,false,'OK',true,0);
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+      firebaseHelper.logEvent(firebaseHelper.event_account_main_api_fail, firebaseHelper.screen_account_main, "Account Api Failed", 'error : '+apiService.error.errorMsg);
     } else {
-      isLoadingdRef.current = 0;
       updateDashboardData(petsArray);
-    }
-  
-    if(userDetailsServiceObj && userDetailsServiceObj.error) {
-      isLoadingdRef.current = 0;
     }
 
   };
@@ -373,6 +383,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
    */
   const getFCMToken = (email, psd) => {
 
+    // validateLogin(email, "Sprp1Cbx015NcQXmaPMyfQ==");
     if (Platform.OS === 'android') {
       //If the user is using an android device
       NativeModules.Device.getDeviceName(psd, (convertedVal) => {
@@ -416,13 +427,11 @@ const LoginComponent = ({ navigation, route, ...props }) => {
       AppOS : Platform.OS === 'ios' ? "1" : "2"
     };
 
-    trace_Login_API_Complete = await perf().startTrace('t_Login_Screen_Login_API');
-    let loginServiceObj = await ServiceCalls.loginWearablesApp(json);
-    stopFBTraceLogin();
-
-    if(loginServiceObj && loginServiceObj.statusData && loginServiceObj.responseData){
-
-      if(loginServiceObj.responseData.userDetails && loginServiceObj.responseData.userDetails.RolePermissions.length === 0) {
+    let apiMethod = apiMethodManager.LOGIN_APP;
+    let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+   
+      if(apiService.data.UserDetails && apiService.data.UserDetails.RolePermissions.length === 0) {
 
         firebaseHelper.logEvent(firebaseHelper.event_login_fail, firebaseHelper.screen_login, "Login Service Fail", 'Invali Credentials');
         createPopup(Constant.LOGIN_FAILED_ALERT,Constant.LOGIN_FAILED_MSG,'OK',true,false,true,1,0);
@@ -430,33 +439,45 @@ const LoginComponent = ({ navigation, route, ...props }) => {
         isLoadingdRef.current = 0;
 
       } else {
-
-        setBasicValues(loginServiceObj.responseData.userDetails,psd);
-        firebaseHelper.logEvent(firebaseHelper.event_login_success, firebaseHelper.screen_login, "Login Service Success", 'email : ', loginServiceObj.responseData.userDetails.Email);
-
+        setBasicValues(apiService.data.UserDetails,psd);
       }
+
+    } else if(apiService && apiService.isInternet === false) {
+
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK',true,false,true,1,0);
+
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+      firebaseHelper.logEvent(firebaseHelper.event_login_fail, firebaseHelper.screen_login, "Login Service Fail", 'Login service fail : '+ apiService.error.errorMsg);
+      loginFailAction();
+      createPopup(Constant.LOGIN_FAILED_ALERT,Constant.LOGIN_FAILED_MSG,'OK',true,false,true,1,0); 
 
     } else {
 
-      firebaseHelper.logEvent(firebaseHelper.event_login_fail, firebaseHelper.screen_login, "Login Service Fail", 'Invali Credentials');
-      createPopup(Constant.LOGIN_FAILED_ALERT,Constant.LOGIN_FAILED_MSG,'OK',true,false,true,1,0);
-      set_isLoading(false);
-      isLoadingdRef.current = 0;
-      
+      loginFailAction();
+      firebaseHelper.logEvent(firebaseHelper.event_login_fail, firebaseHelper.screen_login, "Login Service Fail", 'Login service fail : '+ 'Success False');
+
     }
 
-    if(loginServiceObj && loginServiceObj.error) {
-      firebaseHelper.logEvent(firebaseHelper.event_login_fail, firebaseHelper.screen_login, "Login Service Fail", 'Login service fail');
-      stopFBTraceLogin();
-      set_isLoading(false);
-      isLoadingdRef.current = 0;
-      createPopup(Constant.LOGIN_FAILED_ALERT,Constant.LOGIN_FAILED_MSG,'OK',true,false,true,1,0);
-    }
+  };
+
+  const loginFailAction = async () => {
+
+    set_isLoading(false);
+    isLoadingdRef.current = 0;
+    set_isHidePassword(true);
+    set_backBtnEnable(false);
+    set_isUserLoggedIn(false);
+    await DataStorageLocal.saveDataToAsync(Constant.IS_USER_LOGGEDIN,JSON.stringify(false));
+    createPopup(Constant.LOGIN_FAILED_ALERT,Constant.LOGIN_FAILED_MSG,'OK',true,false,true,1,0);
 
   }
 
   // Login Action
   const loginAction = async (email, psd) => {
+    
     let internet = await internetCheck.internetCheck();
     if (!internet) {
       createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK',true,false,true,1,0);
@@ -465,6 +486,8 @@ const LoginComponent = ({ navigation, route, ...props }) => {
       let userEmail = await DataStorageLocal.getDataFromAsync(Constant.USER_EMAIL_LOGIN);
       if(userEmail && userEmail !== email) {
         await removeTimer();
+        await DataStorageLocal.removeDataFromAsync(Constant.ANSWERED_SECTIONS);
+        await DataStorageLocal.removeDataFromAsync(Constant.CTW_QUESTIONNAIRE);
         const rnBiometrics = new ReactNativeBiometrics();
         rnBiometrics.deleteKeys().then((resultObject) => {
           const { keysDeleted } = resultObject
@@ -492,6 +515,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
       createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK',true,false,true,1,0);
     } else {
 
+      set_forgotPsd('deletePsd');
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       if (userEmail) {
         if (re.test(userEmail.replace(/ /g, ''))) {
@@ -508,7 +532,16 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   };
 
   const updateDashboardData = async (petsArray) => {
+
+    await DataStorageLocal.saveDataToAsync(Constant.IS_USER_LOGGEDIN, JSON.stringify(true));
+    let isNotificationClick = await DataStorageLocal.getDataFromAsync(Constant.IS_FROM_NOTIFICATION);
     navigation.navigate("DashBoardService", { loginPets: petsArray });
+
+    let userEmail = await DataStorageLocal.getDataFromAsync(Constant.USER_EMAIL_LOGIN);
+    if(userEmail && userEmail === userEmail && isNotificationClick) {
+      navigation.navigate('NotificationsComponent',{});
+    }
+    
   };
 
   // Navigates to Registration process
@@ -564,12 +597,13 @@ const LoginComponent = ({ navigation, route, ...props }) => {
     return true;
   };
 
-  const backBtnAction = () => {
+  const backBtnAction = async () => {
 
-    if(isLoadingdRef.current === 0 && popIdRef.current === 0){
-      // firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_login, "User clicked on back button to navigate to WelcomeComponent", '');
-      navigation.navigate("WelcomeComponent");
-    }
+    set_isUserLoggedIn(true);
+    set_backBtnEnable(false);
+    set_userEmail(null);
+    set_userPswd(null);
+
   };
 
   const getAuthType = () => {
@@ -614,8 +648,70 @@ const LoginComponent = ({ navigation, route, ...props }) => {
         }).catch(() => {
         })   
       } 
-     })
+    })
     
+  };
+
+  const anotherLoginAction = async () => {
+    // await DataStorageLocal.saveDataToAsync(Constant.IS_USER_LOGGEDIN, JSON.stringify(false));
+    set_isUserLoggedIn(false);
+    set_backBtnEnable(true);
+  };
+
+  const autoLoginAction = async () => {
+
+    let userEmail = await DataStorageLocal.getDataFromAsync(Constant.USER_EMAIL_LOGIN);
+    let userPsd = await DataStorageLocal.getDataFromAsync(Constant.USER_PSD_LOGIN);
+    if(userEmail && userPsd) {
+      validateLogin(userEmail, userPsd);
+    } else {
+      await DataStorageLocal.saveDataToAsync(Constant.IS_USER_LOGGEDIN, JSON.stringify(false));
+      set_isUserLoggedIn(false);
+    }
+  };
+
+  const getUserEmail = async () => {
+    
+    let tempMail = await DataStorageLocal.getDataFromAsync(Constant.USER_EMAIL_LOGIN_TEMP);
+    if(tempMail){
+      set_backBtnEnable(false)
+      set_userEmail(tempMail.replace(/ /g, ''));
+      await DataStorageLocal.removeDataFromAsync(Constant.USER_EMAIL_LOGIN_TEMP);
+    }     
+  };
+
+  const leftButtonAction = async () => {
+    set_userEmail(undefined);
+    set_userPswd(undefined);
+  };
+
+  const validateEmail = (email) => {
+
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(re.test(email.replace(/ /g, '')) && userPswd){
+        set_isEmailValid(true);
+    }else {
+        set_isEmailValid(false);
+    }
+    set_userEmail(email.replace(/ /g, ''));
+
+  }; 
+
+  const validatePassword = (value) => {
+
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    if(re.test(userEmail) && value.length>7){
+      set_isEmailValid(true);
+    }else {
+      set_isEmailValid(false);
+    }
+
+    set_userPswd(value);
+  };
+
+  const hidePsdAction = () => {
+    set_isHidePassword(!isHidePassword)
   };
 
   return (
@@ -630,6 +726,13 @@ const LoginComponent = ({ navigation, route, ...props }) => {
       popUpisLftBtn = {popUpisLftBtn}
       isAuthEnabled = {isAuthEnabled}
       authenticationType = {authenticationType}
+      forgotPsd = {forgotPsd}
+      isUserLoggedIn = {isUserLoggedIn}
+      backBtnEnable = {backBtnEnable}
+      isEmailValid = {isEmailValid}
+      userPswd = {userPswd}
+      userEmail = {userEmail}
+      isHidePassword = {isHidePassword}
       loginAction={loginAction}
       forgotPswdAction={forgotPswdAction}
       registerAction={registerAction}
@@ -637,7 +740,13 @@ const LoginComponent = ({ navigation, route, ...props }) => {
       popCancelBtnAction = {popCancelBtnAction}
       backBtnAction = {backBtnAction}
       validateAuthentication = {validateAuthentication}
-
+      anotherLoginAction = {anotherLoginAction}
+      autoLoginAction = {autoLoginAction}
+      getUserEmail = {getUserEmail}
+      leftButtonAction = {leftButtonAction}
+      validateEmail = {validateEmail}
+      validatePassword = {validatePassword}
+      hidePsdAction = {hidePsdAction}
     />
   );
 

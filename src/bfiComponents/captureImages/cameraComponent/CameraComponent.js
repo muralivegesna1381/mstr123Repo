@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, Image, PermissionsAndroid, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
-import { Camera, useCameraDevices } from 'react-native-vision-camera';
+import { Camera, useCameraDevice } from 'react-native-vision-camera';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import fonts from '../../../utils/commonStyles/fonts';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -17,9 +17,8 @@ const CameraComponent = ({ navigation, route, ...props }) => {
     const [cameraNightMode, set_cameraNightMode] = useState(false);
     const [fullBodyFlip, set_fullBodyFlip] = useState(false);
 
-    const devices = useCameraDevices()
-    const device = devices[cameraFlip];
-    const supportsCameraFlipping = useMemo(() => devices.back != null && devices.front != null, [devices.back, devices.front]);
+    const device = useCameraDevice('back')
+    // const supportsCameraFlipping = useMemo(() => devices.back != null && devices.front != null, [devices.back, devices.front]);
     const supportsFlash = device?.hasFlash ?? false;
 
     const [frameImgArray, set_frameImgArray] = useState([
@@ -44,6 +43,12 @@ const CameraComponent = ({ navigation, route, ...props }) => {
             //Get Path from camera
             const photo = await camera.current.takePhoto({});
             const photoPath = 'file://' + photo.path
+            // navigation.navigate('PetImageCaptureComponent', {
+            //     indexPos: route.params?.indexPos,
+            //     imagePath: photoPath,
+            //     imageCroppedPath: photoPath
+            // })
+
             ImagePicker.openCropper({
                 path: 'file://' + photo.path,
                 width: 400,
@@ -141,7 +146,7 @@ const CameraComponent = ({ navigation, route, ...props }) => {
                         </View> : null}
                         <View style={{ alignItems: 'flex-end', flex: 1 }}>
                             <TouchableOpacity onPress={() => { navigation.pop() }}>
-                                <Image style={styles.imageCloseStyle} source={require('./../../../../assets/images/otherImages/svg/timerCloseIcon.svg')} />
+                                <Image style={styles.imageCloseStyle} source={require('./../../../../assets/images/otherImages/png/xImg.png')} />
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -305,7 +310,8 @@ const styles = StyleSheet.create({
     imageCloseStyle: {
         aspectRatio: 1,
         height: hp('4%'),
-        resizeMode: 'contain', paddingHorizontal: wp("7%")
+        resizeMode: 'contain', paddingHorizontal: wp("7%"),
+        tintColor: '#FFFFFF'
     },
 
     imageCameraDoneStyle: {

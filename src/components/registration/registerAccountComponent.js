@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import perf from '@react-native-firebase/perf';
+import React, { useEffect, useRef, useState } from 'react';
 import { BackHandler } from 'react-native';
 import * as Constant from "./../../utils/constants/constant";
-import RegisterAccountUi from "./registerAccountUi"
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
-import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import RegisterAccountUi from "./registerAccountUi";
+import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
 
 let trace_inRegisterAccountScreen;
 let trace_RegisterAccount_API_Complete;
@@ -22,6 +24,7 @@ const RegisterAccountComponent = ({ navigation, route, ...props }) => {
     const [popUpAlert, set_popUpAlert] = useState('Alert');
     const [secondaryEmail, set_secondaryEmail] = useState('');
     const [isNotification, set_isNotification] = useState(false);
+    const [countryISDCodes, set_countryISDCodes] = useState(undefined)
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
@@ -29,6 +32,8 @@ const RegisterAccountComponent = ({ navigation, route, ...props }) => {
     let notificationEnable = useRef(false);
 
     React.useEffect(() => {
+
+        getISDCodes()
 
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
         const focus = navigation.addListener("focus", () => {
@@ -96,7 +101,7 @@ const RegisterAccountComponent = ({ navigation, route, ...props }) => {
      * @param {*} secondName 
      * On validating the details, these details will be sent to backend Api to validate
      */
-    const submitAction = async (email, phNumber, firstName, secondName, secondaryEmail, notificationsEnable) => {
+    const submitAction = async (email, phNumber, firstName, secondName, secondaryEmail, notificationsEnable, isdCodeID) => {
 
         set_email(email);
         set_secondaryEmail(secondaryEmail);
@@ -108,17 +113,18 @@ const RegisterAccountComponent = ({ navigation, route, ...props }) => {
         isLoadingdRef.current = 1;
 
         let json = {
-            FirstName : firstName,
-            LastName : secondName,
-            Email : email,
+            FirstName: firstName,
+            LastName: secondName,
+            Email: email,
             PhoneNumber: phNumber,
-            SecondaryEmail : secondaryEmail,
-            NotifyToSecondaryEmail : notificationsEnable
+            IsdCodeId: isdCodeID,
+            SecondaryEmail: secondaryEmail,
+            NotifyToSecondaryEmail: notificationsEnable
         };
 
         firebaseHelper.logEvent(firebaseHelper.event_registration_account_action, firebaseHelper.screen_register_account, "User clicked submit button to initiate the Account cration API ", 'Emails : ' + (email + ' and sEmail ' + secondaryEmail));
         trace_RegisterAccount_API_Complete = await perf().startTrace('t_RegisterAccount_API');
-        requestforRegistration(json,email);
+        requestforRegistration(json, email);
 
     };
 
@@ -127,39 +133,38 @@ const RegisterAccountComponent = ({ navigation, route, ...props }) => {
      * Success : Based on Client not equals to 0, Peet parent will be navigated to OTP screen
      * Failure : When client id is 0, error message will be shown 
      */
-    const requestforRegistration = async (json,email) => {
+    const requestforRegistration = async (json, email) => {
 
-        let registerServiceObj = await ServiceCalls.registerUserValidateEmail(json);
+        let apiMethod = apiMethodManager.REGISTER_USER_EMAIL;
+        let apiService = await apiRequest.postData(apiMethod, json, Constant.SERVICE_MIGRATED, navigation);
         stopFBTrace();
         set_isLoading(false);
         isLoadingdRef.current = 0;
 
-        if (registerServiceObj && !registerServiceObj.isInternet) {
+        if (apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+
+            if (apiService.data.Key) {
+                navigation.navigate('PetParentAddressComponent', { isFromScreen: 'registration', eMailValue: email, secondaryEmail: secondaryEmailNew.current, isNotificationEnable: notificationEnable.current, parentObj: apiService.data });
+            } else {
+                firebaseHelper.logEvent(firebaseHelper.event_registration_account_api_fail, firebaseHelper.screen_register_account, "Registering the Account API Fail ", 'Error : ');
+                createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.data.Value, true);
+            }
+
+        } else if (apiService && apiService.isInternet === false) {
+
             firebaseHelper.logEvent(firebaseHelper.event_registration_account_api_fail, firebaseHelper.screen_register_account, "Registering the Account API Fail ", 'Error : No Internet');
             createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
-            return;
-        }
 
-        if (registerServiceObj && registerServiceObj.statusData) {
-            
-            if(registerServiceObj.responseData) {
-                
-                if(registerServiceObj.responseData.Key) {
-                    navigation.navigate('PetParentAddressComponent', { isFromScreen: 'registration', eMailValue: email, secondaryEmail: secondaryEmailNew.current, isNotificationEnable:notificationEnable.current, parentObj : registerServiceObj.responseData });
-                } else {
-                    firebaseHelper.logEvent(firebaseHelper.event_registration_account_api_fail, firebaseHelper.screen_register_account, "Registering the Account API Fail ", 'Error : ' + registerServiceObj.responseData.Value);
-                    createPopup(Constant.ALERT_DEFAULT_TITLE, registerServiceObj.responseData.Value, true);
-                }
-            }
-                       
+        } else if (apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true);
+            firebaseHelper.logEvent(firebaseHelper.event_registration_account_api_fail, firebaseHelper.screen_register_account, "Registering the Account API Fail ", 'Error : ' + apiService.error.errorMsg);
+
         } else {
-            firebaseHelper.logEvent(firebaseHelper.event_registration_account_api_fail, firebaseHelper.screen_register_account, "Registering the Account API Fail ", 'Error : Email already Exists');
-            createPopup(Constant.ALERT_DEFAULT_TITLE, registerServiceObj.responseData.Value, true);
-        }
 
-        if (registerServiceObj && registerServiceObj.error) {
+            firebaseHelper.logEvent(firebaseHelper.event_registration_account_api_fail, firebaseHelper.screen_register_account, "Registering the Account API Fail ", 'Error : Email already Exists');
             createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
-            firebaseHelper.logEvent(firebaseHelper.event_registration_account_api_fail, firebaseHelper.screen_register_account, "Registering the Account API Fail ", 'Error : ');
+
         }
 
     };
@@ -179,8 +184,42 @@ const RegisterAccountComponent = ({ navigation, route, ...props }) => {
         popIdRef.current = 0;
     };
 
+    const getISDCodes = async () => {
+        let isdCodesLocalData = await DataStorageLocal.getDataFromAsync(Constant.PHONE_ISD_CODES);
+        if (isdCodesLocalData) {
+            const parsedData = JSON.parse(isdCodesLocalData);
+            set_countryISDCodes(parsedData)
+        } else {
+            set_isLoading(true);
+            isLoadingdRef.current = 1;
+            let apiMethod = apiMethodManager.GET_ISD_CODES;
+            let apiService = await apiRequest.getData(apiMethod, '', Constant.SERVICE_JAVA, navigation);
+            set_isLoading(false);
+            isLoadingdRef.current = 0;
+            if (apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+                if (apiService.data.isdCodes && apiService.data.isdCodes.length > 0) {
+                    await DataStorageLocal.saveDataToAsync(Constant.PHONE_ISD_CODES, JSON.stringify(apiService.data.isdCodes));
+                    set_isLoading(false);
+                    isLoadingdRef.current = 0;
+                    set_countryISDCodes(apiService.data.isdCodes)
+                } else {
+                    set_countryISDCodes([])
+                }
+
+            } else if (apiService && apiService.isInternet === false) {
+                createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, false, 'OK', true, 0, '');
+            } else if (apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+                createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, false, 'OK', true, 0, '');
+            } else {
+                createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, false, 'OK', true, 0, '');
+            }
+        }
+
+    };
+
     return (
         <RegisterAccountUi
+            countryISDCodes={countryISDCodes}
             firstName={firstName}
             secondName={secondName}
             isLoading={isLoading}

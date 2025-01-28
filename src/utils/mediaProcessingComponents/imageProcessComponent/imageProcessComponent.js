@@ -59,7 +59,7 @@ const uploadImageToFB = async (imgObj,fileName,filePath,petId,clientId,id,modeOf
 
   let filename = '';
   let medianame = fileName.replace('/r','/')
-  filename = "Observations_Images/" + clientId.toString() + '_' + petId.toString() + '_' + id.toString() + '_' + dateString + '_' + medianame;
+  filename = "Observations_Images/" + medianame;
 
   return new Promise(function(resolve, reject) {
     const storageRef = storage().ref(filename)

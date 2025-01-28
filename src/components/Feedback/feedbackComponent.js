@@ -5,8 +5,8 @@ import * as DataStorageLocal from "../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../utils/constants/constant";
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 
 const FeedbackComponent = ({navigation, route, ...props }) => {
 
@@ -52,41 +52,36 @@ const FeedbackComponent = ({navigation, route, ...props }) => {
 
       trace_Get_Feedback_Details_Api_Complete = await perf().startTrace('t_Get_Feedback_Details_Api');
       let client = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-      let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-      let getfeedbackServiceObj = await ServiceCalls.getFeedbackByPetParent(client,token);
-
+      let apiMethod = apiMethodManager.GET_FEEDBACK + client ;
+      let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
       set_isLoading(false);
       isLoadingdRef.current = 0;
       stopFBTraceGetFeedbackByPetParent();
-
-      if(getfeedbackServiceObj && getfeedbackServiceObj.logoutData){
-        AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
+        
+      if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+        
+        if(apiService.data.mobileAppFeeback && apiService.data.mobileAppFeeback.length > 0){
+          set_feedbackArray(apiService.data.mobileAppFeeback);
+          set_noLogsShow(false);             
+        } else {
+          set_noLogsShow(true);
+        }
+          
+      } else if(apiService && apiService.isInternet === false) {
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
         return;
+
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+        createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);
+        firebaseHelper.logEvent(firebaseHelper.event_feedback_details_api_failure, firebaseHelper.screen_feedback, "Getting Feedback details API Fail", 'error : '+apiService.error.errorMsg);
+          
+      } else if(apiService && apiService.logoutError !== null) {            
+      }else {
+        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+        firebaseHelper.logEvent(firebaseHelper.event_feedback_details_api_failure, firebaseHelper.screen_feedback, "Getting Feedback details API Fail", 'Service Status : false');
+        
       }
       
-      if(getfeedbackServiceObj && !getfeedbackServiceObj.isInternet){
-          createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
-          return;
-      }
-
-      if(getfeedbackServiceObj && getfeedbackServiceObj.statusData){
-          if(getfeedbackServiceObj.responseData && getfeedbackServiceObj.responseData.length > 0){
-            set_feedbackArray(getfeedbackServiceObj.responseData);
-            set_noLogsShow(false);             
-          } else {
-            set_noLogsShow(true);
-          }
-      } else {
-        firebaseHelper.logEvent(firebaseHelper.event_feedback_details_api_failure, firebaseHelper.screen_feedback, "Getting Feedback details API Fail", 'Service Status : false');
-        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-      }
-
-      if(getfeedbackServiceObj && getfeedbackServiceObj.error) {
-        let errors = getfeedbackServiceObj.error.length > 0 ? getfeedbackServiceObj.error[0].code : '';
-        firebaseHelper.logEvent(firebaseHelper.event_feedback_details_api_failure, firebaseHelper.screen_feedback, "Getting Feedback details API Fail", 'error : '+errors);
-        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-      }
     };
 
     const handleBackButtonClick = () => {

@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {StyleSheet,Text,TouchableOpacity, View,Image} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
 
-const HeaderComponent = ({navigation, route,isChatEnable, isInfoEnable,isTImerEnable,isSettingsEnable,isBackBtnEnable,title,isTitleHeaderEnable,moduleName,headerColor,...props }) => {
+import BackBtnImg from "../../../assets/images/otherImages/svg/backButtonImg.svg";
+import HeaderIcon from "../../../assets/images/otherImages/svg/headerPetIcon.svg";
+import MenuImg from "../../../assets/images/sideMenuImages/svg/menuMainImg.svg";
+import NotificationImg from "../../../assets/images/otherImages/svg/notificationEmptyImg.svg";
+import NotificationRedImg from "../../../assets/images/otherImages/svg/notificationRedImg.svg";
 
-    useEffect (() => {
-    },[]);
+const HeaderComponent = ({navigation, route,isChatEnable, isInfoEnable,isTImerEnable,isSettingsEnable,isBackBtnEnable,isNotificationsEnable,isNotitficationCount,title,isTitleHeaderEnable,moduleName,headerColor,...props }) => {
 
-    const chatBtnAction = () => {
-        props.chatBtnAction();
+    const notificationAction = () => {
+        props.notificationAction();
     }
 
     const timerBtnAction = () => {
@@ -37,15 +40,14 @@ const HeaderComponent = ({navigation, route,isChatEnable, isInfoEnable,isTImerEn
 
                     {isSettingsEnable ? <View style={{justifyContent:'center',marginLeft:wp('2%')}}>
                         <TouchableOpacity onPress = {() => settingsBtnAction()}>
-                            <Image source={require("../../../assets/images/sideMenuImages/svg/menuMainImg.svg")} style={{flex:1,marginLeft: wp("2%"),marginRight: wp("2%"),width:wp('6%'),height:wp('6%')}}/>
+                            <MenuImg style={styles.menuImgStyle}/>
                         </TouchableOpacity>
                     </View> : null}
 
                     <View style={{justifyContent:'center'}}>
                         <TouchableOpacity onPress = {() => backBtnAction()} style={{flexDirection:'row',alignItems:'center',}} disabled = {isBackBtnEnable ? false : true}>
-                            {isBackBtnEnable ? <Image source={require("../../../assets/images/otherImages/svg/backButtonImg.svg")} style={styles.backBtnEnableStyle}/> : null}
-                            <Image source={require("../../../assets/images/otherImages/svg/headerPetIcon.svg")} style={{marginLeft: isBackBtnEnable ? wp("2%") : wp("3%"),marginRight: wp("2%"), width:wp('8%'),aspectRatio:1,resizeMode:'contain'}}/>
-
+                            {isBackBtnEnable ? <View style={styles.backBtnEnableStyle}><BackBtnImg/></View> : null}
+                            <View ><HeaderIcon style={{marginLeft: isBackBtnEnable ? wp("1%") : wp("3%"),marginRight: wp("2%"), width:wp('5%'),aspectRatio:1,resizeMode:''}}/></View>
                         </TouchableOpacity>
                     </View>
 
@@ -59,8 +61,8 @@ const HeaderComponent = ({navigation, route,isChatEnable, isInfoEnable,isTImerEn
                             <Image source={require("../../../assets/images/chatImages/minimizeChat.svg")} style={{marginRight: wp("2%"),width:wp('6%'),height:wp('6%')}}/>
                         </TouchableOpacity> : null}
 
-                        {isChatEnable ? <TouchableOpacity onPress = {() => chatBtnAction()}>
-                            <Image source={require("../../../assets/images/chatImages/closeChat.svg")} style={{marginLeft: wp("3%"), marginRight: wp("3%"),width:wp('6%'),height:wp('6%')}}/>
+                        {isNotificationsEnable ? <TouchableOpacity style = {{width:wp('20%'),alignItems:'center'}} onPress = {() => notificationAction()}>
+                            {isNotitficationCount ? <NotificationRedImg/> : <NotificationImg/>}
                         </TouchableOpacity> : null}
 
                         {isInfoEnable ? <TouchableOpacity onPress = {() => infoBtnAction()}>
@@ -73,7 +75,7 @@ const HeaderComponent = ({navigation, route,isChatEnable, isInfoEnable,isTImerEn
 
                 </View>
             </View>
-            {moduleName === 'firstTimeUser' ? null : <View style={[styles.separatorViewStyle,{backgroundColor: '#dedede'}]}></View>}
+            {moduleName === 'hide' ? null : <View style={[styles.separatorViewStyle,{backgroundColor: '#dedede'}]}></View>}
         </View>
 
         
@@ -104,8 +106,8 @@ const styles = StyleSheet.create({
     },
 
     backBtnEnableStyle : {
-        marginLeft: wp("2%"),
-        width:wp('6%'),
+        marginLeft: wp("4%"),
+        width:wp('5%'),
         height:wp('4%'),
         resizeMode:'contain',
     },
@@ -122,6 +124,14 @@ const styles = StyleSheet.create({
         height:hp('0.1%'),
         width:wp('100%'),
          bottom:0
+    },
+
+    menuImgStyle : {
+        flex:1,
+        marginLeft: wp("2%"),
+        marginRight: wp("2%"),
+        width:wp('6%'),
+        height:wp('6%')
     }
 
 });

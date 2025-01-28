@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useRef } from 'react';
-import {View,BackHandler,Linking} from 'react-native';
+import {BackHandler,Linking} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import SensorFirmwareUI from './sensorFirmwareUI';
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
@@ -69,27 +69,26 @@ const  SensorFirmwareComponent = ({ route, ...props }) => {
 
     const getDefaultPet = async () => {
 
-        let defaultObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        let sensorIndex = await DataStorageLocal.getDataFromAsync(Constant.SENOSR_INDEX_VALUE);
-
-        defaultObj = JSON.parse(defaultObj);
-        set_deviceNumber(defaultObj.devices[parseInt(sensorIndex)].deviceNumber);
-        set_petName(defaultObj.petName);
-        set_firmwareVersion(defaultObj.devices[parseInt(sensorIndex)].firmware);
-        firebaseHelper.logEvent(firebaseHelper.event_firmware_details, firebaseHelper.screen_sensor_firmware, "details : "+defaultObj.devices[parseInt(sensorIndex)].deviceNumber, 'Current Firmware : '+defaultObj.devices[parseInt(sensorIndex)].firmware);     
-        if(defaultObj.devices[parseInt(sensorIndex)].isFirmwareVersionUpdateRequired){
-          firebaseHelper.logEvent(firebaseHelper.event_firmware_details, firebaseHelper.screen_sensor_firmware, "Update Required : "+defaultObj.devices[parseInt(sensorIndex)].isFirmwareVersionUpdateRequired, 'New Firmware : '+defaultObj.devices[parseInt(sensorIndex)].firmwareNew);     
-            set_isUpdateRequired(defaultObj.devices[parseInt(sensorIndex)].isFirmwareVersionUpdateRequired);
-            set_newFirmwareVersion(defaultObj.devices[parseInt(sensorIndex)].firmwareNew);
-            set_isLoading(true);
-            isLoadingdRef.current = 1;
-            set_loaderText("Please wait while we connect with your sensor");
-            SensorHandler.getInstance();
-            setTimeout(() => {  
-                SensorHandler.getInstance().startScan(defaultObj.devices[parseInt(sensorIndex)].deviceNumber,handleSensorCallback);
-            }, 1000)
-            
+      let obj =  await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+      obj = JSON.parse(obj);
+      if(obj) {
+        set_deviceNumber(obj.configDeviceNo);
+        set_petName(obj.petName);
+        set_firmwareVersion(obj.firmware);
+        firebaseHelper.logEvent(firebaseHelper.event_firmware_details, firebaseHelper.screen_sensor_firmware, "details : "+obj.configDeviceNo, 'Current Firmware : '+obj.firmware); 
+        if(!obj.isFirmwareReq){
+          set_isUpdateRequired(obj.isFirmwareReq);
+          set_newFirmwareVersion(obj.firmwareNew);
+          set_isLoading(true);
+          isLoadingdRef.current = 1;
+          set_loaderText("Please wait while we connect with your sensor");
+          SensorHandler.getInstance();
+          setTimeout(() => {  
+            SensorHandler.getInstance().startScan(obj.configDeviceNo,handleSensorCallback);
+          }, 1000)
         }
+      }
+
     }
 
     const nextBtnAction = (value) => {
@@ -177,7 +176,8 @@ const  SensorFirmwareComponent = ({ route, ...props }) => {
             set_popUpMessage(Constant.SENSOR_RETRY_MESSAGE_3);              
         } else {
           set_isPopupLftBtnEnable(false);
-            set_popUpMessage('Unable to Connect Please try again');
+          set_popUpMessage('Unable to Connect Please try again');
+          SensorHandler.getInstance().dissconnectSensor(); 
         }
 
             set_isLoading(false);
@@ -256,6 +256,7 @@ const  SensorFirmwareComponent = ({ route, ...props }) => {
         } else {
             set_isPopupLftBtnEnable(false);
             set_popUpMessage('Unable to Connect Please try again');
+            SensorHandler.getInstance().dissconnectSensor(); 
         }
             set_isLoading(false);
             isLoadingdRef.current = 0;
@@ -294,7 +295,7 @@ const  SensorFirmwareComponent = ({ route, ...props }) => {
             set_isLoading(false);
             isLoadingdRef.current = 0;
             set_isTryAgain(false);
-
+            SensorHandler.getInstance().dissconnectSensor(); 
         } else if (error) {
           //debugger;
             firebaseHelper.logEvent(firebaseHelper.event_firmware_update_fail, firebaseHelper.screen_sensor_firmware, "Sensor Firmware Updated Failed", 'error : '+error);
@@ -306,6 +307,7 @@ const  SensorFirmwareComponent = ({ route, ...props }) => {
             set_popUpMessage("Unable to Update the sensor firmware. Please try after some time");
             set_isPopUp(true);
             popIdRef.current = 1;
+            SensorHandler.getInstance().dissconnectSensor(); 
         }
       }
     );

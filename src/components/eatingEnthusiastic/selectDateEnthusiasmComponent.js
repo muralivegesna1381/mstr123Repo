@@ -6,8 +6,9 @@ import * as DataStorageLocal from './../../utils/storage/dataStorageLocal';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 import moment from 'moment';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
 
 const  SelectDateEnthusiasmComponent = ({navigation, route, ...props }) => {
 
@@ -74,8 +75,7 @@ const  SelectDateEnthusiasmComponent = ({navigation, route, ...props }) => {
 
         let eatObj =  await DataStorageLocal.getDataFromAsync(Constant.EATINGENTUSIASTIC_DATA_OBJ);
         eatObj = JSON.parse(eatObj);
-        let petObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        petObj = JSON.parse(petObj);
+        let petObj = AppPetsData.petsData.defaultPet;
         let client = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
         
         var data = [
@@ -122,33 +122,24 @@ const  SelectDateEnthusiasmComponent = ({navigation, route, ...props }) => {
 
     const submitPetFeedingTime = async (finalJson) => {
 
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let sPetFeedtimeServiceObj = await ServiceCalls.addPetFeedingTime(finalJson,token);
+        let apiMethod = apiMethodManager.ADD_FEEDING_TIME ;
+        let apiService = await apiRequest.postData(apiMethod,finalJson,Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
-
-        if(sPetFeedtimeServiceObj && sPetFeedtimeServiceObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-          
-        if(sPetFeedtimeServiceObj && !sPetFeedtimeServiceObj.isInternet){
-            createPopup(Constant.NETWORK_STATUS,Constant.ALERT_NETWORK,true);  
-            return;
-        }
-          
-        if(sPetFeedtimeServiceObj && sPetFeedtimeServiceObj.statusData){
+        
+        if(apiService && apiService.status) {
             createPopup(Constant.ALERT_INFO,Constant.EATING_SUBMIT_POP_MSG,true);  
-            await DataStorageLocal.removeDataFromAsync(Constant.EATINGENTUSIASTIC_DATA_OBJ);        
-        } else {
-            firebaseHelper.logEvent(firebaseHelper.event_submit_pet_feeding_time_api_failure, firebaseHelper.screen_eating_enthusiasm_time, "Submit Pet Feeding Time Api failed", '');
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);                          
-        }
+            await DataStorageLocal.removeDataFromAsync(Constant.EATINGENTUSIASTIC_DATA_OBJ);    
+        } else if(apiService && apiService.isInternet === false) {
+            createPopup(Constant.NETWORK_STATUS,Constant.ALERT_NETWORK,true);  
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true); 
+            firebaseHelper.logEvent(firebaseHelper.event_submit_pet_feeding_time_api_failure, firebaseHelper.screen_eating_enthusiasm_time, "Submit Pet Feeding Time Api failed", 'error : '+apiService.error.errorMsg);          
           
-        if(sPetFeedtimeServiceObj && sPetFeedtimeServiceObj.error) {
-            let errors = sPetFeedtimeServiceObj.error.length > 0 ? sPetFeedtimeServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_submit_pet_feeding_time_api_failure, firebaseHelper.screen_eating_enthusiasm_time, "Submit Pet Feeding Time Api failed", 'error : '+errors);
+        } else if(apiService && apiService.logoutError !== null) {            
+        }else {
             createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true); 
+            firebaseHelper.logEvent(firebaseHelper.event_submit_pet_feeding_time_api_failure, firebaseHelper.screen_eating_enthusiasm_time, "Submit Pet Feeding Time Api failed", 'error : '+'Status Failed');
+            
         }
 
     };

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, BackHandler,Linking } from 'react-native';
+import { BackHandler,Linking } from 'react-native';
 import WifiListHPN1UI from './wifiListHPN1UI';
 import * as Constant from "./../../../utils/constants/constant";
 import * as DataStorageLocal from './../../../utils/storage/dataStorageLocal';
 import SensorHandler from '../sensorHandler/sensorHandler';
 import * as bleUUID from "./../../../utils/bleManager/blemanager";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
+import * as AppPetsData from '../../../utils/appDataModels/appPetsModel.js';
 import perf from '@react-native-firebase/perf';
 
 let trace_inSensorHPN1ConfigScreen;
@@ -296,8 +297,7 @@ const WifiListHPN1Component = ({ navigation, route, ...props }) => {
 
     if (actionType === "editAction") {
       await SensorHandler.getInstance().stopScanProcess(false);
-      let defaultObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT,);
-      defaultObj = JSON.parse(defaultObj);
+      let defaultObj = AppPetsData.petsData.defaultPet;
       navigation.navigate('SensorWiFiListComponent',{periId:peripharalId,defaultPetObj:defaultObj,isFromScreen:'configuredWifiScreen'});
 
     } else if (actionType === "deleteAction") {

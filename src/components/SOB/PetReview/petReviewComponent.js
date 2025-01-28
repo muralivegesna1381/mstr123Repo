@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, BackHandler } from 'react-native';
+import { BackHandler } from 'react-native';
 import PetReviewUI from './petReviewUI';
 import * as DataStorageLocal from './../../../utils/storage/dataStorageLocal';
 import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+import * as AppPetsData from '../../../utils/appDataModels/appPetsModel.js';
+import * as UserDetailsModel from "./../../../utils/appDataModels/userDetailsModel.js";
+import { constants } from 'buffer';
+import * as modularPermissions from '../../../utils/appDataModels/modularPermissionsModel.js';
 
 let trace_in_petReview_Screen;
 let trace_Submit_SOB_Details_Api_Complete;
@@ -25,6 +29,7 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
   const [email, set_email] = useState(undefined);
   const [name, set_name] = useState(undefined);
   const [phNo, set_phNo] = useState(undefined);
+  const [isdCodeID, set_isdCodeID] = useState(undefined);
   const [petId, set_petId] = useState(undefined);
   const [petsArray, set_petsArray] = useState(undefined);
   const [defaultPet, set_defaultPet] = useState(undefined);
@@ -100,6 +105,7 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
         set_lastName(sJson.petParentObj.lastName);
         set_email(sJson.petParentObj.email);
         set_phNo(sJson.petParentObj.phoneNumber);
+        set_isdCodeID(sJson.petParentObj.isdCodeId? sJson.petParentObj.isdCodeId :0)
       }
 
       if(sJson.eatTimeArray) {
@@ -115,9 +121,9 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
       set_feedingText(temp)
       }
 
-      let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
+      let userRole = UserDetailsModel.userDetailsData.userRole.RoleId;
       //for representive provide pet parent info as what they entered
-      if (userRole === '9') {
+      if (parseInt(userRole) === 9) {
         let petParentData = await DataStorageLocal.getDataFromAsync(Constant.PET_PARENT_DATA);
         petParentData = JSON.parse(petParentData)
         set_name(petParentData.firstName + " " + petParentData.lastName);
@@ -125,6 +131,7 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
         set_lastName(petParentData.lastName);
         set_email(petParentData.email);
         set_phNo(petParentData.phoneNumber);
+        set_isdCodeID(petParentData.IsdCodeId)
       }
 
       if (sJson.isSameAddress === 'same') {
@@ -161,9 +168,41 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
 
   const setDefaultPet = async (pets, petId) => {
 
-    let obj = findArrayElementByPetId(pets, petId);
-    set_defaultPet(obj);
-    await DataStorageLocal.saveDataToAsync(Constant.DEFAULT_PET_OBJECT, JSON.stringify(obj));
+    if (!isWithoutDevice ) {
+      let obj = findArrayElementByPetId(pets, petId);
+      set_defaultPet(obj);
+
+      if(obj && obj.devices && obj.devices.length > 0) {
+        AppPetsData.petsData.isDeviceSetupDone = obj.devices[0].isDeviceSetupDone;
+        AppPetsData.petsData.isDeviceMissing = false;
+      } else {
+        AppPetsData.petsData.isDeviceSetupDone = true;
+        AppPetsData.petsData.isDeviceMissing = true;
+      }
+      AppPetsData.petsData.totalPets = pets;
+      AppPetsData.petsData.defaultPet = obj;
+    }
+
+    let modularity = {
+      "isFmGraph" : false,
+      "isFmDataService" : false,
+      "isFmGoalSet" : false,
+      "isSleepGraph" : false,
+      "isPetWeight" : false,
+      "isEatingEnthusiasm" : false,
+      "isImageScoring" : false,
+      "ptExists" : false,
+      "isWeightPer" : false,
+      "isQuestionnaireEnable" : false,
+      "isObsEnable" : false,
+      "isTimerEnable" : false,
+      "isFoodHistory" : false,
+      "isFeedingReq" : false,
+      "isTimer" : false,
+      "isPTEnable" : false
+    }
+
+    modularPermissions.modularPermissionsData = modularity;
 
   };
 
@@ -182,40 +221,47 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
 
     set_isLoading(true);
     isLoadingdRef.current = 1;
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 
-    let serviceCallsObj = await ServiceCalls.getPetParentPets(client, token);
+    let apiMethod = apiMethodManager.GET_PETPARENT_PETS + client;
+    let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
+            
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
 
-    set_isLoading(false);
-    isLoadingdRef.current = 0;
+      if(apiService.data.petDevices.length > 0){
 
-    if (serviceCallsObj && serviceCallsObj.logoutData) {
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
-
-    if (serviceCallsObj && !serviceCallsObj.isInternet) {
-      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 1, 'CANCEL', 'OK', false);
-      return;
-    }
-
-    if (serviceCallsObj && serviceCallsObj.statusData) {
-
-      if (serviceCallsObj.responseData) {
-        await setDefaultPet(serviceCallsObj.responseData, petIdRef.current);
-        set_petsArray(serviceCallsObj.responseData);
-        sendFeedingPrefsToBackend();
+        if (sobJson.deviceNo && sobJson.deviceNo && sobJson.deviceNo === '' ) {
+          sendFeedingPrefsToBackend(); 
+        } else {
+          await setDefaultPet(apiService.data.petDevices, petIdRef.current);
+          set_petsArray(apiService.data.petDevices);
+          sendFeedingPrefsToBackend();   
+        }
+          
+      }  else {
+        if (isWithoutDevice ) {
+          set_isLoading(false);
+          isLoadingdRef.current = 0;
+          saveFirstTimeUser(true);
+          createPopup('Congratulations', Constant.PET_WITHOUT_SENSOR_MSG, true, 1, 'CANCEL', 'OK', false); 
+          firebaseHelper.logEvent(firebaseHelper.event_SOB_review_api, firebaseHelper.screen_SOB_Review, "User onboarded pet without device : " + client, '');
+        }
       }
-
+            
+    } else if(apiService && apiService.isInternet === false) {
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 1, 'CANCEL', 'OK', false);
+            
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true, 1, 'CANCEL', 'OK', false);
+    
     } else {
-      set_isSOBSubmitted(false);
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
-    }
 
-    if (serviceCallsObj && serviceCallsObj.error) {
-      set_isSOBSubmitted(false);
-      createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
     }
 
   };
@@ -294,6 +340,7 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
           ClientFirstName: firstName,
           ClientLastName: lastName,
           ClientPhone: phNo,
+          IsdCodeId:isdCodeID
         },
 
         Billing: {
@@ -339,96 +386,89 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
 
   const validateDuplicatePet = async (clientId) => {
 
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
     let duplicateJson = {
       petName: sobJson.petName,
       breedId: sobJson.breedId,
       gender: sobJson.gender,
       petParentId: clientId
     }
-    let duplicatePetServiceObj = await ServiceCalls.validateDuplicatePet(duplicateJson, token);
 
-    if (duplicatePetServiceObj && duplicatePetServiceObj.logoutData) {
-      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Validate_Pet_fail, firebaseHelper.screen_SOB_Review, "SOB Review Validate Pet fail", 'Unatherised');
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
+    let apiMethod = apiMethodManager.VALIDATE_DUPLICATE_PET;
+    let apiService = await apiRequest.postData(apiMethod,duplicateJson,Constant.SERVICE_JAVA,navigation);
+    
+    isLoadingdRef.current = 0;
+        
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+      
+      sobRequest();
 
-    if (duplicatePetServiceObj && !duplicatePetServiceObj.isInternet) {
+    } else if(apiService && apiService.isInternet === false) {
       set_isLoading(false);
-      isLoadingdRef.current = 0;
       createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 1, 'CANCEL', 'OK', false);
       firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Validate_Pet_fail, firebaseHelper.screen_SOB_Review, "SOB Review Validate Pet fail", 'Internet : false');
-      return;
-    }
-
-    if (duplicatePetServiceObj && duplicatePetServiceObj.statusData) {
-      trace_Submit_SOB_Details_Api_Complete = await perf().startTrace('t_CompleteOnboardingInfo_API');
-      sobRequest();
+            
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+      set_isLoading(false);
+      createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true, DUPLICATE_PET, 'NO', 'YES', true);
+      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Validate_Pet_fail, firebaseHelper.screen_SOB_Review, "SOB Review Validate Pet fail", 'error : ' + apiService.error.errorMsg);
+    
     } else {
       set_isLoading(false);
-      isLoadingdRef.current = 0;
-      createPopup(Constant.ALERT_DEFAULT_TITLE, duplicatePetServiceObj.responseData, true, DUPLICATE_PET, 'NO', 'YES', true);
-      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Validate_Pet_fail, firebaseHelper.screen_SOB_Review, "SOB Review Validate Pet fail", 'Service call : false');
-    }
+      createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
 
-    if (duplicatePetServiceObj && duplicatePetServiceObj.error) {
-      set_isLoading(false);
-      isLoadingdRef.current = 0;
-      createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', true);
-      let errors = duplicatePetServiceObj.error.length > 0 ? duplicatePetServiceObj.error[0].code : '';
-      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Validate_Pet_fail, firebaseHelper.screen_SOB_Review, "SOB Review Validate Pet fail", 'error : ' + errors);
     }
 
   };
 
   const sobRequest = async () => {
 
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-
-    let onBoardPetServiceObj = await ServiceCalls.completeOnboardingInfo(finalJson.current, token);
-    set_isLoading(false);
-    isLoadingdRef.current = 0;
+    let apiMethod = apiMethodManager.COMPLETE_ONBOARD_INFO;
+    let apiService = await apiRequest.postData(apiMethod,finalJson.current,Constant.SERVICE_MIGRATED,navigation);
+    
     stopFBTrace();
-    if (onBoardPetServiceObj && onBoardPetServiceObj.logoutData) {
-      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_api_fail, firebaseHelper.screen_SOB_Review, "Onboarding Api Fail", 'Unautherised');
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
+        
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+      
+      if (apiService.data) {
 
-    if (onBoardPetServiceObj && !onBoardPetServiceObj.isInternet) {
-      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 1, 'CANCEL', 'OK', false);
-      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_api_fail, firebaseHelper.screen_SOB_Review, "Onboarding Api fail", 'Internet : false');
-      return;
-    }
+          set_petId(apiService.data.petID);
+          petIdRef.current = apiService.data.petID;
+          petParentIDRef.current = apiService.data.petParentId;
+          
+        if (sobJson.deviceNo && sobJson.deviceNo && sobJson.deviceNo === '' ) {
 
-    if (onBoardPetServiceObj && onBoardPetServiceObj.statusData) {
-
-      if (onBoardPetServiceObj.responseData) {
-
-        set_petId(onBoardPetServiceObj.responseData.petID);
-        petIdRef.current = onBoardPetServiceObj.responseData.petID;
-        petParentIDRef.current = onBoardPetServiceObj.responseData.petParentId;
-        saveFirstTimeUser(false);
-        set_isSOBSubmitted(true);
-        getUserPets();
+        } else {
+          set_isSOBSubmitted(true);
+          saveFirstTimeUser(false);
+          getUserPets();
+        }
 
       } else {
+        set_isLoading(false);
+        isLoadingdRef.current = 0;
         createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true, 1, 'CANCEL', 'OK', false);
       }
-
+      
+    } else if(apiService && apiService.isInternet === false) {
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 1, 'CANCEL', 'OK', false);
+      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_api_fail, firebaseHelper.screen_SOB_Review, "Onboarding Api fail", 'Internet : false');
+            
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      set_isSOBSubmitted(false);
+      createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true, 1, 'CANCEL', 'OK', true);
+      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_api_fail, firebaseHelper.screen_SOB_Review, "Onboarding Api fail", 'error : '+apiService.error.errorMsg);
+      
     } else {
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
       firebaseHelper.logEvent(firebaseHelper.event_SOB_review_api_fail, firebaseHelper.screen_SOB_Review, "Onboarding Api fail", 'Service Status : false');
       set_isSOBSubmitted(false);
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', true);
-    }
 
-    if (onBoardPetServiceObj && onBoardPetServiceObj.error) {
-      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_api_fail, firebaseHelper.screen_SOB_Review, "Onboarding Api fail", 'error : Service error');
-      set_isSOBSubmitted(false);
-      createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', true);
     }
 
   };
@@ -438,7 +478,6 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
     set_isLoading(true);
     isLoadingdRef.current = 1;
     let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
     let tempArray = []
 
     if (sobJson) {
@@ -452,43 +491,43 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
       "userId": clientId,
       "petFeedingPreferences": tempArray
     };
-
-    let feedPrefServiceObj = await ServiceCalls.addPetFeedingPreferences(obj, token);
+    let apiMethod = apiMethodManager.ADD_FEEDING_PREFERENCES;
+    let apiService = await apiRequest.postData(apiMethod,obj,Constant.SERVICE_JAVA,navigation);
     set_isLoading(false);
     isLoadingdRef.current = 0;
-
-    if (feedPrefServiceObj && feedPrefServiceObj.logoutData) {
-      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Feeding_Pref_fail, firebaseHelper.screen_SOB_Review, "SOB Feeding Pref Api fail", 'Unautherised');
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
-
-    if (feedPrefServiceObj && !feedPrefServiceObj.isInternet) {
-      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 1, 'CANCEL', 'OK', false);
-      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Feeding_Pref_fail, firebaseHelper.screen_SOB_Review, "SOB Feeding Pref Api fail", 'Internet : false');
-      return;
-    }
-
-    if (feedPrefServiceObj && feedPrefServiceObj.statusData) {
-      //change message based on onboarding type
+        
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+      
       let type = await DataStorageLocal.getDataFromAsync(Constant.ONBOARDING_PET_BFI);
       if (type === Constant.IS_FROM_PET_BFI) {
         createPopup('Congratulations', Constant.PET_CREATE_SUCCESS_MSG_FROM_BFI, true, 1, 'CANCEL', 'OK', false);
       } else {
-        createPopup('Congratulations', Constant.PET_CREATE_SUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
+        // createPopup('Congratulations', Constant.PET_CREATE_SUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
+        if (isWithoutDevice ) {
+          createPopup('Congratulations', Constant.PET_WITHOUT_SENSOR_MSG, true, 1, 'CANCEL', 'OK', false); 
+        } else {
+          createPopup('Congratulations', Constant.PET_CREATE_SUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
+        }
+        
       }
+      
+    } else if(apiService && apiService.isInternet === false) {
+
+      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 1, 'CANCEL', 'OK', false);
+      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Feeding_Pref_fail, firebaseHelper.screen_SOB_Review, "SOB Feeding Pref Api fail", 'Internet : false');
+            
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+      set_isSOBSubmitted(false);
+      createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
+      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Feeding_Pref_fail, firebaseHelper.screen_SOB_Review, "SOB Feeding Pref Api fail", 'error : ' + apiService.error.errorMsg);
+    
     } else {
+
       set_isSOBSubmitted(false);
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
       firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Feeding_Pref_fail, firebaseHelper.screen_SOB_Review, "SOB Feeding Pref Api fail", 'Service Status : false');
-    }
 
-    if (feedPrefServiceObj && feedPrefServiceObj.error) {
-      set_isSOBSubmitted(false);
-      createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
-      let errors = feedPrefServiceObj.error.length > 0 ? feedPrefServiceObj.error[0].code : '';
-      firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Feeding_Pref_fail, firebaseHelper.screen_SOB_Review, "SOB Feeding Pref Api fail", 'error : ' + errors);
     }
 
   };
@@ -535,6 +574,8 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
       } else {
         createPopup('', '', false, 0, '', '', false);
       }
+    }else if (popUpMessage === Constant.PET_WITHOUT_SENSOR_MSG) {
+      updateDashboardData([]);
     }
     else if (popUpMessage === Constant.PET_CREATE_SUCCESS_MSG_FROM_BFI) {
       //navigate to capture images screen once onboarding success
@@ -566,10 +607,11 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
   };
 
   const saveFirstTimeUser = async (value) => {
-    await DataStorageLocal.saveDataToAsync(Constant.IS_FIRST_TIME_USER, JSON.stringify(value));
+    AppPetsData.petsData.isFirstUser = value;
   };
 
   const savePetsForDashBoardAfterNotiSetting = async (arrayPet) => {
+
     removeOnboardData();
     await DataStorageLocal.saveDataToAsync(Constant.SENOSR_INDEX_VALUE, '' + 0);
 
@@ -599,6 +641,7 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
     }
 
     await DataStorageLocal.saveDataToAsync(Constant.CONFIG_SENSOR_OBJ, JSON.stringify(devObj));
+    await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(defaultPet));
     navigation.navigate('SensorInitialComponent', { defaultPetObj: defaultPet });
 
   };

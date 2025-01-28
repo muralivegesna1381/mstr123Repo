@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,BackHandler,TouchableOpacity,Image} from 'react-native';
+import {View,StyleSheet,Text,BackHandler,TouchableOpacity} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from './../../utils/commonStyles/fonts'
 import CommonStyles from './../../utils/commonStyles/commonStyles';
@@ -10,10 +10,12 @@ import BottomComponent from "./../../utils/commonComponents/bottomComponent";
 import GoalSetSliderComponent from "./../goalSetComponents/goalSetSliderComponent"
 import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../utils/constants/constant";
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+
+import EyeImg from "./../../../assets/images/bfiGuide/svg/eye-instructions.svg"
 
 const POP_SUCCESS = 1;
 let trace_goalSet_Screen;
@@ -79,7 +81,6 @@ const  GoalSetComponent = ({navigation,route, ...props }) => {
     const savePetGaol = async (petId) => {
 
         set_isLoading(true);
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
         let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
 
         let obj =  {
@@ -89,35 +90,28 @@ const  GoalSetComponent = ({navigation,route, ...props }) => {
             "userId": null
         }
 
-        let savePetGaolObj = await ServiceCalls.saveForwardMotionGoal(obj,token);
-
+        let apiMethod = apiMethodManager.SAVE_FORWARD_MOTION;
+        let apiService = await apiRequest.putData(apiMethod,obj,Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
-        if(savePetGaolObj && savePetGaolObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-
-        if(savePetGaolObj && !savePetGaolObj.isInternet){
-            createPopup(Constant.NETWORK_STATUS,Constant.ALERT_NETWORK,'OK', true,0);
-            return;
-        }
-
-        if(savePetGaolObj && savePetGaolObj.statusData) {
-
-            if(savePetGaolObj && savePetGaolObj.responseData.message) {
-                createPopup(savePetGaolObj.responseData.message,Constant.ALERT_INFO,'OK', true,1);
+            
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            
+            if(apiService.data.message) {
+                createPopup(apiService.data.message,Constant.ALERT_INFO,'OK', true,1);
             }
+                
+        } else if(apiService && apiService.isInternet === false) {
+            createPopup(Constant.NETWORK_STATUS,Constant.ALERT_NETWORK,'OK', true,0);
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            firebaseHelper.logEvent(firebaseHelper.event_save_GoalSet_api_fail, firebaseHelper.screen_Goal_Set, "Save ForwardMotion Goal Api Failed  : ", 'Service Status : '+apiService.error.errorMsg);
+            createPopup(apiService.error.errorMsg,Constant.ALERT_DEFAULT_TITLE,'OK', true,0);
             
         } else {
+
             createPopup(Constant.SERVICE_FAIL_MSG,Constant.ALERT_DEFAULT_TITLE,'OK', true,0);
             firebaseHelper.logEvent(firebaseHelper.event_save_GoalSet_api_fail, firebaseHelper.screen_Goal_Set, "Save ForwardMotion Goal Api Failed : ", 'Service Status : false');
-        }
 
-        if(savePetGaolObj && savePetGaolObj.error) {
-            let errors = savePetGaolObj.error.length > 0 ? savePetGaolObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_save_GoalSet_api_fail, firebaseHelper.screen_Goal_Set, "Save ForwardMotion Goal Api Failed  : ", 'Service Status : '+errors);
-            createPopup(Constant.SERVICE_FAIL_MSG,Constant.ALERT_DEFAULT_TITLE,'OK', true,0);
         }
 
     };
@@ -229,7 +223,7 @@ const  GoalSetComponent = ({navigation,route, ...props }) => {
                 <TouchableOpacity onPress={() => {instructionAction()}}>
                     <View style={styles.headerViewStyleView}>
                         <View style={{ flexDirection: 'row' }}>
-                        <Image style={styles.imgStyle} resizeMode='contain' source={require('./../../../assets/images/bfiGuide/svg/eye-instructions.svg')}></Image>
+                        <EyeImg style={styles.imgStyle}/>
                         <Text style={styles.viewTextStyleBFIApp}>{'View Instructions'}</Text>
                         </View>
                     </View>
@@ -311,6 +305,7 @@ const  GoalSetComponent = ({navigation,route, ...props }) => {
         width: wp('5%'),
         height: hp('3%'),
         tintColor: "#6BC100",
+        alignSelf:'center'
     },
 
     viewTextStyleBFIApp: {
@@ -321,11 +316,8 @@ const  GoalSetComponent = ({navigation,route, ...props }) => {
     },
 
     headerViewStyleView: {
-        // paddingHorizontal: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        // marginTop: hp('10%'),
-
     },
 
   });

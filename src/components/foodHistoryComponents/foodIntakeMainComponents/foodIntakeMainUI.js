@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, FlatList, Platform } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList, Platform } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import fonts from '../../../utils/commonStyles/fonts'
@@ -14,11 +14,11 @@ import moment from "moment";
 import FoodHistoryComponent from './../foodHComponents/foodHistoryComponent'
 import CalendarPicker from 'react-native-calendar-picker';
 
-import rButtonImg from "./../../../../assets/images/otherImages/svg/right_Arrow.svg";
-import calenderButtonImg from "./../../../../assets/images/otherImages/svg/calender.svg";
-import dropDownImg from "./../../../../assets/images/otherImages/svg/dropDownDate.svg";
-let noLogsDogImg = require("./../../../../assets/images/dogImages/noRecordsDog.svg");
-let noLogsCatImg = require("./../../../../assets/images/dogImages/noRecordsCat.svg");
+import RButtonImg from "./../../../../assets/images/otherImages/svg/right_Arrow.svg";
+import CalenderButtonImg from "./../../../../assets/images/otherImages/svg/calender.svg";
+import DropDownImg from "./../../../../assets/images/otherImages/svg/dropDownDate.svg";
+import NoLogsDogImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
+import NoLogsCatImg from "./../../../../assets/images/dogImages/noRecordsCat.svg";
 
 const FoodIntakeMainUI = ({ route, ...props }) => {
 
@@ -130,7 +130,7 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
                     <View>
                         <View style={{ width: wp('80%') }}>
 
-                        <View style={[styles.cellSubViewStyle, { borderBottomWidth: Platform.isPad ? 0.5 : 0.2 }]}>
+                        <View style={[styles.cellSubViewStyle, { borderBottomWidth: Platform.isPad ? 0.5 : 1 }]}>
 
                             <View style={{  width: wp('45%')}}>
                                 <Text numberOfLines={2} style={[styles.recFoodTexStyle]}>{item.foodIntakeHistory[0].dietName}</Text>
@@ -151,7 +151,7 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
 
                     {item.foodIntakeHistory.length > 1 ? <View style={{ width: wp('80%') }}>
 
-                        <View style={[styles.cellSubViewStyle, { borderBottomWidth: Platform.isPad ? 0.5 : 0.2 }]}>
+                        <View style={[styles.cellSubViewStyle, { borderBottomWidth: Platform.isPad ? 0.5 : 1 }]}>
 
                             <View style={{width: wp('40%') }}>
                                 <Text numberOfLines={2} style={[styles.recFoodTexStyle]}>{item.foodIntakeHistory[1].dietName}</Text>
@@ -168,7 +168,7 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
                     </View>
 
                     <View style={{ justifyContent: 'center', alignItems: 'center', width: wp('10%') }}>
-                        <Image source={rButtonImg} style={[styles.imageStyle, {}]} />
+                        <RButtonImg style={[styles.imageStyle, {}]}/>
                     </View>
 
                 </TouchableOpacity> : null}
@@ -211,7 +211,7 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
                     {props.tabSelection === 0 ? <TouchableOpacity style={[CommonStyles.dateBtnStyle, {}]} onPress={() => { dateTopBtnAction() }}>
                         {props.tabSelection === 0 ? <Text style={[CommonStyles.dateBtnTextStyle]}>{props.datePickerDate ? moment(new Date(props.datePickerDate)).format('MM-DD-YYYY') : 'Date'}</Text> :
                             <Text style={[CommonStyles.dateBtnTextStyle]}>{fCalenderSdate && fCalenderSdate ? (fCalenderSdate === fCalenderedate ? fCalenderSdate : fCalenderSdate + (fCalenderedate ? " to " + fCalenderedate : "")) : (fCalenderSdate ? fCalenderSdate : "Date")}</Text>}
-                        <Image source={calenderButtonImg} style={[CommonStyles.searchCalImageStyle, { width: Platform.isPad ? wp('4%') : wp('6%'), }]} />
+                        <CalenderButtonImg width={Platform.isPad ? wp('4%') : wp('6%')} style={[CommonStyles.searchCalImageStyle]} />
                     </TouchableOpacity> :
                         <View style={{ flexDirection: 'row', width: wp('93%'), justifyContent: 'space-between' }}>
                             <TouchableOpacity style={{ height: hp('4%')}} onPress={() => { dateTopBtnAction() }}>
@@ -227,7 +227,7 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
                                             (fCalenderSdate === fCalenderedate ? moment(fCalenderSdate, 'MM-DD-YYYY').format("DD MMM YYYY") 
                                             : moment(fCalenderSdate, 'MM-DD-YYYY').format("DD MMM YYYY") + (fCalenderedate ? " - " + moment(fCalenderedate, 'MM-DD-YYYY').format("DD MMM YYYY") : "")) 
                                             : (fCalenderSdate ? moment(fCalenderSdate, 'MM-DD-YYYY').format("DD MMM YYYY") : "Date")}</Text>
-                                        <Image source={dropDownImg} resizeMode = {'contain'} style={{ width: Platform.isPad ? wp('4%') : wp('4%'),height: hp('1%'),marginLeft: hp('1%')}} />
+                                        <DropDownImg width={Platform.isPad ? wp('4%') : wp('4%')} height={hp('1%')} style={{marginLeft: hp('1%')}}/>
 
                                     </View>
 
@@ -248,7 +248,7 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
                             renderItem={renderItem}
                             keyExtractor={(item, index) => "" + index}
                         /> : (!props.isLoading ? <View style={{ justifyContent: 'center', alignItems: 'center', height: hp('58%') }}>
-                            <Image style={[styles.nologsDogStyle]} source={props.petObj && props.petObj.speciesId && parseInt(props.petObj.speciesId) === 1 ? noLogsDogImg : noLogsCatImg}></Image>
+                            {props.petObj && props.petObj.speciesId && parseInt(props.petObj.speciesId) === 1 ? <NoLogsDogImg style={[styles.nologsDogStyle]}/> : <NoLogsCatImg style={[styles.nologsDogStyle]}/>}
                             {/* <Text style={CommonStyles.noRecordsTextStyle}>{obsMessage}</Text> */}
                             <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_INTAKES_FOUND}</Text>
                         </View> : null)}
@@ -363,6 +363,7 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
                             onDateChange={(date) => { set_datePickerDate1(date) }}
                             mode={"date"}
                             textColor={'black'}
+                            theme = {'light'}
                             maximumDate={new Date()}
                             minimumDate={minimumDate ? new Date(minimumDate) : new Date('1900-01-01')}
                             style={styles.datePickeStyle}

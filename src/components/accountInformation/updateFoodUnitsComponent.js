@@ -5,8 +5,9 @@ import UpdateFoodUnitsUI from './updateFoodUnitsUI.js';
 import * as DataStorageLocal from '../../utils/storage/dataStorageLocal';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
 import moment from "moment";
 
 let trace_inPUnits_Screen;
@@ -32,6 +33,7 @@ const UpdateFoodUnitsComponent = ({ navigation, route, ...props }) => {
     const [isWeightView, set_isWeightView] = useState(false);
     const [weightUnitId, set_weightUnitId] = useState(1)
     const [date, set_Date] = useState(new Date());
+    const [popupId, set_popupId] = useState(0);
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
@@ -72,7 +74,7 @@ const UpdateFoodUnitsComponent = ({ navigation, route, ...props }) => {
             set_weightUnitId(route.params?.prefObj.preferredWeightUnitId);
             getUnits();
         }
-    }, [route.params?.prefObj]);
+    }, [route.params?.prefObj,route.params?.isdCode_Id]);
 
     const getUnits = async () => {
 
@@ -122,48 +124,30 @@ const UpdateFoodUnitsComponent = ({ navigation, route, ...props }) => {
 
     const getFeedingData = async (value) => {
 
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let getFeedingUnitsSOBJ = await ServiceCalls.getFoofdUnitsApi(value,token);
+        set_isLoading(true);
+        isLoadingdRef.current = 1;
+
+        let apiMethod = apiMethodManager.GET_MEASUREMENTS_UNITS+value;
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
-        isLoadingdRef.current = 0; 
-
-        if(getFeedingUnitsSOBJ && getFeedingUnitsSOBJ.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
+        isLoadingdRef.current = 0;
+        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            return apiService.data.measurementUnits;
+        } else if(apiService && apiService.isInternet === false) {
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,0);          
             return;
-        }
-            
-        if(getFeedingUnitsSOBJ && !getFeedingUnitsSOBJ.isInternet){
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);  
-            return;
-        }
-            
-        if(getFeedingUnitsSOBJ && getFeedingUnitsSOBJ.statusData){
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,0);
 
-            if(getFeedingUnitsSOBJ.responseData){
-                return getFeedingUnitsSOBJ.responseData.measurementUnits               
-            } else {                 
-                set_isNavigate(false);   
-                createPopup('Alert','Details cannot be update. Please try after some time',true);        
-            }
-                        
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true,0);
+            
         } else {
-            firebaseHelper.logEvent(firebaseHelper.event_get_foodUnits_api_fail, firebaseHelper.screen_PP_Food_Units, "Get FoodUnits Api Failed : ", 'Service Status : false');
-            set_isNavigate(false);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,'Details cannot be update. Please try after some time',true);              
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_UPDATE_ERROR_MSG,true,0); 
         }
-            
-        if(getFeedingUnitsSOBJ && getFeedingUnitsSOBJ.error) {
-            firebaseHelper.logEvent(firebaseHelper.event_get_foodUnits_api_fail, firebaseHelper.screen_PP_Food_Units, "Get FoodUnits Api Failed : ", 'Other_Info : Service error');
-            set_isNavigate(false);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,'Details cannot be update. Please try after some time',true);  
-        }
-    }
 
-    // Saves the user new password for auto login
-    const savePs = async (ps) => {
-        await DataStorageLocal.saveDataToAsync(Constant.USER_PSD_LOGIN, "" + ps);
-    };
+    }
 
     // Service call to save the changed password
     const submitAction = async () => {
@@ -171,7 +155,7 @@ const UpdateFoodUnitsComponent = ({ navigation, route, ...props }) => {
         set_isLoading(true);
         isLoadingdRef.current = 1;
         let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let userId = await DataStorageLocal.getDataFromAsync(Constant.USER_ID);
+        let userId = UserDetailsModel.userDetailsData.userRole.UserId;
         let json = {
             ClientID: "" + clientIdTemp,
             UserId : userId,
@@ -182,64 +166,55 @@ const UpdateFoodUnitsComponent = ({ navigation, route, ...props }) => {
             NotifyToSecondaryEmail: true,
             PetParentAddress : prefObj && prefObj.address ? prefObj.address : {},
             PreferredFoodRecTime : prefTimeText,
+            IsdCodeId: route.params?.isdCode_Id? route.params?.isdCode_Id :'',
             PreferredWeightUnitId : weightUnitId,
             PreferredFoodRecUnitId :  unitId
+            
         };
-
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        updatePrefTime(json,token);
+        updatePrefTime(json);
 
     };
 
-    const updatePrefTime = async (json,token) => {
+    const updatePrefTime = async (json) => {
 
-        let cNameServiceObj = await ServiceCalls.changeClientInfo(json,token);
+        set_isLoading(true);
+        isLoadingdRef.current = 1;
+        let apiMethod = apiMethodManager.CHANGE_CLIENT_INFO;
+        let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
         set_isLoading(false);
-        isLoadingdRef.current = 0; 
-
-        if(cNameServiceObj && cNameServiceObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-            
-        if(cNameServiceObj && !cNameServiceObj.isInternet){
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);  
-            return;
-        }
-            
-        if(cNameServiceObj && cNameServiceObj.statusData){
-
-            if(cNameServiceObj.responseData && cNameServiceObj.responseData.Key){
+        isLoadingdRef.current = 0;
+        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            if(apiService.data.Key){
                 set_isNavigate(true);
-                createPopup(Constant.ALERT_INFO,Constant.CHANGE_UNITS_SUCCESS,true);  
-            } else {                 
-                set_isNavigate(false);   
-                createPopup('Alert',Constant.SERVICE_UPDATE_ERROR_MSG,true);        
+                createPopup(Constant.ALERT_INFO,Constant.CHANGE_UNITS_SUCCESS,true,0); 
+            } else {
+                createPopup('Alert',Constant.SERVICE_UPDATE_ERROR_MSG,true,0); 
             }
-                        
-        } else {
-            firebaseHelper.logEvent(firebaseHelper.event_update_foodUnits_api_fail, firebaseHelper.screen_PP_Food_Units, "Update FoodUnits Api Failed : ", 'Service Status : false');
-            set_isNavigate(false);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_UPDATE_ERROR_MSG,true);              
+        } else if(apiService && apiService.isInternet === false) {
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,0);          
+            return;
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,0);
+        } else if(apiService && apiService.logoutError !== null) {
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.logoutError,true,1); 
+        }else {
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_UPDATE_ERROR_MSG,true,0); 
         }
-            
-        if(cNameServiceObj && cNameServiceObj.error) {
-            firebaseHelper.logEvent(firebaseHelper.event_update_foodUnits_api_fail, firebaseHelper.screen_PP_Food_Units, "Update FoodUnits Api Failed : ", 'Service Status : service error');
-            set_isNavigate(false);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_UPDATE_ERROR_MSG,true);  
-        }
+
     }
 
-    const createPopup = (title,msg,value) => {
+    const createPopup = (title,msg,value,popId) => {
         popIdRef.current = 1;
         set_popUpTitle(title);
         set_popUpMessage(msg);
         set_isPopUp(value);
+        set_popupId(popId);
     };
 
     // Popup Ok button action
-    const popOkBtnAction = (value,) => {
+    const popOkBtnAction = async (value,) => {
+
         set_isPopUp(value);
         popIdRef.current = 0;
         set_popUpTitle(undefined);

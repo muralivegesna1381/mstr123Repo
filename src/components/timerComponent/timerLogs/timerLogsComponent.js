@@ -4,8 +4,9 @@ import TimerLogsUI from './timerLogsUI';
 import * as Constant from "./../../../utils/constants/constant";
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+import perf from '@react-native-firebase/perf';
 
 let trace_inTimerLogsScreen;
 
@@ -74,38 +75,30 @@ const  TimerLogsComponent = ({navigation, route, ...props }) => {
 
     const getTimerDetails = async (json,token) => {
 
-      let serviceCallsObj = await ServiceCalls.getPetTimerLog(json,token);
+      let apiMethod = apiMethodManager.GET_TIMER_LOGS;
+      let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
       set_isLoading(false);
       isLoadingdRef.current = 0;
-
-      if(serviceCallsObj && serviceCallsObj.logoutData){
-        AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
-        return;
-      }
-
-      if(serviceCallsObj && !serviceCallsObj.isInternet){
-        return;
-      }
-
-      if(serviceCallsObj && serviceCallsObj.statusData){
-
-        if(serviceCallsObj.responseData){
-          set_timerLogsArray(serviceCallsObj.responseData.Value);
-          if(serviceCallsObj.responseData.Value.length>0){
+              
+      if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+              
+        if(apiService.data){
+          set_timerLogsArray(apiService.data.Value);
+          if(apiService.data.Value.length>0){
             set_noLogsShow(false);
           } else {
             set_noLogsShow(true);
           }
         }
-
+      
+      } else if(apiService && apiService.isInternet === false) {
+        set_noLogsShow(true);
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+        set_noLogsShow(true);
       } else {
         set_noLogsShow(true);
       }
 
-      if(serviceCallsObj && serviceCallsObj.error) {
-        set_noLogsShow(true);
-      }
     };
 
     const navigateToPrevious = () => {  

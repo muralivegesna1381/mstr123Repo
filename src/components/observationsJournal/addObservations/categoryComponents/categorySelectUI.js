@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, TouchableOpacity,Platform } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity,Platform } from 'react-native';
 import BottomComponent from "../../../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from '../../../../utils/commonComponents/headerComponent';
 import fonts from '../../../../utils/commonStyles/fonts'
 import CommonStyles from '../../../../utils/commonStyles/commonStyles';
-import LoaderComponent from './../../../../utils/commonComponents/loaderComponent';
-import AlertComponent from '../../../../utils/commonComponents/alertComponent';
+
+import VideoObsImg from "./../../../../../assets/images/otherImages/svg/videoIconObs.svg";
+import PhotoObsImg from "./../../../../../assets/images/otherImages/svg/photoIconObs.svg";
 
 const CategorySelectUI = ({ route, ...props }) => {
-
-    useEffect(() => {
-
-    }, []);
 
     const nextButtonAction = async () => {
        props.nextButtonAction();
@@ -54,32 +51,14 @@ const CategorySelectUI = ({ route, ...props }) => {
 
                     <TouchableOpacity onPress={() => selectCategory('Photos', 0)}>
                         <View style={props.selectedIndex === 0 ? [styles.activityBckView] : [styles.unActivityBckView]}>
-
-                            {/* <View style={styles.imgBckViewStyle}> */}
-                                <ImageBackground
-                                    source={require("./../../../../../assets/images/otherImages/svg/photoIconObs.svg")}
-                                    style={Platform.isPad ? [styles.petImgStyle, {width: wp("8%")}] : [styles.petImgStyle]}
-                                    resizeMode='contain'
-                                >
-                                </ImageBackground>
-                            {/* </View> */}
-
+                            <PhotoObsImg style={Platform.isPad ? [styles.petImgStyle, {width: wp("8%")}] : [styles.petImgStyle]}/>
                             <Text style={[styles.name]}>{'Photos'}</Text>
                         </View>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => selectCategory('Videos', 1)}>
                         <View style={props.selectedIndex === 1 ? [styles.activityBckView] : [styles.unActivityBckView]}>
-
-                            {/* <View style={styles.imgBckViewStyle}> */}
-                                <ImageBackground
-                                    source={require("./../../../../../assets/images/otherImages/svg/videoIconObs.svg")}
-                                    style={Platform.isPad ? [styles.petImgStyle, {width: wp("8%")}] : [styles.petImgStyle]}
-                                    resizeMode='contain'
-                                >
-                                </ImageBackground>
-                            {/* </View> */}
-
+                            <VideoObsImg style={Platform.isPad ? [styles.petImgStyle, {width: wp("8%")}] : [styles.petImgStyle]}/>
                             <Text style={[styles.name]}>{'Videos'}</Text>
                         </View>
                     </TouchableOpacity>
@@ -99,21 +78,6 @@ const CategorySelectUI = ({ route, ...props }) => {
                     leftButtonAction={async () => backBtnAction()}
                 />
             </View>
-
-            {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
-                <AlertComponent
-                    header = {props.popUpAlert}
-                    message={props.popUpMessage}
-                    isLeftBtnEnable = {false}
-                    isRightBtnEnable = {true}
-                    leftBtnTilte = {'Cancel'}
-                    rightBtnTilte = {'OK'}
-                    popUpRightBtnAction = {() => popOkBtnAction()}
-                />
-            </View> : null}
-
-            {props.isLoading === true ? <LoaderComponent isLoader={true} loaderText = {props.loaderMsg} isButtonEnable = {false} /> : null} 
-
 
         </View>
     );

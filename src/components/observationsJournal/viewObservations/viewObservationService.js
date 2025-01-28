@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {View,BackHandler} from 'react-native';
+import {BackHandler} from 'react-native';
 import ViewObservationComponent from './viewObservationComponent';
 import * as Constant from "./../../../utils/constants/constant";
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import storage, { firebase } from '@react-native-firebase/storage';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
-import { parse } from 'qs';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+import * as ObservationModel from "./../observationModel/observationModel.js"
+import * as Apolloclient from './../../../config/apollo/apolloConfig';
+import * as Queries from "./../../../config/apollo/queries";
 
 const OBS_DELETE = 1;
 const OBS_EDIT = 2;
@@ -149,7 +151,6 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
 
     let defPet = await DataStorageLocal.getDataFromAsync(Constant.OBS_SELECTED_PET);
     defPet = JSON.parse(defPet);
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 
     let id = 1;
     if(defPet && defPet.speciesId){
@@ -157,48 +158,42 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
     }
     firebaseHelper.logEvent(firebaseHelper.event_behaviors_api, firebaseHelper.screen_view_observations, "Initiated Get Behaviors Api", 'Species Id : '+id);
     trace_Get_Behaviors_API_Complete = await perf().startTrace('t_Get_Behaviors_API');
-    getBehavioursFromBckEnd(id,token);
+    getBehavioursFromBckEnd(id);
   };
 
-  const getBehavioursFromBckEnd = async (id,token) => {
+  const getBehavioursFromBckEnd = async (id) => {
 
-    let getBehServiceObj = await ServiceCalls.getPetBehaviors(id,token);
+    let apiMethod = apiMethodManager.GET_BEHAVIORS + id;
+    let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
     set_isLoading(false);
     isLoadingdRef.current = 0;
     stopFBTraceGetBehaviors();
-
-    if(getBehServiceObj && getBehServiceObj.logoutData){
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
         
-    if(getBehServiceObj && !getBehServiceObj.isInternet){
-      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,false,'OK',true,0,'');
-      return;
-    }
-  
-    if(getBehServiceObj && getBehServiceObj.statusData){
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
 
-      if(getBehServiceObj.responseData && getBehServiceObj.responseData.length > 0){
+      if(apiService.data.petBehaviorList && apiService.data.petBehaviorList.length > 0){
         set_isLoading(false);
         isLoadingdRef.current = 0;
-        set_behavioursData(getBehServiceObj.responseData);
-        getBehaviourName(getBehServiceObj.responseData);                 
+        set_behavioursData(apiService.data.petBehaviorList);
+        getBehaviourName(apiService.data.petBehaviorList);    
+                         
       } else {
-        set_behavioursData(undefined);     
+        set_behavioursData(undefined); 
       }
-        
+            
+    } else if(apiService && apiService.isInternet === false) {
+      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,false,'OK',true,0,'');
+            
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+      createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,false,'OK',true,0,'');
+      firebaseHelper.logEvent(firebaseHelper.event_behaviors_api_fail, firebaseHelper.screen_view_observations, "Get Behaviors Api Failed", 'error : '+apiService.error.errorMsg);
+    
     } else {
       firebaseHelper.logEvent(firebaseHelper.event_behaviors_api_fail, firebaseHelper.screen_view_observations, "Get Behaviors Api Failed", 'Service Status : false ');
       createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,false,'OK',true,0,'');
+
     }
-  
-    if(getBehServiceObj && getBehServiceObj.error) {
-      createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,false,'OK',true,0,'');
-      let errors = getBehServiceObj.error.length > 0 ? getBehServiceObj.error[0].code : '';
-      firebaseHelper.logEvent(firebaseHelper.event_behaviors_api_fail, firebaseHelper.screen_view_observations, "Get Behaviors Api Failed", 'error : '+errors);
-    }
+
   };
 
   const stopFBTraceGetBehaviors = async () => {
@@ -242,24 +237,12 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
   const deleteObservationBcknd = async (obsId,petId) => {
 
     let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 
-    let deleteObsServiceObj = await ServiceCalls.deleteObservations(obsId,petId,clientId,token);
-    if(deleteObsServiceObj && deleteObsServiceObj.logoutData){
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      firebaseHelper.logEvent(firebaseHelper.event_delete_observation_api_fail, firebaseHelper.screen_view_observations, "Deleting Observation(id) Fail", 'Unautherised');
-      return;
-    }
-          
-    if(deleteObsServiceObj && !deleteObsServiceObj.isInternet){
-      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,false,'OK',true,0,'');
-      firebaseHelper.logEvent(firebaseHelper.event_delete_observation_api_fail, firebaseHelper.screen_view_observations, "Deleting Observation(id) Fail", 'Internet : false');
-      return;
-    }
-    
-    if(deleteObsServiceObj && deleteObsServiceObj.statusData){
-
+    let apiMethod = apiMethodManager.DELETE_OBSERVATION + obsId + '/' + petId + '/' + clientId;
+    let apiService = await apiRequest.deleteData(apiMethod,null,Constant.SERVICE_JAVA,navigation);
+            
+    if(apiService && apiService.data) {
+      Apolloclient.client.writeQuery({query: Queries.UPDATE_OBSERVATION_LIST,data: {data: { obsData:obsId,__typename: 'UpadateObservationList'}},})
       if(totalCount.current > 0){
         isLoadingdRef.current = 0;
         navigateToPrevious();
@@ -268,20 +251,28 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
         isLoadingdRef.current = 0;
         navigateToPrevious();
       }
-          
+            
+    } else if(apiService && apiService.isInternet === false) {
+
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,false,'OK',true,0,'');
+      firebaseHelper.logEvent(firebaseHelper.event_delete_observation_api_fail, firebaseHelper.screen_view_observations, "Deleting Observation(id) Fail", 'Internet : false');
+            
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,false,'OK',true,0,'');
+      firebaseHelper.logEvent(firebaseHelper.event_delete_observation_api_fail, firebaseHelper.screen_view_observations, "Deleting Observation(id) Fail", 'error : '+apiService.error.errorMsg);
+      
     } else {
+
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
       firebaseHelper.logEvent(firebaseHelper.event_delete_observation_api_fail, firebaseHelper.screen_view_observations, "Deleting Observation(id) Fail : "+obsId, 'Pet Id : '+petId);
-      set_isLoading(false);
-      isLoadingdRef.current = 0;
       createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,false,'OK',true,0,'');
-    }
-    
-    if(deleteObsServiceObj && deleteObsServiceObj.error) {
-      set_isLoading(false);
-      isLoadingdRef.current = 0;
-      createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,false,'OK',true,0,'');
-      let errors = deleteObsServiceObj.error.length > 0 ? deleteObsServiceObj.error[0].code : '';
-      firebaseHelper.logEvent(firebaseHelper.event_delete_observation_api_fail, firebaseHelper.screen_view_observations, "Deleting Observation(id) Fail", 'error : '+errors);
+
     }
 
   };
@@ -414,22 +405,18 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
 
       }
 
-      let obsObj = {
-        selectedPet : defPet,
-        obsText : obsObject ? obsObject.obsText : '', 
-        obserItem : behItem, 
-        selectedDate : obsObject ? obsObject.observationDateTime : new Date(),  
-        mediaArray: tempArray,
-        fromScreen : 'viewObs',
-        isPets : false,
-        isEdit : true,
-        behaviourItem : behItem, 
-        observationId : obsObject.observationId,
-        ctgNameId : obsObject.behaviorTypeId === 3 ? 0 : 1
-      }
+      ObservationModel.observationData.selectedPet = defPet;
+      ObservationModel.observationData.obsText = obsObject ? obsObject.obsText : '';
+      ObservationModel.observationData.selectedDate = obsObject ? new Date(obsObject.observationDateTime) : new Date();
+      ObservationModel.observationData.mediaArray = tempArray;
+      ObservationModel.observationData.fromScreen = 'viewObs';
+      ObservationModel.observationData.isPets = false;
+      ObservationModel.observationData.isEdit = true;
+      ObservationModel.observationData.ctgNameId = obsObject.behaviorTypeId === 3 ? 0 : 1;
+      ObservationModel.observationData.observationId = obsObject.observationId;
+      ObservationModel.observationData.behaviourItem = behItem;
 
       firebaseHelper.logEvent(firebaseHelper.event_edit_observation_Action, firebaseHelper.screen_view_observations, "User clicked on the Observation(iD) Edit button : "+obsObject.observationId, 'Pet Id : '+defPet.petID);
-      await DataStorageLocal.saveDataToAsync(Constant.OBSERVATION_DATA_OBJ, JSON.stringify(obsObj));
       navigation.navigate('ObservationComponent');
 
     }

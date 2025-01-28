@@ -5,6 +5,8 @@ import  * as QestionnaireDataObj from "./../questionnaireCustomComponents/questi
 import * as Constant from "./../../../utils/constants/constant";
 import Highlighter from "react-native-highlight-words";
 import { useNavigation } from "@react-navigation/native";
+import * as Apolloclient from './../../../config/apollo/apolloConfig';
+import * as Queries from "./../../../config/apollo/queries";
 
 const Alert_Network_Id = 1;
 const Alert_Save_Info_BackBtn_Id = 2;
@@ -222,27 +224,25 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                         set_questionnaireDict(dict);
                         questionnaireDictSet.current = dict;
                         props.updateQstServiceDict(dict, completeQuestionsSet.current);
-                        isAnswered = await saveSectionsAnswered(questionaArray,dict,props.petId);
-                        if(isAnswered) {
-                            set_sectionsAnswered(1);
-                        }
+                         isAnswered = await saveWithoutSectionsAnswered(questionaArray,dict,props.petId);
+                         if(isAnswered) {
+                            set_sectionsAnswered(isAnswered)
+                         } else {
+                            set_sectionsAnswered(0)
+                         }
+
                     } else {
                         if(questionsObject.status === 'Submitted') {
                             set_sectionsAnswered(1);
                         }
                     }
-
-                    
                     
                 }
                 
                 return;
 
             } 
-
             
-            // set_completeQuestions(questionaArray);
-            // completeQuestionsSet.current = questionaArray;
             prepareQuestionsData(questionaArray,noOfSections.current[sectionIndex.current-1],noOfSections.current,questionsObject.questionnaireId,questionsObject.status);           
         }
 
@@ -280,7 +280,9 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                     var temp1 = questionaArray.filter(item => item.sectionOrder === noOfSections[i]);
                     /////Total sections count changes again here
                     // set_totalSections(noOfSections.length);
-                    let isAnswered = await saveSectionsAnswered(temp1,dict,props.petId);
+                    //let isAnswered = await saveSectionsAnswered(temp1,dict,props.petId);
+                    let isAnswered = await saveSectionsAnsweredNext(temp1,dict,props.petId);
+
                     if(isAnswered) {
                         sectionsCount = sectionsCount + 1;
                     }
@@ -382,30 +384,76 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
    const updateQuestionnaireQuestions = async(item, answersArray,isMadatory,questionType) => {
           let tempDictRemove;
         //   if(!answersArray || answersArray==='[]'){
-        if(!answersArray || answersArray.length === 0 || answersArray==='[]'){
-            const copyDict= questionnaireDict;
-            delete copyDict['QestionId_'+item.questionId+petId];
-            tempDictRemove = copyDict;
-            questionnaireDictSet.current = tempDictRemove;
-            set_questionnaireDict(tempDictRemove);
-            set_answeredQuestions(Object.keys(tempDictRemove).length);
-        
-        }else {
+            // if(!answersArray || answersArray.length === 0 || answersArray==='[]'){
+            //     const copyDict= questionnaireDict;
+            //     delete copyDict['QestionId_'+item.questionId+petId];
+            //     tempDictRemove = copyDict;
+            //     questionnaireDictSet.current = tempDictRemove;
+            //     set_questionnaireDict(tempDictRemove);
+            //     set_answeredQuestions(Object.keys(tempDictRemove).length);
+            
+            // }else {
+            //     let tempDict = {...questionnaireDict};
+            //     tempDict['QestionId_'+item.questionId+petId] = {
+            //         ...tempDict['QestionId_'+item.questionId+petId],
+            //         [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONITEM]: item,
+            //         [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONANSWER]: answersArray,
+            //         [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONNAIREID]: questionnaireId,
+            //         [QUESTIONNAIRE_QUESTIONS_KEY.ISMANDATORY]:isMadatory,
+            //         [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONTYPE]:questionType,
+            //     };
+            //     questionnaireDictSet.current = tempDict;
+            //     set_questionnaireDict(tempDict);
+            //     set_answeredQuestions(Object.keys(tempDict).length);
+            //     props.updateQstServiceDict(tempDict, completeQuestionsSet.current);
+            //     isChangesMade.current = true;
+            // } 
+
+        if(questionType && questionType === 'Slider Scale') {
             let tempDict = {...questionnaireDict};
-            tempDict['QestionId_'+item.questionId+petId] = {
-                ...tempDict['QestionId_'+item.questionId+petId],
-                [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONITEM]: item,
-                [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONANSWER]: answersArray,
-                [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONNAIREID]: questionnaireId,
-                [QUESTIONNAIRE_QUESTIONS_KEY.ISMANDATORY]:isMadatory,
-                [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONTYPE]:questionType,
-            };
-            questionnaireDictSet.current = tempDict;
-            set_questionnaireDict(tempDict);
-            set_answeredQuestions(Object.keys(tempDict).length);
-            props.updateQstServiceDict(tempDict, completeQuestionsSet.current);
-            isChangesMade.current = true;
-        }     
+                tempDict['QestionId_'+item.questionId+petId] = {
+                    ...tempDict['QestionId_'+item.questionId+petId],
+                    [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONITEM]: item,
+                    [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONANSWER]: answersArray,
+                    [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONNAIREID]: questionnaireId,
+                    [QUESTIONNAIRE_QUESTIONS_KEY.ISMANDATORY]:isMadatory,
+                    [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONTYPE]:questionType,
+                };
+                questionnaireDictSet.current = tempDict;
+                set_questionnaireDict(tempDict);
+                set_answeredQuestions(Object.keys(tempDict).length);
+                props.updateQstServiceDict(tempDict, completeQuestionsSet.current);
+                isChangesMade.current = true;
+
+        } else {
+
+            if(!answersArray || answersArray.length === 0 || answersArray==='[]'){
+                const copyDict= questionnaireDict;
+                delete copyDict['QestionId_'+item.questionId+petId];
+                tempDictRemove = copyDict;
+                questionnaireDictSet.current = tempDictRemove;
+                set_questionnaireDict(tempDictRemove);
+                set_answeredQuestions(Object.keys(tempDictRemove).length);
+            
+            }else {
+                let tempDict = {...questionnaireDict};
+                tempDict['QestionId_'+item.questionId+petId] = {
+                    ...tempDict['QestionId_'+item.questionId+petId],
+                    [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONITEM]: item,
+                    [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONANSWER]: answersArray,
+                    [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONNAIREID]: questionnaireId,
+                    [QUESTIONNAIRE_QUESTIONS_KEY.ISMANDATORY]:isMadatory,
+                    [QUESTIONNAIRE_QUESTIONS_KEY.QUESTIONTYPE]:questionType,
+                };
+                questionnaireDictSet.current = tempDict;
+                set_questionnaireDict(tempDict);
+                set_answeredQuestions(Object.keys(tempDict).length);
+                props.updateQstServiceDict(tempDict, completeQuestionsSet.current);
+                isChangesMade.current = true;
+            }   
+
+        }
+          
     };
 
     const filterQuestionsAction = (value) => {
@@ -495,9 +543,9 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
       }  
       
       if(tempArray.length > 0){
-          set_isFiterEmpty(false);
+        set_isFiterEmpty(false);
       }else{
-          set_isFiterEmpty(true);
+        set_isFiterEmpty(true);
       }
       filterName.current = value;
       if(tempArray.length > 0) {
@@ -510,6 +558,7 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
 
     const navigateToPrevious = async () => {  
 
+        // Apolloclient.client.writeQuery({query: Queries.UPDATE_Quest_LIST,data: {data: { questData:JSON.stringify(questionsArray),__typename: 'UpdateQuestList'}},})
         if(props.status === 'Submitted') {
             await QestionnaireDataObj.deleteQuestionnaire(questionnaireId,petId);
             navigation.navigate("QuestionnaireStudyComponent");
@@ -585,23 +634,22 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
         filterName.current = 'All';
         set_isFiterEmpty(false);
         set_isQuestListOpen(undefined);
-        // if(status !== 'Submitted') {
 
             if(value === 'SUBMIT') {
                 submitQuestionData();
                 return;
             }
-            
             if(sectionIndex.current !== totalSections) {
 
                 if(status !== 'Submitted') {
-
+                    
                     let mndtryAnswered = await getSectionsAnswered();
                     let checkOtherSpecify = await getOthersSpecfyAnswered();
                     if(checkOtherSpecify !== 0) {
                         props.createPopup(Constant.MANDATE_ANSWER_REC,Alert_Madatory_Id,Constant.ALERT_DEFAULT_TITLE,'OK',false,true,1);
                         return;
                     }
+
                     if(mndtryAnswered === Mandate_Answered || mndtryAnswered === No_Mandate || mndtryAnswered === Non_Mandate_Answered) {
                         indexArray.current = [];
                         sectionIndex.current = sectionIndex.current + 1;
@@ -610,8 +658,10 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                         set_secChange(true);
                         set_questionsArray(temp);
                         set_questionsArrayInitial(temp);
-                        set_secDesc(temp[0].sectionDescription);
-                        // await QestionnaireDataObj.saveAnswer(questionnaireDict,questionnaireId,petId);
+                        if(temp && temp.length !== 0 && temp[0].sectionDescription) {
+                            set_secDesc(temp[0].sectionDescription);
+                        }
+                        
                         await saveQuestionnaire('nextAction');
 
                     } else {
@@ -649,7 +699,6 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
             }
         }
         set_mandatoryQuestions(mandateValue);
-
         if(mandateValue > 0) {
             let checkAnswered = 0;
 
@@ -775,6 +824,10 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                     set_secDesc('');
                 }              
             }
+
+            let dict = await QestionnaireDataObj.getAnswer(questionnaireId,petId);
+            let isAnswered = await saveSectionsAnsweredNext(completeQuestions,dict,petId);
+            set_sectionsAnswered(isAnswered);
         }
 
     };
@@ -790,22 +843,19 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
 
             if(dict) {
                 props.updateQstServiceDict(dict, completeQuestionsSet.current);
-                let sectionsCount = 0;
-                for (let i = 0; i < noOfSections.current.length; i++) {
-                    
-                    var temp1 = completeQuestions.filter(item => item.sectionOrder === noOfSections.current[i]);
-                    let isAnswered = undefined;
-                    if(temp1 && temp1.length > 0) {
-                        isAnswered = await saveSectionsAnswered(temp1,dict,petId);
-                    } else {
-                        isAnswered = await saveSectionsAnswered(completeQuestions,dict,petId);
-                    }
-                    
-                    if(isAnswered) {
-                        sectionsCount = sectionsCount + 1;
-                    }
+                let isAnswered
+                if(noOfSections.current.length > 1) {
+                    isAnswered = await saveSectionsAnsweredNext(completeQuestions,dict,petId);
+                } else {
+                    isAnswered = await saveWithoutSectionsAnswered(completeQuestions,dict,petId);
                 }
-                set_sectionsAnswered(sectionsCount);
+
+                if(isAnswered) {
+                    set_sectionsAnswered(isAnswered);
+                } else {
+                    set_sectionsAnswered(0);
+                }
+                
                 isChangesMade.current = false;
             }
 
@@ -816,22 +866,111 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
           }
     };
 
-    const saveSectionsAnswered = async (questions,dict,petId) => {
+    const saveWithoutSectionsAnswered = async (questions,dict,petId) => {
         
-        let checkAnswered = 0;
+        var totalAnsweredSections = 0;
+
+        var mandateAnsweredQuestions = 0;
+        let mandateQuestions = questions.filter(item => item.isMandatory);
+
+        if(mandateQuestions.length === 0) {
+            var answeredQuestions = 0;
+            for (let mnd = 0; mnd < questions.length; mnd++) {
+
+                let dict1 = dict['QestionId_'+questions[mnd].questionId+petId];
+                if(dict1) {                              
+                    answeredQuestions = answeredQuestions + 1;                
+                } 
+                                
+            }
+
+            if(answeredQuestions !== 0 ) {
+                totalAnsweredSections = totalAnsweredSections + 1;
+            }
+
+        } else {
+
+            for (let mnd = 0; mnd < mandateQuestions.length; mnd++) {
+
+                let dict1 = dict['QestionId_'+mandateQuestions[mnd].questionId+petId];
+                if(dict1) {                              
+                    mandateAnsweredQuestions = mandateAnsweredQuestions + 1; 
+                } 
+                            
+            }
+    
+            if(mandateAnsweredQuestions === mandateQuestions.length && mandateQuestions.length !== 0) {
+    
+                totalAnsweredSections = totalAnsweredSections + 1;
+                            
+            } 
+        }
+        
+        return totalAnsweredSections;
+
+    };
+
+    const saveSectionsAnsweredNext = async (questions,dict,petId) => {
+        
+        let noSections = 0;
+
         questions.map((item,index) => {
-            let dict1 = dict['QestionId_'+item.questionId+petId];
-            if(dict1) {
-                checkAnswered = checkAnswered + 1;
+            
+            if(item.sectionOrder) {
+                noSections = item.sectionOrder
             }
             
         })
 
-        if(checkAnswered > 0) {
-            return true;
-        } 
+        if(noSections > 0) {
 
-        return false;
+            var result = [];
+            var totalAnsweredSections = 0;
+
+            for (let sec = 0; sec < noSections; sec++) {
+
+                result = questions.filter(item => item.sectionOrder === sec+1);
+                var mandateAnsweredQuestions = 0;
+                let mandateQuestions = result.filter(item => item.isMandatory);
+
+                if(mandateQuestions.length === 0) {
+                    var answeredQuestions = 0;
+                    for (let mnd = 0; mnd < result.length; mnd++) {
+
+                        let dict1 = dict['QestionId_'+result[mnd].questionId+petId];
+                        if(dict1) {                              
+                            answeredQuestions = answeredQuestions + 1;                
+                        } 
+                                
+                    }
+
+                    if(answeredQuestions !== 0 ) {
+                        totalAnsweredSections = totalAnsweredSections + 1;
+                    }
+
+                } else {
+
+                    for (let mnd = 0; mnd < mandateQuestions.length; mnd++) {
+
+                        let dict1 = dict['QestionId_'+mandateQuestions[mnd].questionId+petId];
+                        if(dict1) {                              
+                            mandateAnsweredQuestions = mandateAnsweredQuestions + 1; 
+                        } 
+                            
+                    }
+    
+                    if(mandateAnsweredQuestions === mandateQuestions.length && mandateQuestions.length !== 0) {
+    
+                        totalAnsweredSections = totalAnsweredSections + 1;
+                            
+                    } 
+                }
+                
+            }
+
+        }
+        
+        return totalAnsweredSections;
 
     };
 
@@ -898,9 +1037,7 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                             completeQuestionsSet.current[i].isSkip = false;
                         }
                     }      
-                    //    for (var i = selectedQuestion.questionOrder; i < selectedQuestionList[0].questionOrder ;  i++) {
-                    //     completeQuestionsSet.current[i].isSkip = false;
-                    //    }
+
                     }
                 } 
 
@@ -943,18 +1080,18 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
         var selectedQuestion = completeQuestionsSet.current.filter(obj1 => obj1.questionId == obj.questionId);
         var skipLastQuestion = completeQuestionsSet.current.filter(obj1 => obj1.questionId == value.skipQuestion);
         await resetPreviousSkipQuestions(questionnaireDict, selectedQuestion[0])
-
         if (value.skipQuestion != undefined) {
-            let arrPrevAnswers1 = questionnaireDict;//await QestionnaireDataObj.getAnswer(questionObject.questionnaireId,petId);
+            let arrPrevAnswers1 = questionnaireDict;
             var arrPrevAnswers = undefined;
             if(arrPrevAnswers1 ) {
                 arrPrevAnswers = Object.values(arrPrevAnswers1);
             }
+
             for (let i = 0; i < completeQuestionsSet.current.length ;  i++) {
 
                 if (completeQuestionsSet.current[i].questionOrder > selectedQuestion[0].questionOrder && completeQuestionsSet.current[i].questionOrder < skipLastQuestion[0].questionOrder){
                     var key =   'QestionId_'+completeQuestionsSet.current[i].questionId+petId;
-
+                    
                     if(questionnaireDict) {
 
                         const copyDict = questionnaireDict;
@@ -969,14 +1106,18 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                 }
                
             }
+
         }
- 
+
+        var temp = completeQuestionsSet.current.filter(item => item.sectionOrder === sectionIndex.current && item.isSkip === false);
+
+        if(temp && temp.length > 0) {
+            set_questionsArray(temp);
+            set_questionsArrayInitial(temp);
+        }
+
+        await checkNoSections(obj,completeQuestionsSet.current);
         await updateQuestionnaireQuestions(obj,value,obj.isMandatory,obj.questionType);
-        // if(filterName.current === 'Answered' || filterName.current === 'Unanswered') {
-        // if(filterName.current === 'All') {
-            // filterName.current = 'All'
-            checkNoSections(props.questionObject,completeQuestionsSet.current);
-        // }
         
     };
 
@@ -996,6 +1137,7 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                 answeredQuestions = {answeredQuestions}
                 filterOptions = {filterOptions}
                 isFiterEmpty = {isFiterEmpty}
+                completeQuestionsNew = {props.completeQuestionsNew}
                 noAction = {props.noAction}
                 noActionDropQId = {props.noActionDropQId}
                 noActionRadQId = {props.noActionRadQId}

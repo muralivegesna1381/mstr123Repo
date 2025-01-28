@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useRef } from 'react';
-import {View,Text,FlatList, TouchableOpacity,StyleSheet,Image} from 'react-native';
+import {View,Text,StyleSheet} from 'react-native';
 import BottomComponent from "../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../utils/commonComponents/headerComponent';
@@ -11,8 +11,6 @@ import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../utils/constants/constant";
 import GooglePlacesComponent from "./../../utils/googlePlacesComponent/googlePlacesComponent";
 
-let downArrowImg = require('./../../../assets/images/otherImages/svg/downArrowGrey.svg');
-
 const  PetAddressUI = ({route, ...props }) => {
 
   const [addLine1, set_addLine1] = useState(undefined);
@@ -23,7 +21,6 @@ const  PetAddressUI = ({route, ...props }) => {
   const [country, set_country] = useState(undefined);
   const [allAnswered, set_allAnswered] = useState(false);
   const [isAddressChange, set_isAddressChange] = useState(false);
-  const [isDropdown, set_isDropdown] = useState(false);
 
   let addLine1Ref = useRef('');
   let addLine2Ref = useRef('');

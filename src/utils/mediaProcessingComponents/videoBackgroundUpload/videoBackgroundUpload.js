@@ -9,8 +9,8 @@ import AlertComponent from '../../commonComponents/alertComponent.js';
 import CommonStyles from '../../commonStyles/commonStyles.js';
 import * as VideoProcess from '../videoProcessingComponent/videoProcessingComponent.js';
 import * as Apolloclient from '../../../config/apollo/apolloConfig.js';
-import * as ServiceCalls from '../../getServicesData/getServicesData.js';
-import * as AuthoriseCheck from '../../authorisedComponent/authorisedComponent.js';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 
 var RNFS = require('react-native-fs');
 
@@ -185,7 +185,7 @@ const VideoBackgroundUpload = ({navigation, route,...props }) => {
     
                     }
                 }
-
+                
                 // statusOfUpload(videosData[0].obsText,'Please Wait... ','done','Uploading','wifi');
                 Apolloclient.client.writeQuery({query: Queries.VIDEO_UPLOAD_BACKGROUND_STATUS,data: {data: {
                     obsVidName : videosData[0].obsText, 
@@ -211,22 +211,11 @@ const VideoBackgroundUpload = ({navigation, route,...props }) => {
 
     const serviceCallToBackend = async (vidsData,totalFilesFound,totalFilesNotfound) => {
 
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let sendObsServiceObj = await ServiceCalls.savePetObservation(vidsData[0],token);
-
-        if(sendObsServiceObj && sendObsServiceObj.logoutData){
-          AuthoriseCheck.authoriseCheck();
-          navigation.navigate('WelcomeComponent');
-          return;
-        }
-        
-        if(sendObsServiceObj && !sendObsServiceObj.isInternet){
-            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,1,FAIL_OBS,false,'OK','');
-            return;
-        }
-  
-        if(sendObsServiceObj && sendObsServiceObj.statusData){
-
+        let apiMethod = apiMethodManager.SAVE_PET_OBSERVATION;
+        let apiService = await apiRequest.postData(apiMethod,vidsData[0],Constant.SERVICE_JAVA,navigation);
+            
+        if(apiService && apiService.status) {
+            
             let filesNotFailed = totalFilesFound-totalFilesNotfound;
             let filesStatus = undefined;
 
@@ -243,17 +232,11 @@ const VideoBackgroundUpload = ({navigation, route,...props }) => {
             }
 
             updateObservationData('success',vidsData[0],filesStatus);
-
-        } else {
-            
-            // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,1,FAIL_OBS,false,'OK','');
-        }
-  
-        if(sendObsServiceObj && sendObsServiceObj.error) {
-
-            // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,1,FAIL_OBS,false,'OK','');
-        }
-
+                
+        } else if(apiService && apiService.isInternet === false) {
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,1,FAIL_OBS,false,'OK','');
+                
+        } 
 
     };
 

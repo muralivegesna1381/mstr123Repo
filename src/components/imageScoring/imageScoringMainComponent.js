@@ -4,9 +4,10 @@ import ImageScoringMainUI from './imageScoringMainUI';
 import * as Constant from "./../../utils/constants/constant";
 import * as DataStorageLocal from './../../utils/storage/dataStorageLocal';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
 
 const ImageScoringMainComponent = ({ navigation, route, ...props }) => {
 
@@ -90,8 +91,7 @@ const ImageScoringMainComponent = ({ navigation, route, ...props }) => {
         trace_ImageScoring_Send_Score_Details_API_Complete = await perf().startTrace('t_Image_Scoring_Send_Scoring_Details_API');
         let client = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
         let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let petObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        petObj = JSON.parse(petObj);
+        let petObj = AppPetsData.petsData.defaultPet;
 
         let tempArray = [];
 
@@ -121,36 +121,30 @@ const ImageScoringMainComponent = ({ navigation, route, ...props }) => {
 
     const sendScoringDetailsToBackend = async (jsonScoring,token) => {
 
-        let submitScoreServiceObj = await ServiceCalls.addPetImageScoring(jsonScoring,token);
-
+        let apiMethod = apiMethodManager.ADD_PETIMAGE_SCORING;
+        let apiService = await apiRequest.postData(apiMethod,jsonScoring,Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
         stopFBTraceSendScoringData();
+            
+        if(apiService && apiService.status) {
+            createPopup('Success',Constant.HWPMEASUREMENT_SUCCESS_MSG,true);
+        } else if(apiService && apiService.isInternet === false) {
 
-        if(submitScoreServiceObj && submitScoreServiceObj.logoutData){
-            firebaseHelper.logEvent(firebaseHelper.event_image_scoring_page_api_final_failure, firebaseHelper.screen_image_based_score_measurements, "Final image based scoring Api failed", "UnAutherised User");
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-          return;
-        }
-        
-        if(submitScoreServiceObj && !submitScoreServiceObj.isInternet){
             firebaseHelper.logEvent(firebaseHelper.event_image_scoring_page_api_final_failure, firebaseHelper.screen_image_based_score_measurements, "Final image based scoring Api failed", "No Internet");
             createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
             return;
-        }
-  
-        if(submitScoreServiceObj && submitScoreServiceObj.statusData){
-            createPopup('Success',Constant.HWPMEASUREMENT_SUCCESS_MSG,true);
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);
+            firebaseHelper.logEvent(firebaseHelper.event_image_scoring_page_api_final_failure, firebaseHelper.screen_image_based_score_measurements, "Final image based scoring Api failed", "error : "+apiService.error.errorMsg);
+            
         } else {
+
             firebaseHelper.logEvent(firebaseHelper.event_image_scoring_page_api_final_failure, firebaseHelper.screen_image_based_score_measurements, "Final image based scoring Api failed", "Service Status : false");
             createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-        }
-  
-        if(submitScoreServiceObj && submitScoreServiceObj.error) {
-            let errors = submitScoreServiceObj.error.length > 0 ? submitScoreServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_image_scoring_page_api_final_failure, firebaseHelper.screen_image_based_score_measurements, "Final image based scoring Api failed", "error : "+errors);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+
         }
 
     };

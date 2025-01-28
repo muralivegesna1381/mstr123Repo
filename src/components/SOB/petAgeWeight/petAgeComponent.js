@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, BackHandler, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, StyleSheet, Text, BackHandler, TouchableOpacity } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
@@ -11,6 +11,9 @@ import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
+
+import RadioBtnSelected from "../../../../assets/images/otherImages/svg/radioBtnGreen.svg";
+import RadioBtnUnSelected from "../../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg";
 
 let trace_inPetAgeScreen;
 
@@ -131,6 +134,7 @@ const PetAgeComponent = ({ route, ...props }) => {
                                 onDateChange={(date) => set_selectedDate(date)}
                                 mode={"date"}
                                 textColor={'black'}
+                                theme = {'light'}
                                 maximumDate={new Date()}
                                 style={styles.datePickeStyle}
                             />
@@ -140,8 +144,7 @@ const PetAgeComponent = ({ route, ...props }) => {
                     <View>
 
                         <TouchableOpacity style={{ flexDirection: 'row', marginTop: wp('5%') }} onPress={() => set_isUnknown(!isUnknown)}>
-                            <ImageBackground source={isUnknown ? require("../../../../assets/images/otherImages/svg/radioBtnGreen.svg") : require("../../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg")}
-                                style={styles.unkImgStyle} resizeMode='contain'></ImageBackground>
+                            {isUnknown ? <RadioBtnSelected width={wp('8%')} height={hp('4.5%')}/> : <RadioBtnUnSelected width={wp('8%')} height={hp('4.5%')}/>}
                             <Text style={[CommonStyles.headerTextStyle, { marginLeft: wp('2%') }]}>{"Approximate"}</Text>
                         </TouchableOpacity>
 

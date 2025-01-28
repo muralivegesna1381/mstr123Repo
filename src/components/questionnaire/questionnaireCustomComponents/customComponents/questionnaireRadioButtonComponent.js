@@ -82,7 +82,7 @@ const questionnaireRadioButtonComponent = ({navigation,value,answersArray,select
 
       } else {
         set_checkValue({option:selectedAnswer.option,rAnswer: selectedAnswer.rAnswer,submitQuestionnaire:false,ansOptionMediaFileName : selectedAnswer.ansOptionMediaFileName});
-        if(selectedAnswer.option.toUpperCase() === Constant.MSELECTION_OTHER_SPECIFY.toUpperCase()) {
+        if(selectedAnswer.option && selectedAnswer.option.toUpperCase() === Constant.MSELECTION_OTHER_SPECIFY.toUpperCase()) {
           set_isOthers(true);
           set_textAnswer(selectedAnswer.rAnswer);
         }
@@ -234,28 +234,6 @@ const questionnaireRadioButtonComponent = ({navigation,value,answersArray,select
             {!isAnsSubmitted && status_QID === 'Submitted' ? <View style = {{height: hp("4%"),justifyContent:'center',}}>
               <Text style={[CommonStyles.submitQSTNotAnsweredTextStyle]}>{Constant.QUESTIONS_NOT_ANSWERED}</Text>
             </View> : _renderRadioItems()}
-
-          {/* {isOthers ? <View style={[styles.SectionStyle,{minHeight: hp("5%"),}]}>
-            <TextInput
-              style={styles.textInputStyle}
-                          maxLength={100}
-                          multiline={true}
-                          placeholder={'Enter Text (Limit: 100)'}
-                          underlineColorAndroid="transparent"
-                          placeholderTextColor="#808080"
-                          value={textAnswer}
-                          onChangeText={async (text) => {
-                            set_textAnswer(text);
-                            if(text) {
-                              setValue({option:answers[selectedIndex.current].questionAnswer,rAnswer: text,submitQuestionnaire: false});
-                            } else {
-                              setValue()
-                            }                            
-                            set_checkValue({option:answers[selectedIndex.current].questionAnswer,rAnswer: text,submitQuestionnaire: false})
-                          }}
-                          editable={status_QID === "Submitted" ? false : true}
-                        />   
-                      </View> : null} */}
 
             {isImageView ? <ImageView
               images={images}

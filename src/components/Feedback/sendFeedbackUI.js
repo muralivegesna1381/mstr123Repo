@@ -9,8 +9,8 @@ import CommonStyles from './../../utils/commonStyles/commonStyles';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview'
 import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 
-let downArrowImg = require('./../../../assets/images/otherImages/svg/downArrowGrey.svg');
-let searchImg = require('./../../../assets/images/otherImages/svg/searchIcon.svg');
+import DownArrowImg from "./../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import SearchImg from "./../../../assets/images/otherImages/svg/searchIcon.svg";
 let xImg = require('./../../../assets/images/otherImages/png/xImg.png');
 
 const  SendFeedbackUI = ({route, ...props }) => {
@@ -138,16 +138,16 @@ const  SendFeedbackUI = ({route, ...props }) => {
                   
                   <View style={styles.SectionStyle}>
 
-                        <TextInput
-                          style={styles.textInputStyle}
-                          maxLength={300}
-                          multiline={true}
-                          placeholder={'Tell us your Feedback (Max : 300 characters)*'}
-                          underlineColorAndroid="transparent"
-                          placeholderTextColor="#808080"
-                          value={feedbackText}
-                          onChangeText={async (text) => {validateObsText(text.trimStart())}}
-                          />  
+                    <TextInput
+                      style={styles.textInputStyle}
+                      maxLength={300}
+                      multiline={true}
+                      placeholder={'Tell us your Feedback (Max : 300 characters)*'}
+                      underlineColorAndroid="transparent"
+                      placeholderTextColor="#808080"
+                      value={feedbackText}
+                      onChangeText={async (text) => {validateObsText(text.trimStart())}}
+                    />  
                   </View> 
 
                   <View style={{width: wp('80%'),marginTop: hp('2%'),alignItems:'center'}}>
@@ -155,18 +155,18 @@ const  SendFeedbackUI = ({route, ...props }) => {
                     <TouchableOpacity style={{flexDirection:'row',borderWidth: 0.5,borderColor: "#D8D8D8",borderRadius: hp("0.5%"),width: wp("80%"),}} onPress={() => {selectBehaviourDrop();}}>
 
                       <View>
-                          <View style={[styles.SectionStyle1,{}]}>
+                        <View style={[styles.SectionStyle1,{}]}>
 
-                             <View style={{flexDirection:'column',}}>
-                                <Text style={styles.dropTextLightStyle}>{'Select Feature name*'}</Text>
-                                {screenName ? <Text style={[styles.dropTextStyle]}>{screenName}</Text> : null}
-                             </View>
-                              
+                          <View style={{flexDirection:'column',}}>
+                            <Text style={styles.dropTextLightStyle}>{'Select Feature name*'}</Text>
+                            {screenName ? <Text style={[styles.dropTextStyle]}>{screenName}</Text> : null}
                           </View>
+                              
+                        </View>
                       </View>
 
                       <View style={{justifyContent:'center'}}>
-                          <Image source={downArrowImg} style={styles.imageStyle} />
+                        <DownArrowImg width = {wp('4%')} height = {hp('4%')}/>
                       </View>
      
                     </TouchableOpacity>
@@ -205,7 +205,7 @@ const  SendFeedbackUI = ({route, ...props }) => {
 
             <View style={{flexDirection:'row',alignItems:'center',width:wp('90%'),}}>
                 <View style={styles.topView}>
-                   <Image source={searchImg} style={styles.searchImageStyle} />
+                   <SearchImg width = {wp('5%')} height = {hp('5%')} style={styles.searchImageStyle}/>
 
                     <TextInput
                         style={styles.textInputStyle}
@@ -219,7 +219,7 @@ const  SendFeedbackUI = ({route, ...props }) => {
                     />
 
                     {searchText && searchText.length> 0 ? <TouchableOpacity onPress={onCancelSearch} style={styles.topButtonView} >
-                            <Text style={[styles.name, { color: "black", }]} > {"CLEAR"}</Text>
+                      <Text style={[styles.name, { color: "black", }]} > {"CLEAR"}</Text>
                     </TouchableOpacity> : null}
 
               </View>
@@ -294,13 +294,6 @@ const  SendFeedbackUI = ({route, ...props }) => {
       alignSelf: "center",
     },
 
-    imageStyle: {
-      margin: "4%",
-      height: 20,
-      width: 20,
-      resizeMode: "contain",
-    },
-
     xImageStyle: {
       width: wp("8%"),
       height: wp("8%"),
@@ -373,10 +366,7 @@ const  SendFeedbackUI = ({route, ...props }) => {
     },
 
     searchImageStyle : {
-      height: hp("2%"),
-      width: wp("2%"),
       flex:0.2,
-      resizeMode:'contain',
       marginLeft: hp("2%"),
     },
 

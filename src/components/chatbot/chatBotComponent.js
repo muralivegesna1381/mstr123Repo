@@ -384,7 +384,6 @@ const ChatBotComponent = ({navigation, route,...props}) => {
             Constant.ZDCHAT_MINIMIZE_STATUS,
             JSON.stringify(status)
           );
-          set_isChatmimised(status);
         } catch (error) {}
       };
 

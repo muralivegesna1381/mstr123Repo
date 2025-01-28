@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {View,StyleSheet,Text,TouchableOpacity,ImageBackground,Image, ScrollView,FlatList,ActivityIndicator} from 'react-native';
 import BottomComponent from "./../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
@@ -11,7 +11,8 @@ import * as Constant from "./../../utils/constants/constant";
 import moment from 'moment';
 import ImageView from "react-native-image-viewing";
 
-let defaultPetImg = require( "./../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
+import DefaultPetImg from "./../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
+import EditImg from "./../../../assets/images/otherImages/svg/editImg.svg";
 
 const  PetEditUI = ({navigation,route, ...props }) => {
 
@@ -22,12 +23,24 @@ const  PetEditUI = ({navigation,route, ...props }) => {
     const [imgLoader, set_imgLoader] = useState(true);
     const [isImageView, set_isImageView] = useState(false);
     const [images, set_images] = useState([]);
+    const [petBirthday, set_petBirthday] = useState('--');
 
     useEffect(() => {
+
         set_isPopUp(props.isPopUp);
         set_isLoading(props.isLoading);
         set_isEdit(props.isEdit);
-    }, [props.isPopUp,props.isLoading,props.isEdit]);
+        if(props.petObj && props.petObj.birthday) {
+
+            const words = props.petObj.birthday.split(' ');
+            if(words && words.length > 0) {
+                var replaced = words[0].replace(/\//g, '-');
+                set_petBirthday(replaced);
+            }
+
+        }
+        
+    }, [props.isPopUp,props.isLoading,props.isEdit,props.petObj]);
 
     useEffect(() => {
         set_imagePathNew(props.imagePathNew);
@@ -86,7 +99,7 @@ const  PetEditUI = ({navigation,route, ...props }) => {
                             </TouchableOpacity>}
                     </ImageBackground> 
                     : 
-                    <Image style = {styles.imageStyles} source={defaultPetImg}></Image>}
+                    <Image style = {styles.imageStyles} source={DefaultPetImg}></Image>}
                 
                     <ScrollView>
 
@@ -114,7 +127,7 @@ const  PetEditUI = ({navigation,route, ...props }) => {
 
                                 <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('80%'),}}>
                                     <Text style={styles.labelTextStyles}>{'Birthday'}</Text>
-                                    <Text style={styles.selectedDataTextStyles}>{props.petObj && props.petObj.birthday ? (props.petObj.birthday ? moment(new Date(props.petObj.birthday)).format("MM-DD-YYYY") : '--') : '--'}</Text>
+                                    <Text style={styles.selectedDataTextStyles}>{petBirthday}</Text>
                                 </View>
                                 
                             </View>
@@ -217,7 +230,7 @@ const  PetEditUI = ({navigation,route, ...props }) => {
                                         <Text style={styles.labelTextStyles}>{'Pet Address'}</Text>
                                         <Text style={[styles.selectedDataTextStyles,{marginRight: hp('2%'), alignSelf:'center'}]}>{props.address ? props.address : '--'}</Text>
                                         <View style={{ justifyContent: 'center', alignItem:'center'}}>
-                                            <Image source={require("./../../../assets/images/otherImages/svg/editImg.svg")} style={{ width: wp('5%'), height: hp('5%'), resizeMode: 'contain' }} />
+                                            <EditImg width={wp('6%')} height={hp('6%')}/>
                                         </View>
                                     </View>
                                     

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, FlatList, TouchableOpacity, Image, ImageBackground } from 'react-native';
+import { View, StyleSheet, Text, FlatList, TouchableOpacity, ImageBackground } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
 import fonts from './../../../utils/commonStyles/fonts'
@@ -8,6 +8,12 @@ import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../../utils/constants/constant";
 import moment from 'moment';
 import DatePicker from 'react-native-date-picker'
+
+import DogCatImg from "./../../../../assets/images/dogImages/dogCatImg.svg";
+import GradientImg from "../../../../assets/images/otherImages/svg/filterGradientImg.svg";
+import FilterImg from "../../../../assets/images/otherImages/svg/filterIcon.svg";
+import FilterBckImg from "../../../../assets/images/otherImages/png/bgTimerFilter.png";
+import CloseImg from "../../../../assets/images/otherImages/svg/timerCloseIcon.svg";
 
 const TimerLogsUI = ({ route, ...props }) => {
 
@@ -244,25 +250,19 @@ const TimerLogsUI = ({ route, ...props }) => {
 
                 {timerLogsArray && timerLogsArray.length > 0 ? <View style={styles.mainViewStyle}>
 
-                    <ImageBackground style={[styles.filterBtnStyle]} imageStyle={{ borderRadius: 5 }} source={require("../../../../assets/images/otherImages/svg/filterGradientImg.svg")}>
+                    <GradientImg width={wp('90%')} height={hp('5%')} style={[styles.filterBtnStyle]}/>
+                    <TouchableOpacity style={[styles.filterBtnStyle,{position:'absolute'}]} onPress={() => { set_ListOpen(!isListOpen) }}>
 
-                        <TouchableOpacity style={styles.filterBtnStyle} onPress={() => { set_ListOpen(!isListOpen) }}>
-                            <View>
+                        <View onLayout={(event) => {
+                            const layout = event.nativeEvent.layout;
+                            const postionDetails = { x: layout.x, y: layout.y, width: layout.width, height: layout.height, };
+                            set_DropDownPostion(postionDetails);
+                        }} style={[styles.SectionStyle]}>
 
-                                <View onLayout={(event) => {
-                                    const layout = event.nativeEvent.layout;
-                                    const postionDetails = { x: layout.x, y: layout.y, width: layout.width, height: layout.height, };
-                                    set_DropDownPostion(postionDetails);
-                                }} style={[styles.SectionStyle]}>
-
-                                    {<Text style={styles.hTextextStyle}>{'Filter'}</Text>}
-                                    <Image style={[styles.filterIconStyle]} imageStyle={{ borderRadius: 5 }} source={require("../../../../assets/images/otherImages/svg/filterIcon.svg")}></Image>
-
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-
-                    </ImageBackground>
+                            <Text style={styles.hTextextStyle}>{'Filter'}</Text>
+                            <FilterImg style={[styles.filterIconStyle]}/>
+                        </View>
+                    </TouchableOpacity>
 
                 </View> : null}
 
@@ -285,7 +285,7 @@ const TimerLogsUI = ({ route, ...props }) => {
                             keyExtractor={(item, index) => "" + index}
                         />
                     </View> : (props.isLoading === false ? <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("15%"), }}>
-                        <Image style={[CommonStyles.nologsDogStyle, { width: wp("45%"), height: hp("25%"), resizeMode: 'contain' }]} source={require("./../../../../assets/images/dogImages/dogCatImg.svg")}></Image>
+                        <DogCatImg style={[CommonStyles.nologsDogStyle, { width: wp("45%"), height: hp("25%"), resizeMode: 'contain' }]}/>
                         <Text style={[CommonStyles.noRecordsTextStyle]}>{Constant.NO_RECORDS_LOGS}</Text>
                         <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
                     </View> : null)}
@@ -294,7 +294,7 @@ const TimerLogsUI = ({ route, ...props }) => {
 
                 {isListOpen ? <View style={[styles.timerFilterListStyle, { top: dropDownPostion.y + dropDownPostion.height },]}>
 
-                    <ImageBackground style={{ alignItems: "center", justifyContent: "center", }} imageStyle={{ borderRadius: 25 }} source={require("../../../../assets/images/otherImages/svg/bgTimerFilter.svg")}>
+                    <ImageBackground style={{ alignItems: "center", justifyContent: "center", }} imageStyle={{ borderRadius: 25 }} source={FilterBckImg}>
 
                         <TouchableOpacity style={styles.filterViewBtnStyle} onPress={() => {
                             set_isFromDate(!isFromDate);
@@ -353,7 +353,7 @@ const TimerLogsUI = ({ route, ...props }) => {
                         <View style={[styles.dropCloseImgStyle]}>
 
                             <TouchableOpacity onPress={() => closeAction()}>
-                                <Image style={[styles.closeIconStyle]} source={require("../../../../assets/images/otherImages/svg/timerCloseIcon.svg")}></Image>
+                                <CloseImg height={hp("5%")} width={wp("10%")}/>
                             </TouchableOpacity>
 
                         </View>
@@ -400,6 +400,7 @@ const TimerLogsUI = ({ route, ...props }) => {
                             onDateChange={(date) => setDateselected(date)}
                             mode={"date"}
                             textColor={'black'}
+                            theme = {'light'}
                             maximumDate={new Date()}
                             minimumDate={fromDate && datePickerDate ? datePickerDate : new Date('1900-01-01')}
                             style={styles.datePickeStyle}
@@ -526,11 +527,12 @@ const styles = StyleSheet.create({
         width: wp("100%"),
         minHeight: hp("40%"),
         borderRadius: 15,
-        alignSelf: 'center'
+        alignSelf: 'center',
+        marginTop: hp("1.0%"),
     },
 
     filterViewBtnStyle: {
-        width: wp("90%"),
+        width: wp("85%"),
         height: wp("10%"),
         backgroundColor: 'white',
         marginBottom: wp("1%"),
@@ -538,11 +540,11 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         justifyContent: "center",
         borderColor: '#EAEAEA',
-        borderWidth: 0.5
+        borderWidth: 0.5,
     },
 
     filterSubmitBtnStyle: {
-        width: wp("40%"),
+        width: wp("35%"),
         height: wp("10%"),
         backgroundColor: '#CCE8B0',
         marginTop: wp("2%"),
@@ -554,7 +556,7 @@ const styles = StyleSheet.create({
     },
 
     filterRestBtnStyle: {
-        width: wp("40%"),
+        width: wp("35%"),
         height: wp("10%"),
         backgroundColor: '#E7E7E9',
         marginTop: wp("2%"),
@@ -659,17 +661,9 @@ const styles = StyleSheet.create({
     },
 
     dropCloseImgStyle: {
-        width: wp('10%'),
-        height: hp('5%'),
         bottom: -10,
-        alignItems: 'flex-end',
+        alignItems: 'center',
         justifyContent: 'flex-end'
     },
-
-    closeIconStyle: {
-        width: wp('10%'),
-        height: hp('5%'),
-        resizeMode: 'contain',
-    }
 
 });

@@ -1,13 +1,12 @@
 diff --git a/node_modules/react-native-highlight-words/index.js b/node_modules/react-native-highlight-words/index.js
-index e15cc90..081daee 100644
+index e15cc90..7397c9d 100644
 --- a/node_modules/react-native-highlight-words/index.js
 +++ b/node_modules/react-native-highlight-words/index.js
-@@ -2,14 +2,16 @@ import React from 'react';
+@@ -2,14 +2,15 @@ import React from 'react';
  import {Text} from 'react-native';
  import {findAll} from 'highlight-words-core';
  import PropTypes from 'prop-types';
 +import  { TextPropTypes} from 'deprecated-react-native-prop-types';
-+
  
  Highlighter.propTypes = {
 -    autoEscape: PropTypes.bool,

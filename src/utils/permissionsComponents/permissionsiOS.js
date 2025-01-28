@@ -8,7 +8,7 @@ export async function checkBlePermissions () {
 
 export async function checkCameraPermissions () {
     const res = await check(PERMISSIONS.IOS.CAMERA);
-    if(res.toUpperCase() === 'GRANTED' || res.toUpperCase() === 'unavailable') {
+    if(res.toUpperCase() === 'GRANTED' || res.toUpperCase() === 'UNAVAILABLE') {
         return true;
     } 
     return false;

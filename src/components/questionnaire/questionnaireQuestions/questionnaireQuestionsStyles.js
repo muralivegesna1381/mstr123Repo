@@ -124,7 +124,6 @@ const QuestionnaireQuestionsStyles = StyleSheet.create({
         resizeMode:'contain',
         width: wp("6%"),      
         height:hp('4%'),
-        // backgroundColor:'red',
     },
 
     filterImageBackViewStyles : {      
@@ -137,7 +136,6 @@ const QuestionnaireQuestionsStyles = StyleSheet.create({
         color:'#000000',
         flex:2.5,
         textAlign:'center',
-        // backgroundColor:'green',
     },
 
     questListStyle: {
@@ -157,28 +155,6 @@ const QuestionnaireQuestionsStyles = StyleSheet.create({
       flexDirection:'row'
     },
 
-    dropDownBtnStyle : {
-
-        width: wp("80%"),      
-        height:hp('5%'),
-        backgroundColor:'white',
-        borderRadius:10,
-        borderColor:'#EAEAEA',
-        borderWidth:1,
-        justifyContent:'center',
-
-    },
-
-    dropTextStyle : {
-
-      ...CommonStyles.textStyleMedium,
-      fontSize: fonts.fontMedium,
-        color:'#000000',
-        marginLeft:hp('2%'),
-        marginRight:hp('2%'),
-
-    },
-
     popSearchViewStyle : {
       height: hp("30%"),
       width: wp("95%"),
@@ -192,118 +168,89 @@ const QuestionnaireQuestionsStyles = StyleSheet.create({
 
     flatcontainer: {
       flex: 1,
-  },
+    },
 
-  flatview: {
-      height: hp("8%"),
-      marginBottom: hp("0.3%"),
-      alignSelf: "center",
-      justifyContent: "center",
-      borderBottomColor: "grey",
-      borderBottomWidth: wp("0.1%"),
+    flatview: {
+        height: hp("8%"),
+        marginBottom: hp("0.3%"),
+        alignSelf: "center",
+        justifyContent: "center",
+        borderBottomColor: "grey",
+        borderBottomWidth: wp("0.1%"),
+        width:wp('90%'),
+    },
+
+    name: {
+      ...CommonStyles.textStyleSemiBold,
+      fontSize: fonts.fontMedium,
+      textAlign: "left",
+      color: "black",
+    },
+
+    saveBtnStyle : {
+      flexDirection:'row',
+      alignItems:'center',
+      backgroundColor:'#6BC105',
       width:wp('90%'),
-  },
+      height:hp('5%'),
+      borderRadius:5,
+      justifyContent:'center',
+      alignSelf:'center'
+    },
 
-  name: {
-    ...CommonStyles.textStyleSemiBold,
-    fontSize: fonts.fontMedium,
-    textAlign: "left",
-    color: "black",
-  },
+    infoBtnStyle : {
+      justifyContent:'center',
+      alignItems:'center',
+      alignSelf:'flex-end',
+    },
 
-  saveBtnStyle : {
-    flexDirection:'row',
-    alignItems:'center',
-    backgroundColor:'#6BC105',
-    width:wp('90%'),
-    height:hp('5%'),
-    borderRadius:5,
-    justifyContent:'center',
-    alignSelf:'center'
-  },
+    infoImgStyle : {
+      resizeMode:'contain',          
+      width:wp('11%'),
+      height:hp('5%'),   
+    },
 
-  infoBtnStyle : {
-    justifyContent:'center',
-    alignItems:'center',
-    alignSelf:'flex-end',
-  },
+    saveBtnStyle : {
+      flexDirection:'row',
+      alignItems:'center',
+      backgroundColor:'#6BC105',
+      width:wp('90%'),
+      height:hp('5%'),
+      borderRadius:5,
+      justifyContent:'center',
+      alignSelf:'center'
+    },
 
-  infoImgStyle : {
-    resizeMode:'contain',          
-    width:wp('11%'),
-    height:hp('5%'),   
-  },
+    secDescStyle : {
+      alignItems:'center',
+      backgroundColor:'#D9D9D9',
+      width:wp('100%'),
+      minHeight:hp('4%'),
+      justifyContent:'center',
+      alignSelf:'center',
+      marginTop:hp('1%'),
+    },
 
-  infoPopStyle : {
+    secDescTxtStyle : {
+      ...CommonStyles.textStyleRegular,
+      fontSize: fonts.fontXSmall,
+      textAlign: "left",
+      color: "black",
+      marginTop:hp('1%'),
+      marginBottom:hp('1%'),
+      marginRight:hp('2%'),
+      marginLeft:hp('2%'),
+    },
 
-    position: 'absolute',
-    right: 12,
-    top: hp('7%'),
-    width:wp('40%'),
-    minheight:hp('8%'), 
-    zIndex: 999,
-    backgroundColor:'green',
-    borderRadius:5,
-
-  },
-
-  infoPopImgStyle: {
-    resizeMode:'stretch',
-  },
-
-  infoTextStyle: {
-
-    color:'white',
-    fontSize: fonts.fontXSmall,
-    ...CommonStyles.textStyleRegular,
-    marginBottom:hp('1%'),
-    marginTop:hp('1%'), 
-    marginLeft:wp('2%'),
-    marginRight:wp('2%'),
-
-  },
-
-  saveBtnStyle : {
-    flexDirection:'row',
-    alignItems:'center',
-    backgroundColor:'#6BC105',
-    width:wp('90%'),
-    height:hp('5%'),
-    borderRadius:5,
-    justifyContent:'center',
-    alignSelf:'center'
-  },
-
-  secDescStyle : {
-    alignItems:'center',
-    backgroundColor:'#D9D9D9',
-    width:wp('100%'),
-    minHeight:hp('4%'),
-    justifyContent:'center',
-    alignSelf:'center',
-    marginTop:hp('1%'),
-  },
-
-  secDescTxtStyle : {
-    ...CommonStyles.textStyleRegular,
-    fontSize: fonts.fontXSmall,
-    textAlign: "left",
-    color: "black",
-    marginTop:hp('1%'),
-    marginBottom:hp('1%'),
-    marginRight:hp('2%'),
-    marginLeft:hp('2%'),
-  },
-
-  secNumTxtStyle : {
-    ...CommonStyles.textStyleBold,
-    fontSize: fonts.fontXSmall,
-    color: "white",
-    marginTop:hp('1%'),
-    marginBottom:hp('1%'),
-    marginRight:hp('2%'),
-    marginLeft:hp('2%'),
-  }
+    secNumTxtStyle : {
+      ...CommonStyles.textStyleBold,
+      fontSize: fonts.fontXSmall,
+      color: "white",
+      marginTop:hp('1%'),
+      marginBottom:hp('1%'),
+      marginRight:hp('2%'),
+      marginLeft:hp('2%'),
+    }
 
 });
 

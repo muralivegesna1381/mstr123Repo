@@ -100,7 +100,7 @@ const  PetAddressEditUI = ({route, ...props }) => {
 
             </View>
             
-            <KeyboardAwareScrollView>
+            {props.showAddressFields ? <KeyboardAwareScrollView>
               
             <View style={{width:wp('100%'),height:hp('70%'),alignItems:'center',marginBottom:hp('20%')}}>
 
@@ -183,7 +183,7 @@ const  PetAddressEditUI = ({route, ...props }) => {
                  </View>   
 
             </View>           
-            </KeyboardAwareScrollView>
+            </KeyboardAwareScrollView> : null}
 
             <View style={CommonStyles.bottomViewComponentStyle}>
                 <BottomComponent

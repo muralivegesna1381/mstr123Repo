@@ -8,8 +8,11 @@ import CommonStyles from '../../../../utils/commonStyles/commonStyles';
 import LoaderComponent from '../../../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../../../utils/commonComponents/alertComponent';
 import * as Constant from "./../../../../utils/constants/constant";
-let videoImg = require('./../../../../../assets/images/dashBoardImages/png/quickVideo.png');
-let failedImg = require('./../../../../../assets/images/otherImages/svg/failedXIcon.svg');
+
+import FailedImg from "./../../../../../assets/images/otherImages/svg/failedXIcon.svg";
+import DefaultDogImg from "./../../../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
+import EditMediaImg from "./../../../../../assets/images/otherImages/svg/editMedia.svg";
+import VideoImg from "./../../../../../assets/images/dashBoardImages/png/quickVideo.png";
 
 const UploadObsVideoUI = ({ route, ...props }) => {
 
@@ -123,15 +126,15 @@ const UploadObsVideoUI = ({ route, ...props }) => {
                         <ImageBackground source={{ uri: mediaArray[index].localThumbImg }} style={styles.media} imageStyle={{ borderRadius: 5 }}>
 
                           <TouchableOpacity style={styles.imageBtnStyle} onPress={() => removeMedia(item)}>
-                            <Image source={failedImg} style={styles.imageBtnStyle1} />
+                            <FailedImg width={wp("6%")} height={hp("6%")} style={styles.imageBtnStyle1}/>
                           </TouchableOpacity>
 
-                        </ImageBackground> :
-
-                        <ImageBackground source={require("./../../../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg")} style={styles.media} imageStyle={{ borderRadius: 5 }}>
+                        </ImageBackground> : 
+                        
+                        <ImageBackground source={DefaultDogImg} style={styles.media} imageStyle={{ borderRadius: 5 }}>
 
                           <TouchableOpacity style={styles.imageBtnStyle} onPress={() => removeMedia(item)}>
-                            <Image source={failedImg} style={styles.imageBtnStyle1} />
+                            <FailedImg width={wp("6%")} height={hp("6%")} style={styles.imageBtnStyle1}/>
                           </TouchableOpacity>
 
                         </ImageBackground>
@@ -141,7 +144,7 @@ const UploadObsVideoUI = ({ route, ...props }) => {
                         <ImageBackground source={{ uri: Platform.OS === 'ios' ? mediaArray[index].filePath : mediaArray[index].localThumbImg }} style={styles.media} imageStyle={{ borderRadius: 5 }}>
 
                           <TouchableOpacity style={styles.imageBtnStyle} onPress={() => removeMedia(item)}>
-                            <Image source={failedImg} style={styles.imageBtnStyle1} />
+                            <FailedImg width={wp("6%")} height={hp("6%")} style={styles.imageBtnStyle1}/>
                           </TouchableOpacity>
 
                         </ImageBackground> :
@@ -149,7 +152,7 @@ const UploadObsVideoUI = ({ route, ...props }) => {
                         <ImageBackground source={{ uri: mediaArray[index].fbFilePath }} style={styles.media} imageStyle={{ borderRadius: 5 }}>
 
                           <TouchableOpacity style={styles.imageBtnStyle} onPress={() => removeMedia(item)}>
-                            <Image source={failedImg} style={styles.imageBtnStyle1} />
+                            <FailedImg width={wp("6%")} height={hp("6%")} style={styles.imageBtnStyle1}/>
                           </TouchableOpacity>
 
                         </ImageBackground>)
@@ -158,8 +161,7 @@ const UploadObsVideoUI = ({ route, ...props }) => {
 
                     {mediaArray.length > 0 && mediaArray[index].filePath && mediaArray[index].filePath !== '' ?
                       <TouchableOpacity onPress={() => redirectToMediaEdit(item, index)}>
-                        <ImageBackground source={require("./../../../../../assets/images/otherImages/svg/editMedia.svg")} style={styles.editMedia}>
-                        </ImageBackground>
+                        <EditMediaImg style={styles.editMedia}/>
                       </TouchableOpacity> : null}
 
                   </View>
@@ -168,7 +170,7 @@ const UploadObsVideoUI = ({ route, ...props }) => {
               enableEmptySections={true}
               keyExtractor={(item, index) => index}
             />
-          </View> : <View style={{ height: hp('30%'), alignItems: 'center', justifyContent: 'center' }}><Image source={videoImg} style={styles.noMedia} /></View>}
+          </View> : <View style={{ height: hp('30%'), alignItems: 'center', justifyContent: 'center' }}><Image source={VideoImg} style={styles.noMedia} /></View>}
 
           <TouchableOpacity style={styles.videoBtnStyle} onPress={() => selectMediaAction()}>
             <Text style={styles.btnTextStyle}>{props.mediaType === 0 ? 'UPLOAD PHOTOS' : 'UPLOAD VIDEOS'}</Text>
@@ -331,6 +333,7 @@ const styles = StyleSheet.create({
     marginRight: wp('-1%'),
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
+    position:'absolute'
   },
 
   imageBtnStyle1: {

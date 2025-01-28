@@ -3,9 +3,8 @@ import {View,BackHandler} from 'react-native';
 import BeaconsListUI from './beaconsListUI';
 import BeaconsHandler from '../beaconsHandler';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
+import * as AppPetsData from '../../../utils/appDataModels/appPetsModel.js';
 import perf from '@react-native-firebase/perf';
-import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
-import * as Constant from "./../../../utils/constants/constant";
 
 let connectBeaconsTimeOut = undefined;
 let trace_inBeaconsListscreen;
@@ -87,13 +86,11 @@ const  BeaconsListComponent = ({navigation,route, ...props }) => {
     };
 
     const initialSessionStop = async () => {
-        await trace_inBeaconsListscreen.stop();
+      await trace_inBeaconsListscreen.stop();
     };
 
     const getDefaultPet = async () => {
-      let defPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-      defPet = JSON.parse(defPet);
-      set_defaultPetObj(defPet);
+      set_defaultPetObj(AppPetsData.petsData.defaultPet);
     }
     
     const getBeaconsDetails = async (beaconsArry) => {

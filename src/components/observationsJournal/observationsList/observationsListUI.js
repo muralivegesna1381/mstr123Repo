@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TouchableOpacity,Image,ImageBackground,ActivityIndicator,FlatList} from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import {View,StyleSheet,Text,TouchableOpacity,ImageBackground,ActivityIndicator,FlatList,Image} from 'react-native';
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
@@ -12,8 +12,11 @@ import moment from "moment";
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 
-let noLogsDogImg = require("./../../../../assets/images/dogImages/noRecordsDog.svg");
-let noLogsCatImg = require("./../../../../assets/images/dogImages/noRecordsCat.svg");
+import NoLogsDogImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
+import NoLogsCatImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
+import ObsVideoImg from "./../../../../assets/images/otherImages/svg/observationVideoLogo.svg";
+import DefaultDogImg from "./../../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
+import RightArrowImg from "./../../../../assets/images/otherImages/svg/rightArrowLightImg.svg";
 
 const  ObservationsListUI = ({route, ...props }) => {
 
@@ -54,7 +57,7 @@ const  ObservationsListUI = ({route, ...props }) => {
     // Passing the default pet obj and index to Pet carasoul
   const getActiveSlide = async (petArray,defaultPetObjj) => {
 
-    set_obsMessage(undefined);
+    //set_obsMessage(undefined);
     let index = 0;
     for(var i = 0; i < petArray.length; i++) {
       if (petArray[i].petID == defaultPetObjj.petID) {
@@ -62,6 +65,7 @@ const  ObservationsListUI = ({route, ...props }) => {
         break;
       }
     }
+
     set_activeSlide(index);
   };
 
@@ -90,8 +94,8 @@ const  ObservationsListUI = ({route, ...props }) => {
 
   // Removes the typeahead list after selecting the pet in search
   const selectedSearchPetAction = async (item) => {
-      await DataStorageLocal.saveDataToAsync(Constant.OBS_SELECTED_PET, JSON.stringify(item));
-      props.selectedSearchPetAction(item);
+    await DataStorageLocal.saveDataToAsync(Constant.OBS_SELECTED_PET, JSON.stringify(item));
+    props.selectedSearchPetAction(item);
   };
 
   const _renderObservations = (item) => {
@@ -106,12 +110,12 @@ const  ObservationsListUI = ({route, ...props }) => {
               {imgLoader === true ? (<View style={CommonStyles.spinnerStyle}>
                 <ActivityIndicator size="large" color="#37B57C" />
               </View>) : null}
-                {item.videos && item.videos.length ? <Image source={require("./../../../../assets/images/otherImages/svg/observationVideoLogo.svg")} style={[styles.videoLogoStyle]}/> : null}
+                {item.videos && item.videos.length ? <ObsVideoImg style={[styles.videoLogoStyle]}/> : null}
             </ImageBackground> : 
 
-            (item.videos && item.videos.length && item.videos[0].videoThumbnailUrl!=='' ? <ImageBackground source={{uri: item.videos[0].videoThumbnailUrl}} style={styles.petImgStyle}>
-              {item.videos && item.videos.length ? <Image source={require("./../../../../assets/images/otherImages/svg/observationVideoLogo.svg")} style={[styles.videoLogoStyle]}/> : null}
-            </ImageBackground> : <Image source={require("./../../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg")} style={[styles.petImgStyle]}/>)}
+            (item.videos && item.videos.length && item.videos[0].videoThumbnailUrl && item.videos[0].videoThumbnailUrl!=='' ? <ImageBackground source={{uri: item.videos[0].videoThumbnailUrl}} style={styles.petImgStyle}>
+              {item.videos && item.videos.length ? <ObsVideoImg style={[styles.videoLogoStyle]}/> : null}
+            </ImageBackground> : <ImageBackground source={DefaultDogImg} style={[styles.petImgStyle]}>{item.videos && item.videos.length ? <ObsVideoImg style={[styles.videoLogoStyle]}/> : null}</ImageBackground>)}
           </View>
 
           <View style={{flex:3,justifyContent:'center'}}>
@@ -123,7 +127,7 @@ const  ObservationsListUI = ({route, ...props }) => {
           </View>
 
           <View style={{flex:0.3,justifyContent:'center',alignItems:'center'}}>
-            <Image style={styles.moreImgStyels} source={require("./../../../../assets/images/otherImages/svg/rightArrowLightImg.svg")}/>
+            <RightArrowImg style={styles.moreImgStyels}/>
           </View>
 
         </View>
@@ -164,7 +168,7 @@ const  ObservationsListUI = ({route, ...props }) => {
 
       <View style={{height:hp('60%')}}>
 
-        {observationsArray && observationsArray.length > 0 ? <View style={{height:hp('5%'),width:wp('100%'),flexDirection:'row',justifyContent:'center',alignSelf:'center',alignItems:'center'}}>
+        {observationsArray && observationsArray.length > 0 && !isLoading ? <View style={{height:hp('5%'),width:wp('100%'),flexDirection:'row',justifyContent:'center',alignSelf:'center',alignItems:'center'}}>
           <Text style={[styles.hTextextStyle,{flex:1.2,textAlign:'center'}]}>{''}</Text>
           <Text style={[styles.hTextextStyle,{flex:3,}]}>{'Observation'}</Text>
           <Text style={[styles.hTextextStyle,{flex:2.5,}]}>{'Modified Date'}</Text>
@@ -177,8 +181,8 @@ const  ObservationsListUI = ({route, ...props }) => {
           renderItem={({ item }) => (_renderObservations(item))}
           keyExtractor={(item) => "" + item.observationId}
         /> : 
-        (observationsArray && observationsArray.length === 0 && !isLoading ? <View style={{justifyContent:'center',alignItems:'center',height:hp('58%')}}>
-          <Image style= {[styles.nologsDogStyle]} source={defaultPetObj && defaultPetObj.speciesId && parseInt(defaultPetObj.speciesId) === 1 ? noLogsDogImg : noLogsCatImg}></Image>
+        (observationsArray && observationsArray.length === 0 ? <View style={{justifyContent:'center',alignItems:'center',height:hp('58%')}}>
+          {defaultPetObj && defaultPetObj.speciesId && parseInt(defaultPetObj.speciesId) === 1 ? <NoLogsDogImg style= {[styles.nologsDogStyle]}/> : <NoLogsCatImg style= {[styles.nologsDogStyle]}/>}
           <Text style={CommonStyles.noRecordsTextStyle}>{obsMessage}</Text>
           <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
         </View> : null)}
@@ -261,7 +265,7 @@ const  ObservationsListUI = ({route, ...props }) => {
       height: hp("2%"),
       resizeMode: "contain",
       overflow: "hidden",
-      marginRight: wp("0.5%"),
+      //marginRight: wp("0.5%"),
     },
 
     hTextextStyle : {

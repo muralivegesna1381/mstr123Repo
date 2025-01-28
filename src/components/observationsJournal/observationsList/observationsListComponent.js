@@ -1,24 +1,29 @@
-import React, { useState, useEffect,useRef } from 'react';
-import { View, BackHandler } from 'react-native';
+import React, { useState,useRef,useEffect } from 'react';
+import { BackHandler } from 'react-native';
 import ObservationsListUI from './observationsListUI'
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+import * as Queries from "./../../../config/apollo/queries";
+import { useQuery} from "@apollo/react-hooks";
+import * as ObservationModel from "./../observationModel/observationModel.js"
+import * as clearAppDataModel from "./../../../utils/appDataModels/clearAppDataModel.js";
 
 let trace_Get_Observations_API_Complete;
 let trace_inObservationsList;
 
 const ObservationsListComponent = ({ navigation, route, ...props }) => {
 
+  const { loading:updateObsListLoading, data : updateObsListData } = useQuery(Queries.UPDATE_OBSERVATION_LIST, { fetchPolicy: "cache-only" });
   const [popUpMessage, set_popUpMessage] = useState(undefined);
   const [popUpTitle, set_popUpTitle] = useState(undefined);
   const [isPopUp, set_isPopUp] = useState(false);
   const [defaultPetObj, set_defaultPetObj] = useState(undefined);
   const [petsArray, set_petsArray] = useState(undefined);
-  const [isLoading, set_isLoading] = useState(false);
+  const [isLoading, set_isLoading] = useState(true);
   const [loaderMsg, set_loaderMsg] = useState(undefined);
   const [date, set_Date] = useState(new Date());
   const [observationsArray, set_observationsArray] = useState([]);
@@ -32,16 +37,16 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
   React.useEffect(() => {
 
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick); 
-
     const focus = navigation.addListener("focus", () => {
       set_Date(new Date());
       observationsSessionStart();
       firebaseHelper.reportScreen(firebaseHelper.screen_observations);
       firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_observations, "User in Observations List Screen", '');
-      set_observationsArray(undefined)
-      getObsPets();
+      // set_observationsArray(undefined)
+      
     });
 
+    getObsPets();
     const unsubscribe = navigation.addListener('blur', () => {
       observationsSessionStop();
     });
@@ -53,6 +58,14 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
       unsubscribe();
     };
   }, [navigation]);
+
+  useEffect(() => {
+
+    if(updateObsListData && updateObsListData.data.__typename === 'UpadateObservationList'){
+      getObsPets();
+    }
+      
+  }, [updateObsListData]);
 
   const handleBackButtonClick = () => {
     navigateToPrevious();
@@ -79,14 +92,10 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
 
     let defPet = await DataStorageLocal.getDataFromAsync(Constant.OBS_SELECTED_PET);
     set_defaultPetObj(JSON.parse(defPet));
-
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
     set_defauiltPetId(JSON.parse(defPet).petID);
 
     trace_Get_Observations_API_Complete = await perf().startTrace('t_Get_Observations_List_API');
-    // firebaseHelper.logEvent(firebaseHelper.event_observation_list_api, firebaseHelper.screen_observations, "User initiated the Observation Api ", 'Pet Id : '+JSON.parse(defPet).petID);
-
-    getObservationList(JSON.parse(defPet).petID,token);
+    getObservationList(JSON.parse(defPet).petID);
 
   };
 
@@ -97,47 +106,47 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
   };
 
   // API to fetch the observations data
-  const getObservationList = async (petId,token) => {
+  const getObservationList = async (petId) => {
     
     set_isLoading(true);
     isLoadingdRef.current = 1;
     set_loaderMsg(Constant.OBSERVATION_LOADING_MSG);
-
-    let getObsServiceObj = await ServiceCalls.getPetObservations(petId,token);
-    set_isLoading(false);
-    isLoadingdRef.current = 0;
+    let apiMethod = apiMethodManager.GET_OBSERVATION_LIST + petId;
+    let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
     stopFBTraceGetObserrvations();
-
-    if(getObsServiceObj && getObsServiceObj.logoutData){
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      firebaseHelper.logEvent(firebaseHelper.event_observation_list_api_fail, firebaseHelper.screen_observations, "Observations List Api Failed", 'Unautherised');
-      return;
-    }
-          
-    if(getObsServiceObj && !getObsServiceObj.isInternet){
-      firebaseHelper.logEvent(firebaseHelper.event_observation_list_api_fail, firebaseHelper.screen_observations, "Observations List Api Failed", 'Internet : false');
-      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
-      return;
-    }
-    
-    if(getObsServiceObj && getObsServiceObj.statusData){
-
-      if(getObsServiceObj.responseData && getObsServiceObj.responseData.length > 0){
-        set_observationsArray(getObsServiceObj.responseData);
+            
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+      
+      if(apiService.data.petObservations && apiService.data.petObservations.length > 0){
+        set_observationsArray(apiService.data.petObservations);
       } else {
         set_observationsArray([]);
       }
-          
+
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+            
+    } else if(apiService && apiService.isInternet === false) {
+
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      firebaseHelper.logEvent(firebaseHelper.event_observation_list_api_fail, firebaseHelper.screen_observations, "Observations List Api Failed", 'Internet : false');
+      createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
+            
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
+      createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+      firebaseHelper.logEvent(firebaseHelper.event_observation_list_api_fail, firebaseHelper.screen_observations, "Observations List Api Failed", 'error : '+apiService.error.errorMsg);
+    
     } else {
+
+      set_isLoading(false);
+      isLoadingdRef.current = 0;
       firebaseHelper.logEvent(firebaseHelper.event_observation_list_api_fail, firebaseHelper.screen_observations, "Observations List Api Failed", 'Service Status : false');
       createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-    }
-    
-    if(getObsServiceObj && getObsServiceObj.error) {
-      createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-      let errors = getObsServiceObj.error.length > 0 ? getObsServiceObj.error[0].code : '';
-      firebaseHelper.logEvent(firebaseHelper.event_observation_list_api_fail, firebaseHelper.screen_observations, "Observations List Api Failed", 'error : '+errors);
+
     }
 
   };
@@ -151,23 +160,22 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
    * else navigates to pet component to select the pet to upload the observation
    * @param {*} value 
    */
-  const submitAction = async (value) => {
+  const submitAction = async () => {
 
     searchDropAction();
-    let obsObj = {
-      selectedPet : defaultPetObj, 
-      fromScreen : 'obsList', 
-      isPets : false, 
-      isEdit : false,
-    }
+    clearAppDataModel.clearObservationData();
+    ObservationModel.observationData.selectedPet = defaultPetObj;
+    ObservationModel.observationData.fromScreen = 'obsList';
+    ObservationModel.observationData.isPets = false;
+    ObservationModel.observationData.isEdit = false;
+    ObservationModel.observationData.selectedDate = new Date();
+
     await DataStorageLocal.removeDataFromAsync(Constant.DELETE_MEDIA_RECORDS);
-    await DataStorageLocal.saveDataToAsync(Constant.OBSERVATION_DATA_OBJ, JSON.stringify(obsObj));
     firebaseHelper.logEvent(firebaseHelper.event_observations_new_btn, firebaseHelper.screen_observations, "User clicked on Add new Observation", 'Pet Id : '+defauiltPetId);
     
     if (petsArray && petsArray.length > 1) {
       navigation.navigate('AddOBSSelectPetComponent', { petsArray: petsArray, defaultPetObj: defaultPetObj });
     } else {
-      // navigation.navigate('ObservationComponent');
       navigation.navigate('CategorySelectComponent');
     }
 
@@ -204,7 +212,11 @@ const ObservationsListComponent = ({ navigation, route, ...props }) => {
 
   // Navigates to view the selected observation record
   const selectObservationAction = async (item) => {
+    
     searchDropAction();
+    clearAppDataModel.clearObservationData();
+    ObservationModel.observationData.selectedDate = new Date();
+
     firebaseHelper.logEvent(firebaseHelper.event_observations_view_btn, firebaseHelper.screen_observations, "User clicked on View Observation", '');
     await DataStorageLocal.removeDataFromAsync(Constant.DELETE_MEDIA_RECORDS);
     navigation.navigate('ViewObservationService', { obsObject: item });

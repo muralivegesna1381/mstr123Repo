@@ -9,10 +9,10 @@ import CommonStyles from '../../utils/commonStyles/commonStyles';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview'
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../utils/constants/constant";
+import FailedImg from "./../../../assets/images/otherImages/svg/failedXIcon.svg";
 
 let hidePswdImg = require('./../../../assets/images/otherImages/png/hide-password.png');
 let showPsdImg = require('./../../../assets/images/otherImages/png/show-password.png');
-let failedImg = require('./../../../assets/images/otherImages/svg/failedXIcon.svg');
 let tickImg = require('./../../../assets/images/otherImages/png/tick.png');
 
 const  PswdUI = ({route, ...props }) => {
@@ -124,7 +124,7 @@ const  PswdUI = ({route, ...props }) => {
         <View style={[CommonStyles.mainComponentStyle]}>
             <View style={[CommonStyles.headerView,{}]}>
                 <HeaderComponent
-                    isBackBtnEnable={false}
+                    isBackBtnEnable={true}
                     isSettingsEnable={false}
                     isChatEnable={false}
                     isTImerEnable={false}
@@ -180,23 +180,23 @@ const  PswdUI = ({route, ...props }) => {
                     </View>
                     <View style={{marginTop:hp('2%')}}>
                         <View style={{flexDirection:'row',alignItems:'center',width:wp('80%')}}>
-                            <Image source={!psdLengthVal ? failedImg : tickImg } style={styles.validateIconStyle} />
+                            {!psdLengthVal ? <FailedImg width={wp('3%')} height={hp('3%')} style={styles.validateIconStyle}/> : <Image source={ tickImg } style={styles.validateIconStyle}/>}
                             <Text style={styles.validateTextStyle}>{'At least 8 characters in length'}</Text>
                         </View>
                         <View style={{flexDirection:'row',alignItems:'center',width:wp('80%')}}>
-                            <Image source={!regULVal ? failedImg : tickImg } style={styles.validateIconStyle} />
+                            {!regULVal ? <FailedImg width={wp('3%')} height={hp('3%')} style={styles.validateIconStyle}/> : <Image source={ tickImg } style={styles.validateIconStyle}/>}
                             <Text style={styles.validateTextStyle}>{'At least one upper and lower case letters (A-Z) (a-z)'}</Text>
                         </View>
                         <View style={{flexDirection:'row',alignItems:'center',width:wp('80%')}}>
-                            <Image source={!regNumVal ? failedImg : tickImg } style={styles.validateIconStyle} />
+                            {!regNumVal ? <FailedImg width={wp('3%')} height={hp('3%')} style={styles.validateIconStyle}/> : <Image source={ tickImg } style={styles.validateIconStyle}/>}
                             <Text style={styles.validateTextStyle}>{'At least one number (i.e 0-9)'}</Text>
                         </View>
                         <View style={{flexDirection:'row',alignItems:'center',width:wp('80%')}}>
-                            <Image source={!regSPCVal ? failedImg : tickImg } style={styles.validateIconStyle} />
+                            {!regSPCVal ? <FailedImg width={wp('3%')} height={hp('3%')} style={styles.validateIconStyle}/> : <Image source={ tickImg } style={styles.validateIconStyle}/>}
                             <Text style={styles.validateTextStyle}>{'At least one special character (!,@,#,$,%,^,&,*)'}</Text>
                         </View>
                         <View style={{flexDirection:'row',alignItems:'center',width:wp('80%')}}>
-                            <Image source={!psdSame ? failedImg : tickImg } style={styles.validateIconStyle} />
+                            {!psdSame ? <FailedImg width={wp('3%')} height={hp('3%')} style={styles.validateIconStyle}/> : <Image source={ tickImg } style={styles.validateIconStyle}/>}
                             <Text style={styles.validateTextStyle}>{Constant.PSWD_MATCH}</Text>
                         </View>
 

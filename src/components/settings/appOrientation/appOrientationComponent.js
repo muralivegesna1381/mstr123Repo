@@ -36,7 +36,26 @@ const AppOrientationComponent = ({navigation, route, ...props }) => {
       const [loginPets, set_loginPets] = useState(undefined);  
       const [isFromScreen, set_isFromScreen] = useState(undefined);  
       const [nxtBtnText, set_nxtBtnText] = useState('NEXT');  
+      const [date, set_Date] = useState(new Date());
       let trace_inAppOrientation_Screen;
+
+      // React.useEffect(() => {
+
+      //   const focus = navigation.addListener("focus", () => {
+      //     set_Date(new Date());
+      //     setModalVisibility(true);
+          
+      //   });
+    
+      //   const unsubscribe = navigation.addListener('blur', () => {
+      //   });
+    
+      //   return () => {
+      //     setModalVisibility(false);
+      //     focus();
+      //     unsubscribe();
+      //   };
+      // }, [navigation]);
 
       useEffect(() => {
 
@@ -62,6 +81,12 @@ const AppOrientationComponent = ({navigation, route, ...props }) => {
          };
      
        }, []);
+
+      //  useEffect(() => {
+
+      //   setModalVisibility(true)
+
+      //  }, [modalVisibility]);
     
       /**
        * Based on the count that is updated this function will change the style of the modal box
@@ -139,10 +164,9 @@ const AppOrientationComponent = ({navigation, route, ...props }) => {
     //Method to end the app orientation and navigate back to Support page or list of pets page based on where the User came from
   const exitFromAppOrientation = () => {
 
-    setModalVisibility(false);
-    if(isFromScreen==='LoginPage'){
+    if(isFromScreen === 'LoginPage'){
       updateDashboardData(loginPets);
-    } else {
+    } else {      
       navigation.navigate('SupportComponent');
     }
     
@@ -150,7 +174,7 @@ const AppOrientationComponent = ({navigation, route, ...props }) => {
 
   const updateDashboardData = (petsArray) => {
     // ApolloClient.client.writeQuery({query: Queries.UPDATE_DASHBOARD_DATA,data: {data: { isRefresh:'refresh',__typename: 'UpdateDashboardData'}},});
-    navigation.navigate("DashBoardService", { loginPets: petsArray });
+    navigation.replace("DashBoardService", { loginPets: petsArray });
   };
 
   const appOrientationSessionStart = async () => {
@@ -162,6 +186,7 @@ const AppOrientationComponent = ({navigation, route, ...props }) => {
   };
 
   return (
+
     <SafeAreaView style={styles.containerMain}>
       <ImageBackground source={image} style={styles.imageViewStyle} resizeMode="stretch">
         <Modal

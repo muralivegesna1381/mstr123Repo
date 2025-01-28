@@ -309,14 +309,6 @@ const DashBoardStyles = StyleSheet.create({
         flex:0.5
     },
 
-    questArrowImgStyle : {
-        height: hp("2%"),
-        width: wp("6%"),
-        alignSelf:'flex-start',
-        resizeMode: "contain",
-        // marginTop: hp("0.5%"),
-    },
-
     questDogImgStyle : {
         height: hp("5.5%"),
         aspectRatio:1,
@@ -354,13 +346,7 @@ const DashBoardStyles = StyleSheet.create({
     },
 
     tyleActivityStyle : {
-        // height: hp("12%"),
         width: wp("91%"),
-        // shadowColor: "#627e92",
-        // shadowOffset: { width: 0, height: 7},
-        // shadowOpacity:  0.21,
-        // shadowRadius: 7.68,
-        // elevation: 10,
         backgroundColor:'white',
         borderRadius:5,
         alignItems:'center'
@@ -371,13 +357,6 @@ const DashBoardStyles = StyleSheet.create({
         ...CommonStyles.textStyleSemiBold,
         color: 'black', 
         marginLeft: wp("2%")
-    },
-
-    foodImgImgStyle : {
-        height: hp("6%"),
-        aspectRatio:1,
-        justifyContent:'center',
-        resizeMode: "contain",
     },
 
     activityFoodTextStyle : {

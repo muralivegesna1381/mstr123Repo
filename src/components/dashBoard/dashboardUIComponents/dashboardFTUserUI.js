@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
 import {View,TouchableOpacity,Text,Image,ScrollView,Linking} from 'react-native';
 import DashBoardStyles from './../dashBoardStyles';
+import {widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
+
+import HPN1FirstImg from "./../../../../assets/images/otherImages/svg/hpn1First.svg";
 
 const  DashboardFTUserUI = ({ firstName, secondName, route, ...props}) => {
 
@@ -45,7 +47,7 @@ const  DashboardFTUserUI = ({ firstName, secondName, route, ...props}) => {
                     <TouchableOpacity onPress={() => Linking.openURL('https://youtu.be/zg9aCENCOt4')}>
                         <View style={ytLinkViewStyle}>
                             
-                            <Image source={require("./../../../../assets/images/otherImages/svg/hpn1First.svg")} style={youTubeThumbs}/>
+                            <HPN1FirstImg width={wp('25%')} height={hp('9%')} style={youTubeThumbs}/>
                             <Text style={[ftytLnksHeaderHeader]}>{'How to Charge the Sensor'}</Text>
 
                         </View>
@@ -54,7 +56,7 @@ const  DashboardFTUserUI = ({ firstName, secondName, route, ...props}) => {
                     <TouchableOpacity onPress={() => Linking.openURL('https://youtu.be/ykwPApENJMw')}>
                         <View style={ytLinkViewStyle}>
                             
-                            <Image source={require("./../../../../assets/images/otherImages/svg/hpn1First.svg")} style={youTubeThumbs}/>
+                            <HPN1FirstImg width={wp('25%')} height={hp('9%')} style={youTubeThumbs}/>
                             <Text style={[ftytLnksHeaderHeader]}>{'How to Setup the Sensor'}</Text>
 
                         </View>

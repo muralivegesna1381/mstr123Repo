@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View, FlatList } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, FlatList } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
@@ -8,7 +8,7 @@ import TextInputComponent from '../../../utils/commonComponents/textInputCompone
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import Fonts from '../../../utils/commonStyles/fonts';
 
-let downArrowImg = require('../../../../assets/images/otherImages/svg/downArrowGrey.svg');
+import DownArrowImg from "../../../../assets/images/otherImages/svg/downArrowGrey.svg";
 
 const ParentProfileUI = ({ route, ...props }) => {
 
@@ -137,7 +137,7 @@ const ParentProfileUI = ({ route, ...props }) => {
 
                                 <TouchableOpacity style={styles.cBtnStyle} onPress={() => { set_isDropdown(!isDropdown) }}>
                                     <Text style={styles.cTextStyle}>{countryCode}</Text>
-                                    <Image source={downArrowImg} style={styles.downArrowStyle} />
+                                    <DownArrowImg style={styles.downArrowStyle}/>
                                 </TouchableOpacity>
 
                             </View>

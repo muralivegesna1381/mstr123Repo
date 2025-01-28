@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, ImageBackground } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import BottomComponent from "../../../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from '../../../../utils/commonComponents/headerComponent';
@@ -8,7 +8,8 @@ import CommonStyles from '../../../../utils/commonStyles/commonStyles';
 import LoaderComponent from '../../../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../../../utils/commonComponents/alertComponent';
 
-let failedImg = require('./../../../../../assets/images/otherImages/svg/failedXIcon.svg');
+import EditImg from "./../../../../../assets/images/otherImages/svg/editMedia.svg";
+import FailedImg from "./../../../../../assets/images/otherImages/svg/failedXIcon.svg";
 
 const QuickVideoUI = ({ route, ...props }) => {
 
@@ -108,13 +109,12 @@ const QuickVideoUI = ({ route, ...props }) => {
 
             {videoPath ? <ImageBackground source={{ uri: thumbnailImage }} style={styles.media} imageStyle={{ borderRadius: 5 }}>
               <TouchableOpacity style={styles.imageBtnStyle} onPress={() => removeVideo()}>
-                <Image source={failedImg} style={styles.imageBtnStyle1} />
+                <FailedImg width={wp("5%")} height={hp("5%")} style={styles.imageBtnStyle1}/>
               </TouchableOpacity>
             </ImageBackground> : null}
 
             {videoPath ? <TouchableOpacity onPress={() => redirectToMediaEdit()}>
-              <ImageBackground source={require("./../../../../../assets/images/otherImages/svg/editMedia.svg")} style={styles.editMedia}>
-              </ImageBackground>
+              <EditImg style={styles.editMedia}/>
             </TouchableOpacity> : null}
 
           </View>
@@ -130,7 +130,7 @@ const QuickVideoUI = ({ route, ...props }) => {
         <BottomComponent
           rightBtnTitle={'NEXT'}
           leftBtnTitle={'BACK'}
-          isLeftBtnEnable={false}
+          isLeftBtnEnable={true}
           rigthBtnState={videoPath ? true : false}
           isRightBtnEnable={true}
           rightButtonAction={async () => nextButtonAction()}

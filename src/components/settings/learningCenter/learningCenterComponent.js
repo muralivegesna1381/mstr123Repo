@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {View,BackHandler} from 'react-native';
 import LearningCenterUI from './learningCenterUI';
-import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 
 const LearningCenterComponent = ({navigation, route, ...props }) => {
 
@@ -47,40 +46,35 @@ const LearningCenterComponent = ({navigation, route, ...props }) => {
 
     set_isLoading(true);
     isLoadingdRef.current = 1;
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 
-    let supportMetObj = await ServiceCalls.getSupportDocs(token);
+    let apiMethod = apiMethodManager.GET_SUPPORT_DOCS;
+    let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
     set_isLoading(false);
     isLoadingdRef.current = 0;
+        
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
 
-    if(supportMetObj && supportMetObj.logoutData){
-      firebaseHelper.logEvent(firebaseHelper.event_Learning_center_page_api_failure, firebaseHelper.screen_learning_center, "Get Support Docs Api Failed",'Unautherised');
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
+      if(apiService.data.supportMaterials) {
+        set_faqsArray(apiService.data.supportMaterials.fags);
+        set_videosArray(apiService.data.supportMaterials.videos);
+        set_userGuidesArray(apiService.data.supportMaterials.userGuides);
+      }
 
-    if(supportMetObj && !supportMetObj.isInternet){
+    } else if(apiService && apiService.isInternet === false) {
+
       createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
       firebaseHelper.logEvent(firebaseHelper.event_Learning_center_page_api_failure, firebaseHelper.screen_learning_center, "Get Support Docs Api Failed",'Internet : false');
-      return;
-    }
 
-    if(supportMetObj && supportMetObj.statusData){
-      if(supportMetObj.responseData){
-        set_faqsArray(supportMetObj.responseData.fags);
-        set_videosArray(supportMetObj.responseData.videos);
-        set_userGuidesArray(supportMetObj.responseData.userGuides);
-      } 
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+      firebaseHelper.logEvent(firebaseHelper.event_Learning_center_page_api_failure, firebaseHelper.screen_learning_center, "Get Support Docs Api Failed",'error : '+apiService.error); 
+      createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);  
+            
     } else {
+
       createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
       firebaseHelper.logEvent(firebaseHelper.event_Learning_center_page_api_failure, firebaseHelper.screen_learning_center, "Get Support Docs Api Failed",'Service Status : false');
-    }
 
-    if(supportMetObj && supportMetObj.error) {
-      let errors = supportMetObj.error.length > 0 ? supportMetObj.error[0].code : '';
-      firebaseHelper.logEvent(firebaseHelper.event_Learning_center_page_api_failure, firebaseHelper.screen_learning_center, "Get Support Docs Api Failed",'error : '+errors); 
-      createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);  
     }
 
   };

@@ -5,9 +5,10 @@ import * as DataStorageLocal from "../../../utils/storage/dataStorageLocal.js";
 import * as Constant from "../../../utils/constants/constant.js";
 import * as firebaseHelper from '../../../utils/firebase/firebaseHelper.js';
 import perf from '@react-native-firebase/perf';
-import * as AuthoriseCheck from '../../../utils/authorisedComponent/authorisedComponent.js';
-import * as ServiceCalls from '../../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 import moment from "moment";
+import * as UserDetailsModel from "./../../../utils/appDataModels/userDetailsModel.js";
 
 let trace_inFoodIntakeListScreen;
 
@@ -92,40 +93,34 @@ const FoodIntakeMainComponent = ({navigation, route, ...props }) => {
       set_isLoading(true);
       isLoadingdRef.current = 1;
       let client = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-      let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-      let fIntakeListServiceObj = await ServiceCalls.foodIntakeListApi(petId,client,dteString,token);
 
+      let apiMethod = apiMethodManager.GET_FOODINTAKE_LIST + petId + "/" + client + "/" + dteString;
+      let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
       set_isLoading(false);
       isLoadingdRef.current = 0;
-
-      if(fIntakeListServiceObj && fIntakeListServiceObj.logoutData){
-        AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
-        return;
-      }
-      
-      if(fIntakeListServiceObj && !fIntakeListServiceObj.isInternet){
-        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
-        return;
-      }
-
-      if(fIntakeListServiceObj && fIntakeListServiceObj.statusData){
-        if(fIntakeListServiceObj.responseData && fIntakeListServiceObj.responseData.length > 0){
-          set_foodArray(fIntakeListServiceObj.responseData)
+        
+      if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+        
+        if(apiService.data.intakes && apiService.data.intakes.length > 0){
+          set_foodArray(apiService.data.intakes)
           set_noLogsShow(false);             
         } else {
           set_foodArray(undefined)
           set_noLogsShow(true);
         }
+            
+      } else if(apiService && apiService.isInternet === false) {
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
+               
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+        createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);
+        firebaseHelper.logEvent(firebaseHelper.event_Get_Food_Inatke_List_api_fail, firebaseHelper.screen_Food_Intake_List_Sel, "Get Food Intake List Api Failed : ", 'error : '+apiService.error.errorMsg);
+        
       } else {
         createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-        firebaseHelper.logEvent(firebaseHelper.event_Get_Food_Inatke_List_api_fail, firebaseHelper.screen_Food_Intake_List_Sel, "Get Food Intake List Api Failed : ", 'Service Status : false');
-      }
+        firebaseHelper.logEvent(firebaseHelper.event_get_Support_Met_api_fail, firebaseHelper.screen_D_Tutorial_Units, "Get Support Meterials Api Failed : ", 'Service Status : false');
 
-      if(fIntakeListServiceObj && fIntakeListServiceObj.error) {
-        let errors = getfeedbackServiceObj.error.length > 0 ? getfeedbackServiceObj.error[0].code : '';
-        firebaseHelper.logEvent(firebaseHelper.event_Get_Food_Inatke_List_api_fail, firebaseHelper.screen_Food_Intake_List_Sel, "Get Food Intake List Api Failed : ", 'error : '+errors);
-        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
       }
 
     };
@@ -134,39 +129,32 @@ const FoodIntakeMainComponent = ({navigation, route, ...props }) => {
 
       set_isLoading(true);
       isLoadingdRef.current = 1;
-      let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-      let fIntakeListServiceObj = await ServiceCalls.getFoodIntakeApi(id,token);
 
+      let apiMethod = apiMethodManager.GET_FOODINTAKE_ID + id;
+      let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
       set_isLoading(false);
       isLoadingdRef.current = 0;
-
-      if(fIntakeListServiceObj && fIntakeListServiceObj.logoutData){
-        AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
-        return;
-      }
-      
-      if(fIntakeListServiceObj && !fIntakeListServiceObj.isInternet){
-        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
-        return;
-      }
-
-      if(fIntakeListServiceObj && fIntakeListServiceObj.statusData){
-        if(fIntakeListServiceObj.responseData){
-          let formatedDate = moment(fIntakeListServiceObj.responseData.intakeDate, 'MM-DD-YYYY').format('YYYY-MM-DD').toString();
-          navigation.navigate('FoodIntakeComponent',{isEdit:2,petObj : petObj,foodEditObj:fIntakeListServiceObj.responseData,selectedDate: formatedDate});          
+        
+      if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+        
+        if(apiService.data){
+          let formatedDate = moment(apiService.data.intakeDate, 'MM-DD-YYYY').format('YYYY-MM-DD').toString();
+          navigation.navigate('FoodIntakeComponent',{isEdit:2,petObj : petObj,foodEditObj:apiService.data,selectedDate: formatedDate});          
         } else {
           createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.DETAILS_FETCH_FAIL,true);
         }
+            
+      } else if(apiService && apiService.isInternet === false) {
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
+               
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+        createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);
+        firebaseHelper.logEvent(firebaseHelper.event_Get_Food_Inatke_By_Id_api_fail, firebaseHelper.screen_Food_Intake_List_Sel, "Get Food Intake by Id Api Failed : ", 'error : '+apiService.error.errorMsg);
+        
       } else {
         createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
         firebaseHelper.logEvent(firebaseHelper.event_Get_Food_Inatke_By_Id_api_fail, firebaseHelper.screen_Food_Intake_List_Sel, "Get Food Intake by Id Api Failed : ", 'Service Status : false');
-      }
 
-      if(fIntakeListServiceObj && fIntakeListServiceObj.error) {
-        let errors = getfeedbackServiceObj.error.length > 0 ? getfeedbackServiceObj.error[0].code : '';
-        firebaseHelper.logEvent(firebaseHelper.event_Get_Food_Inatke_By_Id_api_fail, firebaseHelper.screen_Food_Intake_List_Sel, "Get Food Intake by Id Api Failed : ", 'error : '+errors);
-        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
       }
 
     };
@@ -211,8 +199,8 @@ const FoodIntakeMainComponent = ({navigation, route, ...props }) => {
 
     const unitChangeSelection = async (value) => {
 
-      let petParent = await DataStorageLocal.getDataFromAsync(Constant.PET_PARENT_OBJ,);
-      petParent = JSON.parse(petParent)
+      let petParent = UserDetailsModel.userDetailsData.user; 
+      
       if(petParent && petParent.preferredFoodRecUnitId === 4) {
         set_selectdCategoryUnit("cups");
       } else {

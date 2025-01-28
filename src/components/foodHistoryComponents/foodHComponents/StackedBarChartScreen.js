@@ -1,9 +1,9 @@
-import React, { useState, useEffect,useRef,PropsWithChildren } from 'react';
+import React, { useState } from 'react';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import Fonts from '../../../utils/commonStyles/fonts'
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import {StyleSheet,Text,View,Platform} from 'react-native';
-import { BarChart, yAxisSides } from "react-native-gifted-charts";
+import { BarChart } from "react-native-gifted-charts";
  
 const StackedBarChartScreen = ({stakedChartData,route, ...props }) => {
   

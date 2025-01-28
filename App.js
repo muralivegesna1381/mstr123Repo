@@ -1,41 +1,27 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Alert, StatusBar, Platform, Text, TextInput} from 'react-native';
-import { ApolloProvider } from '@apollo/react-hooks';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Tabbar from "./src/navigation/tabbar"
 import AppNavigator from './src/navigation/appNavigator';
 import * as DataStorageLocal from "./src/utils/storage/dataStorageLocal";
 import * as Constant from "./src/utils/constants/constant";
 import * as Apolloclient from './src/config/apollo/apolloConfig';
 import TimerWidgetComponent from './src/components/timerComponent/timerWidget/timerWidgetComponent';
 import messaging from '@react-native-firebase/messaging';
-import VideoUploadComponent from './src/utils/videoUploadBackground/videoUploadBackground.component';
 import PushNotification, { Importance } from 'react-native-push-notification';
 import QuestionnaireMediaUpload from './src/utils/questionnaireMediaUpload/questionnaireMediaUpload';
 import ImageBackgrounUpload from './src/utils/mediaProcessingComponents/imageBackgroundUpload/imageBackgroundUpload';
 import VideoBackgroundUpload from './src/utils/mediaProcessingComponents/videoBackgroundUpload/videoBackgroundUpload';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 import CaptureBFIUpload from './src/bfiComponents/captureImages/imageCapture/captureBFIUpload';
-
-// import firebase from '@react-native-firebase/app';
 import auth from '@react-native-firebase/auth';
 import { firebase } from '@react-native-firebase/analytics';
 import crashlytics from '@react-native-firebase/crashlytics';
-// import crashlytics from '@react-native-firebase/crashlytics';
-import SplashScreen from 'react-native-splash-screen';
-import { GiftedChat } from 'react-native-gifted-chat'
-import "./ignoreWarnings";
+import { ApolloProvider } from '@apollo/react-hooks';
 
-const App = () => {
+const Stack = createNativeStackNavigator();
+
+function App() {
 
   useEffect(() => {
 
@@ -44,11 +30,11 @@ const App = () => {
     messageListener();
     enableFirebaseFeatures();
     saveDefaultChatbotMessage();
-
+  
     if (Platform.OS === 'android') {
       crateChannelPushNotifications();;
     }
-
+  
     if (Text.defaultProps == null) {
       Text.defaultProps = {};    Text.defaultProps.allowFontScaling = false;
     }
@@ -57,32 +43,45 @@ const App = () => {
         TextInput.defaultProps.allowFontScaling = false;
     }
 
+    const unsubscribeBackground = messaging().onNotificationOpenedApp(remoteMessage => {
+      // updateNotificationFlow();
+      // Handle background notification if needed
+    });
+ 
+    // // Check if the app was opened from a notification (cold start)
+    // messaging()
+    //   .getInitialNotification()
+    //   .then(remoteMessage => {
+    //     if (remoteMessage) {
+    //     }
+    //   });
+ 
+    return unsubscribeBackground; // Clean up the listener
+  
   }, []);
-
+  
   async function enableFirebaseFeatures() {
     await firebase.analytics().setAnalyticsCollectionEnabled(true);
     await crashlytics().setCrashlyticsCollectionEnabled(true)
     await firebase.perf().setPerformanceCollectionEnabled(true);
   }
-
+  
   async function onAppBootstrap() {
-
-    auth().signInAnonymously().then(() => {
-    }).catch(error => {
-    })
-
+  
+    auth().signInAnonymously().then(() => {}).catch(error => {})
+  
   };
-
+  
   const checkPermission = async () => {
-
+  
     const enabled = await messaging().hasPermission();
-
+    getFcmToken();
     if (enabled === 1) {
       getFcmToken();
     } else {
       requestPermission();
     }
-
+  
     let camPermissions = await DataStorageLocal.getDataFromAsync(Constant.IOS_CAMERA_PERMISSIONS_GRANTED);
     if (!camPermissions) {
       await DataStorageLocal.saveDataToAsync(Constant.IOS_CAMERA_PERMISSIONS_GRANTED, 'isFirstTime');
@@ -92,9 +91,9 @@ const App = () => {
       await DataStorageLocal.saveDataToAsync(Constant.IOS_BLE_PERMISSIONS_GRANTED, 'isFirstTime');
     }
   };
-
+  
   const crateChannelPushNotifications = () => {
-
+  
     PushNotification.createChannel(
       {
         channelId: "Wearables_Mobile_Android", // (required)
@@ -107,13 +106,13 @@ const App = () => {
       },
       (created) => { } // (optional) callback returns whether the channel was created, false means it already existed.
     );
-
+  
   }
-
+  
   const getFcmToken = async () => {
     const fcmToken = await messaging().getToken();
   }
-
+  
   const saveDefaultChatbotMessage = () => {
     let tempArray = [
       {
@@ -123,7 +122,7 @@ const App = () => {
         type: "agentMessage"
       },
     ]
-
+  
     if (Platform.OS === 'ios') {
       saveChatMessages(tempArray);
     }
@@ -132,12 +131,12 @@ const App = () => {
     await DataStorageLocal.saveDataToAsync(Constant.ZDCHAT_MESSAGES_ARRAY, JSON.stringify(msgArray))
     saveDefaultDateSetValue("chatEnded");
   }
-
+  
   const saveDefaultDateSetValue = async (value) => {
     await DataStorageLocal.saveDataToAsync(Constant.ZDCHAT_DEFAULT_DATE_SET_VALUE, value.toString())
-
+  
   };
-
+  
   const requestPermission = async () => {
     const authStatus = await messaging().requestPermission();
     const enabled =
@@ -145,10 +144,10 @@ const App = () => {
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
     return enabled;
     // if (enabled) {
-
+  
     // }
   };
-
+  
   const messageListener = async () => {
     messaging().setBackgroundMessageHandler(async remoteMessage => {
       const { title, body } = remoteMessage.notification;
@@ -158,26 +157,25 @@ const App = () => {
       const { title, body } = remoteMessage.notification;
       Alert.alert(title, body);
     });
+  };
+
+  const updateNotificationFlow = async () => {
+    await DataStorageLocal.saveDataToAsync(Constant.IS_FROM_NOTIFICATION, JSON.stringify(true)); 
   }
 
-
   return (
-
     <ApolloProvider client={Apolloclient.client}>
       <StatusBar translucent={true} />
       <View style={{ flex: 1 }}>
         <AppNavigator style={{ flex: 1 }} />
-        <TimerWidgetComponent />
+        <TimerWidgetComponent /> 
         <VideoBackgroundUpload />
-        <QuestionnaireMediaUpload />
+        <QuestionnaireMediaUpload /> 
         <ImageBackgrounUpload />
-        <CaptureBFIUpload />
+         <CaptureBFIUpload /> 
       </View>
     </ApolloProvider>
-
   );
-
 }
 
 export default App;
-

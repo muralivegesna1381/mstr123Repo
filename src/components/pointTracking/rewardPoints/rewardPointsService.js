@@ -2,11 +2,10 @@ import React, { useState, useEffect,useRef } from 'react';
 import {BackHandler} from 'react-native';
 import RewardPointsUi from './rewardPointsUI';
 import * as Constant from "./../../../utils/constants/constant"
-import * as DataStorageLocal from './../../../utils/storage/dataStorageLocal';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 
 let trace_inRewardPointsScreen;
 
@@ -79,8 +78,7 @@ const RewardPointsService = ({navigation, route, ...props }) => {
 
     const getPetImage = async () => {
 
-      let defaultPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-      defaultPet = JSON.parse(defaultPet);
+      let defaultPet = AppPetsData.petsData.defaultPet;
       set_defaultPetObj(defaultPet);
       if(defaultPet && defaultPet.photoUrl !== ''){
         set_petImg(defaultPet.photoUrl);
@@ -108,43 +106,35 @@ const RewardPointsService = ({navigation, route, ...props }) => {
 
       set_isLoading(true);
       isLoadingdRef.current = 1;
-      let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-      
-      let getRewardsServiceObj = await ServiceCalls.getPetCampaignPointsList(id,token);
+      let apiMethod = apiMethodManager.GET_CAMPAIGN_POINTS_LIST + id;
+      let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
       set_isLoading(false);
       isLoadingdRef.current = 0; 
-
-      if(getRewardsServiceObj && getRewardsServiceObj.logoutData){
-        firebaseHelper.logEvent(firebaseHelper.event_getRewardsDetails_api_success, firebaseHelper.screen_rewards, "Reward Details API success", 'Unautherised');  
-        AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
-        return;
-      }
         
-      if(getRewardsServiceObj && !getRewardsServiceObj.isInternet){
-        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
-        firebaseHelper.logEvent(firebaseHelper.event_getRewardsDetails_api_success, firebaseHelper.screen_rewards, "Reward Details API success", 'Internet : false');  
-        return;
-      }
-  
-      if(getRewardsServiceObj && getRewardsServiceObj.statusData){
-
-        if(getRewardsServiceObj.responseData && getRewardsServiceObj.responseData.length > 0){
-          set_awardedArray(getRewardsServiceObj.responseData); 
+      if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            
+        if(apiService.data.petCampaignList && apiService.data.petCampaignList.length > 0){
+          set_awardedArray(apiService.data.petCampaignList); 
         } else {
           firebaseHelper.logEvent(firebaseHelper.event_getRewardsDetails_api_success, firebaseHelper.screen_rewards, "Reward Details API success", 'Campaign List length : '+getRewardsServiceObj.responseData.length);  
           set_awardedArray([]); 
         }
-        
+ 
+      } else if(apiService && apiService.isInternet === false) {
+
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
+        firebaseHelper.logEvent(firebaseHelper.event_getRewardsDetails_api_success, firebaseHelper.screen_rewards, "Reward Details API success", 'Internet : false'); 
+      
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+        createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);
+        firebaseHelper.logEvent(firebaseHelper.event_getRewardsDetails_api_success, firebaseHelper.screen_rewards, "Reward Details API fail", 'error : '+apiService.error.errorMsg);
+            
       } else {
+
         firebaseHelper.logEvent(firebaseHelper.event_getRewardsDetails_api_success, firebaseHelper.screen_rewards, "Reward Details API fail", 'Service Status : false');
         createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-      }
-  
-      if(getRewardsServiceObj && getRewardsServiceObj.error) {
-        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-        let errors = getRewardsServiceObj.error.length > 0 ? getRewardsServiceObj.error[0].code : '';
-        firebaseHelper.logEvent(firebaseHelper.event_getRewardsDetails_api_success, firebaseHelper.screen_rewards, "Reward Details API fail", 'error : '+errors);
+
       }
 
     };
@@ -153,41 +143,34 @@ const RewardPointsService = ({navigation, route, ...props }) => {
 
       set_isLoading(true);
       isLoadingdRef.current = 1;
-      let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 
-      let getTListServiceObj = await ServiceCalls.getPetCampaignPoints(id,token);
+      let apiMethod = apiMethodManager.GET_CAMPAIGN_POINTS + id;
+      let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA);
       set_isLoading(false);
       isLoadingdRef.current = 0; 
-
-      if(getTListServiceObj && getTListServiceObj.logoutData){
-        firebaseHelper.logEvent(firebaseHelper.event_getTotalListofPoints_api_fail, firebaseHelper.screen_rewards, "Total Points API Fail - Total Points Earned ", 'Unautherised');
-        AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
-        return;
-      }
         
-      if(getTListServiceObj && !getTListServiceObj.isInternet){
+      if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            
+        if(apiService.data.petCampaign){
+          set_totalRewardPoints(apiService.data.petCampaign.totalEarnedPoints);
+          set_totalRedeemablePoints(apiService.data.petCampaign.redeemablePoints);
+        }
+ 
+      } else if(apiService && apiService.isInternet === false) {
+
         createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
         firebaseHelper.logEvent(firebaseHelper.event_getTotalListofPoints_api_fail, firebaseHelper.screen_rewards, "Total Points API Fail - Total Points Earned ", 'Internet : false');
-        return;
-      }
-  
-      if(getTListServiceObj && getTListServiceObj.statusData){
+      
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
 
-        if(getTListServiceObj.responseData){
-          set_totalRewardPoints(getTListServiceObj.responseData.totalEarnedPoints);
-          set_totalRedeemablePoints(getTListServiceObj.responseData.redeemablePoints);
-        }
-        
+        createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);
+        firebaseHelper.logEvent(firebaseHelper.event_getTotalListofPoints_api_fail, firebaseHelper.screen_rewards, "Total Points API Fail - Total Points Earned ", 'error : ' + apiService.error.errorMsg);
+            
       } else {
+
         firebaseHelper.logEvent(firebaseHelper.event_getTotalListofPoints_api_fail, firebaseHelper.screen_rewards, "Total Points API Fail - Total Points Earned ", 'Service Status : false');
         createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-      }
-  
-      if(getTListServiceObj && getTListServiceObj.error) {
-        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-        let errors = getTListServiceObj.error.length > 0 ? getTListServiceObj.error[0].code : '';
-        firebaseHelper.logEvent(firebaseHelper.event_getTotalListofPoints_api_fail, firebaseHelper.screen_rewards, "Total Points API Fail - Total Points Earned ", 'error : ' + errors);
+
       }
 
     };
@@ -195,42 +178,34 @@ const RewardPointsService = ({navigation, route, ...props }) => {
     const getRewardsRedeemedDetailsService = async (id) => {
 
       set_isLoading(true);
-      let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        
-      let getRPointsServiceObj = await ServiceCalls.getPetRedemptionHistory(leaderBoardPetId,token);
+
+      let apiMethod = apiMethodManager.GET_PET_REDEEM_HISTORY + leaderBoardPetId;
+      let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA);
       set_isLoading(false);
       isLoadingdRef.current = 0; 
-
-      if(getRPointsServiceObj && getRPointsServiceObj.logoutData){
-        firebaseHelper.logEvent(firebaseHelper.event_getRewardsRedeemedDetailsService_api_fail, firebaseHelper.screen_rewards, "Get RewardsRedeemed Details API Fail ", 'Unautherised');
-        AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
-        return;
-      }
         
-      if(getRPointsServiceObj && !getRPointsServiceObj.isInternet){
-        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
-        firebaseHelper.logEvent(firebaseHelper.event_getRewardsRedeemedDetailsService_api_fail, firebaseHelper.screen_rewards, "Get RewardsRedeemed Details API Fail ", 'Internet : false');
-        return;
-      }
-  
-      if(getRPointsServiceObj && getRPointsServiceObj.statusData){
-
-        if(getRPointsServiceObj.responseData){
-          set_redeemedArray(getRPointsServiceObj.responseData);
+      if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            
+        if(apiService.data.redemptionHistoryList){
+          set_redeemedArray(apiService.data.redemptionHistoryList);
         } else {
           set_redeemedArray([]);
         }
-        
+ 
+      } else if(apiService && apiService.isInternet === false) {
+
+        createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
+        firebaseHelper.logEvent(firebaseHelper.event_getRewardsRedeemedDetailsService_api_fail, firebaseHelper.screen_rewards, "Get RewardsRedeemed Details API Fail ", 'Internet : false');
+      
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+        createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);
+        firebaseHelper.logEvent(firebaseHelper.event_getRewardsRedeemedDetailsService_api_fail, firebaseHelper.screen_rewards, "Get RewardsRedeemed Details API Fail ", 'error : '+apiService.error.errorMsg);
+            
       } else {
         firebaseHelper.logEvent(firebaseHelper.event_getRewardsRedeemedDetailsService_api_fail, firebaseHelper.screen_rewards, "Get RewardsRedeemed Details API Fail ", 'Service Status : false');
         createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-      }
-  
-      if(getRPointsServiceObj && getRPointsServiceObj.error) {
-        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-        let errors = getRPointsServiceObj.error.length > 0 ? getRPointsServiceObj.error[0].code : '';
-        firebaseHelper.logEvent(firebaseHelper.event_getRewardsRedeemedDetailsService_api_fail, firebaseHelper.screen_rewards, "Get RewardsRedeemed Details API Fail ", 'error : '+errors);
+
       }
 
     };

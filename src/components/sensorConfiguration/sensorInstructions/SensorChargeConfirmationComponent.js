@@ -1,5 +1,5 @@
 import React, {useState,useEffect,useRef} from 'react';
-import {Text, View,StyleSheet,Image,BackHandler,Platform,PermissionsAndroid} from 'react-native';
+import {Text, View,StyleSheet,BackHandler,Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import fonts from '../../../utils/commonStyles/fonts'
@@ -8,14 +8,18 @@ import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import * as Constant from "./../../../utils/constants/constant";
 import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
-import { BluetoothStatus } from "react-native-bluetooth-status";
-import RNAndroidLocationEnabler from "react-native-android-location-enabler";
 import BleManager from "react-native-ble-manager";
 import Highlighter from "react-native-highlight-words";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 import * as PermissionsiOS from './../../../utils/permissionsComponents/permissionsiOS';
 import * as CheckPermissionsAndroid from './../../../utils/permissionsComponents/permissionsAndroid';
+
+import HPN1SensorImg from "./../../../../assets/images/sensorImages/svg/hpn1SensorIcon.svg";
+import SensorInstImg from "./../../../../assets/images/sensorImages/svg/sensorInstBleIcon.svg";
+import ConfigSensorMenuImg from "./../../../../assets/images/otherImages/svg/configsensorMenu.svg";
+import SensorBatteryImg from "./../../../../assets/images/sensorImages/svg/sensorInstBatteryIcon.svg";
+import SensorInstWiFiImg from "./../../../../assets/images/sensorImages/svg/sensorInstWifiIcon.svg";
 
 let trace_inSensorsChargecreen;
 
@@ -107,11 +111,6 @@ const SensorChargeConfirmationComponent = ({navigation, route, ...props }) => {
 
       if(Platform.OS === 'ios') {
 
-        // let blePermissions = await DataStorageLocal.getDataFromAsync(Constant.IOS_BLE_PERMISSIONS_GRANTED);
-        // if(blePermissions && blePermissions === 'isFirstTime') {
-        //   await DataStorageLocal.saveDataToAsync(Constant.IOS_BLE_PERMISSIONS_GRANTED,'existingUser');
-        // } else {
-
           let permissions = await PermissionsiOS.checkBlePermissions();
           if(permissions) {
             navigateTosensorAction();
@@ -119,8 +118,6 @@ const SensorChargeConfirmationComponent = ({navigation, route, ...props }) => {
             showBleFailed(Constant.BLE_PERMISSIONS_ENABLED_HIGH,Constant.BLE_PERMISSIONS_ENABLED);
           }
           return;
-
-        // }
         
       }  else {
 
@@ -199,13 +196,13 @@ return (
                 <View style={styles.instViewStyle}>
 
                     <View style={{flexDirection:'row',alignItems:'center'}}>
-                        {sensorType && sensorType.includes('HPN1') ? <Image source={require("./../../../../assets/images/sensorImages/svg/hpn1SensorIcon.svg")} style={styles.iconStyles}/> : <Image source={require("./../../../../assets/images/otherImages/svg/configsensorMenu.svg")} style={styles.iconStyles}/>}
+                        {sensorType && sensorType.includes('HPN1') ? <HPN1SensorImg width={wp('10%')} height={hp('10%')} style={styles.iconStyles}/> : <ConfigSensorMenuImg width={wp('10%')} height={hp('10%')} style={styles.iconStyles}/>}
                         {sensorType && sensorType.includes('HPN1') ? <Text style={[styles.instTxtStyle]}>{'The sensor should be'}<Text style={[styles.instTxtStyleBold]}>{' plugged into charging'}</Text> </Text> 
                         : <Text style={[styles.instTxtStyle]}>{'The sensor should be unplugged from charger'} </Text>} 
                     </View>
 
                     <View style={{flexDirection:'row',alignItems:'center'}}>
-                        <Image source={require("./../../../../assets/images/sensorImages/svg/sensorInstBleIcon.svg")} style={styles.iconStyles}/>
+                        <SensorInstImg width={wp('10%')} height={hp('10%')}/>
                         <Text style={[styles.instTxtStyle]}>{'The phone’s '}
                         <Text style={[styles.instTxtStyleBold]}>{'Bluetooth'}
                         <Text style={[styles.instTxtStyle]}>{' should be switched on throughout the sensor configuration'}</Text> 
@@ -214,18 +211,18 @@ return (
                     </View>
 
                     {sensorType && sensorType.includes('HPN1') ? null : <View style={{flexDirection:'row',alignItems:'center'}}>
-                        <Image source={require("./../../../../assets/images/sensorImages/svg/sensorInstBatteryIcon.svg")} style={styles.iconStyles}/>
+                        <SensorBatteryImg width={wp('10%')} height={hp('10%')}/>
                         <Text style={[styles.instTxtStyle]}>{'The sensor should be sufficiently charged (no blinking red light)'} </Text>   
                     </View>}
 
                     {sensorType && sensorType.includes('HPN1') ? null : <View style={{flexDirection:'row',alignItems:'center'}}>
-                        <Image source={require("./../../../../assets/images/sensorImages/svg/sensorInstWifiIcon.svg")} style={styles.iconStyles}/>
+                        <SensorInstWiFiImg width={wp('10%')} height={hp('10%')}/>
                         <Text style={[styles.instTxtStyle]}>{'The sensor should be awake while they are being configured. Please shake the sensors while the app is writing the Wi-Fi details to the sensors'} </Text>   
                     </View>}
 
                     {sensorType && sensorType.includes('HPN1') ? <View style={{flexDirection:'row',alignItems:'center'}}>
-                        <Image source={require("./../../../../assets/images/sensorImages/svg/sensorInstWifiIcon.svg")} style={styles.iconStyles}/>
-                        <Text style={[styles.instTxtStyle]}>{'The sensor should be within'}<Text style={[styles.instTxtStyleBold]}>{' close proximity '} </Text><Text style={[styles.instTxtStyle]}>{'(< 1-meter range) of the mobile device'} </Text></Text>   
+                      <SensorInstWiFiImg width={wp('10%')} height={hp('10%')}/>
+                      <Text style={[styles.instTxtStyle]}>{'The sensor should be within'}<Text style={[styles.instTxtStyleBold]}>{' close proximity '} </Text><Text style={[styles.instTxtStyle]}>{'(< 1-meter range) of the mobile device'} </Text></Text>   
                     </View> : null}
 
                 </View>
@@ -305,13 +302,6 @@ const styles = StyleSheet.create({
         color: 'black',
         fontSize: fonts.fontMedium,
         ...CommonStyles.textStyleBold,
-    },
-
-    iconStyles : {
-        width:wp('10%'),
-        height:hp('10%'),
-        resizeMode:'contain',
-        flex:1,
     },
 
 });

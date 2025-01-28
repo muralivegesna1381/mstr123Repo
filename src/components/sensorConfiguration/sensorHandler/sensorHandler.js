@@ -205,7 +205,7 @@ class SensorHandler {
 
     this.callBack = callback;
     this.dissconnectErrorCallBack = callback;
-    setTimeout(() => {
+    // setTimeout(() => {
       BleManager.isPeripheralConnected(this.peripheralId, []).then((isConnected) => {
           if (isConnected === true) {
             this.writeData(serviceId, characterId, writeVal, this.callBack);
@@ -229,16 +229,16 @@ class SensorHandler {
         }).catch((error) => {
           this.callBack({ error: "isPeripheralConnected error" });
         });
-    }, 1500);
+    // }, 1500);
 
   };
 
   writeData = (serviceId, characterId, writeVal, callback) => {
 
     this.callBack = callback;
-    setTimeout(() => {
+    // setTimeout(() => {
       BleManager.retrieveServices(this.peripheralId).then(async (peripheralInfo) => {
-          setTimeout(() => {
+          // setTimeout(() => {
             BleManager.write(this.peripheralId,serviceId,characterId,writeVal,10000000).then((characteristic) => {
                 this.callBack({ data: { status: 200 } });
               }).catch((error) => {
@@ -249,7 +249,7 @@ class SensorHandler {
                 this.callBack({ error: "unable to connect "+devicesArray});
               });
 
-          }, 1500);
+          // }, 1500);
 
         }).catch((error) => {
           if(devicesArray && devicesArray.length > 0) {
@@ -258,7 +258,7 @@ class SensorHandler {
           }
           this.callBack({ error: "unable to connect "+devicesArray});
         });
-    }, 1500);
+    // }, 1500);
 
   };
 
@@ -267,7 +267,7 @@ class SensorHandler {
     this.sensorCallBack = callback;
     this.dissconnectErrorCallBack = callback;
     this.wifiList = [];
-    const wifiScan = this.sensorType === "HPN1Sensor" ? [1, 60] : [5];;
+    const wifiScan = this.sensorType === "HPN1Sensor" ? [1, 60] : [5];
 
     this.writeDataToSensor(this.sensorType === "HPN1Sensor" ? bleUUID.HPN1_WIFI_COMMAND_SERVICE : bleUUID.COMM_SERVICE,
     this.sensorType === "HPN1Sensor" ? bleUUID.HPN1_WIFI_SCAN : bleUUID.COMMAND_CHAR, wifiScan,
@@ -300,11 +300,9 @@ class SensorHandler {
 
     this.callBack = callback;
     this.dissconnectErrorCallBack = callback;
-
     setTimeout(() => {
 
       try {
-
         BleManager.isPeripheralConnected(this.peripheralId, []).then((isConnected) => {
 
           if (isConnected === true) {
@@ -335,16 +333,16 @@ class SensorHandler {
         this.callBack({ error: "isPeripheralConnected error" });
       }
       
-    }, 1500);
+    }, Platform.OS === 'android' ? 2000 : 1000);
 
   };
 
   readData = (serviceId, characterId, callback) => {
+
     this.callBack = callback;
-    setTimeout(() => {
+    // setTimeout(() => {
       BleManager.retrieveServices(this.peripheralId).then(async (peripheralInfo) => {
           setTimeout(() => {
-
             BleManager.read(this.peripheralId, serviceId, characterId).then((characteristic) => {
 
               // if(characteristic) {
@@ -361,7 +359,7 @@ class SensorHandler {
         }).catch((error) => {
           this.callBack({ error: "unable to read data" });
         });
-    }, 1500);
+    // }, 1500);
   };
 
   retrieceWifiListAfterCount = (wifiData, callback) => {
@@ -477,14 +475,16 @@ class SensorHandler {
                 } else {
 
                     if (wificommand !== totalcount) {
-                      this.failedNamesCount = this.failedNamesCount + 1
+                      this.failedNamesCount = this.failedNamesCount + 1;
                       if (this.stopScan === false) {
-                        const uniqueNames = Array.from(new Set(this.wifiList));
-                        this.sensorCallBack({data: { status: 200, wifiList: uniqueNames, failedNamesCount:this.failedNamesCount },});
+                        // const uniqueNames = Array.from(new Set(this.wifiList));
+                        // this.sensorCallBack({data: { status: 200, wifiList: uniqueNames, failedNamesCount:this.failedNamesCount },});
                         this.retrieveWifiList(wificommand + 1, totalcount);
                       }
 
                     } 
+                    const uniqueNames = Array.from(new Set(this.wifiList));
+                    this.sensorCallBack({data: { status: 200, wifiList: uniqueNames, failedNamesCount:this.failedNamesCount },});
 
                 }
           

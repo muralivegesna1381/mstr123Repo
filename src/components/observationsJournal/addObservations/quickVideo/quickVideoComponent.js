@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useDebugValue } from 'react';
-import { View, BackHandler, Platform, NativeModules } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { BackHandler, Platform, NativeModules } from 'react-native';
 import QuickVideoUI from './quickVideoUI';
 import * as DataStorageLocal from "./../../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../../utils/constants/constant";
@@ -13,6 +13,7 @@ import perf from '@react-native-firebase/perf';
 import Highlighter from "react-native-highlight-words";
 import * as PermissionsiOS from './../../../../utils/permissionsComponents/permissionsiOS';
 import MediaMeta from "react-native-media-meta";
+import * as ObservationModel from "./../../observationModel/observationModel.js";
 
 let trace_inQuickVideo;
 
@@ -91,8 +92,7 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
 
   const getObsDetails = async () => {
 
-    let oJson = await DataStorageLocal.getDataFromAsync(Constant.OBSERVATION_DATA_OBJ);
-    oJson = JSON.parse(oJson);
+    let oJson = ObservationModel.observationData;
     if (oJson) {
       firebaseHelper.logEvent(firebaseHelper.event_observation_quick_video, firebaseHelper.screen_quick_video, "User Selected Quick Video option", 'Pet Id : ' + oJson.selectedPet.petID);
       set_selectedPet(oJson.selectedPet);
@@ -124,33 +124,13 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
 
     let obsPets = await DataStorageLocal.getDataFromAsync(Constant.ADD_OBSERVATIONS_PETS_ARRAY);
     obsPets = JSON.parse(obsPets);
-    let obsObject = await DataStorageLocal.getDataFromAsync(Constant.OBSERVATION_DATA_OBJ);
-    obsObject = JSON.parse(obsObject);
+    let obsObject = ObservationModel.observationData;
+    obsObject.fromScreen = 'quickVideo';
+    obsObject.quickVideoFileName = mediaArray[0].fileName,
+    obsObject.quickVideoDateFile = mediaArray[0].quickVideoDateFile,
+    obsObject.mediaArray = mediaArray,
+    obsObject.ctgNameId = 1
 
-    // obsObject.selectedPet = obsObject ? obsObject.selectedPet : '';
-    // obsObject.obsText = obsObject ? obsObject.obsText : '';
-    // obsObject.obserItem = obsObject ? obsObject.obserItem : '';
-    // obsObject.selectedDate = obsObject ? obsObject.observationDateTime : new Date();
-    // obsObject.mediaArray = mediaArray;
-    // obsObject.fromScreen = obsObject ? obsObject.fromScreen : '';
-    // obsObject.isPets = false;
-    // obsObject.isEdit = false;
-
-
-    let obsObj = {
-      fromScreen: obsObject ? obsObject.fromScreen : '',
-      isPets: false,
-      isEdit: false,
-      behaviourItem: obsObject ? obsObject.behaviourItem : '',
-      observationId: obsObject ? obsObject.observationId : '',
-      quickVideoFileName: mediaArray[0].fileName,
-      quickVideoDateFile: mediaArray[0].quickVideoDateFile,
-      mediaArray: mediaArray,
-      selectedPet: obsObject ? obsObject.selectedPet : '',
-      ctgNameId: 1
-    }
-
-    await DataStorageLocal.saveDataToAsync(Constant.OBSERVATION_DATA_OBJ, JSON.stringify(obsObj));
     firebaseHelper.logEvent(firebaseHelper.event_observation_quick_video_action, firebaseHelper.screen_quick_video, "User clicked on Next", 'Pet Id : ' + obsObject ? obsObject.selectedPet.petID : '');
     if (obsPets && obsPets.length > 1) {
       navigation.navigate('AddOBSSelectPetComponent', { petsArray: obsPets, defaultPetObj: obsObject.selectedPet });
@@ -162,11 +142,12 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
 
   const navigateToPrevious = () => {
 
-    if (popIdRef.current === 1) {
-    } else {
-      firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_quick_video, "User clicked on back button to navigate to Dashboard", '');
-      navigation.navigate("DashBoardService");
-    }
+    // if (popIdRef.current === 1) {
+    // } else {
+    //   firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_quick_video, "User clicked on back button to navigate to Dashboard", '');
+    //   navigation.navigate("DashBoardService");
+    // }
+    navigation.goBack();
 
   };
 
@@ -301,30 +282,28 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
         promise.then(async function (result) {
 
           await createThumbnail({ url: response.assets[0].uri, timeStamp: 10000, }).then(response => thumImg = response.path)
-            .catch(err => { });
+            .catch(err => {{} });
           set_videoPath(result);
           set_thumbnailImage(thumImg)
 
-          dateFile = moment().utcOffset("+00:00").format("MMDDYYYYHHmmss");
+          dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
           set_OriginalFilePath(response.assets[0].uri)
-
           let fileName = '';
+
+          let petId = selectedPetRef.current.petID;
+          let pName = selectedPetRef.current.petName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+          pName = pName.length > 15 ? pName.substring(0, 15) : pName;
+          let sName = selectedPetRef.current.studyName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+          sName = sName !== "" ? (sName.length > 20 ? sName.substring(0, 20) : sName) : "NOSTUDY";
+
           if (selectedPetRef.current && selectedPetRef.current.devices && selectedPetRef.current.devices.length > 0) {
-            let pName = selectedPetRef.current.petName.length > 15 ? selectedPetRef.current.petName.substring(0, 15) : selectedPetRef.current.petName;
-            let sName = selectedPetRef.current.studyName.length > 20 ? selectedPetRef.current.studyName.substring(0, 20) : selectedPetRef.current.studyName;
-            if (selectedPetRef.current.devices[0].isDeviceSetupDone) {
-              fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPetRef.current.devices[0].deviceNumber + '_' + dateFile;
-            } else {
-              fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + selectedPetRef.current.devices[0].deviceNumber + '_SETUP_PENDING' + '_' + dateFile;
-            }
+            let devNumber = selectedPetRef.current.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '')
+            fileName = pName + '_' + petId + '_' + sName+ '_' + devNumber+ '_' + dateFile;
           } else {
-
-            let pName = selectedPetRef.current.petName.length > 15 ? selectedPetRef.current.petName.substring(0, 15) : selectedPetRef.current.petName;
-            let sName = selectedPetRef.current.studyName.length > 20 ? selectedPetRef.current.studyName.substring(0, 20) : selectedPetRef.current.studyName;
-            // fileName = pName +'_'+sName+'_'+selectedPetRef.current.devices[0].deviceNumber+'_'+dateFile;
-            fileName = pName.replace(/_/g, ' ') + '_' + sName.replace(/_/g, ' ') + '_' + "NO_DEVICE" + '_' + dateFile;
-
+            fileName = pName+ '_' + petId + '_' + sName + '_' + "NO DEVICE" + '_' + dateFile;
           }
+
+          fileName = fileName.toLocaleLowerCase();
 
           set_videoName(fileName)
 

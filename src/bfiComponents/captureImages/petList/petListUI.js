@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, FlatList, Image, ImageBackground, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, BackHandler, FlatList, ImageBackground, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
@@ -8,33 +8,42 @@ import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import fonts from '../../../utils/commonStyles/fonts';
 import * as Constant from "../../../utils/constants/constant";
 import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
+import perf from '@react-native-firebase/perf';
+import { useNavigation } from "@react-navigation/native";
 
-let searchImg = require('./../../../../assets/images/otherImages/svg/searchIcon.svg');
-let defaultPetImg = require("./../../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
+import SearchImg from "./../../../../assets/images/otherImages/svg/searchIcon.svg";
+import DefaultPetImg from "./../../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
+import NoRecordsImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
 
 const PetListUI = ({ route, ...props }) => {
+
+  const navigation = useNavigation();
   const [isRecords, set_isRecords] = useState(true);
-  const [petName, set_petName] = useState(undefined);
-  const [isListOpen, set_ListOpen] = useState(false);
   const [filterArray, set_filterArray] = useState(undefined);
-  let isKeyboard = useRef(false);
   const [imgLoader, set_imgLoader] = useState(true);
   const [searchTextEff, set_searchTextEff] = useState('');
   const [onEndReached, setOnEndReachedCalled] = useState(false);
-  const [hideSearch, setHideSearch] = useState(false)
-  var pageNum = useRef(1);
+  const [hideSearch, setHideSearch] = useState(false);
+  const [date, set_Date] = useState(new Date());
 
+  var pageNum = useRef(1);
+  let isKeyboard = useRef(false);
   let trace_pet_list_Screen;
 
   //Android Physical back button action
   useEffect(() => {
-    initialSessionStart();
-    firebaseHelper.reportScreen(firebaseHelper.screen_bfi_pet_information);
-    firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_pet_information, "User in BFI Pet List Screen", '');
+
+    const focus = navigation.addListener("focus", () => {
+      set_Date(new Date());
+      initialSessionStart();
+      firebaseHelper.reportScreen(firebaseHelper.screen_bfi_pet_information);
+      firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_pet_information, "User in BFI Pet List Screen", '');
+    });
 
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     return () => {
       initialSessionStop();
+      focus();
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
     };
   }, []);
@@ -48,7 +57,7 @@ const PetListUI = ({ route, ...props }) => {
   };
 
   useEffect(() => {
-    
+
     if (props.devices) {
       set_filterArray(props.devices);
       if (props.devices.length > 0) {
@@ -99,6 +108,10 @@ const PetListUI = ({ route, ...props }) => {
     props.doServiceCall(searchTextEff);
   };
 
+  const clearSearchValues = () => {
+    props.clearSearchValues();
+  };
+
   const renderItem = ({ item, index }) => {
     return (
       <View>
@@ -106,7 +119,7 @@ const PetListUI = ({ route, ...props }) => {
           <View style={styles.item}>
             <View style={{ flex: 3 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={{ fontSize: 18, fontFamily: 'Barlow-SemiBold', color: 'black' }}>{item.petName}</Text>
+                <Text style={{ fontSize: fonts.fontXMedium, fontFamily: 'Barlow-SemiBold', color: 'black' }}>{item.petName}</Text>
               </View>
 
               <View style={styles.listItemView}>
@@ -123,15 +136,14 @@ const PetListUI = ({ route, ...props }) => {
 
             </View>
 
-            <ImageBackground source={defaultPetImg} style={[styles.ratingImage1]} imageStyle={{ borderRadius: 15 }}>
-              {item.photoUrl && item.photoUrl !== "" ?
-                <ImageBackground source={{ uri: item.photoUrl }} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => {
-                  set_imgLoader(false)
-                }} style={[styles.ratingImage1]} imageStyle={{ borderRadius: 15 }}>
-                  {imgLoader ? <ActivityIndicator size='small' color="grey" /> : null}
-                </ImageBackground> :
-                <ImageBackground source={defaultPetImg} style={[styles.ratingImage1]} imageStyle={{ borderRadius: 15 }}></ImageBackground>}
-            </ImageBackground>
+            {item.photoUrl && item.photoUrl !== "" ?
+              <ImageBackground source={{ uri: item.photoUrl }} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => {
+                set_imgLoader(false)
+              }} style={[styles.ratingImage1]} imageStyle={{ borderRadius: 15 }}>
+                {imgLoader ? <ActivityIndicator size='small' color="grey" /> : null}
+              </ImageBackground> :
+              <ImageBackground source={DefaultPetImg} style={[styles.ratingImage1]} imageStyle={{ borderRadius: 15 }}></ImageBackground>}
+
           </View>
         </TouchableOpacity>
       </View>
@@ -158,7 +170,7 @@ const PetListUI = ({ route, ...props }) => {
 
       {!hideSearch ? <View style={CommonStyles.searchBarStyle}>
         <View style={[CommonStyles.searchInputContainerStyle]}>
-          <Image source={searchImg} style={CommonStyles.searchImageStyle} />
+          <SearchImg width={wp('3%')} height={hp('4%')} style={{ marginLeft: wp('2%') }} />
           <TextInput
             style={CommonStyles.searchTextInputStyle}
             underlineColorAndroid="transparent"
@@ -176,7 +188,8 @@ const PetListUI = ({ route, ...props }) => {
             onChangeText={(name) => {
               set_searchTextEff(name)
               if (name.length == 0) {
-                getPetsData()
+                clearSearchValues()
+
               }
             }}
           />
@@ -197,7 +210,7 @@ const PetListUI = ({ route, ...props }) => {
               //}
             }}
           /> : <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("15%"), }}>
-            <Image style={[CommonStyles.nologsDogStyle]} source={require("./../../../../assets/images/dogImages/noRecordsDog.svg")}></Image>
+            <NoRecordsImg style={[CommonStyles.nologsDogStyle]} />
             <Text style={[CommonStyles.noRecordsTextStyle, { marginTop: hp("2%") }]}>{Constant.NO_RECORDS_LOGS}</Text>
             <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
           </View>}
@@ -213,7 +226,7 @@ const PetListUI = ({ route, ...props }) => {
         />
       </View>
 
-      {props.isLoading === true ? <LoaderComponent isLoader={false} loaderText={props.loaderMsg} isButtonEnable={false} /> : null}
+      {props.isLoading === true ? <LoaderComponent isLoader={false} loaderText={Constant.DEFAULT_LOADER_MSG} isButtonEnable={false} /> : null}
     </View>
   );
 }

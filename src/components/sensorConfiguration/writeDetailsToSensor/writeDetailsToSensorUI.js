@@ -1,5 +1,5 @@
 import React, {useState,useEffect} from 'react';
-import {StyleSheet,Text, View,Image} from 'react-native';
+import {StyleSheet,Text, View} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import BottomComponent from "./../../../utils/commonComponents/bottomComponent";
 import fonts from './../../../utils/commonStyles/fonts'
@@ -7,6 +7,8 @@ import AlertComponent from './../../../utils/commonComponents/alertComponent';
 import CommonStyles from './../../../utils/commonStyles/commonStyles';
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
 import ImageSequence from 'react-native-image-sequence';
+
+import SensorSuccessImg from "./../../../../assets/images/sensorImages/svg/sensorSuccessImg.svg";
 
 const WriteDetailsToSensorUI = ({navigation, route, ...props }) => {
 
@@ -82,7 +84,7 @@ return (
 
             <View style={[CommonStyles.headerView,{}]}>
                 <HeaderComponent
-                    isBackBtnEnable={setupSuccess === "failed" ? true : false}
+                    isBackBtnEnable={setupSuccess === 101 ? true : false}
                     isSettingsEnable={false}
                     isChatEnable={false}
                     isTImerEnable={false}
@@ -99,8 +101,8 @@ return (
                 </View>
 
                 <View style = {styles.videoViewStyle}>
-                  {setupSuccess === "success" ? <View>
-                  <Image source={(require("./../../../../assets/images/sensorImages/svg/sensorSuccessImg.svg") )} style={styles.sensorIngStyles}/>
+                  {setupSuccess === 100 ? <View>
+                    <SensorSuccessImg width={wp('35%')}/>
                   </View> : 
 
                     <ImageSequence
@@ -110,25 +112,26 @@ return (
                     />}
                 </View>
 
-                {isSensorAwaiting ? 
+                <Text style={setupSuccess === 100 ? [styles.txtStyleBold,{color:'#6BC100'}] : setupSuccess === 101 ? [styles.txtStyleBold,{color:'red'}] : [styles.txtStyleBold]}>{loaderMsg}</Text>
+
+                {/* {isSensorAwaiting ? 
                 <View style = {{width:wp('95%'),height:hp('28%'),}}>
                     <Text style={[styles.dataTxtStyleBold]}>{'Almost there!'}</Text>
                     <Text style={[styles.dataTxtStyleBold]}>{'Please do not stop the configuration process or close the app.'}</Text>
                     <Text style={[styles.dataTxtStyleBold]}>{'Also, please shake the sensor periodically throughout the configuration process.'}</Text>
                 </View> : 
-                <Text style={setupSuccess === "success" ? [styles.txtStyleBold,{color:'#6BC100'}] : setupSuccess === "failed" ? [styles.txtStyleBold,{color:'red'}] : [styles.txtStyleBold]}>{loaderMsg}</Text>}
+                <Text style={setupSuccess === 100 ? [styles.txtStyleBold,{color:'#6BC100'}] : setupSuccess === 101 ? [styles.txtStyleBold,{color:'red'}] : [styles.txtStyleBold]}>{loaderMsg}</Text>} */}
 
             </View>
            
-            {setupSuccess === "success" || setupSuccess === "failed" ? <View style={styles.bottomViewComponentStyle}>
+            {setupSuccess === 100 || setupSuccess === 101 ? <View style={styles.bottomViewComponentStyle}>
                 <BottomComponent
-                    rightBtnTitle = {setupSuccess === "failed" ? 'TRY AGAIN' : 'CONTINUE'}
-                    // isLeftBtnEnable = {sensorType === "HPN1Sensor" && hpn1ConfigWIFICount < 8 ? true : false}
+                    rightBtnTitle = {setupSuccess === 101 ? 'TRY AGAIN' : 'CONTINUE'}
                     isLeftBtnEnable = {false}
                     leftBtnTitle = {'Configure another SSID?'}
                     rigthBtnState = {true}
                     isRightBtnEnable = {true}
-                    rightButtonAction = {async () => nextButtonAction(setupSuccess === "failed" ? 'TRY AGAIN' : 'CONTINUE')}
+                    rightButtonAction = {async () => nextButtonAction(setupSuccess === 101 ? 'TRY AGAIN' : 'CONTINUE')}
                     leftButtonAction = {async () => leftButtonAction()}
 
                 ></BottomComponent>

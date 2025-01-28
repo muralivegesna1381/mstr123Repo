@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
 import fonts from './../../../utils/commonStyles/fonts'
@@ -8,9 +8,8 @@ import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import BottomComponent from "./../../../utils/commonComponents/bottomComponent";
 
-let wifiImg = require('./../../../../assets/images/sensorImages/svg/wifiGreenImg.svg');
-let editImg = require('./../../../../assets/images/sensorImages/svg/sensorEditIcon.svg');
-let deleteImg = require('./../../../../assets/images/sensorImages/svg/sensorDeleteIcon.svg');
+import WiFiImg from "./../../../../assets/images/sensorImages/svg/wifiGreenImg.svg";
+import DeleteImg from "./../../../../assets/images/sensorImages/svg/sensorDeleteIcon.svg"
 
 const WifiListHPN1UI = ({ route, ...props }) => {
 
@@ -61,11 +60,11 @@ const WifiListHPN1UI = ({ route, ...props }) => {
 
                 <View style={[styles.cellBckView]}>
 
-                    <Image source={wifiImg} style={[styles.imageStyle,{flex:0.3,}]}/>
+                    <WiFiImg style={[styles.imageStyle,{flex:0.3,}]}/>
                      <Text style={[styles.headerTextStyle,{flex:1.5,}]}>{item.ssidName}</Text>
 
                    {congiguredWIFIArray && congiguredWIFIArray.length > 1 ? <TouchableOpacity style ={{flex:0.4,alignItems:'center'}} onPress={() => editDeleteAction('deleteWifi',item)}>
-                        <Image source={deleteImg} style={[styles.imageStyle1]}/>
+                        <DeleteImg style={[styles.imageStyle1]}/>
                     </TouchableOpacity> : null}
 
                     </View>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, ImageBackground, TouchableOpacity, Image, FlatList } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList,ImageBackground,Image } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import fonts from '../../../utils/commonStyles/fonts'
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
@@ -8,8 +8,14 @@ import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 import * as Constant from "./../../../utils/constants/constant";
 
-let downArrowImg = require("../../../../assets/images/otherImages/svg/downArrowGrey.svg");
-let upArrowImg = require("../../../../assets/images/otherImages/svg/upArrow.svg");
+import DownArrowImg from "../../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import UpArrowImg from "../../../../assets/images/otherImages/svg/upArrow.svg"
+import GradientImg from "../../../../assets/images/otherImages/svg/filterGradientImg.svg";
+import FilterImg from "../../../../assets/images/otherImages/svg/filterIcon.svg";
+import NoLogsDogImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
+import FilterBckImg from "../../../../assets/images/otherImages/png/bgTimerFilter.png";
+import CloseImg from "../../../../assets/images/otherImages/svg/timerCloseIcon.svg";
+
 const FILTER_ID = 1;
 
 const FAQsComponentUI = ({ route, ...props }) => {
@@ -34,18 +40,21 @@ const FAQsComponentUI = ({ route, ...props }) => {
   const [assetsModelArray, set_assetsModelArray] = useState([]);
   const [noRecordsFound, set_noRecordsFound] = useState(false);
   const [isAppsListOpen, set_isAppsListOpen] = useState(false);
+  const [assetSensorModels, set_assetSensorModels] = useState(undefined);
+  const [assetBeaconsModels, set_assetBeaconsModels] = useState(undefined);
 
   let trace_inFaqs_Screen;
 
-  useEffect(() => {
-    faqsSessionStart();
-    firebaseHelper.reportScreen(firebaseHelper.screen_faqs);
-    firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_faqs, "User in FAQs Screen", ''); 
-     return () => {
-       faqsSessionStop();
-     };
+  // useEffect(() => {
+
+  //   faqsSessionStart();
+  //   firebaseHelper.reportScreen(firebaseHelper.screen_faqs);
+  //   firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_faqs, "User in FAQs Screen", ''); 
+  //    return () => {
+  //      faqsSessionStop();
+  //    };
  
-   }, []);
+  //  }, []);
 
   useEffect(() => {
 
@@ -73,6 +82,8 @@ const FAQsComponentUI = ({ route, ...props }) => {
     let appArray = [];
     let assetTypeArray = [];
     let assetModelArray = [];
+    let sensorModels = [];
+    let beaconsModels = []
 
     for (let i = 0; i < faqsArray.length; i++) {
 
@@ -84,7 +95,11 @@ const FAQsComponentUI = ({ route, ...props }) => {
 
       if (faqsArray[i].categoryId === 2) {
         assetTypeArray.push(faqsArray[i].assetType);
-        assetModelArray.push(faqsArray[i].assetModel);
+        if(faqsArray[i].assetType === "Beacon") {
+          beaconsModels.push(faqsArray[i].assetModel);
+        } else if(faqsArray[i].assetType === "Sensor") {
+          sensorModels.push(faqsArray[i].assetModel);
+        }
       }
 
     }
@@ -94,11 +109,15 @@ const FAQsComponentUI = ({ route, ...props }) => {
     const uniqueAssetType = Array.from(new Set(assetTypeArray));
     const uniqueAssetModel = Array.from(new Set(assetModelArray));
 
+    const uniqueAssetSensors = Array.from(new Set(sensorModels));
+    const uniqueAssetBeacons = Array.from(new Set(beaconsModels));
+
     set_categoryArray(uniqueNames.sort((a, b) => a.localeCompare(b)));
     set_appsArray(uniqueAppArray.sort((a, b) => a.localeCompare(b)));
     set_assetsTypeArray(uniqueAssetType.sort((a, b) => a.localeCompare(b)));
     set_assetsModelArray(uniqueAssetModel.sort((a, b) => a.localeCompare(b)));
-
+    set_assetSensorModels(uniqueAssetSensors.sort((a, b) => a.localeCompare(b)));
+    set_assetBeaconsModels(uniqueAssetBeacons.sort((a, b) => a.localeCompare(b)));
   };
 
   const actionOnRow = (item) => {
@@ -128,6 +147,11 @@ const FAQsComponentUI = ({ route, ...props }) => {
       set_isAssetListOpen(false);
       set_assetTypeText(item);
       set_appText(undefined);
+      if(item === "Sensor") {
+        set_assetsModelArray(assetSensorModels)
+      } else if(item === "Beacon") {
+        set_assetsModelArray(assetBeaconsModels)
+      }
     }
 
     if (isAssetModelListOpen) {
@@ -176,6 +200,7 @@ const FAQsComponentUI = ({ route, ...props }) => {
     set_isAppListOpen(false);
     set_isAssetListOpen(false);
     set_isAssetModelListOpen(false);
+    set_isAppsListOpen(false)
     
     if(value !== FILTER_ID) {
       set_appText(undefined);
@@ -213,7 +238,7 @@ const FAQsComponentUI = ({ route, ...props }) => {
       
       
     }
-    set_assetsModelArray(modelsArray);
+    // set_assetsModelArray(modelsArray);
     set_isAssetModelListOpen(true);
     set_isCListOpen(false);
     set_isAppListOpen(false);
@@ -239,9 +264,8 @@ const FAQsComponentUI = ({ route, ...props }) => {
   const renderFAQItem = ({ item, index }) => {
     return (
 
-      <View style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 5, paddingBottom: 5 }}>
-        <Card>
-          <TouchableOpacity key={index} style={{ padding: 1 }}
+      <View style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 5, paddingBottom: 5}}>
+          <TouchableOpacity key={index} 
             onPress={() => {
               if (index == selectedExpandedCellIndex) {
                 set_selectedExpandedCellIndex(undefined)
@@ -249,33 +273,33 @@ const FAQsComponentUI = ({ route, ...props }) => {
                 set_selectedExpandedCellIndex(index)
               }
             }}>
-            <View style={{ padding: 5, backgroundColor: "white", flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ padding: 10, alignItems: 'center', justifyContent: 'center', marginLeft: 5, marginRight: 10, backgroundColor: '#EBEBEB' }}>
+            <View style={styles.tileBackView}>
+              <View style={styles.tileSubBackView}>
                 <Text style={{ color: "#484848", fontSize: fonts.fontSmall }}>{index + 1}</Text>
               </View>
               <View style={{ flex: 100 }}>
                 <Text style={styles.questionTextStyle}>{item.titleOrQuestion}</Text>
               </View>
-              <Image source={selectedExpandedCellIndex == index ? upArrowImg : downArrowImg} style={{ marginLeft: wp("2%"), marginRight: wp("2%"), width: wp('2%'), height: wp('2%') }} />
+              {selectedExpandedCellIndex == index ? <UpArrowImg style={{ marginLeft: wp("2%"), marginRight: wp("2%"), width: wp('2%'), height: wp('2%') }}/> : <DownArrowImg style={{ marginLeft: wp("2%"), marginRight: wp("2%"), width: wp('2%'), height: wp('2%') }}/>}
             </View>
             {selectedExpandedCellIndex == index ?
-              <View style={{ padding: 5, backgroundColor: "white", flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={styles.tilesAnswerBckView}>
                 <Text style={styles.answerTextStyle}>{item.urlOrAnswer}</Text>
               </View> : null}
           </TouchableOpacity>
-        </Card>
       </View>
     );
   };
 
   return (
+    
     <View style={{ flex: 1 }}>
 
       <View style={styles.mainViewStyle}>
 
-        <ImageBackground style={[styles.filterBtnStyle]} imageStyle={{ borderRadius: 5 }} source={require("../../../../assets/images/otherImages/svg/filterGradientImg.svg")}>
+        <GradientImg width={wp('90%')} height={hp('5%')} style={[styles.filterBtnStyle]}/>
 
-          <TouchableOpacity style={styles.filterBtnStyle} onPress={() => { {set_isListOpen(!isListOpen),resetAction(1)} }}>
+          <TouchableOpacity style={[styles.filterBtnStyle, {position:'absolute'}]} onPress={() => { {set_isListOpen(!isListOpen),resetAction(1)} }}>
             <View>
 
               <View onLayout={(event) => {
@@ -284,14 +308,12 @@ const FAQsComponentUI = ({ route, ...props }) => {
                 set_DropDownPostion(postionDetails);
               }} style={[styles.SectionStyle]}>
 
-                {<Text style={styles.hTextextStyle}>{'Filter'}</Text>}
-                <Image style={[styles.filterIconStyle]} imageStyle={{ borderRadius: 5 }} source={require("../../../../assets/images/otherImages/svg/filterIcon.svg")}></Image>
+                <Text style={styles.hTextextStyle}>{'Filter'}</Text>
+                <FilterImg style={[styles.filterIconStyle]}/>
 
               </View>
             </View>
           </TouchableOpacity>
-
-        </ImageBackground>
 
       </View>
       {!noRecordsFound ? <FlatList
@@ -299,14 +321,16 @@ const FAQsComponentUI = ({ route, ...props }) => {
         renderItem={renderFAQItem}
         keyExtractor={(item, index) => "" + index}
       /> : <View style={{justifyContent:'center',alignItems:'center',height:hp('58%')}}>
-      <Image style= {[styles.nologsDogStyle]} source={require("./../../../../assets/images/dogImages/noRecordsDog.svg")}></Image>
-      <Text style={CommonStyles.noRecordsTextStyle}>{Constant.NO_RECORDS_LOGS}</Text>
-      <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
+
+        <NoLogsDogImg style= {[styles.nologsDogStyle]}/>
+        <Text style={CommonStyles.noRecordsTextStyle}>{Constant.NO_RECORDS_LOGS}</Text>
+        <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
+        
     </View>}
 
       {isListOpen ? <View style={[styles.filterListStyle, { top: dropDownPostion.y + dropDownPostion.height },]}>
 
-        <ImageBackground style={[styles.filterListStyle, { alignItems: 'center', justifyContent: 'center' }]} imageStyle={{ borderRadius: 25 }} source={require("../../../../assets/images/otherImages/svg/bgTimerFilter.svg")}>
+       <ImageBackground style={[styles.filterListStyle, { alignItems: 'center', justifyContent: 'center' }]} imageStyle={{ borderRadius: 25 }} source={FilterBckImg}>
 
           <TouchableOpacity style={styles.filterAppBtnStyle} onPress={() => { set_isCListOpen(!isCListOpen), set_isAppListOpen(false) }}>
 
@@ -347,7 +371,7 @@ const FAQsComponentUI = ({ route, ...props }) => {
           <View style={[styles.dropCloseImgStyle]}>
 
             <TouchableOpacity onPress={() => {set_isListOpen(false),resetAction(1)}}>
-              <Image style={[styles.closeIconStyle]} source={require("../../../../assets/images/otherImages/svg/timerCloseIcon.svg")}></Image>
+              <CloseImg height={hp("5%")} width={wp("10%")}/>
             </TouchableOpacity>
 
           </View>
@@ -402,7 +426,7 @@ const styles = StyleSheet.create({
 
   filterListStyle: {
     position: "absolute",
-    width: wp("90%"),
+    width: wp("100%"),
     minHeight: hp("10%"),
     borderRadius: 15,
     alignSelf: 'center'
@@ -410,7 +434,7 @@ const styles = StyleSheet.create({
 
   mainViewStyle: {
     width: wp('90%'),
-    height: hp('8%'),
+    height: hp('5%'),
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: wp('2%'),
@@ -513,14 +537,44 @@ const styles = StyleSheet.create({
 
   dropCloseImgStyle: {
     bottom: -10,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'flex-end'
   },
 
-  closeIconStyle: {
-    width: wp('10%'),
-    height: hp('5%'),
-    resizeMode: 'contain',
+  tileBackView : {
+    padding: 5, 
+    backgroundColor: "white", 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    shadowColor: 'grey',
+    shadowOffset: { width: 0.2, height: 0.2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 1,
+    elevation: 3,
+  },
+
+  tileSubBackView : {
+    padding: 10, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginLeft: 5, 
+    marginRight: 10, 
+    backgroundColor: '#EBEBEB',
+   
+  },
+
+  tilesAnswerBckView : {
+    padding: 5, 
+    backgroundColor: "white", 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    shadowColor: 'grey',
+    shadowOffset: { width: 0.2, height: 0.2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 1,
+    elevation: 3,
   }
 
 });

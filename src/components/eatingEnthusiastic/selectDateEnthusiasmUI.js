@@ -13,7 +13,7 @@ import * as Constant from "./../../utils/constants/constant";
 const SelectDateEnthusiasmUI = ({ route, ...props }) => {
 
   const [selectedDate, set_selectedDate] = useState(new Date());
-  const [minimumDate, set_minimumDate] = useState(new Date())
+  const [minimumDate, set_minimumDate] = useState()
 
   // Sets the min date to last 7 days for selection
   useEffect(() => {
@@ -73,8 +73,9 @@ const SelectDateEnthusiasmUI = ({ route, ...props }) => {
               onDateChange={(date) => set_selectedDate(date)}
               mode={"datetime"}
               textColor={'black'}
+              theme = {'light'}
               maximumDate={new Date()}
-              minimumDate = {minimumDate}
+             // minimumDate = {minimumDate}
               style={styles.datePickeStyle}
             />
           </View>

@@ -6,6 +6,9 @@ import HeaderComponent from '../../../../utils/commonComponents/headerComponent'
 import SelectPetComponent from '../../../../utils/selectPetComponent/selectPetComponent';
 import AlertComponent from './../../../../utils/commonComponents/alertComponent';
 import CommonStyles from '../../../../utils/commonStyles/commonStyles';
+import LoaderComponent from '../../../../utils/commonComponents/loaderComponent';
+
+import PetObsImg from "./../../../../../assets/images/dogImages/petobsImg.svg";
 
 const  AddOBSSelectPetUI = ({route, ...props }) => {
 
@@ -13,11 +16,15 @@ const  AddOBSSelectPetUI = ({route, ...props }) => {
     const [isPopUp, set_isPopUp] = useState(false);
     const [popUpMessage, set_popUpMessage] = useState(undefined);
     const [popUpAlert, set_popUpAlert] = useState(undefined);
+    const [isLoading, set_isLoading] = useState(true);
 
-    // Setting local variables
+    useEffect(() => {
+        stopLoading();
+    }, []);
+
     useEffect(() => {
         set_petsArray(props.petsArray);
-    }, [props.petsArray, props.selectedIndex,props.fromScreen]);
+    }, [props.petsArray, props.selectedIndex]);
 
     useEffect(() => {
         set_isPopUp(props.isPopUp);
@@ -25,6 +32,12 @@ const  AddOBSSelectPetUI = ({route, ...props }) => {
         set_popUpAlert(props.popUpAlert);
 
     }, [props.isPopUp,props.popUpMessage,props.popUpAlert]);
+
+    const stopLoading = () => {
+        setTimeout(() => {
+            set_isLoading(false)
+        }, 2000);
+    }
 
     // Button actions
     const nextButtonAction = () => {
@@ -59,15 +72,15 @@ const  AddOBSSelectPetUI = ({route, ...props }) => {
 
             <View style={styles.petSelViewComponentStyle}>
                 <SelectPetComponent 
-                petsArray = {petsArray}
-                selectedIndex = {props.selectedIndex}
-                selectedPName = {props.selectedPName}
-                selectPetAction = {selectPetAction}
+                    petsArray = {petsArray}
+                    selectedIndex = {props.selectedIndex}
+                    selectedPName = {props.selectedPName}
+                    selectPetAction = {selectPetAction}
                 />
             </View>
 
             {petsArray && petsArray.length > 6 ? null : <View style={[styles.petImgStyle]}>
-                <Image source={require("./../../../../../assets/images/dogImages/petobsImg.svg")} style={styles.dogImgStyle}/>
+                <PetObsImg style={styles.dogImgStyle}/>
             </View>}
 
             <View style={CommonStyles.bottomViewComponentStyle}>
@@ -93,7 +106,7 @@ const  AddOBSSelectPetUI = ({route, ...props }) => {
                     popUpRightBtnAction = {() => popOkBtnAction()}
                 />
             </View> : null} 
-
+            {isLoading === true ? <LoaderComponent isLoader={true} loaderText = {"Please Wait..."} isButtonEnable = {false} /> : null}  
          </View>
     );
   }
@@ -103,7 +116,7 @@ const  AddOBSSelectPetUI = ({route, ...props }) => {
   const styles = StyleSheet.create({
 
     petSelViewComponentStyle : {
-        height:hp('54%'),
+        minHeight:hp('80%'),
         width:wp('100%'),
     },
 

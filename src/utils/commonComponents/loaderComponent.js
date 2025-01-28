@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import {StyleSheet,View, ActivityIndicator,Text,Image,ImageBackground} from 'react-native';
+import {StyleSheet,View,Text,Image} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import CommonStyles from '../commonStyles/commonStyles';
 import Fonts from '../../utils/commonStyles/fonts';
+import LoaderBckView from "../../../assets/images/timerImages/svg/bgTimerFilter.svg"
 
 const LoaderComponent = ({navigation, route,loaderText,isButtonEnable,heightLoader,isLoader,showLoderBox,loaderText2,...props }) => {
 
@@ -31,17 +32,15 @@ const LoaderComponent = ({navigation, route,loaderText,isButtonEnable,heightLoad
 
         <View style={[styles.mainActivity,{height:hp(heightL),zIndex:999}]}>
 
-            {showLoaderBox1 === 'show' ? <ImageBackground source={require ('../../../assets/images/timerImages/svg/bgTimerFilter.svg')} style = {styles.loaderBckViewStyle} imageStyle={{borderRadius:5}}>
-
+            {showLoaderBox1 === 'show' ? <View style={{alignItems:'center', justifyContent:'center'}}>
+                <LoaderBckView/>
                 <View style = {styles.loaderBckViewStyle}>
-                    <View style={{marginTop:hp('2%')}}>                        
-                        
+                    <View>                        
                         <Image source={require ('../../../assets/images/gifImages/Doganimation.gif')} style={[styles.dogStyle]}></Image>
                     </View>
-                    <Text style={[styles.textStyle,{...CommonStyles.textStyleBold}]}>{lMsg}<Text style={styles.textStyle}>{loaderText}</Text></Text>
-                </View>       
-
-            </ImageBackground> : null }
+                    <Text style={styles.textStyle}>{loaderText}</Text>
+                </View> 
+            </View>: null }
             
         </View>
         
@@ -77,7 +76,7 @@ const styles = StyleSheet.create({
         minHeight : hp('20%'),
         justifyContent: "center",
         alignItems: "center",
-        marginTop : hp('5%'),
+        position:'absolute'
     },
 
     dogStyle: {

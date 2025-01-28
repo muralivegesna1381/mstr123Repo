@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TextInput,NativeModules,Platform,TouchableOpacity,Image,FlatList} from 'react-native';
+import {View,StyleSheet,Text,TouchableOpacity,FlatList} from 'react-native';
 import BottomComponent from "../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../utils/commonComponents/headerComponent';
@@ -10,47 +10,23 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview'
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../utils/constants/constant"
 
-let hidePswdImg = require('../../../assets/images/otherImages/png/hide-password.png');
-let showPsdImg = require('../../../assets/images/otherImages/png/show-password.png');
-let failedImg = require('../../../assets/images/otherImages/svg/failedXIcon.svg');
-let tickImg = require('../../../assets/images/otherImages/png/tick.png');
-let downArrowImg = require('./../../../assets/images/otherImages/svg/downArrowGrey.svg');
-let xImg = require('./../../../assets/images/otherImages/png/xImg.png');
+import DownArrowImg from "./../../../assets/images/otherImages/svg/downArrowGrey.svg";
 
 const  UpdateFoodUnitsUI = ({route, ...props }) => {
 
-    const [pswdValue, set_pswdValue] = useState(undefined);
-    const [confirmPswdValue, set_confirmPswdValue] = useState(undefined);
-    const [isHidePassword, set_isHidePassword] = useState(true);
-    const [isConfirmHidePassword, set_isConfirmHidePassword] = useState(true);
     const [isPopUp, set_isPopUp] = useState(false);
-    const [regNumVal, set_regNumVal] = useState(false);
-    const [regULVal, set_regULVal] = useState(false);
-    const [regSPCVal, set_regSPCVal] = useState(false);
-    const [psdLengthVal, set_psdLengthVal] = useState(false);
-    const [enableConfirmPsd, set_enableConfirmPsd] = useState(false);
-    const [isNxtBtnEnable, set_isNxtBtnEnable] = useState(false);
-    const [currentPsdEncrypt, set_currentPsdEncrypt] = useState(undefined);
-    const [newPsdEncrypt, set_newPsdEncrypt] = useState(undefined);
-    const [isMatchPsd, set_isMatchPsd] = useState(false);
-
-    const [popUpMessage, set_popUpMessage] = useState(undefined);
-    const [popUpTitle, set_popUpTitle] = useState(undefined);
     const [isLoading, set_isLoading] = useState(false);
-    
 
     useEffect(() => {
 
       set_isPopUp(props.isPopUp);
       set_isLoading(props.isLoading);
-      set_popUpTitle(props.popUpTitle);
-      set_popUpMessage(props.popUpMessage);
 
     }, [props.isPopUp, props.popUpMessage, props.popUpTitle, props.isLoading]);
 
     // Initiates the service call to update the new password
     const nextButtonAction = () => {
-      props.submitAction(currentPsdEncrypt,newPsdEncrypt);
+      props.submitAction();
     };
 
     // back button action
@@ -105,7 +81,7 @@ const  UpdateFoodUnitsUI = ({route, ...props }) => {
                                 </View>
 
                                 <View style={{justifyContent:'center'}}>
-                                    <Image source={downArrowImg} style={styles.imageStyle} />
+                                    <DownArrowImg width={wp('5%')} height={hp('5%')}/>
                                 </View>
      
                             </TouchableOpacity>
@@ -123,7 +99,7 @@ const  UpdateFoodUnitsUI = ({route, ...props }) => {
                                 </View>
 
                                 <View style={{justifyContent:'center'}}>
-                                    <Image source={downArrowImg} style={styles.imageStyle} />
+                                    <DownArrowImg width={wp('5%')} height={hp('5%')}/>
                                 </View>
      
                             </TouchableOpacity>
@@ -141,7 +117,7 @@ const  UpdateFoodUnitsUI = ({route, ...props }) => {
                                 </View>
 
                                 <View style={{justifyContent:'center'}}>
-                                    <Image source={downArrowImg} style={styles.imageStyle} />
+                                    <DownArrowImg width={wp('5%')} height={hp('5%')}/>
                                 </View>
      
                             </TouchableOpacity>
@@ -210,10 +186,10 @@ const  UpdateFoodUnitsUI = ({route, ...props }) => {
   export default UpdateFoodUnitsUI;
 
   const styles = StyleSheet.create({
+
     mainComponentStyle : {
         flex:1,
-        backgroundColor:'white'
-            
+        backgroundColor:'white'  
     },
 
     SectionStyle1: {
@@ -312,43 +288,5 @@ const  UpdateFoodUnitsUI = ({route, ...props }) => {
         marginBottom: hp("1.5%"),
 
     },
-
-    textInputContainerStyle: {
-        flexDirection: 'row',
-        width: wp('80%'),
-        height: hp('7%'),
-        borderRadius: hp('0.5%'),
-        borderWidth: 1,
-        marginTop: hp('2%'),
-        borderColor: '#dedede',
-        backgroundColor:'white',
-        marginRight: 'auto',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-      hideOpenIconStyle : {
-        width: wp('6%'),
-        height: hp('6%'),
-        resizeMode: 'contain',
-        marginRight:wp('5%'),
-        tintColor:'black'
-    },
-
-    validateIconStyle : {
-        width: wp('3%'),
-        height: hp('3%'),
-        resizeMode: 'contain',
-        marginLeft:hp('1%'),
-        marginRight:wp('1%'),
-    },
-
-    validateTextStyle : {
-        fontSize: fonts.fontXSmall,
-        fontWeight:'normal',
-        color: '#898989', 
-        ...CommonStyles.textStyleRegular
-        
-      },
 
   });

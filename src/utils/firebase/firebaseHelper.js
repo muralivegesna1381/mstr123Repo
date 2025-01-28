@@ -331,6 +331,7 @@ export const event_SOB_petName_PPAddress_API = 'SOB_Pet_Name_PPAddress_API';
 export const event_SOB_review_Validate_Pet_fail = 'SOB_Review_Valdate_Pet_Api';
 export const event_SOB_review_Feeding_Pref_fail = 'SOB_Review_Feed_pref_Api';
 export const event_SOB_review_Species_API = 'SOB_Review_Species_Api';
+export const event_SOB_Without_Sensor_submit = 'SOB_Sensor_Without_Sensor_Trig';
 
 /////////////////////////// Sensor Flow //////////////////////////
 export const event_Sensor_type = 'Sensor_type';
@@ -571,9 +572,12 @@ export const event_score_instructions_api = 'getBfiImageScores_api';
 export const event_getPetBfiImages_api = 'getPetBfiImages_api';
 export const event_getBfiPets_api = 'getBfiPets_api';
 
+/////////// Notification Screen ////////////////
+export const screen_add_notification_screen = 'Notification_Screen_Page';
 
-
-
+/////////// Media Screen ////////////////
+export const screen_media_screen = 'Media_Screen_Page';
+export const screen_media_details_screen = 'Media_Details_Screen_Page';
 
 export async function setUserId(userId) {
     if (isAnalyticsEnabled) {

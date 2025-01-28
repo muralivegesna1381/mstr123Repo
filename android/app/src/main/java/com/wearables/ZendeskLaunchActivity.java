@@ -19,7 +19,7 @@ public class ZendeskLaunchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(ui.photoeditor.R.layout.activity_main);
         Zendesk.initialize(
                 this,
                 getResources().getString(R.string.zendesk_channel_key),

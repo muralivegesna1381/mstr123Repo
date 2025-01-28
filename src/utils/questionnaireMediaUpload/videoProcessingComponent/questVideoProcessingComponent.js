@@ -1,10 +1,7 @@
 import moment from 'moment';
 import { Video } from 'react-native-compressor';
-import { getVideoMetaData } from 'react-native-compressor';
-import { getRealPath } from 'react-native-compressor';
 import storage, { firebase } from '@react-native-firebase/storage';
 import { createThumbnail } from "react-native-create-thumbnail";
-import RNThumbnail from "react-native-thumbnail";
 import * as dataObjComponent from './../../../utils/dataComponent/dataObjComponent'
 import * as Apolloclient from './../../../config/apollo/apolloConfig';
 import * as Queries from "./../../../config/apollo/queries";
@@ -25,57 +22,61 @@ const compressVideo = async (videoObj,petId,clientId,QueestionnaireId,modeOfUplo
 
     let pathExists = '';
     if(Platform.OS==='android') {
-        pathExists = await RNFS.exists(videoObj.filePath);
+      pathExists = await RNFS.exists(videoObj.filePath);
     } else {
-        pathExists = await RNFS.exists(videoObj.filePath);
+      pathExists = await RNFS.exists(videoObj.filePath);
     }
+
     if(pathExists){
 
-        if(Platform.OS==='android'){
+      if(Platform.OS==='android'){
             
-          eventVideoUpload();
+        eventVideoUpload();
 
-            let androidComressFile = await compressAndroidVideoFile(videoObj);
-            let updatedCompressObj = await dataObjComponent.updateObjKeys(videoObj,androidComressFile,'compressedFile');
-            let fVideoFile = await uploadVideoToFB(updatedCompressObj,androidComressFile,petId,clientId,QueestionnaireId,modeOfUpload,qestName); 
-            let updatedFBVideoObj = await dataObjComponent.updateObjKeys(updatedCompressObj,fVideoFile,'fbFilePath');
-            let thumImage = await generateThumbnail(updatedFBVideoObj,videoObj.filePath,petId,clientId,QueestionnaireId,modeOfUpload,qestName);
-            let updatedThumbObj = await dataObjComponent.updateObjKeys(updatedFBVideoObj,thumImage,'thumbFilePath');
-            return updatedThumbObj;
+        let androidComressFile = await compressAndroidVideoFile(videoObj);
+        let updatedCompressObj = await dataObjComponent.updateObjKeys(videoObj,androidComressFile,'compressedFile');
+        let fVideoFile = await uploadVideoToFB(updatedCompressObj,androidComressFile,petId,clientId,QueestionnaireId,modeOfUpload,qestName); 
+        let updatedFBVideoObj = await dataObjComponent.updateObjKeys(updatedCompressObj,fVideoFile,'fbFilePath');
+        let thumImage = await generateThumbnail(updatedFBVideoObj,videoObj.filePath,petId,clientId,QueestionnaireId,modeOfUpload,qestName);
+        let updatedThumbObj = await dataObjComponent.updateObjKeys(updatedFBVideoObj,thumImage,'thumbFilePath');
+        return updatedThumbObj;
 
-        } else {
+      } else {
 
-            const result = await Video.compress(videoObj.filePath,
-            {
-                compressionMethod: 'auto',
-            },(progress) => {
-                Apolloclient.client.writeQuery({query: Queries.UPLOAD_QUESTIONNAIRE_VIDEO_BACKGROUND_STATUS,data: {data: {
-                  questName : qestName, 
-                  statusUpload : 'Preparing Video ',
-                  fileName : videoObj.fileName,
-                  uploadProgress:Math.floor(progress * 100) + '%',
-                  progressTxt:'Completed' ,
-                  stausType:'Uploading',
-                  mediaTYpe:'Video',
-                  internetType:'wifi',
-                  uploadMode:modeOfUpload,
-                  __typename: 'UploadQuestionnaireVideoBackgroundStatus'
-                }},})  
-            });
+        const result = await Video.compress(videoObj.filePath,
+        {
+          compressionMethod: 'auto',
+        },(progress) => {
+            Apolloclient.client.writeQuery({query: Queries.UPLOAD_QUESTIONNAIRE_VIDEO_BACKGROUND_STATUS,data: {data: {
+              questName : qestName, 
+              statusUpload : 'Preparing Video ',
+              fileName : videoObj.fileName,
+              uploadProgress:Math.floor(progress * 100) + '%',
+              progressTxt:'Completed' ,
+              stausType:'Uploading',
+              mediaTYpe:'Video',
+              internetType:'wifi',
+              uploadMode:modeOfUpload,
+              __typename: 'UploadQuestionnaireVideoBackgroundStatus'
+            }
+          },})  
+        });
 
-            let updatedCompressObj = await dataObjComponent.updateObjKeys(videoObj,result,'compressedFile');
-            let fVideoFile = await uploadVideoToFB(updatedCompressObj,result,petId,clientId,QueestionnaireId,modeOfUpload,qestName); 
-            let updatedFBVideoObj = await dataObjComponent.updateObjKeys(updatedCompressObj,fVideoFile,'fbFilePath');
-            let thumImage = await generateThumbnail(updatedFBVideoObj,videoObj.filePath,petId,clientId,QueestionnaireId,modeOfUpload,qestName);
-            let updatedThumbObj = await dataObjComponent.updateObjKeys(updatedFBVideoObj,thumImage,'thumbFilePath');
-            return updatedThumbObj;
+        let updatedCompressObj = await dataObjComponent.updateObjKeys(videoObj,result,'compressedFile');
+        let fVideoFile = await uploadVideoToFB(updatedCompressObj,result,petId,clientId,QueestionnaireId,modeOfUpload,qestName); 
+        let updatedFBVideoObj = await dataObjComponent.updateObjKeys(updatedCompressObj,fVideoFile,'fbFilePath');
+        let thumImage = await generateThumbnail(updatedFBVideoObj,videoObj.filePath,petId,clientId,QueestionnaireId,modeOfUpload,qestName);
+        let updatedThumbObj = await dataObjComponent.updateObjKeys(updatedFBVideoObj,thumImage,'thumbFilePath');
+        return updatedThumbObj;
 
-        }
+      }
       
     } else {
-        // createPopup('OK','Sorry','Video not found');
-        // uploadMediaToFB('','fileNotFound');
-        return 'nofileFOund'
+
+      let updatedCompressObj = await dataObjComponent.updateObjKeys(videoObj,'','compressedFile');
+      let updatedFBVideoObj = await dataObjComponent.updateObjKeys(updatedCompressObj,'','fbFilePath');
+      let updatedThumbObj = await dataObjComponent.updateObjKeys(updatedFBVideoObj,'','thumbFilePath');
+      return updatedThumbObj;
     }; 
 
 };
@@ -125,7 +126,7 @@ const uploadVideoToFB = async (videoObj,compressedFile,petId,clientId,Queestionn
     let questId = QueestionnaireId;
     let dte = moment(new Date()).format("YYYYMMDDHHmmss");
     let medianame = videoObj.fileName.replace('/r','/')
-    let filename = "Questionnaire_Videos/"+ clientId + '_'+ petId.toString() + '_' + questId.toString() + dte+ '_' +medianame;
+    let filename = "Questionnaire_Videos/"+ medianame;
     
     return new Promise(function(resolve, reject) {
 
@@ -193,53 +194,54 @@ const uploadThumnailToFB = async (videoObj,thnumImage,petId,clientId,Queestionna
 
     let questId = QueestionnaireId;
     let dte = moment(new Date()).format("YYYYMMDDHHmmss");
-    let medianame = videoObj.fileName.replace('/r','/')
-    let filename = "Questionnaire_Thumb_Images/"+ clientId + '_'+ petId.toString() + '_' + questId.toString() + dte + '.jpg';
+    let medianame = videoObj.fileName.replace('/r','/');
+    medianame = medianame.slice(0, -4)
+    let filename = "Questionnaire_Thumb_Images/"+ medianame + '.jpg';
     
     return new Promise(function(resolve, reject) {
-        const storageRef = storage().ref(filename)
-        const uploadTask = storageRef.putFile(thnumImage)
-        uploadTask.on('state_changed',
-          function(snapshot) {
-            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-            progress = parseInt(progress);
+      const storageRef = storage().ref(filename)
+      const uploadTask = storageRef.putFile(thnumImage)
+      uploadTask.on('state_changed',
+        function(snapshot) {
+          var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          progress = parseInt(progress);
 
+          Apolloclient.client.writeQuery({query: Queries.UPLOAD_QUESTIONNAIRE_VIDEO_BACKGROUND_STATUS,data: {data: {
+            questName : qestName, 
+            statusUpload : 'Validating Video ',
+            fileName : videoObj.fileName,
+            uploadProgress: progress + '%',
+            progressTxt:'Completed' ,
+            stausType:'Uploading',
+            mediaTYpe:'Video',
+            internetType:'wifi',
+            uploadMode:modeOfUpload,
+            __typename: 'UploadQuestionnaireVideoBackgroundStatus'
+          }},}) 
+        },
+        function error(err) {
+            reject('nofileFOund')
+        },
+        function complete() {
+          uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+              
             Apolloclient.client.writeQuery({query: Queries.UPLOAD_QUESTIONNAIRE_VIDEO_BACKGROUND_STATUS,data: {data: {
               questName : qestName, 
-              statusUpload : 'Validating Video ',
-              fileName : videoObj.fileName,
-              uploadProgress: progress + '%',
-              progressTxt:'Completed' ,
+              statusUpload : 'Validating Video',
+              fileName : '',
+              uploadProgress: '',
+              progressTxt:'' ,
               stausType:'Uploading',
               mediaTYpe:'Video',
               internetType:'wifi',
               uploadMode:modeOfUpload,
               __typename: 'UploadQuestionnaireVideoBackgroundStatus'
             }},}) 
-          },
-          function error(err) {
-            reject('nofileFOund')
-          },
-          function complete() {
-            uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
               
-              Apolloclient.client.writeQuery({query: Queries.UPLOAD_QUESTIONNAIRE_VIDEO_BACKGROUND_STATUS,data: {data: {
-                questName : qestName, 
-                statusUpload : 'Validating Video',
-                fileName : '',
-                uploadProgress: '',
-                progressTxt:'' ,
-                stausType:'Uploading',
-                mediaTYpe:'Video',
-                internetType:'wifi',
-                uploadMode:modeOfUpload,
-                __typename: 'UploadQuestionnaireVideoBackgroundStatus'
-              }},}) 
-              
-              resolve(downloadURL);
-            })
-          }
-        )
-      });
+            resolve(downloadURL);
+          })
+        }
+      )
+    });
   
 };

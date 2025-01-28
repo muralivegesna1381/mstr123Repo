@@ -11,6 +11,9 @@ import AlertComponent from '../../utils/commonComponents/alertComponent';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import ImageView from "react-native-image-viewing";
 
+import RadioBtnSelected from "./../../../assets/images/scoreImages/eRadioSelected.svg";
+import RadioBtnUnSelected from "./../../../assets/images/scoreImages/eRadioUnSel.svg";
+
 const ImageScoringMainUI = ({ route, ...props }) => {
 
     const [isLoading, set_isLoading] = useState(false);
@@ -187,7 +190,7 @@ const ImageScoringMainUI = ({ route, ...props }) => {
                                         </View> : null}
 
                                         {clasificationId !== 2 ? <View style={[styles.cellSubViewStyle4]}>
-                                            <Image style={styles.btnSelectStyle} source={selectedIndex === index ? require("./../../../assets/images/scoreImages/eRadioSelected.svg") : require("./../../../assets/images/scoreImages/eRadioUnSel.svg")}></Image>
+                                            {selectedIndex === index ? <RadioBtnSelected style={styles.btnSelectStyle}/> : <RadioBtnUnSelected style={styles.btnSelectStyle}/>}
                                         </View> : null}
             
                                     </View> : null}
@@ -261,15 +264,18 @@ const ImageScoringMainUI = ({ route, ...props }) => {
 
             <View style={{ width: wp('100%'), height: hp('75%'), alignItems: 'center'}}>
 
-                <View style={{ marginTop: hp('2%'), width: wp('90%') }}>
+                {dataArray && dataArray.length > 0 ? <View style={{ marginTop: hp('2%'), width: wp('90%') }}>
                     <Text style={[styles.headerTextStyle]}>{scoringName}</Text>
                     <Text style={[styles.subHeaderTextStyle]}>{"Please select your pet's " + title}</Text>
-                </View>
+                </View> : null}
 
                 <KeyboardAwareScrollView>
-                    <View style={{ marginTop: hp('2%'), marginBottom: hp('6%') }}>
+                    {dataArray && dataArray.length > 0 ? <View style={{ marginTop: hp('2%'), marginBottom: hp('6%') }}>
                         {_renderItems()}
-                    </View>
+                    </View> :  <View style={{justifyContent:'center',alignItems:'center',height:hp('70%')}}>
+                            <Text style={CommonStyles.noRecordsTextStyle}>{"You're all caught up!"}</Text>
+                            <Text style={[styles.noRecordsTextStyle1]}>{'Please visit this space regularly to answer the image-based questions.'}</Text>
+                        </View>}
                 </KeyboardAwareScrollView>
                     
             </View>
@@ -511,6 +517,14 @@ const styles = StyleSheet.create({
         fontSize: fonts.fontXSmall,
         color: "black",
         marginTop: hp('1%'),
-    }
+    },
+
+    noRecordsTextStyle1 : {
+        fontSize: fonts.fontMedium,
+        fontFamily: 'Barlow-Regular',
+        color: 'black', 
+        marginTop:hp('1%'),
+        textAlign:'center'
+    },
 
 });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, FlatList, ImageBackground } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList, ImageBackground } from 'react-native';
 import BottomComponent from "./../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from './../../utils/commonComponents/headerComponent';
@@ -8,7 +8,8 @@ import CommonStyles from './../../utils/commonStyles/commonStyles';
 import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 
-let failedImg = require('./../../../assets/images/otherImages/svg/failedXIcon.svg');
+import CameraImg from "./../../../assets/images/otherImages/svg/cameraImg.svg";
+import FailedImg from "./../../../assets/images/otherImages/svg/failedXIcon.svg";
 
 const ScoringImagePickerUI = ({ route, ...props }) => {
 
@@ -100,10 +101,10 @@ const ScoringImagePickerUI = ({ route, ...props }) => {
                         {props.imagePath1 ? <ImageBackground source={{ uri: props.imagePath1 }} style={styles.media} imageStyle={{ borderRadius: 5 }}>
 
                             <TouchableOpacity style={styles.imageBtnStyle} onPress={() => removeImageAction()}>
-                                <Image source={failedImg} style={styles.imageBtnStyle1} />
+                                <FailedImg width={wp("8%")} height={hp("4%")} />
                             </TouchableOpacity>
 
-                        </ImageBackground> : <ImageBackground source={require('./../../../assets/images/otherImages/svg/cameraImg.svg')} imageStyle={{ resizeMode: 'contain' }} style={styles.media}></ImageBackground>}
+                        </ImageBackground> : <CameraImg style={styles.media}/>}
 
                     </View>
 
@@ -241,17 +242,18 @@ const styles = StyleSheet.create({
 
     imageBtnStyle: {
         width: wp('8%'),
-        aspectRatio: 1,
+        height: hp('4%'),
         alignSelf: 'flex-end',
         marginRight: wp('-1%'),
+        marginTop: hp('-1%'),
         justifyContent: 'flex-end',
-        alignItems: 'flex-end'
+        alignItems: 'flex-end',
     },
 
     imageBtnStyle1: {
-        width: wp('6%'),
-        height: hp('6%'),
-        resizeMode: 'contain'
+        resizeMode: 'contain',
+        alignSelf:'center',
+        marginTop: hp('-14%'),
     }
 
 });

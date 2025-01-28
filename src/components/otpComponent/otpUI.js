@@ -3,7 +3,6 @@ import { View, StyleSheet, Text, TextInput, Keyboard } from 'react-native';
 import BottomComponent from "../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from '../../utils/commonComponents/headerComponent';
-import fonts from '../../utils/commonStyles/fonts'
 import CommonStyles from '../../utils/commonStyles/commonStyles';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
@@ -123,7 +122,7 @@ const OTPUI = ({navigation, route, ...props }) => {
       </View>
       <View style={styles.componentStyle}>
 
-        <KeyboardAwareScrollView>
+        <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
 
           <View style={styles.otpViewStyle}>
             <Text style={CommonStyles.headerTextStyle}>{'Verification'}</Text>
@@ -138,7 +137,7 @@ const OTPUI = ({navigation, route, ...props }) => {
                 maxLength={1}
                 keyboardType="numeric"
                 secureTextEntry={true}
-                onChangeText={async (input1) => { await set_input1(input1); await inputValue2.focus(); }}
+                onChangeText={async (input1) => { set_input1(input1); await inputValue2.focus(); }}
                 onKeyPress={({ nativeEvent }) => {
                   if (nativeEvent.key === "Backspace") {
                     deleteOtp();
@@ -153,7 +152,7 @@ const OTPUI = ({navigation, route, ...props }) => {
                 maxLength={1}
                 keyboardType="numeric"
                 secureTextEntry={true}
-                onChangeText={async (input2) => { await set_input2(input2); await inputValue3.focus(); }}
+                onChangeText={async (input2) => { set_input2(input2); await inputValue3.focus(); }}
                 onKeyPress={({ nativeEvent }) => {
                   if (nativeEvent.key === "Backspace") {
                     deleteOtp();
@@ -168,7 +167,7 @@ const OTPUI = ({navigation, route, ...props }) => {
                 maxLength={1}
                 keyboardType="numeric"
                 secureTextEntry={true}
-                onChangeText={async (input3) => { await set_input3(input3); await inputValue4.focus(); }}
+                onChangeText={async (input3) => { set_input3(input3); await inputValue4.focus(); }}
                 onKeyPress={({ nativeEvent }) => {
                   if (nativeEvent.key === "Backspace") {
                     deleteOtp();
@@ -183,7 +182,7 @@ const OTPUI = ({navigation, route, ...props }) => {
                 maxLength={1}
                 keyboardType="numeric"
                 secureTextEntry={true}
-                onChangeText={async (input4) => { await set_input4(input4); await inputValue5.focus(); }}
+                onChangeText={async (input4) => { set_input4(input4); await inputValue5.focus(); }}
                 onKeyPress={({ nativeEvent }) => {
                   if (nativeEvent.key === "Backspace") {
                     deleteOtp();
@@ -198,7 +197,7 @@ const OTPUI = ({navigation, route, ...props }) => {
                 maxLength={1}
                 keyboardType="numeric"
                 secureTextEntry={true}
-                onChangeText={async (input5) => { await set_input5(input5); await inputValue6.focus(); }}
+                onChangeText={async (input5) => { set_input5(input5); await inputValue6.focus(); }}
                 onKeyPress={({ nativeEvent }) => {
                   if (nativeEvent.key === "Backspace") {
                     deleteOtp();
@@ -213,7 +212,7 @@ const OTPUI = ({navigation, route, ...props }) => {
                 maxLength={1}
                 keyboardType="numeric"
                 secureTextEntry={true}
-                onChangeText={async (input6) => { await set_input6(input6); await Keyboard.dismiss(); }}
+                onChangeText={async (input6) => { set_input6(input6); Keyboard.dismiss(); }}
                 onKeyPress={({ nativeEvent }) => {
                   if (nativeEvent.key === "Backspace") {
                     deleteOtp();

@@ -5,11 +5,14 @@ import * as DataStorageLocal from '../../utils/storage/dataStorageLocal';
 import * as Constant from "../../utils/constants/constant";
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as clearAPIDAta from './../../utils/dataComponent/savedAPIData.js';
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
 
 let trace_inChangeName_Screen;
 let trace_ChangeName_API_Complete;
+const LOGOUT_POPUP_ID = 1;
 
 const UpdateNameService = ({ navigation, route, ...props }) => {
 
@@ -24,6 +27,11 @@ const UpdateNameService = ({ navigation, route, ...props }) => {
     const [secondaryEmail, set_secondaryEmail] = useState('');
     const [isNotification, set_isNotification] = useState(false);
     const [petParentAddress, set_petParentAddress] = useState(undefined);
+    const [popupId, set_popupId] = useState(0);
+    const [prefObj, set_prefObj] = useState(undefined);
+    const [prefTimeText, set_prefTimeText] = useState(undefined);
+    const [weightUnitId, set_weightUnitId] = useState(1)
+    const [unitId, set_unitId] = useState(4);
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
@@ -64,11 +72,24 @@ const UpdateNameService = ({ navigation, route, ...props }) => {
             set_isNotification(route.params?.isNotification);
         }
 
-        if(route.params?.petParentAddress) {
+        if (route.params?.petParentAddress) {
             set_petParentAddress(route.params?.petParentAddress);
         }
 
-    }, [route.params?.fullName, route.params?.phoneNo, route.params?.firstName, route.params?.secondName,route.params?.isNotification,route.params?.secondaryEmail,route.params?.petParentAddress]);
+        if (route.params?.prefObj) {
+            set_prefObj(route.params?.prefObj)
+        }
+
+    }, [route.params?.fullName, route.params?.phoneNo, route.params?.firstName, route.params?.secondName, route.params?.isNotification, route.params?.secondaryEmail, route.params?.petParentAddress, route.params?.prefObj]);
+
+    useEffect(() => {
+
+        if (route.params?.prefObj) {
+            set_unitId(route.params?.prefObj.preferredFoodRecUnitId)
+            set_prefTimeText(route.params?.prefObj.preferredFoodRecTime);
+            set_weightUnitId(route.params?.prefObj.preferredWeightUnitId);
+        }
+    }, [route.params?.prefObj]);
 
     const handleBackButtonClick = () => {
         navigateToPrevious();
@@ -78,7 +99,7 @@ const UpdateNameService = ({ navigation, route, ...props }) => {
     const initialSessionStart = async () => {
         trace_inChangeName_Screen = await perf().startTrace('t_inChangeNameScreen');
     };
-    
+
     const initialSessionStop = async () => {
         await trace_inChangeName_Screen.stop();
     };
@@ -89,9 +110,9 @@ const UpdateNameService = ({ navigation, route, ...props }) => {
 
     // Navigate to previous screen
     const navigateToPrevious = () => {
-        if(isLoadingdRef.current === 0 && popIdRef.current === 0){
+        if (isLoadingdRef.current === 0 && popIdRef.current === 0) {
             navigation.navigate('AccountInfoService');
-        } 
+        }
     };
 
     // Service call to update the User name
@@ -100,18 +121,21 @@ const UpdateNameService = ({ navigation, route, ...props }) => {
         set_isLoading(true);
         isLoadingdRef.current = 1;
         let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let userId = await DataStorageLocal.getDataFromAsync(Constant.USER_ID);
+        let userId = UserDetailsModel.userDetailsData.userRole.UserId;
         let json = {
             ClientID: "" + clientIdTemp,
-            UserId : userId,
+            UserId: userId,
             FirstName: frst,
             LastName: lastName ? last : ' ',
             PhoneNumber: phnNo ? phnNo : '',
-            SecondaryEmail:secondaryEmail,
-            NotifyToSecondaryEmail:isNotification,
-            PetParentAddress : petParentAddress ? petParentAddress : {}
+            IsdCodeId: route.params?.isdCode_Id ? route.params?.isdCode_Id : '',
+            SecondaryEmail: secondaryEmail,
+            NotifyToSecondaryEmail: isNotification,
+            PetParentAddress: petParentAddress ? petParentAddress : {},
+            PreferredFoodRecTime: prefTimeText,
+            PreferredWeightUnitId: weightUnitId,
+            PreferredFoodRecUnitId: unitId
         };
-
         changeInfoApi(json);
 
     };
@@ -119,58 +143,58 @@ const UpdateNameService = ({ navigation, route, ...props }) => {
     const changeInfoApi = async (json) => {
 
         trace_ChangeName_API_Complete = await perf().startTrace('t_ChangeClientInfo_API');
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let cNameServiceObj = await ServiceCalls.changeClientInfo(json,token);
-        set_isLoading(false);
-        isLoadingdRef.current = 0; 
-        stopFBTrace();
-        if(cNameServiceObj && cNameServiceObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-            
-        if(cNameServiceObj && !cNameServiceObj.isInternet){
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);  
-            return;
-        }
-            
-        if(cNameServiceObj && cNameServiceObj.statusData){
 
-            if(cNameServiceObj.responseData && cNameServiceObj.responseData.Key){
-                // firebaseHelper.logEvent(firebaseHelper.event_change_name_api_success, firebaseHelper.screen_change_name, "User Name Api success", '');
+        let apiMethod = apiMethodManager.CHANGE_CLIENT_INFO;
+        let apiService = await apiRequest.postData(apiMethod, json, Constant.SERVICE_MIGRATED, navigation);
+        set_isLoading(false);
+        isLoadingdRef.current = 0;
+        stopFBTrace();
+
+        if (apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            if (apiService.data.Key) {
                 set_isNavigate(true);
-                createPopup(Constant.ALERT_INFO,Constant.CHANGE_NAME_SUCCESS,true);  
-            } else {                 
+                createPopup(Constant.ALERT_INFO, Constant.CHANGE_NAME_SUCCESS, true, 0);
+            } else {
                 firebaseHelper.logEvent(firebaseHelper.event_change_name_api_fail, firebaseHelper.screen_change_name, "User Name Api failed", 'Responce Key : false');
-                set_isNavigate(false);   
-                createPopup('Alert',Constant.NAME_ERROR_UPDATE,true);        
+                set_isNavigate(false);
+                createPopup('Alert', Constant.NAME_ERROR_UPDATE, true, 0);
             }
-                        
-        } else {
-            firebaseHelper.logEvent(firebaseHelper.event_change_name_api_fail, firebaseHelper.screen_change_name, "User Name Api failed", 'Status : false');
-            set_isNavigate(false);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.NAME_ERROR_UPDATE,true);              
-        }
-            
-        if(cNameServiceObj && cNameServiceObj.error) {
+
+        } else if (apiService && apiService.isInternet === false) {
+            createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 0);
+            return;
+
+        } else if (apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+            createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true, 0);
             firebaseHelper.logEvent(firebaseHelper.event_change_name_api_fail, firebaseHelper.screen_change_name, "User Name Api failed", 'error');
-            set_isNavigate(false);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);  
+        } else {
+            firebaseHelper.logEvent(firebaseHelper.event_change_name_api_fail, firebaseHelper.screen_change_name, "User Name Api failed", 'error : Service error');
+            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_UPDATE_ERROR_MSG, true, 0);
         }
+
     };
 
-    const createPopup = (title,msg,value) => {
+    const createPopup = (title, msg, value, popId) => {
         popIdRef.current = 1;
         set_popAlert(title);
         set_popUpMessage(msg);
         set_isPopUp(value);
+        set_popupId(popId);
     };
 
     // Popup Ok button Action
-    const popOkBtnAction = () => {
+    const popOkBtnAction = async () => {
+
         set_isPopUp(false);
         popIdRef.current = 0;
+        if (popupId === LOGOUT_POPUP_ID) {
+            await clearAPIDAta.clearAPIDAta();
+            navigation.popToTop();
+            // navigation.navigate('WelcomeComponent');
+            navigation.navigate('LoginComponent', { "isAuthEnabled": false });
+            return
+        }
+
         set_popUpMessage('');
         set_popAlert('');
         if (isNavigate) {

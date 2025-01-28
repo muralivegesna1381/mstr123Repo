@@ -1,5 +1,5 @@
 import React, {useState,useEffect} from 'react';
-import {StyleSheet, View,Image,BackHandler} from 'react-native';
+import {StyleSheet, View,BackHandler} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import BottomComponent1 from "../../utils/commonComponents/bottomComponent1";
 import fonts from '../../utils/commonStyles/fonts'
@@ -10,6 +10,8 @@ import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
 import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import RNExitApp from 'react-native-exit-app';
+
+import AppHeaderImg from "./../../../assets/images/otherImages/svg/appHeader.svg";
 
 const WelcomeComponent = ({navigation, route, ...props }) => {
 
@@ -77,7 +79,7 @@ const WelcomeComponent = ({navigation, route, ...props }) => {
 
       <View style={styles.mainViewStyle}>
         <View>
-          <Image source={require("./../../../assets/images/otherImages/svg/appHeader.svg")} style={styles.headerearables}/>
+          <AppHeaderImg style={styles.headerearables}/>
         </View>
       </View>
             

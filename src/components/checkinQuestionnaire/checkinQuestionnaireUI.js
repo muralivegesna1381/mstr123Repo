@@ -1,5 +1,5 @@
 import React,{useState, useEffect,useRef} from 'react';
-import {View,Text,TouchableOpacity,FlatList, Image,ImageBackground, ScrollView, Platform} from 'react-native';
+import {View,Text,TouchableOpacity,FlatList, Image,ImageBackground} from 'react-native';
 import BottomComponent from "./../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from './../../utils/commonComponents/headerComponent';
@@ -20,13 +20,13 @@ import QstVerticalSliderComponent from "./../questionnaire/questionnaireCustomCo
 import QstMediaUploadComponent from './../questionnaire/questionnaireCustomComponents/customComponents/qstMediaUploadComponent';
 import QstDatePickerComponent from './../questionnaire/questionnaireCustomComponents/customComponents/qstDatePickerComponent';
 
-import downButtonImg from "./../../../assets/images/otherImages/svg/downArrowGrey.svg";
-import upButtonImg from "./../../../assets/images/otherImages/svg/upArrow.svg";
+import DownButtonImg from "./../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import UpButtonImg from "./../../../assets/images/otherImages/svg/upArrow.svg";
+import DefaultPetImg from "./../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
 import filterImg from "./../../../assets/images/otherImages/png/filter.png";
-// import gradientImg from "./../../../assets/images/otherImages/png/gradientPetBackview.png";
 import gradientImg from "./../../../assets/images/otherImages/png/petCarasoulBck.png";
-
-let defaultPetImg = require( "./../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
+import InfoImg from "./../../../assets/images/otherImages/svg/questInst.svg";
+import NoRecordsImg from "./../../../assets/images/dogImages/noRecordsDog.svg";
 
 const QUESTIONNAIRE_QUESTIONS_KEY = {
     QUESTIONITEM: 'questionItem',
@@ -98,7 +98,7 @@ const CheckinQuestionnaireUI = ({navigation, route,...props}) => {
             set_questionTitle(props.questionObject.questionnaireName);
         }
         // set_questionTitle(props.questionObject.questionnaireName);
-    }, [props.defaultPetObj,props.questionsArray,props.questionsArrayInitial,props.mandatoryQuestions,props.questionnaireDict,props.questionObject]);
+    }, [props.defaultPetObj,props.questionsArray,props.questionsArrayInitial,props.mandatoryQuestions,props.questionnaireDict,props.questionObject,props.sectionsAnswered ]);
 
     useEffect(() => {
         set_status(props.status);
@@ -395,7 +395,7 @@ const CheckinQuestionnaireUI = ({navigation, route,...props}) => {
                     </View>
                                     
                     <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-                        {<Image source={indexArray.current.includes(index) ? upButtonImg : downButtonImg} style={imageStyle}/>}                                          
+                        {indexArray.current.includes(index) ? <UpButtonImg style={imageStyle}/> : <DownButtonImg style={imageStyle}/>}                                     
                     </View>
                 </TouchableOpacity>
 
@@ -407,7 +407,7 @@ const CheckinQuestionnaireUI = ({navigation, route,...props}) => {
                             placeholder={'Enter Text (Limit: 500)'}   
                             maxLength = {500}
                             textAnswer={getQuestionnaireQuestions(item.questionId)}
-                            isMultiLineText={true}
+                            isMultiLineText={false}
                             status_QID = {status}
                             questionImageUrl = {item.questionImageUrl ? item.questionImageUrl : false}
                             isAnsSubmitted = {item.answer ? true : false}
@@ -455,7 +455,7 @@ const CheckinQuestionnaireUI = ({navigation, route,...props}) => {
                                     ansOptionMediaFileName : textAnswer.ansOptionMediaFileName
                                 }; 
                                 skipRadioBtnAction(tempValue,item);
-                                // updateQuestionnaireQuestions(item,textAnswer,item.isMandatory,item.questionType);
+                                updateQuestionnaireQuestions(item,textAnswer,item.isMandatory,item.questionType);
                             }} 
                             setSubmitValue={(value) => {
                                 autoSubmitQuestRadioBtnAction(value,item.questionId);
@@ -504,7 +504,7 @@ const CheckinQuestionnaireUI = ({navigation, route,...props}) => {
                                 }; 
     
                                 skipRadioBtnAction(tempValue,item);
-                                // updateQuestionnaireQuestions(item,value,item.isMandatory,item.questionType);
+                                updateQuestionnaireQuestions(item,tempValue,item.isMandatory,item.questionType);
                             }}
                             setSubmitValue={(value) => {
                                 autoSubmitQuestionnaire(value,item.questionId);
@@ -638,7 +638,7 @@ const CheckinQuestionnaireUI = ({navigation, route,...props}) => {
                 <ImageBackground style={[backViewGradientStyle]} imageStyle={{ borderRadius: 5 }} source={gradientImg}>
 
                     <View style={{alignItems:'center',justifyContent:'center',marginRight:hp('2%'),marginLeft:hp('3%'),}}>
-                        {petURL && !isImgFailed  ? <ImageBackground source={{uri:petURL}} style={[petImageStyle]} onError = {() => set_isImgFailed(true)}/> : <ImageBackground source={defaultPetImg} style={[petImageStyle]}/>}
+                        {petURL && !isImgFailed ? <ImageBackground source={{uri:petURL}} style={[petImageStyle]} onError = {() => set_isImgFailed(true)}/> : <ImageBackground source={DefaultPetImg} style={[petImageStyle]}/>}
                     </View>
 
                     <View style={{flex:3,justifyContent:'center'}}>
@@ -649,7 +649,7 @@ const CheckinQuestionnaireUI = ({navigation, route,...props}) => {
 
                     {props.infoText !== '' ? <View style={{flex:0.8,justifyContent:'center'}}>
                         <TouchableOpacity style={[infoBtnStyle]} onPress={() => {showInfo()}}>
-                            <Image style={[infoImgStyle]} source={require("./../../../assets/images/otherImages/svg/questInst.svg")}></Image>  
+                            <InfoImg style={[infoImgStyle]}/>
                         </TouchableOpacity>
                     </View> : null}
 
@@ -691,7 +691,7 @@ const CheckinQuestionnaireUI = ({navigation, route,...props}) => {
                 </View>
             
                 <View style={{marginTop:hp('1.1%'), marginLeft:wp('18%'), position:'absolute',}}>
-                    <Text style={[progressAnswered]}>{props.sectionAnswered + " of " + props.totalSection + " Sections Answered"}</Text>
+                    <Text style={[progressAnswered]}>{props.sectionAnsweredTotal + " of " + props.totalSection + (props.totalSection > 1 ? " Sections Answered" : " Section Answered")}</Text>
                 </View>
            
             </View>
@@ -726,7 +726,7 @@ const CheckinQuestionnaireUI = ({navigation, route,...props}) => {
              
             </View> : 
             <View style={{justifyContent:'center', alignItems:'center',marginTop: hp("15%"),}}>
-                <Image style= {[CommonStyles.nologsDogStyle]} source={require("./../../../assets/images/dogImages/noRecordsDog.svg")}></Image>
+                <NoRecordsImg style= {[CommonStyles.nologsDogStyle]}/>
                 <Text style={[CommonStyles.noRecordsTextStyle,{marginTop: hp("2%")}]}>{Constant.NO_RECORDS_LOGS}</Text>
                 <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
             </View>}

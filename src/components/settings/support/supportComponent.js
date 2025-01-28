@@ -1,21 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Linking, NativeModules } from 'react-native';
 import SupportUI from './supportUI';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 import * as DataStorageLocal from "../../../utils/storage/dataStorageLocal";
 import * as Constant from "../../../utils/constants/constant";
+import * as UserDetailsModel from "./../../../utils/appDataModels/userDetailsModel.js";
+
+import LearningImg from "./../../../../assets/images/otherImages/svg/learningCenterImg.svg";
+import EamilImg from "./../../../../assets/images/otherImages/svg/emailImg.svg";
+import PhoneImg from "./../../../../assets/images/otherImages/svg/phoneSupportImg.svg";
+import PrivacyImg from "./../../../../assets/images/otherImages/svg/privacyIcon.svg";
+import TermsImg from "./../../../../assets/images/otherImages/svg/termsIcon.svg";
+import ChatImg from "./../../../../assets/images/otherImages/svg/chatSupport.svg";
+import OrientationImg from "./../../../../assets/images/otherImages/svg/app-or.svg";
 
 const SupportComponent = ({ navigation, route, ...props }) => {
 
     const [arraySupport, set_arraySupport] = useState([
-        { 'id': 1, 'header': 'Learning Center', 'subheader': 'Find intelligent answers instantly', 'img': require("./../../../../assets/images/otherImages/svg/learningCenterImg.svg") },
-        { 'id': 2, 'header': 'Email', 'subheader': 'Get solutions beamed to you inbox', 'img': require("./../../../../assets/images/otherImages/svg/emailImg.svg") },
-        { 'id': 3, 'header': 'Phone', 'subheader': 'Talk to us!', 'img': require("./../../../../assets/images/otherImages/svg/phoneSupportImg.svg") },
-        { 'id': 4, 'header': 'Privacy Policy', 'subheader': 'Legal', 'img': require("./../../../../assets/images/otherImages/svg/privacyIcon.svg") },
-        { 'id': 5, 'header': 'Terms of service', 'subheader': 'Legal', 'img': require("./../../../../assets/images/otherImages/svg/termsIcon.svg") },
-        { 'id': 6, 'header': 'Chat', 'subheader': 'appo', 'img': require("./../../../../assets/images/otherImages/svg/chatSupport.svg") },
-        { 'id': 7, 'header': 'App orientation', 'subheader': '', 'img': require("./../../../../assets/images/otherImages/svg/app-or.svg") }
+        { 'id': 1, 'header': 'Learning Center', 'subheader': 'Find intelligent answers instantly', 'img': LearningImg },
+        { 'id': 2, 'header': 'Email', 'subheader': 'Get solutions beamed to you inbox', 'img': EamilImg },
+        { 'id': 3, 'header': 'Phone', 'subheader': 'Talk to us!', 'img': PhoneImg},
+        { 'id': 4, 'header': 'Privacy Policy', 'subheader': 'Legal', 'img': PrivacyImg},
+        { 'id': 5, 'header': 'Terms of service', 'subheader': 'Legal', 'img': TermsImg},
+        { 'id': 6, 'header': 'Chat', 'subheader': 'appo', 'img': ChatImg},
+        { 'id': 7, 'header': 'App orientation', 'subheader': '', 'img': OrientationImg}
     ]);
     const [isPopUp, set_isPopUp] = useState(false);
     const [popUpMessage, set_popUpMessage] = useState(undefined);
@@ -23,7 +32,6 @@ const SupportComponent = ({ navigation, route, ...props }) => {
     const [popUpId, set_popUpId] = useState(undefined);
     const [isFrom, set_isFrom] = useState(undefined);
 
-    let arraySupportRef = useRef();
     let trace_Support_Screen;
 
     useEffect(() => {
@@ -47,9 +55,7 @@ const SupportComponent = ({ navigation, route, ...props }) => {
 
     const updateArrayData = async () => {
         
-        // let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
-        let userDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS,);
-        userDetails = JSON.parse(userDetails);
+        let userDetails = UserDetailsModel.userDetailsData.userRole;
 
         if (userDetails.RoleName === "Hill's Veterinarian" || userDetails.RoleName === "External Veterinarian" || userDetails.RoleName === "Hill's Representative") {
             set_arraySupport(arraySupport.splice(1, 5));
@@ -98,11 +104,10 @@ const SupportComponent = ({ navigation, route, ...props }) => {
         if (item.id === 1) {
             navigation.navigate("LearningCenterComponent");
         } else if (item.id === 2) {
-            Linking.openURL("mailto:support@wearablesclinicaltrials.com?subject=Support Request&body=Description");
+            // Linking.openURL("mailto:support@wearablesclinicaltrials.com?subject=Support Request&body=Description").catch(popActions('Please configure email in your phone in order to send the email', 'Alert', true,0));
+            Linking.openURL("mailto:support@wearablesclinicaltrials.com?subject=Support Request&body=Description").catch();
         } else if (item.id === 3) {
-
             Linking.openURL("tel:8664145861");
-
         } else if (item.id === 4) {
             Linking.openURL('https://www.colgatepalmolive.co.uk/legal-privacy-policy/privacy-policy');
         } else if (item.id === 5) {

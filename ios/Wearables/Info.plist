@@ -6,28 +6,8 @@
 	<array>
 		<string>Video-Upload</string>
 	</array>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
-	<key>CFBundleDisplayName</key>
-	<string>Wearables</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -39,33 +19,13 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSAppleMusicUsageDescription</key>
-	<string>Requires Media</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>To connect to your pet's sensor, We need to enable Bluetooth on your device.</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>To connect to your pet's sensor, We need to enable Bluetooth on your device.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>This lets you take photos which can be used to record your pet’s activities or for your pet’s profile picture.</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>This app uses your Bio Metrics</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Wearables app uses your location to locate and get directions to your veterinary practice</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Wearables App uses your location to locate and get directions to your veterinary practice</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>The app uses your phone microphone while recording the observation video</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app requires Photo Library permissions</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This allows you to share photos from your library and save photos to your Camera Roll.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Barlow-Black.ttf</string>
 		<string>Barlow-BlackItalic.ttf</string>
 		<string>Barlow-Bold.ttf</string>
-		<string>Barlow-BoldItalic.ttf</string>
 		<string>Barlow-ExtraBold.ttf</string>
+		<string>Barlow-BoldItalic.ttf</string>
 		<string>Barlow-ExtraBoldItalic.ttf</string>
 		<string>Barlow-ExtraLight.ttf</string>
 		<string>Barlow-ExtraLightItalic.ttf</string>
@@ -103,23 +63,6 @@
 		<string>fetch</string>
 		<string>processing</string>
 		<string>remote-notification</string>
-	</array>
-	<key>UILaunchStoryboardName</key>
-	<string>SplashScreen.storyboard</string>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>armv7</string>
-	</array>
-	<key>UIRequiresFullScreen</key>
-	<true/>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>

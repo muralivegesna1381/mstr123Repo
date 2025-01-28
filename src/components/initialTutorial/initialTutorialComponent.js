@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {View,StyleSheet,Text,TouchableOpacity,Dimensions,Image} from 'react-native';
+import {View,StyleSheet,Text,TouchableOpacity,Dimensions,Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from './../../utils/commonStyles/fonts'
 import CommonStyles from './../../utils/commonStyles/commonStyles';
@@ -9,6 +9,15 @@ import Carousel, {Pagination} from 'react-native-snap-carousel';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
+import VersionNumber, { appVersion } from 'react-native-version-number';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import LoaderComponent from './../../utils/commonComponents/loaderComponent';
+
+import StarImg from "./../../../assets/images/tutorialImages/star.svg";
+import Tutorial1Img from "./../../../assets/images/tutorialImages/tutorial1.svg";
+import Tutorial2Img from "./../../../assets/images/tutorialImages/tutorial2.svg";
+import Tutorial3Img from "./../../../assets/images/tutorialImages/tutorial3.svg";
 
 const { height, width } = Dimensions.get('window');
 let trace_inInitialTutorialScreen;
@@ -16,13 +25,15 @@ let trace_inInitialTutorialScreen;
 const  InitialTutorialComponent = ({navigation,route, ...props }) => {
 
     const data = [
-        // {key: 1, imagePath: require('./../../../assets/images/tutorialImages/tutorial1.svg'), tittle:"Know What Your Pet is Up to", message:"See how active your pet is by tracking the time and distance for moderate to high-intensity activities like running, walking, fetching etc."},
-        {key: 2, imagePath: require('./../../../assets/images/tutorialImages/tutorial2.svg'), tittle:"Activity Goals", message:"Give your pets a healthy life by customising goals for their activities."},
-        {key: 2, imagePath: require('./../../../assets/images/tutorialImages/tutorial3.svg'), tittle:"Activity Goals", message:"Monitor your pet's weight, record your pet's observations and participate in campaigns."}
+        // {key: 1, imagePath: Tutorial1Img, tittle:"Know What Your Pet is Up to", message:"See how active your pet is by tracking the time and distance for moderate to high-intensity activities like running, walking, fetching etc."},
+        {key: 2, imagePath: Tutorial2Img, tittle:"Activity Goals", message:"Give your pets a healthy life by customising goals for their activities."},
+        {key: 2, imagePath: Tutorial3Img, tittle:"Activity Goals", message:"Monitor your pet's weight, record your pet's observations and participate in campaigns."}
     ];
 
     const [activeSlide, setActiveSlide] = useState(0);
 	const carouselRef = useRef(null);
+    const [isLoading, set_isLoading] = useState(false);
+    const [loaderMsg, set_loaderMsg] = useState(undefined);
 
     useEffect(() => {
         removeAuthentication();
@@ -52,9 +63,32 @@ const  InitialTutorialComponent = ({navigation,route, ...props }) => {
     };
     // Navigates to Welcome screen
     const nxtButtonAction = async () => {
+        removeAuthentication();
         firebaseHelper.logEvent(firebaseHelper.event_next_success, firebaseHelper.screen_appInitial_tutorial, "User clicked Skip button ", '');
         await DataStorageLocal.saveDataToAsync(Constant.IS_USER_SKIPPED,JSON.stringify(true));
-        navigation.navigate('WelcomeComponent');
+        set_isLoading(true);
+        set_loaderMsg('Please Wait...');
+        let appStatus = await getAppUpdateStatus(); 
+        navigation.navigate('LoginComponent',{"isAuthEnabled" : false, appStatus : appStatus}); 
+        // navigation.navigate('WelcomeComponent');
+    };
+
+    const getAppUpdateStatus = async () => {
+
+        let deviceAppVersion = VersionNumber.buildVersion;
+        let osValue = Platform.OS === 'ios' ? 1 : 2;
+    
+        let apiMethod = apiMethodManager.APP_UPDATE_STATUS + osValue + '/' + deviceAppVersion;
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
+        set_isLoading(false);
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+          return apiService.data;
+        }  else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+          return undefined;  
+        } else {
+          return undefined;
+        }
+    
     };
 
     // Render Image and Text in flatlist
@@ -66,7 +100,7 @@ const  InitialTutorialComponent = ({navigation,route, ...props }) => {
 
                 <Text style={styles.headerTextStyle}>{item.tittle}</Text> 
                 <Text style={styles.textStyle}>{item.message}</Text> 
-                <Image source={item.imagePath} style={styles.petImageStyle}/>
+                <item.imagePath style={styles.petImageStyle}/>
                 
             </View>
         );
@@ -91,7 +125,7 @@ const  InitialTutorialComponent = ({navigation,route, ...props }) => {
 
           <TouchableOpacity style={styles.starBgStyle}  onPress={() => {carouselRef.current.snapToItem(props.index);}}>
             <View backgroundColor={ props.inactive ? '#242A37' : '#37B57C'} style={styles.starBgStyle}>             
-              <Image source={require('./../../../assets/images/tutorialImages/star.svg')} style={{width: wp('3%'),height: wp('3%'),}} />           
+              <StarImg style={{width: wp('3%'),height: wp('3%'),}}/>        
             </View>
           </TouchableOpacity>
 
@@ -122,7 +156,7 @@ const  InitialTutorialComponent = ({navigation,route, ...props }) => {
                 {getPagination()}
 
             </View>
-            
+            {isLoading === true ? <LoaderComponent isLoader={true} loaderText = {loaderMsg} isButtonEnable = {false} /> : null} 
         </View>
     );
   }

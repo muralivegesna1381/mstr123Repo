@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, ImageBackground, TouchableOpacity, BackHandler,Platform } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, BackHandler,Platform } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
@@ -10,6 +10,9 @@ import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
+
+import MalePetImg from "./../../../../assets/images/otherImages/svg/malePet.svg";
+import FemalePetImg from "./../../../../assets/images/otherImages/svg/femalePet.svg";
 
 let trace_inPetGenderScreen;
 
@@ -127,12 +130,7 @@ const PetGenderComponent = ({ route, ...props }) => {
                         <View style={selectedIndex === 0 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                             <View style={styles.imgBckViewStyle}>
-                                <ImageBackground
-                                    source={require("./../../../../assets/images/otherImages/svg/malePet.svg")}
-                                    style={Platform.isPad ? [styles.petImgStyle, {width: wp("6%")}] : [styles.petImgStyle]}
-                                    resizeMode='contain'
-                                >
-                                </ImageBackground>
+                                <MalePetImg width={Platform.isPad ? wp("4%") : wp("6%")} height={Platform.isPad ? hp("4%") : hp("6%")}/>
                             </View>
 
                             <Text style={[styles.name]}>{'Male'}</Text>
@@ -143,12 +141,7 @@ const PetGenderComponent = ({ route, ...props }) => {
                         <View style={selectedIndex === 1 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                             <View style={styles.imgBckViewStyle}>
-                                <ImageBackground
-                                    source={require("./../../../../assets/images/otherImages/svg/femalePet.svg")}
-                                    style={Platform.isPad ? [styles.petImgStyle, {width: wp("6%")}] : [styles.petImgStyle]}
-                                    resizeMode='contain'
-                                >
-                                </ImageBackground>
+                                <FemalePetImg width={Platform.isPad ? wp("4%") : wp("6%")} height={Platform.isPad ? hp("4%") : hp("6%")}/>
                             </View>
 
                             <Text style={[styles.name]}>{'Female'}</Text>

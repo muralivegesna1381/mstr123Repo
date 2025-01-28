@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, StyleSheet, Text, ImageBackground, TouchableOpacity, BackHandler,Platform } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
@@ -11,6 +11,7 @@ import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 import Fonts from './../../../utils/commonStyles/fonts'
+import * as UserDetailsModel from "./../../../utils/appDataModels/userDetailsModel.js";
 
 let trace_inPetLocation_Selection_Screen;
 
@@ -112,8 +113,8 @@ const PetLocationComponent = ({ route, ...props }) => {
 
     const getPetEditDetails = async (petObject) => {
 
-        let pParentObj = await DataStorageLocal.getDataFromAsync(Constant.PET_PARENT_OBJ);
-        pParentObj = JSON.parse(pParentObj);
+        let pParentObj = UserDetailsModel.userDetailsData.user;
+
         if(petObject) {
             set_petName(petObject.petName);
         }
@@ -309,7 +310,7 @@ const styles = StyleSheet.create({
     },
 
     petImgStyle: {
-        width: wp("8%"),
+        width: wp("6%"),
         aspectRatio: 1,
     },
 

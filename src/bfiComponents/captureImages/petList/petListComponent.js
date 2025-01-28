@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as Constant from "../../../utils/constants/constant";
 import PetListUI from './petListUI';
 import * as DataStorageLocal from '../../../utils/storage/dataStorageLocal';
-import * as ServiceCalls from '../../../utils/getServicesData/getServicesData.js';
 import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+import * as UserDetailsModel from "./../../../utils/appDataModels/userDetailsModel.js";
 
 const PetListComponent = ({ navigation, route, ...props }) => {
     const [petObj, set_petObj] = useState(undefined);
@@ -29,14 +31,16 @@ const PetListComponent = ({ navigation, route, ...props }) => {
             
         set_isLoading(true);
         let clientID = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let serviceCallsObj = await ServiceCalls.getPetsToCaptureBfiImages(clientID, token, pageNum.current, searchText.current);
 
-        if (serviceCallsObj && serviceCallsObj.statusData) {
-            set_isLoading(false);
-            if (serviceCallsObj && serviceCallsObj.responseData && serviceCallsObj.responseData.length > 0) {
-                for (let i = 0; i < serviceCallsObj.responseData.length; i++) {
-                    totalRecordsData.current.push(serviceCallsObj.responseData[i]);
+        let apiMethod = apiMethodManager.GET_PETS_TO_CAPTUREBFI + clientID + "&speciesId=1&pageNo=" + pageNum.current + "&pageLength=10&searchText=" + searchText.current;
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
+        set_isLoading(false);
+                        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+                        
+            if (apiService.data.pets && apiService.data.pets.length > 0) {
+                for (let i = 0; i < apiService.data.pets.length; i++) {
+                    totalRecordsData.current.push(apiService.data.pets[i]);
                 }
                 set_devices(totalRecordsData.current)
             } else {
@@ -49,23 +53,29 @@ const PetListComponent = ({ navigation, route, ...props }) => {
                     //stop pagination if no more records coming
                     stopPagination.current = true
                 }
-            }
+            }   
+
+        } else if(apiService && apiService.isInternet === false) {
+            
+                            
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+            
+            firebaseHelper.logEvent(firebaseHelper.event_get_pets_api, firebaseHelper.screen_bfi_pet_list, "CaptureBFI Getpets Service failed", 'Service error : ' + apiService.error.errorMsg);        
+        } else {
+            
+            firebaseHelper.logEvent(firebaseHelper.event_get_pets_api, firebaseHelper.screen_bfi_pet_list, "CaptureBFI Getpets Service failed", 'Service error : ' + 'Status false');
+            
         }
 
-        if (serviceCallsObj && serviceCallsObj.error) {
-            let errors = serviceCallsObj.error.length > 0 ? serviceCallsObj.error[0].code : ''
-            set_isLoading(false);
-            firebaseHelper.logEvent(firebaseHelper.event_get_pets_api, firebaseHelper.screen_bfi_pet_list, "CaptureBFI Getpets Service failed", 'Service error : ' + errors);
-        }
     };
 
     const navigateToPrevious = () => {
-        navigation.pop()
+        navigation.pop();
     };
 
     const navigateToNext = async () => {
         //get user role
-        let userRole = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_ID);
+        let userRole = UserDetailsModel.userDetailsData.userRole.RoleId;
         //clear old existing data
         await DataStorageLocal.removeDataFromAsync(Constant.ONBOARDING_OBJ);
         //add flag as coming from pet BFI
@@ -74,7 +84,7 @@ const PetListComponent = ({ navigation, route, ...props }) => {
         firebaseHelper.logEvent(firebaseHelper.event_add_pet_click, firebaseHelper.screen_bfi_pet_list, "CaptureBFI Add pet clicked", '');
 
         //Ask Pet Parent Profile Info if login as representative
-        if (userRole === '9')
+        if (parseInt(userRole) === 9)
             navigation.navigate('ParentProfileComponent');
         else
             navigation.navigate('PetNameComponent');
@@ -101,10 +111,19 @@ const PetListComponent = ({ navigation, route, ...props }) => {
     };
 
     const doServiceCall = (searchEntryText) => {
+
         searchText.current = searchEntryText
         totalRecordsData.current = []
         pageNum.current = 1
-        getDashBoardPets()
+        getDashBoardPets();
+
+    };
+
+    const clearSearchValues = () => {
+        searchText.current = ''
+        totalRecordsData.current = []
+        pageNum.current = 1
+        getDashBoardPets();
     };
 
     return (
@@ -118,6 +137,7 @@ const PetListComponent = ({ navigation, route, ...props }) => {
             infoBtnAction={infoBtnAction}
             pageNumberUpdated={pageNumberUpdated}
             doServiceCall={doServiceCall}
+            clearSearchValues = {clearSearchValues}
         />
     );
 

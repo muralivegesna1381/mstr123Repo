@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, BackHandler } from 'react-native';
+import { BackHandler } from 'react-native';
 import * as Constant from "./../../utils/constants/constant";
 import OTPUI from './otpUI'
 import * as firebaseHelper from '././../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
-import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 
 let trace_inOTPScreen;
 
@@ -115,7 +114,6 @@ const OTPComponent = ({ navigation, route, ...props }) => {
      */
     const submitAction = async (otpValue1) => {
 
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
         set_isLoading(true);
         isLoadingdRef.current = 1;
         let json = {
@@ -125,38 +123,37 @@ const OTPComponent = ({ navigation, route, ...props }) => {
 
         let apiName = '';
         if (isFromScreen === 'registration') {
-            apiName = 'RegisterUserValidateEmailVerificationCode';
+            apiName = apiMethodManager.REGISTRATION_OTP;
         } else {
-            apiName = 'ForgotPasswordValidateEmailVerificationCode';
+            apiName = apiMethodManager.FORGOT_PASSWORD_OTP;
         }
 
-        let otpServiceObj = await ServiceCalls.validateOTPBackend(json, apiName);
+        let apiMethod = apiName;
+        let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
-        if (otpServiceObj && otpServiceObj.logoutData) {
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            firebaseHelper.logEvent(firebaseHelper.event_OTP_api_fail, firebaseHelper.screen_otp, "OTP Api Failed", 'Unatherised');
-            return;
-        }
+        
+        if(apiService && apiService.data && apiService.data.Key) {
+        
+            set_popUpMessage('');
+            navigation.navigate('PswdComponent', { isFromScreen: isFromScreen, otpValue: otpValue1, eMailValue: eMailValue, secondaryEmail: secondaryEmail, isNotificationEnable:isNotification, addressObj:addressObj });
+ 
+        } else if(apiService && apiService.isInternet === false) {
 
-        if (otpServiceObj && !otpServiceObj.isInternet) {
             createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
             firebaseHelper.logEvent(firebaseHelper.event_OTP_api_fail, firebaseHelper.screen_otp, "OTP Api Failed", 'Internet : false');
             return;
-        }
 
-        if (otpServiceObj && otpServiceObj.statusData) {
-            set_popUpMessage('');
-            navigation.navigate('PswdComponent', { isFromScreen: isFromScreen, otpValue: otpValue1, eMailValue: eMailValue, secondaryEmail: secondaryEmail, isNotificationEnable:isNotification, addressObj:addressObj });
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            firebaseHelper.logEvent(firebaseHelper.event_OTP_api_fail, firebaseHelper.screen_otp, "OTP Api Failed - Wrong OTP Value", 'error');
+            createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true);
+            
         } else {
+
             firebaseHelper.logEvent(firebaseHelper.event_OTP_api_fail, firebaseHelper.screen_otp, "OTP Api Failed - Wrong OTP Value", 'Email : ' + eMailValue);
             createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.OTP_VERIFICATION_CODE_FAILURE, true);
-        }
 
-        if (otpServiceObj && otpServiceObj.error) {
-            firebaseHelper.logEvent(firebaseHelper.event_OTP_api_fail, firebaseHelper.screen_otp, "OTP Api Failed - Wrong OTP Value", 'error');
-            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
         }
 
     };

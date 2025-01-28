@@ -3,10 +3,9 @@ import {View,StyleSheet,Platform,Text} from 'react-native';
 import fonts from './../../utils/commonStyles/fonts';
 import {widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import CommonStyles from './../../utils/commonStyles/commonStyles';
- import Slider from "react-native-slider";
+//import Slider from "react-native-slider";
 import SliderSmooth from "react-native-smooth-slider";
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import * as Constant from './../../utils/constants/constant';
 
   const GoalSetSliderComponent = ({minValue,maxValue,value,breakValue,setValue,route,...props}) => {
 
@@ -20,7 +19,6 @@ import * as Constant from './../../utils/constants/constant';
       },[breakValue]);
 
       useEffect(() => { 
-
         if(value){
           set_valueSlider(parseInt(value));
         }else{
@@ -40,13 +38,30 @@ import * as Constant from './../../utils/constants/constant';
      * Based on Multiline, this component will be Text Area / TextInput
      */
     return(
-        <View style={styles.container}>
+      <View style={styles.container}>
 
-            <View style={{width: wp('80%'), alignItems:'center'}}>
+        <View style={{width: wp('80%'), alignItems:'center'}}>
 
-                <GestureHandlerRootView style={styles.container}>
+          <GestureHandlerRootView style={styles.container}>
 
-                    {Platform.OS === 'ios' ? <SliderSmooth style = {[styles.track1]}
+            <SliderSmooth style = {[styles.track1]}
+              value={valueSlider}
+              disabled={false}
+              useNativeDriver={true}
+              minimumValue = {minValue}
+              maximumValue = {maxValue}
+              vertical = {false}
+                        // animationType = {'spring' }
+              minimumTrackTintColor={'#64DED3'}
+              maximumTrackTintColor={'#D3D3D3'}
+              step = {stepValue}
+              trackStyle = {{height: (Platform.isPad ? hp('1.5%') : hp('1%')),borderRadius: 15, }}
+              thumbTintColor = {'black'}
+              thumbStyle = {{width: (Platform.isPad ? 30 : 20), height: (Platform.isPad ? 30 : 20),borderRadius: 100,}}
+              onSlidingComplete={value => {selectAction(value)}}
+            /> 
+
+                    {/* {Platform.OS === 'ios' ? <SliderSmooth style = {[styles.track1]}
                         value={valueSlider}
                         disabled={false}
                         useNativeDriver={true}
@@ -78,18 +93,18 @@ import * as Constant from './../../utils/constants/constant';
                         trackStyle={styles.track}
                         disabled = {false}
                         
-                    /> 
-              }
-            </GestureHandlerRootView>
-
-            </View>
-
-            <View style={{width: wp('75%'), flexDirection:'row',justifyContent:'space-between',marginTop: -30,}}>
-              {<Text style={[styles.valuesTextStyle,]}>{minValue}</Text>}
-              {<Text style={[styles.valuesTextStyle]}>{maxValue}</Text>}
-            </View>
+                    />  */}
+              
+          </GestureHandlerRootView>
 
         </View>
+
+        <View style={{width: wp('75%'), flexDirection:'row',justifyContent:'space-between',marginTop: -30,}}>
+          {<Text style={[styles.valuesTextStyle,]}>{minValue}</Text>}
+          {<Text style={[styles.valuesTextStyle]}>{maxValue}</Text>}
+        </View>
+
+      </View>
 
     )
 }

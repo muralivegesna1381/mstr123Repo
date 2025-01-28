@@ -1,4 +1,3 @@
-import React from 'react';
 import { StyleSheet } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import fonts from './fonts'
@@ -138,7 +137,6 @@ const CommonStyles = StyleSheet.create({
         height: hp('6%'),
         resizeMode: 'contain',
         marginRight: wp('2%'),
-        // tintColor:'black'
     },
 
     spinnerStyle: {
@@ -181,7 +179,6 @@ const CommonStyles = StyleSheet.create({
     petsSelViewHeaderStyle: {
         backgroundColor: 'transparent',
         width: wp('100%'),
-        //  minHeight:hp('12%'),
         borderRadius: 5,
         justifyContent: 'center',
     },
@@ -338,7 +335,6 @@ const CommonStyles = StyleSheet.create({
         paddingLeft: wp('2%'),
         fontSize: 15,
         fontFamily: 'Barlow-Regular',
-        // alignSelf:'center',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -358,15 +354,15 @@ const CommonStyles = StyleSheet.create({
     dropDownTextStyle: {
         fontFamily: 'Barlow-Regular',
         fontSize: fonts.fontXMedium,
-        // textAlign: "left",
         color: "black",
+        
     },
 
     dropDownHeaderTextStyle: {
         fontFamily: 'Barlow-Regular',
         fontSize: fonts.fontXSmall,
-        // textAlign: "left",
         color: "black",
+        
     },
 
     shadowStyleLight: {
@@ -416,7 +412,7 @@ const CommonStyles = StyleSheet.create({
     searchIconStyle: {
         aspectRatio: 1,
         height: hp('4.5%'),
-        marginLeft: hp('2%'),
+        marginLeft: wp('2%'),
     },
 
     captureImageLable: {
@@ -456,7 +452,6 @@ const CommonStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         alignSelf: 'center',
-
     },
 
     searchFilterListStyle: {
@@ -486,17 +481,9 @@ const CommonStyles = StyleSheet.create({
         color: 'black',     
     },
 
-    // searchIconStyle : {      
-    //     aspectRatio:1,
-    //     height:hp('4%'),
-    //     marginLeft:hp('2%'), 
-    // },
-
     searchImageStyle : {
-        height: hp("4%"),
-        width: wp("3%"),
         resizeMode:'contain',
-        marginLeft:hp('2%'), 
+        // marginLeft:hp('2%'), 
     },
 
     searchNologsDogStyle : {
@@ -580,13 +567,6 @@ const CommonStyles = StyleSheet.create({
         alignItems: "center",
       },
 
-    //   dropDownHeaderTextStyle: {
-    //     fontFamily: 'Barlow-Regular',
-    //     fontSize: fonts.fontTiny,
-    //     // textAlign: "left",
-    //     color: "black",
-    //   },
-
       popSearchViewStyle : {
         height: hp("30%"),
         width: wp("100%"),
@@ -601,7 +581,7 @@ const CommonStyles = StyleSheet.create({
     datePickerMViewStyle : {
         alignSelf:'center',
         borderRadius:5,
-        marginBottom:hp('2%')
+        // marginBottom:hp('2%')
     },
   
     datePickerSubViewStyle : {
@@ -676,9 +656,7 @@ const CommonStyles = StyleSheet.create({
 
     fhTextStyle1 : {
         fontSize: 14,
-        fontFamily: 'Barlow-SemiBold',
-        // color: '#A0A0A0', 
-        // marginLeft:hp('2%'),              
+        fontFamily: 'Barlow-SemiBold',             
     },
 
     // shadowStyle : {

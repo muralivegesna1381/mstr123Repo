@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Constant from "../../../utils/constants/constant";
 import * as DataStorageLocal from '../../../utils/storage/dataStorageLocal';
 import BuildEnv from './../../../config/environment/environmentConfig';
 import InstructionsUI from './instructionsUI';
 import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
 
+const Environment = JSON.parse(BuildEnv.Environment());
 
 const InstructionsPage = ({ navigation, route, ...props }) => {
 
   const [instructions, set_instructions] = useState(undefined);
   const [instructionType, set_instructionType] = useState(0);
-  let imgsRef = useRef([])
-  const Environment = JSON.parse(BuildEnv.Environment());
+  
   useEffect(() => {
     //setting instruction type based on screen instructions is triggered from
     // 1 is from camera related sceens and 2 is from scoring related screens

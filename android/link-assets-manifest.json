@@ -1,0 +1,117 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/Barlow-Black.ttf",
+      "sha1": "61ad587727cbde19543e8f29d9227a698486b14e"
+    },
+    {
+      "path": "assets/fonts/Barlow-BlackItalic.ttf",
+      "sha1": "ba65bd8751651a81748f59dace1dec04eb4f45a1"
+    },
+    {
+      "path": "assets/fonts/Barlow-Bold.ttf",
+      "sha1": "45ec0dfc1f25ccb88746520ccac545900ecc7e3b"
+    },
+    {
+      "path": "assets/fonts/Barlow-BoldItalic.ttf",
+      "sha1": "ee711e5d99afcd0a1d1801f839ffb8dd4267593c"
+    },
+    {
+      "path": "assets/fonts/Barlow-ExtraBoldItalic.ttf",
+      "sha1": "a2b7cea6e8054a77332ff469116c1bac87240e70"
+    },
+    {
+      "path": "assets/fonts/Barlow-ExtraLight.ttf",
+      "sha1": "7192fd00ef236859166db67d0ab67e553ff6efe6"
+    },
+    {
+      "path": "assets/fonts/Barlow-ExtraLightItalic.ttf",
+      "sha1": "b0f5acda801aa695ade4032c71296b676b41c276"
+    },
+    {
+      "path": "assets/fonts/Barlow-Italic.ttf",
+      "sha1": "62e00aca2842c44c7bcdf21af020c4be3aab80eb"
+    },
+    {
+      "path": "assets/fonts/Barlow-Light.ttf",
+      "sha1": "2164e712dbf129b1001ffb017278826d5969c579"
+    },
+    {
+      "path": "assets/fonts/Barlow-LightItalic.ttf",
+      "sha1": "7dabc874612ddb5b7bd66edae32877c4312b4051"
+    },
+    {
+      "path": "assets/fonts/Barlow-Medium.ttf",
+      "sha1": "5357f6606d811227fa2f477de3178ab5030c613f"
+    },
+    {
+      "path": "assets/fonts/Barlow-MediumItalic.ttf",
+      "sha1": "2a9202f869f426365d8ffd129677964e19c58733"
+    },
+    {
+      "path": "assets/fonts/Barlow-Regular.ttf",
+      "sha1": "a7d64a03c1dce5107e1a20f4d787df232b85a971"
+    },
+    {
+      "path": "assets/fonts/Barlow-SemiBold.ttf",
+      "sha1": "3a5a9453e92b05358262eac56ce9a824e0bae75c"
+    },
+    {
+      "path": "assets/fonts/Barlow-SemiBoldItalic.ttf",
+      "sha1": "e38bd790bf42d88890f4ea28d9cae998909edfd0"
+    },
+    {
+      "path": "assets/fonts/Barlow-Thin.ttf",
+      "sha1": "3b751469f8486480a3383051937bd557d27f8582"
+    },
+    {
+      "path": "assets/fonts/Barlow-ThinItalic.ttf",
+      "sha1": "dd88f443523b2ffe031bb7ed33654d02ab8b1be3"
+    },
+    {
+      "path": "assets/fonts/Poppins-Black.ttf",
+      "sha1": "6b1dd041c24de51d8859c4d83909c35c099a8219"
+    },
+    {
+      "path": "assets/fonts/Poppins-BlackItalic.ttf",
+      "sha1": "d7574b5facaf4baa69a1ad73bcd627503874fdaf"
+    },
+    {
+      "path": "assets/fonts/Poppins-Bold.ttf",
+      "sha1": "f68e7e93da3f4a710d28b0ee5f744b5112351401"
+    },
+    {
+      "path": "assets/fonts/Poppins-BoldItalic.ttf",
+      "sha1": "fcdff71a7e46fac6078dcbede38d415506d6f2cd"
+    },
+    {
+      "path": "assets/fonts/Poppins-ExtraBold.ttf",
+      "sha1": "f83d4a3a977b69dce924f490d4be0736b2f240b0"
+    },
+    {
+      "path": "assets/fonts/Poppins-ExtraBoldItalic.ttf",
+      "sha1": "89f0ead6b7e4da053f2565fdfc90b261372a6b7b"
+    },
+    {
+      "path": "assets/fonts/Poppins-ExtraLight.ttf",
+      "sha1": "e43759127fe5f6acb8c53b9bf79245d9af828b22"
+    },
+    {
+      "path": "assets/fonts/Poppins-ExtraLightItalic.ttf",
+      "sha1": "bf67c0e6d1f1288edc80390fa266f31fc5ff891e"
+    },
+    {
+      "path": "assets/fonts/Poppins-Italic.ttf",
+      "sha1": "b2c040a2e8fa61c93c7c13814da0c5de5bae1220"
+    },
+    {
+      "path": "assets/fonts/Poppins-Light.ttf",
+      "sha1": "987ef3e07d6361fbb658624e297750133f2343bd"
+    },
+    {
+      "path": "assets/fonts/Poppins-LightItalic.ttf",
+      "sha1": "ff206afee6ed7c9a4a46d1a32fc53b1bc443a84e"
+    }
+  ]
+}

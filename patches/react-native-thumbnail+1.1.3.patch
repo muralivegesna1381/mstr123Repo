@@ -1,0 +1,290 @@
+diff --git a/node_modules/react-native-thumbnail/android/build.gradle b/node_modules/react-native-thumbnail/android/build.gradle
+index 1f28a4d..836e289 100644
+--- a/node_modules/react-native-thumbnail/android/build.gradle
++++ b/node_modules/react-native-thumbnail/android/build.gradle
+@@ -13,12 +13,12 @@ buildscript {
+ apply plugin: 'com.android.library'
+ 
+ android {
+-    compileSdkVersion 26
+-    buildToolsVersion "26.0.1"
++    compileSdkVersion 34
++    buildToolsVersion "34.0.0"
+ 
+     defaultConfig {
+         minSdkVersion 16
+-        targetSdkVersion 26
++        targetSdkVersion 34
+         versionCode 1
+         versionName "1.0"
+     }
+@@ -33,6 +33,6 @@ repositories {
+ }
+ 
+ dependencies {
+-    compile 'com.facebook.react:react-native:+'
++    implementation 'com.facebook.react:react-native:+'
+ }
+   
+\ No newline at end of file
+diff --git a/node_modules/react-native-thumbnail/android/build/.transforms/efc706ba71309c2293b30454ee18a1f4/results.bin b/node_modules/react-native-thumbnail/android/build/.transforms/efc706ba71309c2293b30454ee18a1f4/results.bin
+new file mode 100644
+index 0000000..0d259dd
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/.transforms/efc706ba71309c2293b30454ee18a1f4/results.bin
+@@ -0,0 +1 @@
++o/classes
+diff --git a/node_modules/react-native-thumbnail/android/build/.transforms/efc706ba71309c2293b30454ee18a1f4/transformed/classes/classes_dex/classes.dex b/node_modules/react-native-thumbnail/android/build/.transforms/efc706ba71309c2293b30454ee18a1f4/transformed/classes/classes_dex/classes.dex
+new file mode 100644
+index 0000000..252db13
+Binary files /dev/null and b/node_modules/react-native-thumbnail/android/build/.transforms/efc706ba71309c2293b30454ee18a1f4/transformed/classes/classes_dex/classes.dex differ
+diff --git a/node_modules/react-native-thumbnail/android/build/generated/source/buildConfig/debug/me/hauvo/thumbnail/BuildConfig.java b/node_modules/react-native-thumbnail/android/build/generated/source/buildConfig/debug/me/hauvo/thumbnail/BuildConfig.java
+index fb0ae57..059e9a4 100644
+--- a/node_modules/react-native-thumbnail/android/build/generated/source/buildConfig/debug/me/hauvo/thumbnail/BuildConfig.java
++++ b/node_modules/react-native-thumbnail/android/build/generated/source/buildConfig/debug/me/hauvo/thumbnail/BuildConfig.java
+@@ -5,9 +5,6 @@ package me.hauvo.thumbnail;
+ 
+ public final class BuildConfig {
+   public static final boolean DEBUG = Boolean.parseBoolean("true");
+-  public static final String APPLICATION_ID = "me.hauvo.thumbnail";
++  public static final String LIBRARY_PACKAGE_NAME = "me.hauvo.thumbnail";
+   public static final String BUILD_TYPE = "debug";
+-  public static final String FLAVOR = "";
+-  public static final int VERSION_CODE = 1;
+-  public static final String VERSION_NAME = "1.0";
+ }
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml b/node_modules/react-native-thumbnail/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml
+new file mode 100644
+index 0000000..624503b
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="me.hauvo.thumbnail" >
++
++    <uses-sdk android:minSdkVersion="16" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json b/node_modules/react-native-thumbnail/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json
+new file mode 100644
+index 0000000..46fd1f3
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json
+@@ -0,0 +1,18 @@
++{
++  "version": 3,
++  "artifactType": {
++    "type": "AAPT_FRIENDLY_MERGED_MANIFESTS",
++    "kind": "Directory"
++  },
++  "applicationId": "me.hauvo.thumbnail",
++  "variantName": "debug",
++  "elements": [
++    {
++      "type": "SINGLE",
++      "filters": [],
++      "attributes": [],
++      "outputFile": "AndroidManifest.xml"
++    }
++  ],
++  "elementType": "File"
++}
+\ No newline at end of file
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/aar_metadata/debug/aar-metadata.properties b/node_modules/react-native-thumbnail/android/build/intermediates/aar_metadata/debug/aar-metadata.properties
+new file mode 100644
+index 0000000..1211b1e
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/aar_metadata/debug/aar-metadata.properties
+@@ -0,0 +1,6 @@
++aarFormatVersion=1.0
++aarMetadataVersion=1.0
++minCompileSdk=1
++minCompileSdkExtension=0
++minAndroidGradlePluginVersion=1.0.0
++coreLibraryDesugaringEnabled=false
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json b/node_modules/react-native-thumbnail/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
+new file mode 100644
+index 0000000..9e26dfe
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
+@@ -0,0 +1 @@
++{}
+\ No newline at end of file
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/compile_library_classes_jar/debug/classes.jar b/node_modules/react-native-thumbnail/android/build/intermediates/compile_library_classes_jar/debug/classes.jar
+new file mode 100644
+index 0000000..38e591d
+Binary files /dev/null and b/node_modules/react-native-thumbnail/android/build/intermediates/compile_library_classes_jar/debug/classes.jar differ
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/compile_r_class_jar/debug/R.jar b/node_modules/react-native-thumbnail/android/build/intermediates/compile_r_class_jar/debug/R.jar
+new file mode 100644
+index 0000000..685c8bc
+Binary files /dev/null and b/node_modules/react-native-thumbnail/android/build/intermediates/compile_r_class_jar/debug/R.jar differ
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/compile_symbol_list/debug/R.txt b/node_modules/react-native-thumbnail/android/build/intermediates/compile_symbol_list/debug/R.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/react-native-thumbnail/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+new file mode 100644
+index 0000000..16be283
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+@@ -0,0 +1 @@
++#Thu Sep 26 17:38:01 IST 2024
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/react-native-thumbnail/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+new file mode 100644
+index 0000000..b45f9fe
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/build/generated/res/resValues/debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/build/generated/res/resValues/debug"/></dataSet><mergedItems/></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml b/node_modules/react-native-thumbnail/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+new file mode 100644
+index 0000000..0829f97
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/debug/jniLibs"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/incremental/mergeDebugShaders/merger.xml b/node_modules/react-native-thumbnail/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+new file mode 100644
+index 0000000..2387e02
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/shaders"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/debug/shaders"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/incremental/packageDebugAssets/merger.xml b/node_modules/react-native-thumbnail/android/build/intermediates/incremental/packageDebugAssets/merger.xml
+new file mode 100644
+index 0000000..35fd71e
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/incremental/packageDebugAssets/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/assets"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/debug/assets"/></dataSet><dataSet config="generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/build/intermediates/shader_assets/debug/out"/></dataSet></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/javac/debug/classes/me/hauvo/thumbnail/BuildConfig.class b/node_modules/react-native-thumbnail/android/build/intermediates/javac/debug/classes/me/hauvo/thumbnail/BuildConfig.class
+new file mode 100644
+index 0000000..174c283
+Binary files /dev/null and b/node_modules/react-native-thumbnail/android/build/intermediates/javac/debug/classes/me/hauvo/thumbnail/BuildConfig.class differ
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/javac/debug/classes/me/hauvo/thumbnail/RNThumbnailModule.class b/node_modules/react-native-thumbnail/android/build/intermediates/javac/debug/classes/me/hauvo/thumbnail/RNThumbnailModule.class
+new file mode 100644
+index 0000000..c7c2903
+Binary files /dev/null and b/node_modules/react-native-thumbnail/android/build/intermediates/javac/debug/classes/me/hauvo/thumbnail/RNThumbnailModule.class differ
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/javac/debug/classes/me/hauvo/thumbnail/RNThumbnailPackage.class b/node_modules/react-native-thumbnail/android/build/intermediates/javac/debug/classes/me/hauvo/thumbnail/RNThumbnailPackage.class
+new file mode 100644
+index 0000000..f862507
+Binary files /dev/null and b/node_modules/react-native-thumbnail/android/build/intermediates/javac/debug/classes/me/hauvo/thumbnail/RNThumbnailPackage.class differ
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/local_only_symbol_list/debug/R-def.txt b/node_modules/react-native-thumbnail/android/build/intermediates/local_only_symbol_list/debug/R-def.txt
+new file mode 100644
+index 0000000..78ac5b8
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/local_only_symbol_list/debug/R-def.txt
+@@ -0,0 +1,2 @@
++R_DEF: Internal format may change without notice
++local
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt b/node_modules/react-native-thumbnail/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+new file mode 100644
+index 0000000..87527b9
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+@@ -0,0 +1,7 @@
++1<?xml version="1.0" encoding="utf-8"?>
++2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++3    package="me.hauvo.thumbnail" >
++4
++5    <uses-sdk android:minSdkVersion="16" />
++6
++7</manifest>
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml b/node_modules/react-native-thumbnail/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml
+new file mode 100644
+index 0000000..624503b
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="me.hauvo.thumbnail" >
++
++    <uses-sdk android:minSdkVersion="16" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/navigation_json/debug/navigation.json b/node_modules/react-native-thumbnail/android/build/intermediates/navigation_json/debug/navigation.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/navigation_json/debug/navigation.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar b/node_modules/react-native-thumbnail/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar
+new file mode 100644
+index 0000000..ad671a1
+Binary files /dev/null and b/node_modules/react-native-thumbnail/android/build/intermediates/runtime_library_classes_jar/debug/classes.jar differ
+diff --git a/node_modules/react-native-thumbnail/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt b/node_modules/react-native-thumbnail/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt
+new file mode 100644
+index 0000000..3abbfac
+--- /dev/null
++++ b/node_modules/react-native-thumbnail/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt
+@@ -0,0 +1 @@
++me.hauvo.thumbnail
+diff --git a/node_modules/react-native-thumbnail/android/build/outputs/logs/manifest-merger-debug-report.txt b/node_modules/react-native-thumbnail/android/build/outputs/logs/manifest-merger-debug-report.txt
+index 976b707..9c73c50 100644
+--- a/node_modules/react-native-thumbnail/android/build/outputs/logs/manifest-merger-debug-report.txt
++++ b/node_modules/react-native-thumbnail/android/build/outputs/logs/manifest-merger-debug-report.txt
+@@ -1,37 +1,17 @@
+ -- Merging decision tree log ---
+ manifest
+-ADDED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:1-5:12
+-INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:1-5:12
+-INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:1-5:12
+-INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:1-5:12
+-INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:1-5:12
+-INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:1-5:12
+-INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:1-5:12
++ADDED from /Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:1-5:12
++INJECTED from /Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:1-5:12
+ 	package
+-		ADDED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml:3:11-39
+-		INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-		INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-	android:versionName
+-		INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-		ADDED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:1-5:12
+-		INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-	android:versionCode
+-		INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-		ADDED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:1-5:12
+-		INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
++		ADDED from /Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/AndroidManifest.xml:3:11-39
++		INJECTED from /Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/AndroidManifest.xml
+ 	xmlns:android
+-		ADDED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:11-69
++		ADDED from /Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/AndroidManifest.xml:2:11-69
+ uses-sdk
+-INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
+-INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
++INJECTED from /Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
++INJECTED from /Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/AndroidManifest.xml
++INJECTED from /Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/AndroidManifest.xml
+ 	android:targetSdkVersion
+-		INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-		ADDED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-		INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
++		INJECTED from /Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/AndroidManifest.xml
+ 	android:minSdkVersion
+-		INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-		ADDED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
+-		INJECTED from /Volumes/DATA/Github/react-native-thumbnail/android/src/main/AndroidManifest.xml
++		INJECTED from /Users/nravva/Documents/wearables/wearables-mobile-revamp/node_modules/react-native-thumbnail/android/src/main/AndroidManifest.xml
+diff --git a/node_modules/react-native-thumbnail/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin b/node_modules/react-native-thumbnail/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin
+new file mode 100644
+index 0000000..d9d3862
+Binary files /dev/null and b/node_modules/react-native-thumbnail/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin differ

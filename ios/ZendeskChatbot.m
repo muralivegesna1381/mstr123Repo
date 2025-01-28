@@ -9,7 +9,9 @@
  */ 
 
 #import "React/RCTBridgeModule.h"
+
 @interface RCT_EXTERN_MODULE(ZendeskChatbot, NSObject)
+
 RCT_EXTERN_METHOD(launchZendeskMessagingWindow: (NSString *)input callback:(RCTResponseSenderBlock)callback )
 RCT_EXTERN_METHOD(logOutFromZendeskMessagingWindow: (NSString *)input callback:(RCTResponseSenderBlock)callback )
 

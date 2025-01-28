@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TouchableOpacity,Image,FlatList,ImageBackground,BackHandler,ActivityIndicator,Platform} from 'react-native';
+import React, { useState, useEffect,useRef } from 'react';
+import {View,StyleSheet,Text,TouchableOpacity,Image,FlatList,ImageBackground,BackHandler,ActivityIndicator,Platform,TextInput} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from './../../utils/commonComponents/headerComponent';
 import fonts from './../../utils/commonStyles/fonts'
@@ -8,14 +8,21 @@ import CommonStyles from './../../utils/commonStyles/commonStyles';
 import DeviceInfo from 'react-native-device-info';
 import * as Constant from "./../../utils/constants/constant";
 import DropdownComponent from '../../utils/commonComponents/dropDownComponent';
+import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 
+import SearchImg from "./../../../assets/images/otherImages/svg/searchIcon.svg";
+import NoLogsDogImg from "./../../../assets/images/dogImages/noRecordsDog.svg";
+import DefaultDogImg from "./../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
 let tickImg = require('./../../../assets/images/otherImages/png/tick.png');
 
 const  AllDevicesUI = ({route, ...props }) => {
 
     const [imgLoader, set_imgLoader] = useState(false);
     const [isRecords, set_isRecords] = useState(true);
-
+    const [petName, set_petName] = useState(undefined);
+    const [filterArray, set_filterArray] = useState(undefined);
+    const [isListOpen, set_ListOpen] = useState(false);
+    let isKeyboard = useRef(false);
     // Android Physical back button action
     useEffect(() => {      
       BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
@@ -29,7 +36,7 @@ const  AllDevicesUI = ({route, ...props }) => {
     useEffect(() => {
 
       if(props.devices) {
-
+        set_filterArray(props.devices)
         if(props.devices.length > 0) {
           set_isRecords(true);
         } else {
@@ -72,6 +79,45 @@ const  AllDevicesUI = ({route, ...props }) => {
       props.actionOnOptiontype(item);
     };
 
+    const filterPets = (pName) => {
+
+      if (isKeyboard.current === true) {
+        set_petName(pName)
+        if (pName && pName.length > 0) {
+          set_ListOpen(true);
+        } else {
+          set_ListOpen(false);
+        }
+
+        let nestedFilter = props.devices;
+        const devArray = nestedFilter.filter(type => (type.petName.toString().toUpperCase().includes(pName.toUpperCase()) || type.deviceNumber.toUpperCase().includes(pName.toUpperCase())));
+  
+        if (devArray && devArray.length > 0) {
+          set_filterArray(devArray)
+        } else {
+          set_filterArray(undefined)
+        }
+      }
+    };
+
+    const checkforFirmwareUpadte = (item) => {
+
+      let firmwareCheck = false;
+      if(item.deviceModel === 'AGL2' || item.deviceModel === 'CMAS') {
+
+        if(item.firmware && item.firmware !== '' && item.firmwareNew && item.firmwareNew !== '') {
+          if(parseFloat(item.firmware) < parseFloat(item.firmwareNew)) {
+              firmwareCheck = true;
+          }
+
+        }
+
+        return firmwareCheck;
+
+      } 
+
+    }
+
     const renderItem = ({item, index }) => {
 
       return (
@@ -93,9 +139,8 @@ const  AllDevicesUI = ({route, ...props }) => {
                     </View>
                   ) : null}
 
-                  </ImageBackground> : 
-                  <ImageBackground source={require("./../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg")} borderRadius = {100} resizeMode='cover' style={[styles.imgStyle,{width: Platform.isPad ? wp("10%") : wp("15%"),}]}></ImageBackground>}
-                  
+                  </ImageBackground> : <ImageBackground source={DefaultDogImg} borderRadius = {100} resizeMode='cover' style={[styles.imgStyle,{width: Platform.isPad ? wp("10%") : wp("15%"),}]}></ImageBackground>}
+          
                   <View style={{flexDirection:'column',flex:2}}>
 
                     {<Text style={[styles.deviceName,{ color: "black" },]}>{item.isDeviceSetupDone && item.battery && item.petName && item.petName.length > 15 ? item.petName.slice(0,15) + '...' : (item.petName && item.petName.length > 22 ? item.petName.slice(0,22) + '...' : item.petName)}</Text>}
@@ -104,8 +149,8 @@ const  AllDevicesUI = ({route, ...props }) => {
                       <Text style={[styles.deviceName,{ color: "red" },]}>{'Setup Pending'}</Text>
                     </View> : (item.isFirmwareVersionUpdateRequired && item.isDeviceSetupDone ? (
                         <View style={{flexDirection: "row",alignItems: "center",}}>
-                          <Image source={tickImg} style={styles.setupUpdateImgStyles}/>
-                          <Text style={[styles.subHeaderStyle,{color: "#37B57C", marginRight: hp("1%"),}]}>{"Update Available "}</Text>
+                          {checkforFirmwareUpadte(item) ? <Image source={tickImg} style={styles.setupUpdateImgStyles}/> : null}
+                          {checkforFirmwareUpadte(item) ? <Text style={[styles.subHeaderStyle,{color: "#37B57C", marginRight: hp("1%"),}]}>{"Update Available "}</Text> : null}
                         </View>
                         
                       ) : null)}
@@ -144,76 +189,75 @@ const  AllDevicesUI = ({route, ...props }) => {
     };
 
     return (
-        <View style={[styles.mainComponentStyle]}>
+      <View style={[styles.mainComponentStyle]}>
 
-          <View style={[CommonStyles.headerView]}>
-            <HeaderComponent
-              isBackBtnEnable={true}
-              isSettingsEnable={false}
-              isChatEnable={false}
-              isTImerEnable={false}
-              isTitleHeaderEnable={true}
-              title={'List of Sensors'}
-              backBtnAction = {() => backBtnAction()}
-            />
+        <View style={[CommonStyles.headerView]}>
+          <HeaderComponent
+            isBackBtnEnable={true}
+            isSettingsEnable={false}
+            isChatEnable={false}
+            isTImerEnable={false}
+            isTitleHeaderEnable={true}
+            title={'List of Sensors'}
+            backBtnAction = {() => backBtnAction()}
+          />
+        </View>
+
+        <View style={{flex:1,marginBottom:hp('1%'),marginTop:hp('1%'),alignSelf:'center'}}>
+
+          {props.showSearch ? <View style={Platform.isPad ? [CommonStyles.searchBarStyle, { borderRadius: 10,width: wp('90%') }] : [CommonStyles.searchBarStyle,{width: wp('90%'),}]}>
+
+            <View style={[CommonStyles.searchInputContainerStyle]}>
+              <SearchImg width={ wp("3%")} height={ hp("4%")} style={[CommonStyles.searchImageStyle]}/>
+              <TextInput style={[CommonStyles.searchTextInputStyle]}
+                underlineColorAndroid="transparent"
+                placeholder="Search by pet or device number"
+                placeholderTextColor="#7F7F81"
+                autoCapitalize="none"
+                value={petName}
+                onFocus={() => isKeyboard.current = true}
+                onChangeText={(name) => { filterPets(name) }}
+              />
             </View>
 
-            <View style={{flex:1,marginBottom:hp('1%'),marginTop:hp('3%'),alignSelf:'center'}}>
+          </View> : null}
 
-                {isRecords ? <FlatList
-                  data={props.devices ? props.devices : undefined}
-                  showsVerticalScrollIndicator={false}
-                  renderItem={ renderItem }
-                  keyExtractor={(item, index) => `${index}`}
-                /> : <View style={{justifyContent:'center', alignItems:'center',marginTop: hp("15%"),}}>
-                  <Image style= {[CommonStyles.nologsDogStyle]} source={require("./../../../assets/images/dogImages/noRecordsDog.svg")}></Image>
-                  <Text style={[CommonStyles.noRecordsTextStyle,{marginTop: hp("2%")}]}>{Constant.NO_RECORDS_LOGS}</Text>
-                  <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
-              </View> }
+          {isRecords ? <FlatList
+            data={filterArray ? filterArray : undefined}
+            showsVerticalScrollIndicator={false}
+            renderItem={ renderItem }
+            keyExtractor={(item, index) => `${index}`}
+          /> : <View style={{justifyContent:'center', alignItems:'center',marginTop: hp("15%"),}}>
+            <NoLogsDogImg style= {[CommonStyles.nologsDogStyle]}/>
+            <Text style={[CommonStyles.noRecordsTextStyle,{marginTop: hp("2%")}]}>{Constant.NO_RECORDS_LOGS}</Text>
+            <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
+          </View>}
                 
-            </View>  
+        </View>  
 
-            {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
-              <AlertComponent
-                header = {Constant.ALERT_DEFAULT_TITLE}
-                message={Constant.FIRMWARE_UPTO_DATE}
-                isLeftBtnEnable = {false}
-                isRightBtnEnable = {true}
-                leftBtnTilte = {'NO'}
-                rightBtnTilte = {"OK"}
-                popUpRightBtnAction = {() => popOkBtnAction()}
-              />
-            </View> : null}
+        {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
+          <AlertComponent
+            header = {Constant.ALERT_DEFAULT_TITLE}
+            message={Constant.FIRMWARE_UPTO_DATE}
+            isLeftBtnEnable = {false}
+            isRightBtnEnable = {true}
+            leftBtnTilte = {'NO'}
+            rightBtnTilte = {"OK"}
+            popUpRightBtnAction = {() => popOkBtnAction()}
+          />
+        </View> : null}
 
-            {props.isListView ? <View style={[CommonStyles.customPopUpStyle]}>
+        {props.isListView ? <View style={[CommonStyles.customPopUpStyle]}>
 
-              <DropdownComponent
-                dataArray = {props.optionsArray}
-                headerText={'Select Action'}
-                actionOnOptiontype ={actionOnOptiontype}
-              />
-              
-
-              {/* <View style = {[CommonStyles.dropDownFlatview,{height: hp("5%"),}]}>
-                <Text style={[CommonStyles.dropDownHeaderTextStyle]}>{'Actions'}</Text>
-              </View>
-              <FlatList
-                style={CommonStyles.dropDownFlatcontainer}
-                data={props.optionsArray}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item, index }) => (
-                  <TouchableOpacity onPress={() => actionOnOptiontype(item)}>
-                    <View style={CommonStyles.dropDownFlatview}>
-                      <Text style={[CommonStyles.dropDownTextStyle]}>{item.name}</Text>
-                    </View>
-                  </TouchableOpacity>)}
-                enableEmptySections={true}
-                keyExtractor={(item) => item.name}
-              /> */}
+          <DropdownComponent
+            dataArray = {props.optionsArray}
+            headerText={'Select Action'}
+            actionOnOptiontype ={actionOnOptiontype}
+          />
         
-            </View> : null}
-
-         </View>
+        </View> : null}
+        {props.isLoading === true ? <LoaderComponent isLoader={true} loaderText={Constant.LOADER_WAIT_MESSAGE} isButtonEnable={false} /> : null}
+      </View>
     );
   }
   
@@ -238,12 +282,8 @@ const  AllDevicesUI = ({route, ...props }) => {
     },
 
     imgStyle: {
-      // aspectRatio:1,
       width: wp("10%"),
       aspectRatio:1,
-      // alignSelf: "center",
-      // resizeMode: "contain",
-      // borderRadius: 100,
       overflow: "hidden",
       marginRight: hp("1%"),
     },
@@ -251,7 +291,6 @@ const  AllDevicesUI = ({route, ...props }) => {
     deviceName: {
       ...CommonStyles.textStyleSemiBold,
       fontSize: fonts.fontMedium,
-      // textAlign: "justify",
       margin:wp("0.5%"),
     },
 

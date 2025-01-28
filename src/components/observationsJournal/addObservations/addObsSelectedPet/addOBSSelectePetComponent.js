@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {View,BackHandler} from 'react-native';
 import AddOBSSelectPetUI from './addOBSSelectePetUI';
 import * as internetCheck from "./../../../../utils/internetCheck/internetCheck";
 import * as Constant from "./../../../../utils/constants/constant";
-import * as DataStorageLocal from "./../../../../utils/storage/dataStorageLocal";
 import * as firebaseHelper from './../../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
+import * as ObservationModel from "./../../observationModel/observationModel.js"
 
 let trace_inObservationsList;
 
@@ -19,17 +19,12 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
     const [isPopUp, set_isPopUp] = useState(false);
     const [popUpMessage, set_popUpMessage] = useState(undefined);
     const [popUpAlert, set_popUpAlert] = useState(undefined);
-    const [defaultPetObj, set_defaultPetObj] = useState(undefined);
     const [date, set_Date] = useState(new Date());
-    const [fromScreen, set_fromScreen] = useState(undefined);
-
-    let fromScreen1 = useRef(undefined);
 
     // Initial the class. Gets the pets list
     React.useEffect(() => {
 
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick); 
-        getObsDetails(); 
         const focus = navigation.addListener("focus", () => {
             set_Date(new Date());
             observationSelectPetStart();
@@ -53,23 +48,20 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
     useEffect(() => {
 
         if(route.params?.petsArray){
-            let duplicates = getUnique(route.params?.petsArray, 'petID');
-            set_petsArray(duplicates);
+
+            let petsArray = getUnique(route.params?.petsArray, 'petID');
+            set_petsArray(petsArray);
 
             if(route.params?.defaultPetObj){
-                for (let i=0; i < duplicates.length; i++){
-                    if(duplicates[i].petID === route.params?.defaultPetObj.petID){
-                        set_selectedPet(duplicates[i]);
+                for (let i=0; i < petsArray.length; i++){
+                    if(petsArray[i].petID === route.params?.defaultPetObj.petID){
+                        set_selectedPet(petsArray[i]);
                         set_selectedIndex(i);
-                        set_selectedPName(duplicates[i].petName)
+                        set_selectedPName(petsArray[i].petName)
                         set_nxtBtnEnable(true);                    
                     }
                 }
             }
-        }
-
-        if(route.params?.defaultPetObj){
-            set_defaultPetObj(route.params?.defaultPetObj);
         }
 
     }, [route.params?.petsArray,route.params?.defaultPetObj]);
@@ -94,20 +86,37 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
         await trace_inObservationsList.stop();
     };
 
-    // Navigation from. This screen is a common class for Quick and Observation flows
-    const getObsDetails = async () => {
-
-        let oJson = await DataStorageLocal.getDataFromAsync(Constant.OBSERVATION_DATA_OBJ);
-        oJson = JSON.parse(oJson);
-       
-        if(oJson){
-            set_fromScreen(oJson.fromScreen);
-            fromScreen1.current = oJson.fromScreen;
-        }
-      };
-
       // Moves to next screen and checks Internet connectivity
     const submitAction = async () => {
+
+        let newPet = selectedPet;
+        let existingPet = ObservationModel.observationData.selectedPet;
+
+        if (newPet && existingPet) {
+
+            if(newPet.petID !== existingPet.petID) {
+
+                let obj = {
+                    "selectedPet" : Object, 
+                    "fromScreen" : String, 
+                    "isPets" : Boolean, 
+                    "isEdit" : Boolean,
+                    "obsText" : String,
+                    "obserItem" : Object,
+                    "selectedDate" : String,
+                    "mediaArray" : Array,
+                    "behaviourItem" : Object,
+                    "observationId" : Number,
+                    "ctgNameId" : Number,
+                    "ctgName" : String,
+                    "quickVideoFileName" : String
+                  }
+                  ObservationModel.observationData = obj;
+                  ObservationModel.observationData.selectedDate = new Date();
+
+            }
+
+        }
 
         let internet = await internetCheck.internetCheck();
         firebaseHelper.logEvent(firebaseHelper.event_add_observations_pet_selection, firebaseHelper.screen_add_observations_pets, "Pet selection to add observation", 'Pet Id : '+selectedPet ? selectedPet.petID : '');
@@ -117,49 +126,39 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
             set_isPopUp(true);
         } else {
 
-            let obsObject = await DataStorageLocal.getDataFromAsync(Constant.OBSERVATION_DATA_OBJ);
-            obsObject = JSON.parse(obsObject);
+            let obj = ObservationModel.observationData;
             let fileName = '';
 
-            if(obsObject && selectedPet && fromScreen1.current === 'quickVideo') {
-                let pName = selectedPet.petName.length > 15 ? selectedPet.petName.substring(0,15) : selectedPet.petName;
-                let sName = selectedPet.studyName.length > 20 ? selectedPet.studyName.substring(0,20) : selectedPet.studyName;
-                // fileName = pName +'_'+sName+'_'+selectedPet.devices[0].deviceNumber+'_'+obsObject.quickVideoDateFile;
-                if(selectedPet.devices && selectedPet.devices.length > 0) {
-                    fileName = pName.replace(/_/g, ' ') +'_'+sName.replace(/_/g, ' ')+'_'+selectedPet.devices[0].deviceNumber+'_'+obsObject.quickVideoDateFile;
+            if(selectedPet && obj && obj.fromScreen && obj.fromScreen === "quickVideo") {
+                let petId = selectedPet.petID;
+                let pName = selectedPet.petName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+                pName = pName.length > 15 ? pName.substring(0, 15) : pName;
+                let sName = selectedPet.studyName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+                sName = sName !== "" ? (sName.length > 20 ? sName.substring(0, 20) : sName) : "NOSTUDY";
+
+                if (selectedPet && selectedPet.devices && selectedPet.devices.length > 0) {
+              
+                    let devNumber = selectedPet.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '')
+                    fileName = pName + '_' + petId + '_' + sName+ '_' + devNumber+ '_' + obj.quickVideoDateFile;
+ 
                 } else {
-                    fileName = pName.replace(/_/g, ' ') +'_'+sName.replace(/_/g, ' ')+'_'+"NO_DEVICE"+'_'+obsObject.quickVideoDateFile;
+                    fileName = pName + '_' + petId + '_' + sName + '_' + 'NO DEVICE' + '_' + obj.quickVideoDateFile;
                 }
-                obsObject.mediaArray[0].fileName = fileName;
-                obsObject.quickVideoFileName = fileName;
+
+                ObservationModel.observationData.mediaArray[0].fileName = fileName;
+                ObservationModel.observationData.quickVideoFileName = fileName;
+
             }
 
-            if(obsObject) {
+            ObservationModel.observationData.selectedPet = selectedPet;
+            ObservationModel.observationData.isPets = true;
 
-                if(obsObject.selectedPet.petID === selectedPet.petID) {
-                    obsObject.selectedPet = selectedPet;
-                    obsObject.isPets = true;
-                } else {
-                    obsObject.selectedPet = selectedPet;
-                    obsObject.isPets = true;
-                    obsObject.isEdit = false;
-                    obsObject.obsText = ''; 
-                    obsObject.obserItem = ''; 
-                    obsObject.selectedDate = new Date(); 
-                    obsObject.mediaArray = fromScreen1.current === 'quickVideo' ? obsObject.mediaArray : [];
-                    obsObject.behaviourItem = '';
-                    obsObject.observationId = '';
-                }
-                
-            }
-
-            await DataStorageLocal.saveDataToAsync(Constant.OBSERVATION_DATA_OBJ,JSON.stringify(obsObject));
-            if(fromScreen1.current === "quickVideo") {
+            if(ObservationModel.observationData.fromScreen === "quickVideo") {
                 navigation.navigate('ObservationComponent');
             } else {
                 navigation.navigate('CategorySelectComponent');
             }
-                        
+            
         }
         
     }
@@ -167,18 +166,19 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
     // Navigates to previous screen
     const navigateToPrevious = () => {      
         
-        if(fromScreen1.current==='quickVideo'){
-            navigation.navigate('QuickVideoComponent');  
-        } else {
-            navigation.navigate('ObservationsListComponent');  
-        }
+        // if(ObservationModel.observationData === 'quickVideo'){
+        //     navigation.navigate('QuickVideoComponent');  
+        // } else {
+        //     navigation.navigate('ObservationsListComponent');  
+        // }
+        navigation.goBack()
           
     }
 
     // In search dropdown, After selecting the pet sets the pet to observation
     const selectPetAction = (item) => {
-       set_selectedPet(item);
-       set_nxtBtnEnable(true);
+        set_selectedPet(item);
+        set_nxtBtnEnable(true);
     };
 
     // Popup Actions
@@ -197,7 +197,6 @@ const  AddOBSSelectPetComponent = ({navigation, route, ...props }) => {
             popUpMessage = {popUpMessage}
             popUpAlert = {popUpAlert}
             isPopUp = {isPopUp}
-            fromScreen = {fromScreen}
             navigateToPrevious = {navigateToPrevious}
             submitAction = {submitAction}
             selectPetAction = {selectPetAction}

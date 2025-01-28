@@ -3,10 +3,11 @@ import { View, BackHandler } from 'react-native';
 import UpdatePetParentAddressUI from './updatePetParentAddressUI';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import * as Constant from "./../../utils/constants/constant";
 import * as DataStorageLocal from './../../utils/storage/dataStorageLocal';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
 
 let trace_inUpdatePetParentAddressScreen;
 let trace_Edit_PAddress_API_Complete;
@@ -28,6 +29,11 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
     const [isNavigate, set_isNavigate] = useState(undefined);
     const [isEditable, set_isEditable] = useState(false);
     const [addressMOBJ, set_addressMOBJ] = useState(false);
+    const [popupId, set_popupId] = useState(0);
+    const [prefObj, set_prefObj] = useState(undefined);
+    const [prefTimeText, set_prefTimeText] = useState(undefined);
+    const [weightUnitId, set_weightUnitId] = useState(1)
+    const [unitId, set_unitId] = useState(4);
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
@@ -80,8 +86,21 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
         if(route.params?.petParentAddress) {
             set_petParentAddress(route.params?.petParentAddress);
         }
+
+        if(route.params?.prefObj) {
+            set_prefObj(route.params?.prefObj)
+        }
         
-    }, [route.params?.fullName, route.params?.phoneNo,route.params?.firstName,route.params?.secondName,route.params?.isNotification,route.params?.secondaryEmail, route.params?.petParentAddress]);
+    }, [route.params?.fullName, route.params?.phoneNo,route.params?.firstName,route.params?.secondName,route.params?.isNotification,route.params?.secondaryEmail, route.params?.petParentAddress,route.params?.prefObj]);
+
+    useEffect(() => {
+
+        if(route.params?.prefObj) {
+            set_unitId(route.params?.prefObj.preferredFoodRecUnitId)
+            set_prefTimeText(route.params?.prefObj.preferredFoodRecTime);
+            set_weightUnitId(route.params?.prefObj.preferredWeightUnitId);
+        }
+    }, [route.params?.prefObj]);
 
     const handleBackButtonClick = () => {
         navigateToPrevious();
@@ -103,13 +122,6 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
 
     const submitAction = async (addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef) => {
 
-        // if(addLine1Ref && cityRef && stateRef && zipCodeRef && countryRef) {
-        //     validatePetParentAddress(addLine1Ref,addLine2Ref,cityRef,stateRef,zipCodeRef,countryRef);
-        // } else {
-
-        // }
-
-        
         updateAddress(petParentAddress);
 
     };
@@ -123,36 +135,24 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
         set_isLoading(true);
         isLoadingdRef.current = 1;
 
-        let addressServiceObj = await ServiceCalls.validateAddress(obj);
+        let apiMethod = apiMethodManager.VALIDATE_ADDRESS;
+        let apiService = await apiRequest.postData(apiMethod,obj,Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
-
-        if (addressServiceObj && addressServiceObj.invalidData) {
-            firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'Entered Invalid Address ');
-            createPopup(Constant.ALERT_DEFAULT_TITLE, 'Invalid Address', true);
-            return;
-        }
-
-        if (addressServiceObj && !addressServiceObj.isInternet) {
-            firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'IsInternet ' + addressServiceObj.isInternet);
-            createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
-            return;
-        }
-
-        if (addressServiceObj && addressServiceObj.statusData) {
-            
-            if(addressServiceObj.responseData && addressServiceObj.responseData.isValidAddress === 1) {
+        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            if(apiService.data.isValidAddress === 1 && apiService.data.address) {
 
                 let addObj = {
                     "addressId" : null,
-                    "address1" : addressServiceObj.responseData.address.address1,
+                    "address1" : apiService.data.address.address1,
                     "address2" : '',
-                    "city" : addressServiceObj.responseData.address.city,
-                    "state" : addressServiceObj.responseData.address.state,
-                    "country" : addressServiceObj.responseData.address.country,
-                    "zipCode" : addressServiceObj.responseData.address.zipCode,
-                    "timeZoneId" : addressServiceObj.responseData.address.timeZone.timeZoneId,
-                    "timeZone" : addressServiceObj.responseData.address.timeZone.timeZoneName,
+                    "city" : apiService.data.address.city,
+                    "state" : apiService.data.address.state,
+                    "country" : apiService.data.address.country,
+                    "zipCode" : apiService.data.address.zipCode,
+                    "timeZoneId" : apiService.data.address.timeZone.timeZoneId,
+                    "timeZone" : apiService.data.address.timeZone.timeZoneName,
                     "addressType" : 1,
                     "isPreludeAddress" : 0
                }
@@ -161,17 +161,22 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
 
             } else {
                 firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'error : Invalid Address');
-                createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_UPDATE_ERROR_MSG, true);
+                createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_UPDATE_ERROR_MSG, true,0);
             }
-            
+          
+        } else if(apiService && apiService.isInternet === false) {
+            firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'IsInternet ' + ": No Internet");
+            createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true,0);         
 
-        } else {
-            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_UPDATE_ERROR_MSG, true);
-        }
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true,0);
+            firebaseHelper.logEvent(firebaseHelper.event_change_name_api_fail, firebaseHelper.screen_change_name, "User Name Api failed", 'error');
 
-        if (addressServiceObj && addressServiceObj.error) {
+        } else if(apiService && apiService.logoutError !== null) {
+        }else {
             firebaseHelper.logEvent(firebaseHelper.event_registration_Address_api_fail, firebaseHelper.screen_register_parent_address, "User address Update Failed ", 'error : '+ addressServiceObj.error && addressServiceObj.error.length > 0 ? addressServiceObj.error[0].code : '');
-            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
+            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true,0);
+
         }
 
     };
@@ -181,7 +186,7 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
         set_isLoading(true);
         isLoadingdRef.current = 1;
         let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let userId = await DataStorageLocal.getDataFromAsync(Constant.USER_ID);
+        let userId = UserDetailsModel.userDetailsData.userRole.UserId;
 
         let jsonTemp = {
             ClientID: "" + clientIdTemp,
@@ -189,51 +194,43 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
             FirstName: firstName,
             LastName: secondName ,
             PhoneNumber: phnNo,
+            IsdCodeId: route.params?.isdCode_Id? route.params?.isdCode_Id :'',
             SecondaryEmail:secondaryEmail,
             NotifyToSecondaryEmail:isNotification,
-            PetParentAddress : objAddress
+            PetParentAddress : objAddress,
+            PreferredFoodRecTime : prefTimeText,
+            PreferredWeightUnitId : weightUnitId,
+            PreferredFoodRecUnitId :  unitId
         };
-
         trace_Edit_PAddress_API_Complete = await perf().startTrace('t_ChangeClient_PP_Address_API');
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let addServiceObj = await ServiceCalls.changeClientInfo(jsonTemp,token);
+
+        let apiMethod = apiMethodManager.CHANGE_CLIENT_INFO;
+        let apiService = await apiRequest.postData(apiMethod,jsonTemp,Constant.SERVICE_MIGRATED);
         stopFBTrace();
         set_isLoading(false);
         isLoadingdRef.current = 0; 
-
-        if(addServiceObj && addServiceObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-          
-        if(addServiceObj && !addServiceObj.isInternet){
-            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);  
-            return;
-        }
-          
-        if(addServiceObj && addServiceObj.statusData){
-            if(addServiceObj.responseData && addServiceObj.responseData.Key){
+        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            if(apiService.data.Key){
                 set_isNavigate(true);
-                createPopup(Constant.ALERT_INFO,Constant.CHANGE_ADDRESS_SUCCESS,true);  
-            } else {                 
+                createPopup(Constant.ALERT_INFO,Constant.CHANGE_ADDRESS_SUCCESS,true,0);  
+            } else {
                 firebaseHelper.logEvent(firebaseHelper.event_change_PPAddress_api_fail, firebaseHelper.screen_edit_parent_address, "Change Pet parent Api Failed ", '');
                 set_isNavigate(false);
-                createPopup('Alert',Constant.ADDRESS_ERROR_UPDATE,true);        
+                createPopup('Alert',Constant.ADDRESS_ERROR_UPDATE,true,0);   
             }
-          
+        } else if(apiService && apiService.isInternet === false) {
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,0);          
+            return;
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true,0); 
+            firebaseHelper.logEvent(firebaseHelper.event_change_PPAddress_api_fail, firebaseHelper.screen_edit_parent_address, "Change Pet parent Api Failed ", 'error : ' + apiService.error.errorMsg);
+            set_isNavigate(false);
+            
         } else {
             firebaseHelper.logEvent(firebaseHelper.event_change_PPAddress_api_fail, firebaseHelper.screen_edit_parent_address, "Change Pet parent Api Failed ", '');
             set_isNavigate(false);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);              
-        }
-          
-        if(addServiceObj && addServiceObj.error) {
-
-            firebaseHelper.logEvent(firebaseHelper.event_change_PPAddress_api_fail, firebaseHelper.screen_edit_parent_address, "Change Pet parent Api Failed ", '');
-            set_isNavigate(false);
-            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-                
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,0); 
         }
 
     };
@@ -242,14 +239,15 @@ const UpdatePetParentAddressComponent = ({ navigation, route, ...props }) => {
         await trace_Edit_PAddress_API_Complete.stop();
       };
 
-    const createPopup = (title, msg, isPop) => {
+    const createPopup = (title, msg, isPop,popId) => {
         set_popUpAlert(title);
         set_popUpMessage(msg);
         set_isPopUp(isPop);
         popIdRef.current = 1;
+        set_popupId(popId);
     };
 
-    const popOkBtnAction = () => {
+    const popOkBtnAction = async () => {
         set_isPopUp(false);
         popIdRef.current = 0;
         set_popUpMessage('');

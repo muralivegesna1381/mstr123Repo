@@ -11,8 +11,6 @@ import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../utils/constants/constant";
 import GooglePlacesComponent from "./../../utils/googlePlacesComponent/googlePlacesComponent";
 
-let downArrowImg = require('./../../../assets/images/otherImages/svg/downArrowGrey.svg');
-
 const  UpdatePetParentAddressUI = ({route, ...props }) => {
 
   const [addLine1, set_addLine1] = useState(undefined);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {View,StyleSheet,Text,Image} from 'react-native';
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
@@ -25,8 +25,6 @@ const  DeviceValidationUI = ({route, ...props }) => {
     const [isDeviceValidated, set_isDeviceValidated] = useState(undefined);
     const [isLoading, set_isLoading] = useState(true);
     const [deviceType, set_deviceType] = useState(undefined);
-
-    let isBackSpace = useRef(false);
 
     useEffect(() => {
       set_isPopUp(props.isPopUp);

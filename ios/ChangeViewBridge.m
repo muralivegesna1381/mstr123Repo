@@ -39,4 +39,7 @@ RCT_EXPORT_METHOD(changeToNativeView: (NSArray *)urls callback:(RCTResponseSende
  // RCT_EXPORT_VIEW_PROPERTY(onBarCodeCaptured, RCTDirectEventBlock);
   
 }
+- (void)changeToNativeView {
+}
+
 @end

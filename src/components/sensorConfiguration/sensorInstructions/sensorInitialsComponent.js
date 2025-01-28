@@ -1,5 +1,5 @@
-import React, {useState,useEffect,useRef} from 'react';
-import {Text, View,Platform,PermissionsAndroid,StyleSheet,BackHandler} from 'react-native';
+import React, {useState,useEffect} from 'react';
+import {Text, View,Platform,StyleSheet,BackHandler} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import fonts from '../../../utils/commonStyles/fonts'
@@ -12,7 +12,6 @@ import ImageSequence from 'react-native-image-sequence';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 
-let hpn1Img = require( "./../../../../assets/images/sensorImages/png/hpn1ConnectImg.png");
 let trace_inSensorsInitialcreen;
 
 const SensorInitialComponent = ({navigation, route, ...props }) => {

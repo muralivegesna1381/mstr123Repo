@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, BackHandler } from 'react-native';
+import { BackHandler } from 'react-native';
 import SelectBSCScoringUI from './SelectBSCScoringUI';
 import * as Constant from "./../../utils/constants/constant";
-import * as DataStorageLocal from './../../utils/storage/dataStorageLocal';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
 
 const SelectBSCScoringComponent = ({ navigation, route, ...props }) => {
 
@@ -52,50 +52,43 @@ const SelectBSCScoringComponent = ({ navigation, route, ...props }) => {
         set_isLoading(true);
         isLoadingdRef.current = 1;
         trace_Get_Pet_ImageScoring_Scales_API_Complete = await perf().startTrace('t_Image_Scoring_Get_Pet_Image_Scoring_Scales_API');
-        let petObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
-        petObj = JSON.parse(petObj);
+        let petObj = AppPetsData.petsData.defaultPet;
         set_defaultPetObj(petObj);
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        getPetImageScoringScales(petObj.petID, token);
+        getPetImageScoringScales(petObj.petID);
     };
 
-    const getPetImageScoringScales = async (petId, token) => {
+    const getPetImageScoringScales = async (petId,) => {
 
-        let getImgScoreServiceObj = await ServiceCalls.getPetImageScoringScales(petId, token);
+        let apiMethod = apiMethodManager.Get_PETIMAGE_SCALES + petId;
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
-        stopFBTraceGetPetImageScoringScales();
-
-        if (getImgScoreServiceObj && getImgScoreServiceObj.logoutData) {
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-
-        if (getImgScoreServiceObj && !getImgScoreServiceObj.isInternet) {
-            createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
-            return;
-        }
-
-        if (getImgScoreServiceObj && getImgScoreServiceObj.statusData) {
-
-            if (getImgScoreServiceObj.responseData && getImgScoreServiceObj.responseData.length > 0) {
-                set_scoringArray(getImgScoreServiceObj.responseData);
+        stopFBTraceGetPetImageScoringScales();                
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+                
+            if (apiService.data.imageScoringScales && apiService.data.imageScoringScales.length > 0) {
+                set_scoringArray(apiService.data.imageScoringScales);
             } else {
                 set_scoringArray([]);
-                firebaseHelper.logEvent(firebaseHelper.event_image_scoring_pet_image_scoring_scales_api_success, firebaseHelper.screen_image_based_score, "Get Pet Image Scoring scales Api success", "Response length: " + getImgScoreServiceObj.responseData.length);
+                firebaseHelper.logEvent(firebaseHelper.event_image_scoring_pet_image_scoring_scales_api_success, firebaseHelper.screen_image_based_score, "Get Pet Image Scoring scales Api success", "Response length: " + 'No records');
             }
+                
+        } else if(apiService && apiService.isInternet === false) {
+    
+            createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
+            return;
 
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true);
+            firebaseHelper.logEvent(firebaseHelper.event_image_scoring_pet_image_scoring_scales_api_failure, firebaseHelper.screen_image_based_score, "Get Pet Image Scoring scales Api failed", "error : " + apiService.error.errorMsg);
+            
         } else {
             firebaseHelper.logEvent(firebaseHelper.event_image_scoring_pet_image_scoring_scales_api_failure, firebaseHelper.screen_image_based_score, "Get Pet Image Scoring scales Api failed", "Service Status : false");
             createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
-        }
 
-        if (getImgScoreServiceObj && getImgScoreServiceObj.error) {
-            let errors = getImgScoreServiceObj.error.length > 0 ? getImgScoreServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_image_scoring_pet_image_scoring_scales_api_failure, firebaseHelper.screen_image_based_score, "Get Pet Image Scoring scales Api failed", "error : " + errors);
-            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
         }
+        
     }
 
     const imageScoringBCSScoringPageSessionStart = async () => {
@@ -144,12 +137,6 @@ const SelectBSCScoringComponent = ({ navigation, route, ...props }) => {
         firebaseHelper.logEvent(firebaseHelper.event_image_scoring_button_trigger, firebaseHelper.screen_image_based_score, "User selected item", '' + itemName);
         navigation.navigate('ImageScoringMainComponent', { scoreObj: item });
 
-        // //Redirect to new BFI Scoring screen for dog
-        // if (defaultPetObj.speciesId === "1" && item.scoringType === "BFI Scoring") {
-        //     navigation.navigate('PetListBFIScoringScreen');
-        // } else {
-        //     navigation.navigate('ImageScoringMainComponent', { scoreObj: item });
-        // }
     };
 
     return (

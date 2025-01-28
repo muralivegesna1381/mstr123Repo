@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet,TouchableOpacity, Image, Text } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import BottomComponent from "../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from '../../utils/commonComponents/headerComponent';
-import fonts from '../../utils/commonStyles/fonts'
 import AlertComponent from '../../utils/commonComponents/alertComponent';
 import CommonStyles from '../../utils/commonStyles/commonStyles';
 import TextInputComponent from '../../utils/commonComponents/textInputComponent';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import * as Constant from "../../utils/constants/constant";
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
-
-let tickImg = require("./../../../assets/images/otherImages/svg/feedingTick.svg");
-let notTickImg = require("./../../../assets/images/otherImages/svg/feedingTickEmpty.svg");
 
 const UpdateSecondaryEmailUI = ({ route, ...props }) => {
 
@@ -26,7 +22,6 @@ const UpdateSecondaryEmailUI = ({ route, ...props }) => {
     const [enableRemoveBtn, set_enableRemoveBtn] = useState(false);
 
     let isNotiEnable = useRef(false);
-    // let isEmailValid = useRef(false);
 
     // Setting the Existing valuse from component class
     useEffect(() => {

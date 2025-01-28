@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TouchableWithoutFeedback,ImageBackground,ScrollView} from 'react-native';
+import React, { useState } from 'react';
+import {View,StyleSheet,Text,TouchableWithoutFeedback,ScrollView} from 'react-native';
 import BottomComponent from "./../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
@@ -7,6 +7,8 @@ import fonts from './../../../utils/commonStyles/fonts'
 import CommonStyles from './../../../utils/commonStyles/commonStyles';
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
 import * as Constant from "./../../../utils/constants/constant";
+
+import ApproxTimerImg from "./../../../../assets/images/timerImages/svg/approxTimer.svg";
 
 const  ApproxTimeUI = ({route, ...props }) => {
 
@@ -65,12 +67,7 @@ const  ApproxTimeUI = ({route, ...props }) => {
                         <TouchableWithoutFeedback  onPress={() => selectTimeAction('20',0)}>
                             <View style={selectedIndex === 0 ? [styles.activityBckView] : [styles.unActivityBckView]}>
                                 <View style={styles.imgBckViewStyle}>
-                                    <ImageBackground
-                                        source={require("./../../../../assets/images/timerImages/svg/approxTimer.svg")}
-                                        style={styles.petImgStyle}
-                                        resizeMode = 'contain'
-                                        >
-                                    </ImageBackground>
+                                    <ApproxTimerImg width={wp('4%')} height={hp('4%')}/>
                                 </View>
 
                                 <Text style={[styles.name]}>{'20 Minutes'}</Text>
@@ -81,12 +78,7 @@ const  ApproxTimeUI = ({route, ...props }) => {
                             <View style={selectedIndex === 1 ? [styles.activityBckView] : [styles.unActivityBckView]}>
                                 
                                 <View style={styles.imgBckViewStyle}>
-                                    <ImageBackground
-                                        source={require("./../../../../assets/images/timerImages/svg/approxTimer.svg")}
-                                        style={styles.petImgStyle}
-                                        resizeMode = 'contain'
-                                        >
-                                    </ImageBackground>
+                                    <ApproxTimerImg width={wp('4%')} height={hp('4%')}/>
                                 </View>
 
                                 <Text style={[styles.name]}>{'40 Minutes'}</Text>
@@ -101,12 +93,7 @@ const  ApproxTimeUI = ({route, ...props }) => {
                             <View style={selectedIndex === 2 ? [styles.activityBckView] : [styles.unActivityBckView]}>
                                 
                                 <View style={styles.imgBckViewStyle}>
-                                    <ImageBackground
-                                        source={require("./../../../../assets/images/timerImages/svg/approxTimer.svg")}
-                                        style={styles.petImgStyle}
-                                        resizeMode = 'contain'
-                                        >
-                                    </ImageBackground>
+                                    <ApproxTimerImg width={wp('4%')} height={hp('4%')}/>
                                 </View>
 
                                 <Text style={[styles.name]}>{'60 Minutes'}</Text>
@@ -117,12 +104,7 @@ const  ApproxTimeUI = ({route, ...props }) => {
                             <View style={selectedIndex === 3 ? [styles.activityBckView] : [styles.unActivityBckView]}>
                                 
                                 <View style={styles.imgBckViewStyle}>
-                                    <ImageBackground
-                                        source={require("./../../../../assets/images/timerImages/svg/approxTimer.svg")}
-                                        style={styles.petImgStyle}
-                                        resizeMode = 'contain'
-                                        >
-                                    </ImageBackground>
+                                    <ApproxTimerImg width={wp('4%')} height={hp('4%')}/>
                                 </View>
 
                                 <Text style={[styles.name]}>{'90 Minutes'}</Text>
@@ -204,11 +186,6 @@ const  ApproxTimeUI = ({route, ...props }) => {
         textAlign: "center",
         color:'black',
         marginTop: hp("1%"),
-    },
-    
-    petImgStyle: {
-        width: wp("6%"),
-        aspectRatio :1,
     },
 
     imgBckViewStyle : {

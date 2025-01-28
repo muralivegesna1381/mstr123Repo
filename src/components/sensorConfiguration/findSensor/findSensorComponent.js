@@ -147,14 +147,6 @@ const FindSensorComponent = ({navigation, route, ...props }) => {
   const backBtnAction = () => {
 
     navigation.pop();
-
-    // if(popIdRef.current === 0){
-    //   if(fromScreen==='configured'){
-    //     navigation.navigate('WifiListHPN1Component');
-    //   } else {
-    //     navigation.navigate('SensorChargeConfirmationComponent');
-    //   }
-    // }
   
   }
   

@@ -1,20 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { BackHandler, FlatList, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
+import { BackHandler, FlatList, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import fonts from '../../../utils/commonStyles/fonts';
 import * as Constant from "../../../utils/constants/constant";
-import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
+import perf from '@react-native-firebase/perf';
+
+import EditImg from "./../../../../assets/images/bfiGuide/svg/edit.svg";
+import NoRecodsFoundImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
 
 const SubmittedScoreUI = ({ route, ...props }) => {
+
   const [isRecords, set_isRecords] = useState(true);
   const [dataArray, set_dataArray] = useState(undefined);
 
   var screenName = useRef('Scores');
   let trace_submitted_scores_Screen;
-
-  
 
   // Setting the instructions data to the UI
   useEffect(() => {
@@ -68,26 +70,22 @@ const SubmittedScoreUI = ({ route, ...props }) => {
       <View>
         <TouchableOpacity>
           <View style={styles.item}>
-            <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between', alignItems: 'center', marginVertical: wp('2%'), width: wp('60%'), height: hp('3%') }}>
+            <View style={{ flexDirection: 'row', width: wp('80%'), justifyContent: 'space-between', alignItems: 'center', marginVertical: wp('2%'), width: wp('60%'), height: hp('3%') }}>
 
-              <View style={{ flexDirection: 'row', flex: 1 }}>
+              <View style={{ flexDirection: 'row' }}>
                 <Text style={styles.textStyle}>{item.scoreDate}</Text>
                 <Text style={styles.textStyle}>{item.scoreTime}</Text>
-
               </View>
 
-              <View style={{ flexDirection: 'row', flex: 0.6 }}>
-                <View
-                  style={Platform.isPad === true ? [styles.scoreItemBgTab] : [styles.scoreItemBg]}>
-                  <ImageBackground resizeMode="contain" style={[styles.ratingImage2, {}]}
-                    source={item.scoreImg}
-                  />
+              <View style={{ flexDirection: 'row' }}>
+                <View style={Platform.isPad === true ? [styles.scoreItemBgTab] : [styles.scoreItemBg]}>
+                  <item.scoreImg width ={wp("8%")} height ={hp("4%")} style={[styles.ratingImage2, {}]}/>
                   <Text style={Platform.isPad === true ? [styles.textStyleWhiteTab] : [styles.textStyleWhite]}>{item.scoreValue}</Text>
                 </View>
 
                 {item.editScore ?
                   <TouchableOpacity onPress={() => { navigateToScorePage(item, index); }}>
-                    <Image resizeMode="contain" style={[styles.editImageStyle, {}]} source={require("./../../../../assets/images/bfiGuide/svg/edit.svg")} />
+                    <EditImg width={wp('3%')} height={hp('3%')} style={[styles.editImageStyle, {}]}/>
                   </TouchableOpacity> : null}
               </View>
 
@@ -124,7 +122,7 @@ const SubmittedScoreUI = ({ route, ...props }) => {
           keyExtractor={(item, index) => `${index}`} />
           :
           <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("15%"), }}>
-            <Image style={[CommonStyles.nologsDogStyle]} source={require("./../../../../assets/images/dogImages/noRecordsDog.svg")}></Image>
+            <NoRecodsFoundImg style={[CommonStyles.nologsDogStyle]}/>
             <Text style={[CommonStyles.noRecordsTextStyle, { marginTop: hp("2%") }]}>{Constant.NO_RECORDS_LOGS}</Text>
             <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
           </View>}
@@ -142,6 +140,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white'
   },
+
   item: {
     flexDirection: "row",
     alignItems: 'flex-start',
@@ -154,26 +153,20 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     flex: 1
   },
-  ratingImage1: {
-    resizeMode: 'contain',
-    marginLeft: hp('2%'),
-    marginRight: hp('1%'),
-    aspectRatio: 1,
-    height: hp('7%'),
-    marginTop: hp("0.5%")
-  },
 
   textStyle: {
     fontSize: fonts.fontMedium,
     marginLeft: wp('3%'),
-    marginRight: wp('3%'),
+    // //marginRight: wp('3%'),
     ...CommonStyles.textStyleSemiBold
   },
+
   scoreItemBgTab: {
     marginLeft: wp('8%'),
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   ratingImage2: {
     height: hp("5%"),
     width: wp("8%"),
@@ -187,12 +180,12 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     height: hp('3%'),
   },
+
   scoreItemBg: {
     marginLeft: wp('5%'),
     justifyContent: 'center',
     alignItems: 'center',
   },
-
 
   textStyleWhite: {
     color: "#FFFFFF",
@@ -200,7 +193,6 @@ const styles = StyleSheet.create({
     ...CommonStyles.textStyleBold,
     marginLeft: wp('5.5%'),
     marginRight: wp('6%')
-
   },
 
   textStyleWhiteTab: {

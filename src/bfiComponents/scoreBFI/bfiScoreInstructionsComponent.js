@@ -7,10 +7,20 @@ import HeaderComponent from '../../utils/commonComponents/headerComponent';
 import LoaderComponent from "../../utils/commonComponents/loaderComponent";
 import * as Constant from "../../utils/constants/constant";
 import * as DataStorageLocal from '../../utils/storage/dataStorageLocal';
-import * as AuthoriseCheck from '../../utils/authorisedComponent/authorisedComponent';
-import * as ServiceCalls from '../../utils/getServicesData/getServicesData.js';
 import AlertComponent from '../../utils/commonComponents/alertComponent';
 import * as firebaseHelper from '../../utils/firebase/firebaseHelper';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import perf from '@react-native-firebase/perf';
+
+import ArrowImg from "./../../../assets/images/otherImages/svg/arrow.svg";
+import FailedImg from "./../../../assets/images/otherImages/svg/failedXIcon.svg";
+import BFI20Img from "./../../../assets/images/bfiBcsImages/20.svg";
+import BFI30Img from "./../../../assets/images/bfiBcsImages/30.svg";
+import BFI40Img from "./../../../assets/images/bfiBcsImages/40.svg";
+import BFI50Img from "./../../../assets/images/bfiBcsImages/50.svg";
+import BFI60Img from "./../../../assets/images/bfiBcsImages/60.svg";
+import BFI70Img from "./../../../assets/images/bfiBcsImages/70.svg";
 
 const BFIScoreInstructions = ({navigation, route, ...props }) => {
   const imageColorArr=[
@@ -30,12 +40,12 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
     '#F7DEDF',
   ]
   const dogImgData=[
-    require("./../../../assets/images/bfiBcsImages/20.svg"),
-    require("./../../../assets/images/bfiBcsImages/30.svg"),
-    require("./../../../assets/images/bfiBcsImages/40.svg"),
-    require("./../../../assets/images/bfiBcsImages/50.svg"),
-    require("./../../../assets/images/bfiBcsImages/60.svg"),
-   require("./../../../assets/images/bfiBcsImages/70.svg"),
+    require("./../../../assets/images/bfiBcsImages/20.png"),
+    require("./../../../assets/images/bfiBcsImages/30.png"),
+    require("./../../../assets/images/bfiBcsImages/40.png"),
+    require("./../../../assets/images/bfiBcsImages/50.png"),
+    require("./../../../assets/images/bfiBcsImages/60.png"),
+    require("./../../../assets/images/bfiBcsImages/70.png"),
   ]
   const [popupMessage, set_popupMessage] = useState(undefined);
   const [isPopUp, set_isPopUp] = useState(false);
@@ -48,11 +58,13 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
 
   //Android Physical back button action
   useEffect(() => {
+
     initialSessionStart();
     firebaseHelper.reportScreen(firebaseHelper.screen_bfi_scoring_Instructions);
     firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_scoring_Instructions, "User in scoring instructions Screen", '');
 
    getBFIInstructionsDataFromLocal();
+  //  getBfiImageScoresData()
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     return () => {
       initialSessionStop();
@@ -62,6 +74,8 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
   }, []);
 
   const getBFIInstructionsDataFromLocal = async() =>{
+
+    set_FlatListData(undefined)
     let data = await DataStorageLocal.getDataFromAsync(Constant.BFIINSTRUCTIONSDATA);
     data = JSON.parse(data)
     if(data === undefined || data === ''|| data === null){
@@ -69,11 +83,11 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
     }
     else{
       let obj;
-      for(let i=0;i<data.bfiImageScores.length; i++){
-       if(data.bfiImageScores[i].score === '<20' || data.bfiImageScores[i].score === '>70' || data.bfiImageScores[i].score === 'N/A' ){
+      for(let i=0;i<data.length; i++){
+       if(data[i].score === '<20' || data[i].score === '>70' || data[i].score === 'N/A' ){
        }
        else{
-         obj = data.bfiImageScores[i];
+         obj = data[i];
          mainData.current.push(obj)
        }
      }
@@ -106,46 +120,45 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
   const getBfiImageScoresData = async (speciesId) => {
     //setting array based on instruction type recieved
     set_isLoading(true);
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-    let serviceCallsObj = await ServiceCalls.getBfiImageScores(token);
-    if (serviceCallsObj && serviceCallsObj.logoutData) {
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
-    if (serviceCallsObj && !serviceCallsObj.isInternet) {
-      set_isLoading(false);
-      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, 'OK', false, true);
-      return;
-    }
-    if (serviceCallsObj && serviceCallsObj.statusData) {
-      set_isLoading(false);
-      if (serviceCallsObj.responseData.bfiImageScores.length > 0) {
-        await DataStorageLocal.saveDataToAsync(Constant.BFIINSTRUCTIONSDATA, JSON.stringify(serviceCallsObj.responseData));
+
+    let apiMethod = apiMethodManager.GET_BFI_IMAGE_SCORES;
+    let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
+    set_isLoading(false);
+    set_FlatListData(undefined);
+                    
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+                    
+      if (apiService.data.bfiImageScores.length > 0) {
+        await DataStorageLocal.saveDataToAsync(Constant.BFIINSTRUCTIONSDATA, JSON.stringify(apiService.data.bfiImageScores));
         let obj;
-        for(let i=0;i<serviceCallsObj.responseData.bfiImageScores.length; i++){
-         if(serviceCallsObj.responseData.bfiImageScores[i].score === '<20' || serviceCallsObj.responseData.bfiImageScores[i].score === '>70' || serviceCallsObj.responseData.bfiImageScores[i].score === 'N/A' ){
+        for(let i=0; i < apiService.data.bfiImageScores.length; i++){
+         if(apiService.data.bfiImageScores[i].score === '<20' || apiService.data.bfiImageScores[i].score === '>70' || apiService.data.bfiImageScores[i].score === 'N/A' ){
          }
          else{
-           obj = serviceCallsObj.responseData.bfiImageScores[i];
+           obj = apiService.data.bfiImageScores[i];
            mainData.current.push(obj)
          }
         }
         set_FlatListData(mainData.current)
       }
-      } else {
-      set_isLoading(false);
+
+    } else if(apiService && apiService.isInternet === false) {
+        
+      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, 'OK', false, true);
+                        
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+        
+      createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, 'OK', false, true);
+      firebaseHelper.logEvent(firebaseHelper.event_score_instructions_api , firebaseHelper.screen_bfi_scoring_Instructions, "getBfiImageScores_api Service failed", 'Service error : ' + apiService.error.errorMsg);
+
+    } else {
+        
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.CAPTURED_SUBMIT_IMAGES_FAIL, 'OK', false, true);
       firebaseHelper.logEvent(firebaseHelper.event_score_instructions_api, firebaseHelper.screen_bfi_scoring_Instructions, "getBfiImageScores_api Service failed", 'Service Status : false');
+        
     }
 
-    if (serviceCallsObj && serviceCallsObj.error) {
-      let errors = serviceCallsObj.error.length > 0 ? serviceCallsObj.error[0].code : ''
-      set_isLoading(false);
-      firebaseHelper.logEvent(firebaseHelper.event_score_instructions_api , firebaseHelper.screen_bfi_scoring_Instructions, "getBfiImageScores_api Service failed", 'Service error : ' + errors);
-    }
   };
-
 
   const renderItem = ({ item, index }) => {
     return (
@@ -162,8 +175,7 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
               <Text style={styles.textStyleHeaderSmall} >Body fat</Text>
           </View> 
         <Image style={[styles.ratingImage1]} source={ dogImgData[index] } />
-        <Image style={[ styles.arrowImage1]} source={require("./../../../assets/images/otherImages/svg/arrow.svg")} />
-
+        <ArrowImg style={[ styles.arrowImage1]}/>
       </TouchableOpacity>
     );
    
@@ -189,7 +201,7 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
       <View style={{ width: wp('100%'), justifyContent: 'center' }}>
             <Text style={[styles.detailsTxtStyle]}>{item.header}</Text>
            {
-             addDescView(item.description) 
+            //  addDescView(item.description) 
            }
           </View>
      </View>
@@ -220,7 +232,7 @@ const BFIScoreInstructions = ({navigation, route, ...props }) => {
       {isDetailsView === true ? <View style={[styles.popSearchViewStyle]}>
         <View style={{ width: wp('85%'), height: hp('5%'), alignItems: 'flex-end'}}>
           <TouchableOpacity onPress={() => set_isDetailsView(false)}>
-            <Image style={styles.closeBtnStyle} source={require("./../../../assets/images/otherImages/svg/failedXIcon.svg")}></Image>
+            <FailedImg width={wp('6%')} height={hp('6%')} style={styles.closeBtnStyle}/>
           </TouchableOpacity>  
         </View>
         <View style={{width: wp('100%'),marginBottom: hp('1%'), alignSelf: 'center' }}>
@@ -271,10 +283,11 @@ const styles = StyleSheet.create({
     },
     ratingImage1: {
       resizeMode: 'contain',
-      aspectRatio: 1,
-      height: hp('10%'),
-      marginLeft:wp('20%'),
-      marginRight:wp('5%'),
+      //aspectRatio: 1,
+      height: hp('12%'),
+      width: wp('25%'),
+     marginLeft:wp('20%'),
+      marginRight:wp('15%'),
       alignSelf: 'center',
       justifyContent: 'center'
     },

@@ -138,7 +138,7 @@ const uploadVideoToFB = async (videoObj,compressedFile,petId,clientId,behId,mode
     let behIdT = behId;
     let dte = moment(new Date()).format("YYYYMMDDHHmmss");
     let medianame = videoObj.fileName.replace('/r','/')
-    let filename = "Observations_Videos/"+ clientId + '_'+ petId.toString() + '_' + behIdT.toString() + dte+ '_' +medianame;
+    let filename = "Observations_Videos/"+ medianame;
     let fileUri = decodeURI(compressedFile)
 
     return new Promise(function(resolve, reject) {
@@ -207,8 +207,9 @@ const uploadThumnailToFB = async (videoObj,thnumImage,petId,clientId,behId,modeO
 
     let questId = behId;
     let dte = moment(new Date()).format("YYYYMMDDHHmmss");
-    let medianame = videoObj.fileName.replace('/r','/')
-    let filename = "Observations_Thumbnails/"+ clientId + '_'+ petId.toString() + '_' + questId.toString() + dte + '.jpg';
+    let medianame = videoObj.fileName.replace('/r','/');
+    medianame = medianame.slice(0, -4)
+    let filename = "Observations_Thumbnails/"+ medianame + '.jpg';
     
     return new Promise(function(resolve, reject) {
         const storageRef = storage().ref(filename)

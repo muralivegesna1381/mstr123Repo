@@ -9,6 +9,9 @@ import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../utils/constants/constant"
 import AlertComponent from '../../utils/commonComponents/alertComponent';
 
+import RadioBtnSelected from "./../../../assets/images/scoreImages/eRadioSelected.svg";
+import RadioBtnUnSelected from "./../../../assets/images/scoreImages/eRadioUnSel.svg";
+
 const EatingEnthusiasticUI = ({route, ...props }) => {
 
     const [isLoading, set_isLoading] = useState(false);
@@ -53,9 +56,8 @@ const EatingEnthusiasticUI = ({route, ...props }) => {
         return (
            <>
             <TouchableOpacity style={styles.tableContentViewStyle} onPress={() => { selectAction('MOST ENTHUSED', item)}}>
-                <Image style={[styles.btnSelectStyle]} source={parseInt(selectedIndex.enthusiasmScaleValue ) - 1 === index ? require("./../../../assets/images/scoreImages/eRadioSelected.svg") : require("./../../../assets/images/scoreImages/eRadioUnSel.svg")}></Image>
-                <Text style={[styles.desTextStyle]}>{item.description}</Text>
-                {/* <Image style= {[styles.dogStyle]} source={{uri:item.imageUrl}}></Image> */}
+                {selectedIndex && parseInt(selectedIndex.enthusiasmScaleValue ) - 1 === index ? <RadioBtnSelected style={[styles.btnSelectStyle]}/> : <RadioBtnUnSelected style={[styles.btnSelectStyle]}/>}
+                <Text style={[styles.desTextStyle]}>{item.enthusiasmScaleValue}</Text>
                 <ImageBackground style= {[styles.dogStyle]} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => set_imgLoader(false)} resizeMode='contain' source={{uri:item.imageUrl}}>
                 {imgLoader === true && item && item.imageUrl ? (<View style={[CommonStyles.spinnerStyle]}><ActivityIndicator size="large" color="#37B57C"/></View>) : null}
                 </ImageBackground>
@@ -81,19 +83,24 @@ const EatingEnthusiasticUI = ({route, ...props }) => {
                 />
             </View>
 
-            <View style={{width:wp('100%'),height:hp('70%'),alignItems:'center',justifyContent:'center'}}>
+            <View style={{width:wp('100%'),height:hp('75%'),alignItems:'center',justifyContent:'center'}}>
 
-                <View style={{marginTop:hp('2%'),width:wp('80%'),}}>
+                {eatingEntArray && eatingEntArray.length > 0 ? <View style={{marginTop:hp('2%'),width:wp('80%'),}}>
                     <Text style={[styles.headerTextStyle]}>{specieId === "1" ? 'Thinking about the last meal you fed your dog, how would you rank your dog’s enjoyment of or enthusiasm for eating their food.' : 'Thinking about the last meal you fed your cat, how would you rank your cat’s enjoyment of or enthusiasm for eating their food.'}</Text>
-                </View>
+                </View> : null}
 
-                <FlatList
+                {eatingEntArray && eatingEntArray.length > 0 ? <FlatList
                   style={styles.flatcontainer}
                   data={eatingEntArray}
                   showsVerticalScrollIndicator={false}
                   renderItem={({ item,index}) => (_renderObservations(item,index))}
                   keyExtractor={(item,index) => "" + index}
-                />
+                /> :
+                <View style={{justifyContent:'center',alignItems:'center',height:hp('58%')}}>
+                    <Text style={CommonStyles.noRecordsTextStyle}>{"You're all caught up!"}</Text>
+                    <Text style={[styles.noRecordsTextStyle1]}>{'Please visit this space regularly to answer the image-based questions.'}</Text>
+                </View> 
+                }
 
             </View>
             
@@ -171,6 +178,14 @@ const EatingEnthusiasticUI = ({route, ...props }) => {
         color: "black",
         flex:2.0,
         marginLeft: wp('5%'),
+    },
+
+    noRecordsTextStyle1 : {
+        fontSize: fonts.fontMedium,
+        fontFamily: 'Barlow-Regular',
+        color: 'black', 
+        marginTop:hp('1%'),
+        textAlign:'center'
     },
 
   });

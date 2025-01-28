@@ -11,16 +11,18 @@ import * as DataStorageLocal from "../../../utils/storage/dataStorageLocal";
 import * as Constant from "../../../utils/constants/constant";
 import * as firebaseHelper from '../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from '../../../utils/getServicesData/getServicesData.js';
 import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import BuildEnv from './../../../config/environment/environmentConfig';
 import fonts from '../../../utils/commonStyles/fonts'
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+
+import RightArrowImg from "./../../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import SearchImg from "./../../../../assets/images/otherImages/svg/searchIcon.svg";
+import DownArrowImg from "../../../../assets/images/otherImages/svg/downArrowGrey.svg";
+let xImg = require('./../../../../assets/images/otherImages/png/xImg.png');
 
 const Environment = JSON.parse(BuildEnv.Environment());
-let rightArrowImg = require('./../../../../assets/images/otherImages/svg/downArrowGrey.svg');
-let searchImg = require('./../../../../assets/images/otherImages/svg/searchIcon.svg');
-let xImg = require('./../../../../assets/images/otherImages/png/xImg.png');
-let downArrowImg = require('./../../../../assets/images/otherImages/svg/downArrowGrey.svg');
 
 let trace_inPetNameScreen;
 
@@ -111,6 +113,7 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
             sJosnObj.current = sJson1;
 
             set_petFoodAmount(sJson1.foodIntake);
+            foodAmountRef.current = sJson1.foodIntake;
             set_petName(sJson1.petName);
             set_dietName(sJson1.dietName);
             set_dietID(sJson1.brandId);
@@ -131,49 +134,32 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
 
         set_isLoading(true);
         isLoadingdRef.current = 1;
-        let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 
-        let json = {
-            ClientID: "" + clientIdTemp,
-        };
-
-        let userDetailsServiceObj = await ServiceCalls.getClientInfo(json, token);
+        let apiMethodManage = apiMethodManager.GET_USER_PROFILE;
+        let apiService = await apiRequest.getData(apiMethodManage,'',Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
-
-        if (userDetailsServiceObj && userDetailsServiceObj.logoutData) {
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'Unautherised');
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-
-        if (userDetailsServiceObj && !userDetailsServiceObj.isInternet) {
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'Internet : false');
-            return;
-        }
-
-        if (userDetailsServiceObj && userDetailsServiceObj.statusData) {
-
-            if (userDetailsServiceObj.responseData) {
-                set_petParentObj(userDetailsServiceObj.responseData);
-                if (userDetailsServiceObj.responseData.petParentAddress && Object.keys(userDetailsServiceObj.responseData.petParentAddress).length !== 0) {
-                    set_petParentAddress(userDetailsServiceObj.responseData.petParentAddress);
-                    set_isParentAddress(true);
-                }
-            } else {
-                firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'No data found');
+        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            if(apiService.data.user && apiService.data.user.address) {
+                set_petParentAddress(apiService.data.user.address);
+                set_isParentAddress(true);
             }
 
+        } else if(apiService && apiService.isInternet === false) {
+
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'Internet : false');
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'error : ' + apiService.error.errorMsg);
+        
         } else {
+
             firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'Service Status : false');
+
         }
 
-        if (userDetailsServiceObj && userDetailsServiceObj.error) {
-            let errors = userDetailsServiceObj.error.length > 0 ? userDetailsServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'error : ' + errors);
-        }
     };
 
     const nextButtonAction = async () => {
@@ -224,10 +210,20 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
     const actionOnRowDietUnit = (item) => {
         //Captures diet name and diet id after selecting the diet from the list/
         if (item != "Cancel") {
-            set_petFoodAmount("")
-            set_petFoodAmountUnits(item)
+
+            if(petFoodAmountUnits !== item) {
+                set_petFoodAmount("");
+                foodAmountRef.current = 0;
+                set_isBtnEnable(false);
+            }
+            
+            set_petFoodAmountUnits(item);
         }
-        set_isDropdown(false)
+        set_isDropdown(false);
+
+        if (dietName && parseFloat(foodAmountRef.current) > 0) {
+            set_isBtnEnable(true);
+        } 
     };
 
     const searchFilterFunction = (text) => {
@@ -269,7 +265,7 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
                     set_isLoading(false);
                 }
             })
-            .catch(error => console.error(error));
+            .catch(error => {});
     };
 
     return (
@@ -304,7 +300,7 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
                                         </View>
                                     </View>
                                     <View style={{ justifyContent: 'center' }}>
-                                        <Image source={rightArrowImg} style={styles.imageStyle} />
+                                        <RightArrowImg style={styles.imageStyle}/>
                                     </View>
                                 </TouchableOpacity>
                             </View>
@@ -316,7 +312,7 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
                                         labelText={'Amount per day'}
                                         isEditable={true}
                                         widthValue={wp('50%')}
-                                        maxLengthVal={10}
+                                        maxLengthVal={6}
                                         keyboardType={'numeric'}
                                         autoCapitalize={false}
                                         setValue={(text) => {
@@ -341,7 +337,7 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
                                 <View style={{ width: wp("30%") }}>
                                     <TouchableOpacity style={styles.cBtnStyle} onPress={() => { set_isDropdown(!isDropdown) }}>
                                         <Text style={styles.cTextStyle}>{petFoodAmountUnits}</Text>
-                                        <Image source={downArrowImg} style={styles.downArrowStyle} />
+                                        <DownArrowImg style={styles.downArrowStyle}/>
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -363,11 +359,10 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
                 />
             </View>
 
-
             {isSearchView ? <View style={styles.popSearchViewStyle}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', width: wp('90%'), }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: wp('100%'), alignSelf:'center' }}>
                     <View style={styles.topView}>
-                        <Image source={searchImg} style={styles.searchImageStyle} />
+                        <SearchImg width={wp('3%')} height={hp('3%')} style={styles.searchImageStyle}/>
                         <TextInput
                             style={styles.textInputStyle}
                             onChangeText={(text) => searchFilterFunction(text)}
@@ -471,7 +466,7 @@ const styles = StyleSheet.create({
     },
     popSearchViewStyle: {
         height: hp("85%"),
-        width: wp("95%"),
+        width: wp("100%"),
         backgroundColor: '#DCDCDC',
         bottom: 0,
         position: 'absolute',

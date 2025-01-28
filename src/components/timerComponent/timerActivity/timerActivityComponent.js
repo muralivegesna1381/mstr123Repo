@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {View,BackHandler} from 'react-native';
+import {BackHandler} from 'react-native';
 import TimerActivityUI from './timerActivityUI';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';

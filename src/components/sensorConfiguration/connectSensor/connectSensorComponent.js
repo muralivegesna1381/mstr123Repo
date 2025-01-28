@@ -194,14 +194,12 @@ const  ConnectSensorComponent = ({ route, ...props }) => {
                     navigation.navigate('SensorCommandComponent',{commandType:'Force Sync',naviType:'ForceSync', deviceType:sensorType.current});
                 } else {
 
-                    
-
                     if(!statusType.current && (deviceModal.current === 'CMAS' || deviceModal.current === 'AGL2')){
                         set_isFirstTime(true);
                         setTimeout(() => {  
-                            isLoadingdRef.current = 0;
+                            isLoadingdRef.current = 0; 
                             set_isLoading(false);
-                            navigation.navigate('SensorWiFiListComponent',{periId:pheriId.current,defaultPetObj:defaultPetObj.current,isFromScreen:'connectSensor',devNumber:sensorNumber.current});
+                            navigation.navigate('SensorWiFiListComponent',{periId:data.peripheralId,defaultPetObj:defaultPetObj.current,isFromScreen:'connectSensor',devNumber:sensorNumber.current});
                         }, 3000);
                     } else {
                         set_isLoading(false);

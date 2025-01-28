@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, View, BackHandler } from 'react-native';
+import { StyleSheet, Text, View, BackHandler } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import CommonStyles from '../../utils/commonStyles/commonStyles';
 import fonts from '../../utils/commonStyles/fonts';
@@ -8,6 +8,12 @@ import HeaderComponent from '../../utils/commonComponents/headerComponent';
 import * as DataStorageLocal from '../../utils/storage/dataStorageLocal';
 import * as Constant from "../../utils/constants/constant";
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
+import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
+import perf from '@react-native-firebase/perf';
+
+import ReviewScoreBFIImg from "./../../../assets/images/bfiGuide/svg/review_score_bfi.svg";
+import ReviewCaptureImg from "./../../../assets/images/bfiGuide/svg/review_capture_images.svg";
 
 const ReviewComponent = ({ route, navigation }) => {
 
@@ -50,7 +56,7 @@ const ReviewComponent = ({ route, navigation }) => {
       navigation.navigate('PetListBFIScoringScreen', { isBfiListRefresh: true });
     } else {
       //send flag to hit pets api call. incase new pet added
-      let firstUser = await DataStorageLocal.getDataFromAsync(Constant.IS_FIRST_TIME_USER);
+      let firstUser = AppPetsData.petsData.isFirstUser;
       navigation.navigate('PetListComponent', { isFirstUser: firstUser });
     }
 
@@ -59,8 +65,7 @@ const ReviewComponent = ({ route, navigation }) => {
   const backBtnAction = async () => {
     //change logic as per role
     let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-    let userDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
-    userDetails = JSON.parse(userDetails)
+    let userDetails = UserDetailsModel.userDetailsData.userRole;
 
     if (clientId && clientId > 0) {
       navigation.navigate("DashBoardService");
@@ -109,9 +114,7 @@ const ReviewComponent = ({ route, navigation }) => {
       </View>
 
       <View style={[styles.container]}>
-
-        <Image style={[styles.ratingImage]} source={isFromScreen === 'bfiScore' ? require('./../../../assets/images/bfiGuide/svg/review_score_bfi.svg')
-          : require('./../../../assets/images/bfiGuide/svg/review_capture_images.svg')} />
+        {isFromScreen === 'bfiScore' ? <ReviewScoreBFIImg style={[styles.ratingImage]}/> : <ReviewCaptureImg style={[styles.ratingImage]}/>}
         <View style={CommonStyles.headerViewStyleBFIApp}>
           <Text style={styles.headerTextStyleBFIApp}>{isFromScreen === 'bfiScore' ? "Thank you for Scoring" : 'Thank you for capturing'}</Text>
           <Text style={styles.headerSubTextStyleBFIAppNormal}>{isFromScreen === 'bfiScore' ? 'Do you want to score for ' : 'No worries! We\'re processing your pet pics. You\'ll be notified soon.'}</Text>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, TouchableWithoutFeedback, ImageBackground, FlatList, TouchableOpacity, Image, BackHandler } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, StyleSheet, Text, TouchableWithoutFeedback, FlatList, TouchableOpacity, Image, BackHandler } from 'react-native';
 import BottomComponent from "./../../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
@@ -10,14 +10,15 @@ import * as Constant from "./../../../utils/constants/constant";
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+
+import Tickmg from "./../../../../assets/images/otherImages/svg/feedingTick.svg";
+import NoTickImg from "./../../../../assets/images/otherImages/svg/feedingTickEmpty.svg";
+import EAlertImg from "./../../../../assets/images/scoreImages/eAlert.svg";
 
 let trace_inPetFeedTimeScreen;
-let trace_FeedingTime_API_Complete;
-let tickImg = require("./../../../../assets/images/otherImages/svg/feedingTick.svg");
-let notTickImg = require("./../../../../assets/images/otherImages/svg/feedingTickEmpty.svg");
 
 const PetFeedingPreferencesComponentUI = ({ navigation, route, ...props }) => {
 
@@ -87,7 +88,7 @@ const PetFeedingPreferencesComponentUI = ({ navigation, route, ...props }) => {
                 set_isParentAddress(true);
             }
     
-            if (sJson.eatTimeArray.length) {
+            if (sJson.eatTimeArray && sJson.eatTimeArray.length) {
                 for (let i = 0; i < sJson.eatTimeArray.length; i++) {
                     tempArray.push(sJson.eatTimeArray[i].feedingPreferenceId)
                     tempAnswersArray.current.push(sJson.eatTimeArray[i]);
@@ -106,59 +107,41 @@ const PetFeedingPreferencesComponentUI = ({ navigation, route, ...props }) => {
 
     const getPetFeedingTime = async () => {
 
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
+        set_isLoading(true);
+        isLoadingdRef.current = 1;
 
-        if (token) {
-
-            trace_FeedingTime_API_Complete = await perf().startTrace('t_getPetFeedingPreferences_API');
-            set_isLoading(true);
-            isLoadingdRef.current = 1;
-
-            let getPetFeedServiceObj = await ServiceCalls.getPetFeedingPreferences(token);
-            set_isLoading(false);
-            isLoadingdRef.current = 0;
-            stopFBTrace();
-            
-            if(getPetFeedServiceObj && getPetFeedServiceObj.logoutData){
-                firebaseHelper.logEvent(firebaseHelper.event_SOB_petFeeding_api_fail, firebaseHelper.screen_SOB_petFeeding, "Gettind Feeding preferences from backend Api Fail", 'Unautherised');
-                AuthoriseCheck.authoriseCheck();
-                navigation.navigate('WelcomeComponent');
-                return;
-            }
+        let apiMethod = apiMethodManager.GET_FEEDING_PREFS;
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
+        set_isLoading(false);
+        isLoadingdRef.current = 0;
                 
-            if(getPetFeedServiceObj && !getPetFeedServiceObj.isInternet){
-                createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
-                firebaseHelper.logEvent(firebaseHelper.event_SOB_petFeeding_api_fail, firebaseHelper.screen_SOB_petFeeding, "Gettind Feeding preferences from backend Api Fail", 'Internet : false');
-                return;
-            }
-          
-            if(getPetFeedServiceObj && getPetFeedServiceObj.statusData){
-
-                if(getPetFeedServiceObj.responseData) {
-                    set_timeArray(getPetFeedServiceObj.responseData);
-                    getSOBDetails();
-                } else {
-                    firebaseHelper.logEvent(firebaseHelper.event_SOB_petFeeding_api_fail, firebaseHelper.screen_SOB_petFeeding, "Gettind Feeding preferences from backend Api Succes", 'No data recieved');
-                    createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-                }
-                               
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+                
+            if(apiService.data.petFeedingPreferences) {
+                set_timeArray(apiService.data.petFeedingPreferences);
+                getSOBDetails();
             } else {
-
-                firebaseHelper.logEvent(firebaseHelper.event_SOB_petFeeding_api_fail, firebaseHelper.screen_SOB_petFeeding, "Gettind Feeding preferences from backend Api Fail", 'Service Status : false');
+                firebaseHelper.logEvent(firebaseHelper.event_SOB_petFeeding_api_fail, firebaseHelper.screen_SOB_petFeeding, "Gettind Feeding preferences from backend Api Succes", 'No data recieved');
                 createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-                
             }
-          
-            if(getPetFeedServiceObj && getPetFeedServiceObj.error) {
-                createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true); 
-                let errors = getPetFeedServiceObj.error.length > 0 ? getPetFeedServiceObj.error[0].code : '';
-                firebaseHelper.logEvent(firebaseHelper.event_SOB_petFeeding_api_fail, firebaseHelper.screen_SOB_petFeeding, "Gettind Feeding preferences from backend Api Fail", 'error : '+errors);
-            }
-        }
-    };
+        
+        } else if(apiService && apiService.isInternet === false) {
 
-    const stopFBTrace = async () => {
-        await trace_FeedingTime_API_Complete.stop();
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_petFeeding_api_fail, firebaseHelper.screen_SOB_petFeeding, "Gettind Feeding preferences from backend Api Fail", 'Internet : false');
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true); 
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_petFeeding_api_fail, firebaseHelper.screen_SOB_petFeeding, "Gettind Feeding preferences from backend Api Fail", 'error : '+apiService.error.errorMsg); 
+            
+        } else {
+
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_petFeeding_api_fail, firebaseHelper.screen_SOB_petFeeding, "Gettind Feeding preferences from backend Api Fail", 'Service Status : false');
+            createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+
+        }
+
     };
 
     const nextButtonAction = async () => {
@@ -246,11 +229,6 @@ const PetFeedingPreferencesComponentUI = ({ navigation, route, ...props }) => {
                                 if (selectedItems.current.includes(item.feedingPreferenceId)) {
 
                                     selectedItems.current = selectedItems.current.filter(item1 => item1 !== item.feedingPreferenceId);
-                                    // var index = tempAnswersArray.current.findIndex(e => e.feedingPreferenceId === item.feedingPreferenceId);
-
-                                    // if (index != -1) {
-                                    //     tempAnswersArray.current.splice(index, 1);
-                                    // } 
 
                                     for (var i = tempAnswersArray.current.length - 1; i >= 0; i--) {
                                         if (tempAnswersArray.current[i].feedingPreferenceId === item.feedingPreferenceId) {
@@ -303,13 +281,13 @@ const PetFeedingPreferencesComponentUI = ({ navigation, route, ...props }) => {
                                             </View>
 
                                             <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                                                <ImageBackground source={selectedItems.current.includes(item.feedingPreferenceId) ? tickImg : notTickImg} style={[styles.petImgStyle, {}]} resizeMode='contain'></ImageBackground>
+                                                {selectedItems.current.includes(item.feedingPreferenceId) ? <Tickmg style={[styles.petImgStyle, {}]}/> : <NoTickImg style={[styles.petImgStyle, {}]}/>}
                                             </View>
 
                                             <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                                                 {item.feedingPreferenceId === 6 ? <View style={{ width: wp('10%'), height: hp('5%'), justifyContent: 'center', alignItems: 'center' }}>
                                                     <TouchableOpacity onPress={() => { selectAlertAction() }}>
-                                                        <Image style={styles.detailsBtnStyle} source={require("./../../../../assets/images/scoreImages/eAlert.svg")}></Image>
+                                                        <EAlertImg width={wp('5%')} height={hp('5%')}/>
                                                     </TouchableOpacity>
                                                 </View> : null}
                                             </View>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, FlatList } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from './../../utils/commonComponents/headerComponent';
 import fonts from './../../utils/commonStyles/fonts'
@@ -8,15 +8,15 @@ import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import * as Constant from "./../../utils/constants/constant"
 import AlertComponent from '../../utils/commonComponents/alertComponent';
 
-let bfiDogImg = require("./../../../assets/images/scoreImages/bfiDogImgIcon.svg");
-let bcsDogImg = require("./../../../assets/images/scoreImages/bcsDogIcon.svg");
-let stoolDogImg = require("./../../../assets/images/scoreImages/stollDogScoringIcon.svg");
-let hwpDogImg = require("./../../../assets/images/scoreImages/hwpDogIcon.svg");
-
-let bfiCatImg = require("./../../../assets/images/scoreImages/bfiCatImgIcon.svg");
-let bcsCatImg = require("./../../../assets/images/scoreImages/bcsCatIcon.svg");
-let stooCatlImg = require("./../../../assets/images/scoreImages/stollCatScoringIcon.svg");
-let hwpCatImg = require("./../../../assets/images/scoreImages/hwpCatIcon.svg");
+import RightArrowImg from "./../../../assets/images/otherImages/svg/rightArrowLightImg.svg";
+import BFIDogImg from "./../../../assets/images/scoreImages/bfiDogImgIcon.svg";
+import BCSDogImg from "./../../../assets/images/scoreImages/bcsDogIcon.svg";
+import StoolDogImg from "./../../../assets/images/scoreImages/stollDogScoringIcon.svg";
+import HWPDogImg from "./../../../assets/images/scoreImages/hwpDogIcon.svg";
+import BFICatImg from "./../../../assets/images/scoreImages/bfiCatImgIcon.svg";
+import BCSCatImg from "./../../../assets/images/scoreImages/bcsCatIcon.svg";
+import StoolCatImg from "./../../../assets/images/scoreImages/stollCatScoringIcon.svg";
+import HWPCatImg from "./../../../assets/images/scoreImages/hwpCatIcon.svg";
 
 const SelectBSCScoringUI = ({ route, ...props }) => {
 
@@ -47,17 +47,18 @@ const SelectBSCScoringUI = ({ route, ...props }) => {
                 <TouchableOpacity onPress={() => selectActivityAction(item, index, item.scoringType)}>
 
                     <View style={[styles.cellBckView]}>
-                        <Image style= {[styles.leftImgIconStyle]} source={item.scoringTypeId === 1 ? 
-                            (props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? bcsDogImg : bcsCatImg) : 
-                            (item.scoringTypeId === 2 ? (props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? bfiDogImg : bfiCatImg)
-                             : (item.scoringTypeId === 3 ? (props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? stoolDogImg : stooCatlImg)
-                              : (props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? hwpDogImg : hwpCatImg)))}></Image>
+
+                        {item.scoringTypeId === 1 ? 
+                            (props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? <BCSDogImg style= {[styles.leftImgIconStyle]}/> : <BCSCatImg style= {[styles.leftImgIconStyle]}/>) : 
+                            (item.scoringTypeId === 2 ? (props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? <BFIDogImg style= {[styles.leftImgIconStyle]}/> : <BFICatImg style= {[styles.leftImgIconStyle]}/>)
+                             : (item.scoringTypeId === 3 ? (props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? <StoolDogImg style= {[styles.leftImgIconStyle]}/> : <StoolCatImg style= {[styles.leftImgIconStyle]}/>)
+                              : (props.defaultPetObj && props.defaultPetObj.speciesId && parseInt(props.defaultPetObj.speciesId) === 1 ? <HWPDogImg style= {[styles.leftImgIconStyle]}/> : <HWPCatImg style= {[styles.leftImgIconStyle]}/>)))}
                         <View style={{ flex: 5, }}>
                             <Text style={[styles.headerTextStyle]}>{item.imageScaleName}</Text>
                             <Text style={[styles.subHeaderTextStyle]}>{item.scoringType}</Text>
                         </View>
 
-                        <Image style={styles.arrowImgStyels} source={require("./../../../assets/images/otherImages/svg/rightArrowLightImg.svg")} />
+                        <RightArrowImg style={styles.arrowImgStyels}/>
 
                     </View>
 

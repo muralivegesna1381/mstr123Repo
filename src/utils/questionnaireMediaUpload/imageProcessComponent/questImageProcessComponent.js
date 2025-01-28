@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment';
 import { Image } from 'react-native-compressor';
 import storage, { firebase } from '@react-native-firebase/storage';

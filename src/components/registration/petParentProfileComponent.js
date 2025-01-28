@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, BackHandler } from 'react-native';
+import { BackHandler } from 'react-native';
 import PetParentProfileUi from "./petParentProfileUI"
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
@@ -58,8 +58,9 @@ const PetParentProfileComponent = ({ navigation, route, ...props }) => {
 
     const navigateToPrevious = async () => {
         if (isFrom === 'welcomeScreen') {
-            firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_register_parent_profile_account, "User clicked on back button to navigate to WelcomeComponent ", '');
-            navigation.navigate('WelcomeComponent');
+            navigation.navigate('LoginComponent',{"isAuthEnabled" : false}); 
+            // firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_register_parent_profile_account, "User clicked on back button to navigate to WelcomeComponent ", '');
+            // navigation.navigate('WelcomeComponent');
         } else {
 
             firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_register_parent_profile_account, "User clicked on back button to navigate to LoginComponent ", '');

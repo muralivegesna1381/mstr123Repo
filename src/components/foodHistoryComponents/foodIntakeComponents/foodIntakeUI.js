@@ -13,13 +13,14 @@ import FsTextInputComponent from '../foodHistoryCustomComponents/fsTextInputComp
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import QuestionnaireSliderComponent from "./../../questionnaire/questionnaireCustomComponents/customComponents/questionnaireSliderComponent";
 
-import downButtonImg from "./../../../../assets/images/otherImages/svg/downArrowGrey.svg";
-import upButtonImg from "./../../../../assets/images/otherImages/svg/upArrow.svg";
-import rSelectedImg from "./../../../../assets/images/otherImages/svg/radioBtnSelectedImg.svg";
-import rUnSelectedImg from "./../../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg";
-import calenderButtonImg from "./../../../../assets/images/otherImages/svg/calender.svg";
-import plusImg from "./../../../../assets/images/otherImages/svg/plusFIN.svg";
-import minusImg from "./../../../../assets/images/otherImages/svg/minusFIN.svg";
+import DownButtonImg from "./../../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import UpButtonImg from "./../../../../assets/images/otherImages/svg/upArrow.svg";
+import CalenderButtonImg from "./../../../../assets/images/otherImages/svg/calender.svg";
+import PlusImg from "./../../../../assets/images/otherImages/svg/plusFIN.svg";
+import MinusImg from "./../../../../assets/images/otherImages/svg/minusFIN.svg";
+
+import RadioGreenImg from "../../../../assets/images/otherImages/svg/radioBtnGreen.svg";
+import RadioUnSelectedImg from "../../../../assets/images/otherImages/svg/radioBtnUnSelectedImg.svg";
 
 const FoodIntakeUI = ({ route, ...props }) => {
 
@@ -144,7 +145,7 @@ const FoodIntakeUI = ({ route, ...props }) => {
             <View style={{ width: wp('90%'), alignItems: 'center', justifyContent: 'center' }}>
 
                 <TouchableOpacity onPress={() => { selectFeedbackOptionsAction(item, index, parentItemIndex) }} style={{ width: wp('80%'), alignSelf: 'center', flexDirection: 'row', alignItems: 'center' }}>
-                    <Image source={item.selctedIndex === index + 1 ? rSelectedImg : rUnSelectedImg} style={[styles.rImageStyle, { width: Platform.isPad ? wp('3%') : wp('5%'), tintColor: 'green' }]} />
+                    {item.selctedIndex === index + 1 ? <RadioGreenImg width={Platform.isPad ? wp('3%') : wp('5%')} height={hp('5%')}/> : <RadioUnSelectedImg width={Platform.isPad ? wp('3%') : wp('5%')} height={hp('5%')}/>}
                     <Text numberOfLines={2} style={[styles.foddOptionsTextStyle, {}]}>{item.description}</Text>
                 </TouchableOpacity>
 
@@ -174,7 +175,7 @@ const FoodIntakeUI = ({ route, ...props }) => {
 
                     {<View style={{ width: wp('80%'), height: indexArray3.current.includes(index) ? hp('5%') : hp('5%'), marginTop: hp('1%'), alignSelf: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
                         <Text numberOfLines={2} style={[styles.feedQTexStyle, {}]}>{item.feedbackCategory}</Text>
-                        {<Image source={indexArray3.current.includes(index) ? upButtonImg : downButtonImg} style={[styles.imageStyle, { width: Platform.isPad ? wp('2.5%') : wp('4%') }]} />}
+                        {indexArray3.current.includes(index) ? <UpButtonImg width={Platform.isPad ? wp('2.5%') : wp('4%')} style={[styles.imageStyle,{alignSelf:'center'}]} /> : <DownButtonImg fill={'red'} width={Platform.isPad ? wp('2.5%') : wp('4%')} style={[styles.imageStyle,{alignSelf:'center'}]}/>}
                     </View>}
 
                 </TouchableOpacity>
@@ -223,13 +224,13 @@ const FoodIntakeUI = ({ route, ...props }) => {
                     {item.FOOD_NAME && item.PERCENT_CONSUMED && index < 4 && pArray && pArray.length - 1 === index ?
                         <TouchableOpacity onPress={() => { addDeleteAction(2, item, index, parentItemIndex) }} style={[styles.editBtnStyle, { width: Platform.isPad ? wp('4%') : wp('6%') }]}>
                             {/* <Text style={[styles.editBtnTextStyle, { color: 'white' }]}>{'+'}</Text> */}
-                            <Image source={plusImg} style={[styles.rImageStyle, { width: Platform.isPad ? wp('3.5%') : wp('5%')}]} />
+                            <PlusImg width={Platform.isPad ? wp('3.5%') : wp('5%')} style={[styles.rImageStyle]} />
                         </TouchableOpacity> : null}
 
                     {pArray && pArray.length > 1 ?
                         <TouchableOpacity onPress={() => { addDeleteAction(1, item, index, parentItemIndex) }} style={[styles.editBtnStyle]}>
                             {/* <Text style={[styles.editBtnTextStyle, {}]}>{'-'}</Text> */}
-                            <Image source={minusImg} style={[styles.rImageStyle, { width: Platform.isPad ? wp('3.5%') : wp('5%')}]} />
+                            <MinusImg width={Platform.isPad ? wp('3.5%') : wp('5%')} style={[styles.rImageStyle]}/>
                         </TouchableOpacity> : null}
 
                 </View>}
@@ -317,7 +318,7 @@ const FoodIntakeUI = ({ route, ...props }) => {
                             </View>
 
                             <View style={{ flex: 0.3, justifyContent: 'center', alignItems: 'center' }}>
-                                {<Image source={indexArray.current.includes(index) ? upButtonImg : downButtonImg} style={[styles.imageStyle, { width: Platform.isPad ? wp('2.5%') : wp('4%') }]} />}
+                                {indexArray.current.includes(index) ? <UpButtonImg width={Platform.isPad ? wp('2.5%') : wp('4%')} style={[styles.imageStyle]} /> : <DownButtonImg width={Platform.isPad ? wp('2.5%') : wp('4%')} style={[styles.imageStyle]}/>}
                             </View>
 
                         </View>
@@ -458,7 +459,7 @@ const FoodIntakeUI = ({ route, ...props }) => {
 
                     <TouchableOpacity disabled = {!props.foodEditObj ? false : true} style={[CommonStyles.dateBtnStyle, {}]} onPress={() => { dateTopBtnAction() }}>
                         <Text style={[CommonStyles.dateBtnTextStyle]}>{datePickerDate ? datePickerDate.toString() : 'Date'}</Text>
-                        <Image source={calenderButtonImg} style={[CommonStyles.searchCalImageStyle, { width: Platform.isPad ? wp('4%') : wp('6%'), }]} />
+                        <CalenderButtonImg width={Platform.isPad ? wp('4%') : wp('6%')} style={[CommonStyles.searchCalImageStyle]}/>
                     </TouchableOpacity>
 
                 </View>}
@@ -480,12 +481,12 @@ const FoodIntakeUI = ({ route, ...props }) => {
                         <View style={styles.radioBckViewStyle}>
 
                             <TouchableOpacity onPress={() => enableOtherFoodAction(2)} style={{ flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                <Image source={props.isOtherFood ? rSelectedImg : rUnSelectedImg} style={[styles.rImageStyle, { width: Platform.isPad ? wp('3.5%') : wp('5%'), tintColor: 'green' }]} />
+                                {props.isOtherFood ? <RadioGreenImg width={Platform.isPad ? wp('3.5%') : wp('5%')} fill='green' stroke = 'green' style={[styles.rImageStyle]}/> : <RadioUnSelectedImg width={Platform.isPad ? wp('3.5%') : wp('5%')}fill='grey' style={[styles.rImageStyle]}/>}
                                 <Text style={[styles.optTexStyle, {}]}>{'Yes'}</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => enableOtherFoodAction(1)} style={{ flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                                <Image source={props.isOtherFood ? rUnSelectedImg : rSelectedImg} style={[styles.rImageStyle, { width: Platform.isPad ? wp('3.5%') : wp('5%'), tintColor: 'green' }]} />
+                                {props.isOtherFood ? <RadioUnSelectedImg width={Platform.isPad ? wp('3.5%') : wp('5%')} color={'red'} fill='green' stroke = 'green' style={[styles.rImageStyle]}/> : <RadioGreenImg width={Platform.isPad ? wp('3.5%') : wp('5%')} fill='grey' style={[styles.rImageStyle]}/>}
                                 <Text style={[styles.optTexStyle, {}]}>{'No'}</Text>
                             </TouchableOpacity>
 
@@ -514,7 +515,7 @@ const FoodIntakeUI = ({ route, ...props }) => {
 
                         <TouchableOpacity onPress={() => { set_isFeedbackExpand(!isFeedbackExpand) }} style={{ width: wp('90%'), height: isFeedbackExpand ? hp('5%') : hp('5%'), alignSelf: 'center', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text numberOfLines={2} style={[styles.recFoodTexStyle, {}]}>{'Feedback'}</Text>
-                            {<Image source={isFeedbackExpand ? upButtonImg : downButtonImg} style={[styles.imageStyle, { width: Platform.isPad ? wp('2.5%') : wp('4%') }]} />}
+                            {isFeedbackExpand ? <UpButtonImg width={Platform.isPad ? wp('2.5%') : wp('3%')} height={Platform.isPad ? hp('2.5%') : hp('3%')} style={[styles.imageStyle,{alignSelf:'center'}]} /> : <DownButtonImg width={Platform.isPad ? wp('2.5%') : wp('3%')} height={Platform.isPad ? hp('2.5%') : hp('3%')} style={[styles.imageStyle,{alignSelf:'center'}]}/>}
                         </TouchableOpacity>
 
                         {isFeedbackExpand ?
@@ -574,6 +575,7 @@ const FoodIntakeUI = ({ route, ...props }) => {
                             onDateChange={(date) => { set_datePickerDate1(date) }}
                             mode={"date"}
                             textColor={'black'}
+                            theme = {'light'}
                             maximumDate={new Date()}
                             minimumDate={minimumDate ? new Date(minimumDate) : new Date('1900-01-01')}
                             style={CommonStyles.datePickeStyle}

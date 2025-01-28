@@ -23,6 +23,7 @@ const questionnaireTextInputComponent = ({textAnswer,setValue,maxLength,isMultiL
         }
         
     },[questionImageUrl]);
+
     /**
      * Textinput UI
      * Based on Multiline, this component will be Text Area / TextInput

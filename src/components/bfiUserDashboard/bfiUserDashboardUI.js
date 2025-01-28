@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity, Platform } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import Fonts from './../../utils/commonStyles/fonts'
 import CommonStyles from './../../utils/commonStyles/commonStyles';
@@ -7,6 +6,8 @@ import * as Constant from "./../../utils/constants/constant";
 import HeaderComponent from './../../utils/commonComponents/headerComponent';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 import fonts from './../../utils/commonStyles/fonts';
+
+import RightArrowBtnImg from "./../../../assets/images/dashBoardImages/svg/right-arrow.svg";
 
 const BFIUserDashboardUI = ({ navigation, route, ...props }) => {
 
@@ -85,7 +86,7 @@ const BFIUserDashboardUI = ({ navigation, route, ...props }) => {
 
                             </View>
                             <View style={{ flex: 1, alignItems: 'center' }}>
-                                <Image source={require('./../../../assets/images/dashBoardImages/svg/right-arrow.svg')} style={[styles.questArrowImgStyle, { tintColor: 'black' }]}></Image>
+                                <RightArrowBtnImg style={[styles.questArrowImgStyle, { tintColor: 'black' }]}/>
                             </View>
                         </View>
 
@@ -107,7 +108,7 @@ const BFIUserDashboardUI = ({ navigation, route, ...props }) => {
                             </View>
 
                             <View style={{ flex: 1, alignItems: 'center' }}>
-                                <Image source={require('./../../../assets/images/dashBoardImages/svg/right-arrow.svg')} style={[styles.questArrowImgStyle, { tintColor: 'black' }]}></Image>
+                                <RightArrowBtnImg style={[styles.questArrowImgStyle, { tintColor: 'black' }]}/>
                             </View>
 
                         </View>

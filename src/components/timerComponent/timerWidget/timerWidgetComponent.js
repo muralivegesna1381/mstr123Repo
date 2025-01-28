@@ -8,8 +8,9 @@ import moment from "moment";
 import Highlighter from "react-native-highlight-words";
 import * as DataStorageLocal from './../../../utils/storage/dataStorageLocal';
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+import * as modularPermissions from './../../../utils/appDataModels/modularPermissionsModel.js';
 
 var PushNotification = require("react-native-push-notification");
 
@@ -299,7 +300,7 @@ const TimerWidgetComponent = ({navigation,route, ...props }) => {
             query: Queries.DASHBOARD_TIMER_WIDGET,
                  data: {
                    data: { 
-                    timerStatus:'',timerBtnActions:'TimerLogs',__typename: 'DashboardTimerWidget'}
+                    timerStatus:new Date(),timerBtnActions:'TimerLogs',__typename: 'DashboardTimerWidget'}
                    },
          })
 
@@ -331,7 +332,6 @@ const TimerWidgetComponent = ({navigation,route, ...props }) => {
         let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
         let timerData = await DataStorageLocal.getDataFromAsync(Constant.TIMER_OBJECT);
         let timerPetObj = await DataStorageLocal.getDataFromAsync(Constant.TIMER_SELECTED_PET);
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 
         timerData = JSON.parse(timerData);
         timerPetObj = JSON.parse(timerPetObj);
@@ -341,7 +341,7 @@ const TimerWidgetComponent = ({navigation,route, ...props }) => {
             Category: timerData.activityText,
             ClientID: ""+clientId,//parseInt(clientId)
             PetID:""+timerPetObj.petID,
-            DeviceNumber: timerPetObj.devices[0].deviceNumber.toString(),
+            DeviceNumber: timerPetObj.devices && timerPetObj.devices.length > 0 ? timerPetObj.devices[0].deviceNumber.toString() : '',
             Duration: elapsed.toString(),
             TimerDate: sDate.toString(),
           };
@@ -350,35 +350,34 @@ const TimerWidgetComponent = ({navigation,route, ...props }) => {
             saveTimerDataAsync('','',false,false,'','','','','','',0,false);
         }
         firebaseHelper.logEvent(firebaseHelper.event_timer_Widget_api, firebaseHelper.screen_timer_widget, "Timer Api in Widget initiated", "Pet Id : "+timerPetObj.petID);
-        await updateTimerDetails(json,token);
+        await updateTimerDetails(json);
                 
     }
 
-    const updateTimerDetails = async (json,token) => {
+    const updateTimerDetails = async (json) => {
 
-        let serviceCallsObj = await ServiceCalls.managePetTimerLog(json,token);
+        let apiMethod = apiMethodManager.MANAGE_PET_TIMER_LOG;
+        let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
         set_isLoading(false);
-        if(serviceCallsObj && serviceCallsObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
 
-        if(serviceCallsObj && !serviceCallsObj.isInternet){
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+   
+        
+        } else if(apiService && apiService.isInternet === false) {
+
             createPopup('',false,'OK',Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,undefined,true); 
-            return;
-        }
+            firebaseHelper.logEvent(firebaseHelper.event_timer_api_success, firebaseHelper.screen_timer_main, "Timer Api Fail", "Internet : false");
 
-        if(serviceCallsObj && serviceCallsObj.statusData){
-            firebaseHelper.logEvent(firebaseHelper.event_timer_widget_api_success, firebaseHelper.screen_timer_widget, "Timer Api in Widget Success", "");
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup('',false,'OK',Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,undefined,true); 
+            firebaseHelper.logEvent(firebaseHelper.event_timer_Widget_api_fail, firebaseHelper.screen_timer_widget, "Timer Api in Widget Failed", "error : ");
+            
         } else {
+
             firebaseHelper.logEvent(firebaseHelper.event_timer_Widget_api_fail, firebaseHelper.screen_timer_widget, "Timer Api in Widget Failed", "");
             createPopup('',false,'OK',Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,undefined,true);  
-        }
 
-        if(serviceCallsObj && serviceCallsObj.error) {
-            firebaseHelper.logEvent(firebaseHelper.event_timer_Widget_api_fail, firebaseHelper.screen_timer_widget, "Timer Api in Widget Failed", "error : ");
-            createPopup('',false,'OK',Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,undefined,true);  
         }
 
     };
@@ -661,17 +660,18 @@ const TimerWidgetComponent = ({navigation,route, ...props }) => {
         let sec = seconds;
         let elapsed = hours + ':' + minutes+':'+sec;
         clearTimer(elapsed,timerData.isTimerPaused);
-        removeTimerWidget();
+        removeTimerWidget(elapsed);
 
     };
 
-    const removeTimerWidget = () => {
+    const removeTimerWidget = async (elapsed) => {
 
+        modularPermissions.modularPermissionsData.isTimer = false;
         Apolloclient.client.writeQuery({
             query: Queries.DASHBOARD_TIMER_WIDGET,
                  data: {
                     data: { 
-                        timerStatus:'StopTimer',timerBtnActions:'',__typename: 'DashboardTimerWidget'}
+                        timerStatus:elapsed,timerBtnActions:'',__typename: 'DashboardTimerWidget'}
                     },
          })
 

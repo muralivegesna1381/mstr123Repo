@@ -9,8 +9,6 @@ import LoaderComponent from '../../../../utils/commonComponents/loaderComponent'
 import moment from 'moment';
 import AlertComponent from './../../../../utils/commonComponents/alertComponent';
 
-let failedImg = require('./../../../../../assets/images/otherImages/svg/failedXIcon.svg');
-
 const  ObsReviewUI = ({route, ...props }) => {
 
     const [isLoading, set_isLoading] = useState(false);

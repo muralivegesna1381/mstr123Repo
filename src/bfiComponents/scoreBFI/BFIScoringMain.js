@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, FlatList, Image, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, BackHandler, FlatList, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import ImageView from "react-native-image-viewing";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import BottomComponent from '../../utils/commonComponents/bottomComponent';
@@ -10,14 +10,22 @@ import CommonStyles from '../../utils/commonStyles/commonStyles';
 import fonts from '../../utils/commonStyles/fonts';
 import * as Constant from "../../utils/constants/constant";
 import * as DataStorageLocal from '../../utils/storage/dataStorageLocal';
-import BuildEnv from './../../config/environment/environmentConfig';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
-import { ScrollView } from 'react-native-gesture-handler';
-import * as ServiceCalls from '../../utils/getServicesData/getServicesData.js';
-import TextInputComponent from '../../utils/commonComponents/textInputComponent';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import perf from '@react-native-firebase/perf';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview'
+
+import IsScrollStartImg from "./../../../assets/images/bfiGuide/svg/left_indicater.svg";
+import IsScrollEndImg from "./../../../assets/images/bfiGuide/svg/right_indicater.svg";
+import ArrowLeftImg from "./../../../assets/images/bfiGuide/svg/arrow-black-left.svg";
+import ArrowRightImg from "./../../../assets/images/bfiGuide/svg/arrow-black-right.svg"
+import EyeInstructionImg from "./../../../assets/images/bfiGuide/svg/eye-instructions.svg";
+import BFIEmptyImg from "./../../../assets/images/bfiGuide/svg/ic_bfi_empty_bg.svg";
 
 const BFIScoreMain = ({ route, navigation }) => {
+
   const [images, set_images] = useState([]);
   const [imagesFullview, set_imagesFullview] = useState([]);
   const [isImageView, set_isImageView] = useState(false);
@@ -33,8 +41,7 @@ const BFIScoreMain = ({ route, navigation }) => {
   const [isScrollEndReached, set_isScrollEndReached] = useState(false);
   const [descriptionEnable, set_descriptionEnable] = useState(false);
   const [descriptionText, set_descriptionText] = useState(undefined);
-
-
+  const [petBfiImagesSId, set_petBfiImagesSId] = useState(undefined);
 
   var imagePositionStyle = styles.imageStyle;
 
@@ -45,21 +52,16 @@ const BFIScoreMain = ({ route, navigation }) => {
   var previousScore = useRef(undefined);
   var descText = useRef(undefined)
 
-  const Environment = JSON.parse(BuildEnv.Environment());
-
-  let icScrollStartReach = require('./../../../assets/images/bfiGuide/svg/left_indicater.svg');
-  let icScrollEndReach = require('./../../../assets/images/bfiGuide/svg/right_indicater.svg');
-
   const [petImgArray, set_petImgArray] = useState([
-    require('./../../../assets/images/bfiGuide/svg/ic_bfi_bg_other.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_bfi_bg_20.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_bfi_bg_30.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_bfi_bg_40.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_bfi_bg_50.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_bfi_bg_60.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_bfi_bg_70.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_bfi_bg_other.svg'),
-    require('./../../../assets/images/bfiGuide/svg/ic_bfi_bg_other.svg')
+    require('./../../../assets/images/bfiGuide/png/ic_bfi_bg_20.png'),
+    require('./../../../assets/images/bfiGuide/png/ic_bfi_bg_30.png'),
+    require('./../../../assets/images/bfiGuide/png/ic_bfi_bg_40.png'),
+    require('./../../../assets/images/bfiGuide/png/ic_bfi_bg_50.png'),
+    require('./../../../assets/images/bfiGuide/png/ic_bfi_bg_60.png'),
+    require('./../../../assets/images/bfiGuide/png/ic_bfi_bg_70.png'),
+    require('./../../../assets/images/bfiGuide/png/ic_bfi_bg_other.png'),
+    require('./../../../assets/images/bfiGuide/png/ic_bfi_bg_other.png'),
+    require('./../../../assets/images/bfiGuide/png/ic_bfi_bg_other.png')
   ]);
 
   const [bfiScoresList, setBFIScoresList] = useState([
@@ -83,7 +85,6 @@ const BFIScoreMain = ({ route, navigation }) => {
     scoringSessionStartDate.current = startDate;
 
     getScoreIDs()
-
     initialSessionStart();
     firebaseHelper.reportScreen(firebaseHelper.screen_bfi_pet_information);
     firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_submit_bfiScore, "score BFI Screen entered", '');
@@ -105,24 +106,25 @@ const BFIScoreMain = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    if (route.params?.from === "setImages" && route.params?.bfiInfoData) {
+    
+    if (route.params?.from === "setImages" && route.params?.bfiInfoData && route.params?.bfiInfoData.length > 0) {
       let tempArray = [];
-      petBfiImagesSetId.current = route.params?.bfiInfoData.petBfiImagesSetId
+      petBfiImagesSetId.current = route.params?.bfiInfoData[0].petBfiImagesSetId;
       if (route.params?.isEditable) {
         set_descriptionEnable(true)
-        previousScore.current = route.params?.bfiInfoData.bfiScore
+        previousScore.current = route.params?.bfiInfoData[0].bfiScore
       }
-      for (let i = 0; i < route.params?.bfiInfoData.petBfiImages.length; i++) {
+      for (let i = 0; i < route.params?.bfiInfoData[0].petBfiImages.length; i++) {
         let tempObj = {
-          uri: route.params?.bfiInfoData.petBfiImages[i].imageUrl,
+          uri: route.params?.bfiInfoData[0].petBfiImages[i].imageUrl,
         }
         tempArray.push(tempObj);
       }
       set_imagesFullview(tempArray)
 
-      set_images(route.params?.bfiInfoData.petBfiImages)
+      set_images(route.params?.bfiInfoData[0].petBfiImages)
     }
-    else if (route.params?.bfiInfoData) {
+    else if (route.params?.bfiInfoData && route.params?.bfiInfoData.length > 0) {
       let tempArray = [];
       petBfiImagesSetId.current = route.params?.bfiInfoData[0].petBfiImagesSetId
       if (route.params?.isEditable) {
@@ -180,8 +182,8 @@ const BFIScoreMain = ({ route, navigation }) => {
     }
     else {
       firebaseHelper.logEvent(firebaseHelper.event_score_submit_btn_clicked, firebaseHelper.screen_submit_bfiScore, "BFI Screen submit action clicked", "");
-      submitBFIScore()
       set_isLoading(true);
+      submitBFIScore()
     }
 
   };
@@ -207,6 +209,7 @@ const BFIScoreMain = ({ route, navigation }) => {
 
   //Prepare capture images submit request
   const submitBFIScore = async () => {
+
     let endDate = moment(new Date(new Date())).utcOffset("+00:00").format("YYYY-MM-DDTHH:mm:ss")
     scoringSessionEndDate.current = endDate;
 
@@ -220,34 +223,33 @@ const BFIScoreMain = ({ route, navigation }) => {
       endTime: scoringSessionEndDate.current,
       createdBy: clientId
     };
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-    let serviceCallsObj = await ServiceCalls.submitBFIScore(token, submitScoreReq);
-    if (serviceCallsObj && serviceCallsObj.logoutData) {
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
 
-    if (serviceCallsObj && !serviceCallsObj.isInternet) {
-      set_isLoading(false);
+    let apiMethod = apiMethodManager.SUBMIT_BFI_SCORE;
+    let apiService = await apiRequest.postData(apiMethod,submitScoreReq,Constant.SERVICE_JAVA,navigation);
+    set_isLoading(false);
+                    
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+                    
+      if(apiService.status) {
+        navigation.navigate("ReviewComponent", { isFromScreen: 'bfiScore' });
+      }
+
+    } else if(apiService && apiService.isInternet === false) {
+        
       createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, 'OK', false, true);
-      return;
-    }
+                        
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+        
+      createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, 'OK', false, true);
+      firebaseHelper.logEvent(firebaseHelper.event_bfi_score_submit_api, firebaseHelper.screen_submit_bfiScore, "savePetBfiImages Service failed", 'Service error : ' + apiService.error.errorMsg);
 
-    if (serviceCallsObj && serviceCallsObj.statusData) {
-      set_isLoading(false);
-      navigation.navigate("ReviewComponent", { isFromScreen: 'bfiScore' });
     } else {
-      set_isLoading(false);
+        
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SCORE_UNABLE_TO_SUBMIT, 'OK', false, true);
       firebaseHelper.logEvent(firebaseHelper.event_bfi_score_submit_api, firebaseHelper.screen_submit_bfiScore, "savePetBfiImages Service failed", 'Service Status : false');
+        
     }
 
-    if (serviceCallsObj && serviceCallsObj.error) {
-      let errors = serviceCallsObj.error.length > 0 ? serviceCallsObj.error[0].code : ''
-      set_isLoading(false);
-      firebaseHelper.logEvent(firebaseHelper.event_bfi_score_submit_api, firebaseHelper.screen_submit_bfiScore, "savePetBfiImages Service failed", 'Service error : ' + errors);
-    }
   }
 
   //flat list start listener
@@ -276,30 +278,21 @@ const BFIScoreMain = ({ route, navigation }) => {
     * Service call to fetch the ScoreID's
     */
   const getScoreIDs = async () => {
+    
     set_isLoading(true)
 
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-    let serviceCallsObj = await ServiceCalls.getBfiImageScores(token);
-
-    if (serviceCallsObj && serviceCallsObj.logoutData) {
-      AuthoriseCheck.authoriseCheck();
-      navigation.navigate('WelcomeComponent');
-      return;
-    }
-
-    if (serviceCallsObj && !serviceCallsObj.isInternet) {
-      set_isLoading(false);
-      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, 'OK', false, true);
-      return;
-    }
-
-    if (serviceCallsObj && serviceCallsObj.statusData) {
-      set_isLoading(false);
-      if (serviceCallsObj.responseData.bfiImageScores.length > 0) {
+    let apiMethod = apiMethodManager.GET_BFI_SCORES;
+    let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
+    set_isLoading(false);
+                    
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+                    
+      if (apiService.data.bfiImageScores.length > 0) {
         hashmapScoreIDsData.current.clear()
-        for (let i = 0; i < serviceCallsObj.responseData.bfiImageScores.length; i++) {
-          const score = serviceCallsObj.responseData.bfiImageScores[i].score
-          const scoreID = serviceCallsObj.responseData.bfiImageScores[i].bfiImageScoreId
+        
+        for (let i = 0; i < apiService.data.bfiImageScores.length; i++) {
+          const score = apiService.data.bfiImageScores[i].score
+          const scoreID = apiService.data.bfiImageScores[i].bfiImageScoreId
 
           //Add Data to hashmap with score and ScoreID
           hashmapScoreIDsData.current.set(score, scoreID)
@@ -307,17 +300,20 @@ const BFIScoreMain = ({ route, navigation }) => {
           selectPreviousScore()
         }
       }
+
+    } else if(apiService && apiService.isInternet === false) {
+      createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, 'OK', false, true);
+                        
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+      firebaseHelper.logEvent(firebaseHelper.event_getscore_ids_api, firebaseHelper.screen_submit_bfiScore, "savePetBfiImages Service failed", 'Service error : ' + apiService.error.errorMsg);
+
     } else {
-      set_isLoading(false);
+        
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.CAPTURED_SUBMIT_IMAGES_FAIL, 'OK', false, true);
       firebaseHelper.logEvent(firebaseHelper.event_getscore_ids_api, firebaseHelper.screen_submit_bfiScore, "savePetBfiImages Service failed", 'Service Status : false');
+        
     }
 
-    if (serviceCallsObj && serviceCallsObj.error) {
-      let errors = serviceCallsObj.error.length > 0 ? serviceCallsObj.error[0].code : ''
-      set_isLoading(false);
-      firebaseHelper.logEvent(firebaseHelper.event_getscore_ids_api, firebaseHelper.screen_submit_bfiScore, "savePetBfiImages Service failed", 'Service error : ' + errors);
-    }
   };
 
   //submitted captured images view
@@ -342,17 +338,15 @@ const BFIScoreMain = ({ route, navigation }) => {
       <TouchableOpacity onPress={() => { updateSelectedItem(item, index) }}>
         <View style={styles.flatListContainer}>
           {index > -1 && index === currentBFISelected ?
-            <ImageBackground style={styles.listItemBg}
-              source={petImgArray[currentBFISelected]} >
-              <Text style={styles.itemTextStyleActive}>{item.name}
-              </Text>
+            <ImageBackground style={styles.listItemBg} source={petImgArray[currentBFISelected]} >
+              <Text style={styles.itemTextStyleActive}>{item.name}</Text>
             </ImageBackground>
             :
-            <ImageBackground style={styles.listItemBg}
-              source={require('./../../../assets/images/bfiGuide/svg/ic_bfi_empty_bg.svg')} >
-              <Text style={styles.itemTextStyleInActive}>{item.name}
-              </Text>
-            </ImageBackground>
+            <View style= {{alignItems:'center',justifyContent:'center'}}>
+              <BFIEmptyImg style={styles.listItemBg}/>
+              <Text style={[styles.itemTextStyleInActive,{position:'absolute'}]}>{item.name}</Text>
+            </View>
+           
           }
         </View>
       </TouchableOpacity>
@@ -372,9 +366,11 @@ const BFIScoreMain = ({ route, navigation }) => {
           backBtnAction={() => backBtnAction()}
         />
       </View>
-      <Text style={styles.petNameTextStyleBFIApp}>{petName}</Text>
 
-      {images && images.length > 0 ?
+      <KeyboardAwareScrollView>
+        <Text style={styles.petNameTextStyleBFIApp}>{petName}</Text>
+
+       {images && images.length > 0 ?
         <View style={{ flexDirection: 'row', height: hp('15%'), marginLeft: wp('2%'), marginRight: wp('3%'), }}>
           <FlatList
             horizontal
@@ -384,26 +380,18 @@ const BFIScoreMain = ({ route, navigation }) => {
             onEndReached={handleEndReached}
             keyExtractor={({ imagePositionId }, index) => index}
             renderItem={horizontalRenderItem} />
-        </View> : undefined}
-
+        </View> : null}
 
       {images.length > 3 ? <View style={styles.headerViewStyleView}>
         <View style={{ flexDirection: 'row' }}>
-          <Image style={{
-            width: wp('6%'), height: hp('2%'), marginHorizontal: wp('2%')
-          }} resizeMode='contain' source={require('./../../../assets/images/bfiGuide/svg/arrow-black-left.svg')}></Image>
-          <Image style={{
-            width: wp('6%'), height: hp('2%')
-          }} resizeMode='contain' source={!isScrollEndReached ? icScrollEndReach : icScrollStartReach}></Image>
-          <Image style={{
-            width: wp('6%'), height: hp('2%'), marginHorizontal: wp('2%')
-          }} resizeMode='contain' source={require('./../../../assets/images/bfiGuide/svg/arrow-black-right.svg')}></Image>
-
+          <ArrowLeftImg width = {wp('6%')} height={hp('2%')} style={{marginHorizontal: wp('2%')}}/>
+          {!isScrollEndReached ? <IsScrollEndImg width = { wp('6%')} height = {hp('2%')}/> : <IsScrollStartImg width = { wp('6%')} height = {hp('2%')}/>}
+          <ArrowRightImg width = {wp('6%')} height={hp('2%')} style={{marginHorizontal: wp('2%')}}/>
         </View>
       </View>
         : null}
 
-      <ScrollView style={styles.scrollContainer}>
+      <View style={styles.scrollContainer}>
 
         <View style={styles.headerViewStyleBFIApp}>
           <FlatList
@@ -432,20 +420,20 @@ const BFIScoreMain = ({ route, navigation }) => {
           </View>
           : null}
 
-
         <TouchableOpacity onPress={() => {
           navigation.navigate("BFIScoreInstructions")
         }}>
+
           <View style={styles.headerViewStyleView}>
             <View style={{ flexDirection: 'row', marginBottom: hp("20%") }}>
-              <Image style={styles.eyeImageStyle} resizeMode='contain' source={require('./../../../assets/images/bfiGuide/svg/eye-instructions.svg')}></Image>
+              <EyeInstructionImg style={styles.eyeImageStyle}/>
               <Text style={styles.viewTextStyleBFIApp}>{'View BFI Chart and Instructions'}</Text>
             </View>
           </View>
         </TouchableOpacity>
 
-      </ScrollView>
-
+      </View>
+      </KeyboardAwareScrollView>
       <View style={CommonStyles.bottomViewComponentStyle}>
         <BottomComponent
           rightBtnTitle={'Submit'}
@@ -507,7 +495,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignSelf: "center",
     marginBottom: hp("1%"),
-    height: hp('13%'),
+    height: hp('8%'),
   },
 
   textInputStyle: {
@@ -561,9 +549,12 @@ const styles = StyleSheet.create({
   },
   headerViewStyleBFIApp: {
     alignItems: 'center',
-    paddingHorizontal: 30,
-    marginVertical: hp('2%')
-
+    // paddingHorizontal: 30,
+    marginVertical: hp('2%'),
+    justifyContent:'center',
+    alignItems:'center',
+    width: wp('90%'),
+    alignSelf:'center'
   },
   headerViewStyleView: {
     paddingHorizontal: 30,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import fonts from '../../../utils/commonStyles/fonts'
@@ -10,9 +10,13 @@ import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import ImageSequence from 'react-native-image-sequence';
 
-let rightArrowImg = require('./../../../../assets/images/otherImages/svg/rightArrowLightImg.svg');
-let downArrowImg = require('./../../../../assets/images/otherImages/svg/downArrowGrey.svg');
-let wifiImg = require('./../../../../assets/images/sensorImages/svg/wifiGreenImg.svg');
+import RightArrowImg from "./../../../../assets/images/otherImages/svg/rightArrowLightImg.svg";
+import DownArrowImg from "./../../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import WiFiImg from "./../../../../assets/images/sensorImages/svg/wifiGreenImg.svg";
+import WiFI1Img from "./../../../../assets/images/aniImgs/wifi.svg";
+import WiFI2Img from "./../../../../assets/images/aniImgs/wifi1.svg";
+import WiFi3Img from"./../../../../assets/images/aniImgs/wifi2.svg";
+
 let wifiImgPlus = require('./../../../../assets/images/sensorImages/png/plusWifi.png');
 let hideImg = require('./../../../../assets/images/otherImages/png/hide-password.png');
 let openImg = require('./../../../../assets/images/otherImages/png/show-password.png');
@@ -22,45 +26,36 @@ const SensorWiFiListUI = ({ navigation, route, ...props }) => {
     const [wifiList, set_wifiList] = useState([]);
     const [wifiPsd, set_wifiPsd] = useState(undefined);
     const [expandedIndex, set_expandedIndex] = useState(-1);
-    const [isLoading, set_isLoading] = useState(false);
     const [loaderText, set_loaderText] = useState(undefined);
     const [btnName, set_btnName] = useState(undefined);
-    const [isBckBtnEnable, set_isBckBtnEnable] = useState(true);
     const [isHidePassword, set_isHidePassword] = useState(true);
-    const [fetchedList, set_fetchedList] = useState(0);
     const [totalList, set_totalList] = useState(0);
     const [sensorType, set_sensorType] = useState(undefined);
     const images = [
-        require("./../../../../assets/images/aniImgs/wifi.svg"),
-        require("./../../../../assets/images/aniImgs/wifi1.svg"),
-        require("./../../../../assets/images/aniImgs/wifi2.svg"),        
+        require("./../../../../assets/images/aniImgs/wifi.png"),
+        require("./../../../../assets/images/aniImgs/wifi1.png"),
+        require("./../../../../assets/images/aniImgs/wifi2.png"),        
       ];
 
     var indexArray = useRef([]);
 
     useEffect(() => {
-        let tempWifiList = [];
-        tempWifiList = props.wifiList;
+
         if(props.sensorType){
             set_sensorType(props.sensorType);
         }
-        set_wifiList(tempWifiList);
-
+        if(props.wifiList && props.wifiList.length > 0) {
+            set_wifiList(props.wifiList);
+        }
     }, [props.wifiList]);
 
     useEffect(() => {
-
-        set_isLoading(props.isLoading);
         set_loaderText(props.loaderText);
         set_btnName(props.btnName);
-
-    }, [props.isLoading, props.loaderText, props.btnName]);
+    }, [props.loaderText, props.btnName]);
 
     useEffect(() => {
-
-        set_fetchedList(parseInt(props.fetchedList));
         set_totalList(parseInt(props.totalList));
-
     }, [props.fetchedList, props.totalList]);
 
     useEffect(() => {
@@ -114,14 +109,12 @@ const SensorWiFiListUI = ({ navigation, route, ...props }) => {
 
                 return (
                     <>
-                        <TouchableOpacity style={indexArray.current.includes(index) ? [styles.collapseHeaderExpStyle] : [styles.collapseHeaderStyle]} key={index} onPress={() => {
+                        <TouchableOpacity disabled = {item.wifiName && item.wifiName !== '' ? false : true} style={indexArray.current.includes(index) ? [styles.collapseHeaderExpStyle] : [styles.collapseHeaderStyle]} key={index} onPress={() => {
                             expandedIndex === index ? set_expandedIndex(-1) : set_expandedIndex(index);
-                            expandedIndex === index ? null : set_wifiPsd(undefined);
-                            expandedIndex === index ? null : set_isHidePassword(true);
-
+                            expandedIndex === index ? set_wifiPsd(wifiPsd) : set_wifiPsd(undefined);
+                            expandedIndex === index ? set_isHidePassword(isHidePassword) : set_isHidePassword(true);
                             if (item.wifiName !== "Add Network Manually") {
                                 indexArray.current = [index];
-
                             } else {
                                 navigateToManualNetwork();
                             }
@@ -131,14 +124,15 @@ const SensorWiFiListUI = ({ navigation, route, ...props }) => {
 
                             </View>
                             <View style={{ width: wp('100%'), flexDirection: "row", alignItems: 'center' }}>
-                                {item && item.wifiName !== '' ? <Image source={item.wifiName === "Add Network Manually" ? wifiImgPlus : wifiImg} style={styles.imageStyle} /> : 
+                                {item && item.wifiName !== '' ? (item.wifiName === "Add Network Manually" ? <Image source={wifiImgPlus} style={styles.imageStyle}/> : <WiFiImg width={30} height={25} style={styles.imageStyle}/>) : 
                                 <ImageSequence
                                     images={images}
                                     framesPerSecond={2}
                                     style={{width: 30, height: 25,marginRight: hp("2%"),marginLeft: hp("2%"),marginBottom: hp("0.5%")}}
-                                />}
+                                />
+                                }
                                 {item && item.wifiName !== '' ? <Text style={[styles.wifiNameStyle]}>{item.wifiName}</Text> : <Text style={[styles.wifiNameStyle]}>{item.status}</Text>}
-                                <Image source={indexArray.current.includes(index) ? downArrowImg : rightArrowImg} style={styles.nextImageStyle} />
+                                {indexArray.current.includes(index) ? <DownArrowImg width={wp('5%')} height={hp('2.5%')} style={[styles.nextImageStyle,{marginLeft: item.wifiName === "Add Network Manually" ? wp("3%") : wp("1%"),}]}/> : <RightArrowImg width={wp('5%')} height={hp('2.5%')} style={[styles.nextImageStyle,{marginLeft: item.wifiName === "Add Network Manually" ? wp("3%") : wp("1%"),}]}/>}
                             </View>
                         </TouchableOpacity>
 
@@ -190,7 +184,7 @@ const SensorWiFiListUI = ({ navigation, route, ...props }) => {
 
             <View style={[CommonStyles.headerView]}>
                 <HeaderComponent
-                    isBackBtnEnable={isBckBtnEnable}
+                    isBackBtnEnable={btnName && btnName === 'REFRESH NETWORK...' ? true : false}
                     isSettingsEnable={false}
                     isChatEnable={false}
                     isTImerEnable={false}
@@ -200,15 +194,15 @@ const SensorWiFiListUI = ({ navigation, route, ...props }) => {
                 />
             </View>
 
-            <View style={{ marginTop: hp('3%'), height: hp('68%') }}>
+            <View style={{ marginTop: hp('3%'), height: btnName && btnName === 'REFRESH NETWORK...' ? hp('70%') : hp('82%') }}>
                 <KeyboardAwareScrollView>
                     {_renderItems()}
                 </KeyboardAwareScrollView>
 
             </View>
 
-            <View style={CommonStyles.bottomViewComponentStyle}>
-                { btnName && btnName!=='' ? <BottomComponent
+            { btnName && btnName === 'REFRESH NETWORK...' ? <View style={CommonStyles.bottomViewComponentStyle}>
+                <BottomComponent
                     leftBtnTitle={''}
                     rightBtnTitle={btnName}
                     isLeftBtnEnable={false}
@@ -216,8 +210,8 @@ const SensorWiFiListUI = ({ navigation, route, ...props }) => {
                     isRightBtnEnable={true}
                     rightButtonAction={async () => nextButtonAction()}
 
-                ></BottomComponent> : <View style={{flex:1,justifyContent: 'center',alignItems: 'center'}}><Text style={styles.headerStyle}>{'Please wait..'}</Text></View>}
-            </View>
+                ></BottomComponent>
+            </View> : null}
 
             {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
                 <AlertComponent
@@ -231,7 +225,7 @@ const SensorWiFiListUI = ({ navigation, route, ...props }) => {
                     popUpLeftBtnAction={() => popCancelBtnAction()}
                 />
             </View> : null}
-            {isLoading === true ? <LoaderComponent showLoderBox={totalList > 0 ? 'hide' : 'show'} isLoader={true} heightLoader={'80%'} loaderText={loaderText} isButtonEnable={false} /> : null}
+            {wifiList && wifiList.length > 1 ?  null : <LoaderComponent showLoderBox={totalList > 0 ? 'hide' : 'show'} isLoader={true} heightLoader={'80%'} loaderText={loaderText} isButtonEnable={false} />}
         </View>
     );
 };
@@ -247,11 +241,11 @@ const styles = StyleSheet.create({
     },
 
     wifiNameStyle: {
+        width: wp('65%'),
         ...CommonStyles.textStyleRegular,
         fontSize: fonts.fontNormal,
         textAlign: "left",
         color: '#7F7F81',
-        flex: 1.2,
     },
 
     submitBtnStyle: {
@@ -309,7 +303,8 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         borderBottomColor: 'transparent',
         borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0
+        borderBottomRightRadius: 0,
+        
     },
 
     collapsedBodyExpStyle: {
@@ -329,8 +324,8 @@ const styles = StyleSheet.create({
     },
 
     imageStyle: {
-        height: 30,
-        width: 30,
+        height: hp('5%'),
+        width: wp('5%'),
         resizeMode: "contain",
         marginRight: hp("2%"),
         marginLeft: hp("2%"),
@@ -338,12 +333,8 @@ const styles = StyleSheet.create({
     },
 
     nextImageStyle: {
-        height: 10,
-        width: 10,
         resizeMode: "contain",
-        marginRight: hp("2%"),
-        marginLeft: hp("2%"),
-        flex: 0.6
+        marginLeft: wp("1%"),
     },
 
 });

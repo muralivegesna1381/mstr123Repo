@@ -5,7 +5,6 @@ import DatePicker from 'react-native-date-picker'
 import CommonStyles from './../../../../utils/commonStyles/commonStyles';
 import * as Constant from "./../../../../utils/constants/constant";
 import ImageView from "react-native-image-viewing";
-// import DatePicker from 'react-native-modern-datepicker';
 
 const QstDatePickerComponent = ({value,setValue,questionImageUrl,status_QID,isAnsSubmitted, route,...props}) => {
 
@@ -61,24 +60,12 @@ const QstDatePickerComponent = ({value,setValue,questionImageUrl,status_QID,isAn
                         onDateChange={(date) => {selectAction(date)}} 
                         mode = {"date"} 
                         textColor = {'black'} 
+                        theme = {'light'}
                         maximumDate = {new Date()}
                         style={styles.datePickeStyle}
                     />
 
               </View>}
-             
-
-            {/* {status_QID === 'Submitted' ? null : <View style={{flexDirection:'row', justifyContent:'flex-end',width: wp('75%'),marginTop: hp('2%')}}>
-              
-              <TouchableOpacity style={CommonStyles.tilesBtnLftStyle} onPress={() => selectAction('REVERT')}>
-                  <ImageBackground source={require("./../../../../../assets/images/otherImages/png/wrong.png")} style={CommonStyles.tilesBtnImgStyle} resizeMode='contain'></ImageBackground>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={CommonStyles.tilesBtnStyle} onPress={() => selectAction('SUBMIT')}>
-                  <ImageBackground source={require("./../../../../../assets/images/otherImages/png/right.png")} style={CommonStyles.tilesBtnImgStyle} resizeMode='contain'></ImageBackground>
-              </TouchableOpacity>
-
-            </View>} */}
 
           </View>
 
@@ -110,7 +97,6 @@ const styles = StyleSheet.create({
         backgroundColor:'white',
         width: wp('70%'),
         height: hp('25%'),
-        // alignSelf:'center'
     },
 
 });

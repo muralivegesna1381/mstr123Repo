@@ -1,21 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import {SafeAreaView,ScrollView,StatusBar,StyleSheet,Text,TouchableOpacity, View,FlatList} from 'react-native';
+import {StyleSheet,Text,TouchableOpacity, View,FlatList} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
 
 const DropdownComponent = ({navigation, topBtnTitle, bottomBtnTitle, isDelete, bottomBtnEnable,dataArray,headerText,...props }) => {
-
-    useEffect (() => {
-    },[]);
-
-    const topButtonAction = () => {
-        props.topButtonAction();
-    }
-
-    const bottomButtonAction = () => {
-        props.bottomButtonAction();
-    };
 
     const actionOnOptiontype = (item) => {
         props.actionOnOptiontype(item);
@@ -38,7 +26,7 @@ const DropdownComponent = ({navigation, topBtnTitle, bottomBtnTitle, isDelete, b
 
                     <TouchableOpacity onPress={() => actionOnOptiontype(item)}>
                         <View style={CommonStyles.dropDownFlatview}>
-                        <Text style={[CommonStyles.dropDownTextStyle]}>{item.name}</Text>
+                            <Text style={[CommonStyles.dropDownTextStyle]}>{item.name}</Text>
                         </View>
                     </TouchableOpacity>
 
@@ -61,42 +49,6 @@ const styles = StyleSheet.create({
         height: hp('100%'),
         justifyContent: "center",
         alignItems: "center",
-    },
-
-    topButtonstyle: {
-        backgroundColor:'#CCE8B0',
-         width: wp("80%"),
-        height: hp("6%"),
-        borderRadius: hp("0.5%"),
-        justifyContent: "center",
-        alignItems:'center',
-        borderColor:'#6BC100',
-        borderWidth:1.0,
-        marginVertical:wp('2%'),
-      },
-    
-      bottomButtonstyle : {
-        backgroundColor:'#E8E8EA',
-        width: wp("80%"),
-        height: hp("6%"),
-        borderRadius: hp("0.5%"),
-        justifyContent: "center",
-        alignItems:'center',
-        // borderColor:'red',
-        borderWidth:1.0,
-        marginVertical:wp('2%'),
-      },
-
-      topBtnTextStyle: {
-        color: 'black',
-        fontSize: fonts.fontMedium,
-        ...CommonStyles.textStyleBold,
-      },
-
-      bottomBtnTextStyle: {
-        color: 'black',
-        fontSize: fonts.fontMedium,
-        ...CommonStyles.textStyleBold,
     },
 
 });

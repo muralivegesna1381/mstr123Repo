@@ -1,23 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Image,Platform} from 'react-native';
+import {View,StyleSheet,Platform} from 'react-native';
 import BottomComponent from "./../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
-import fonts from './../../../utils/commonStyles/fonts'
 import SelectPetComponent from './../../../utils/selectPetComponent/selectPetComponent';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
+import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
+
+import DogCatImg from "./../../../../assets/images/dogImages/dogImgCat.svg";
 
 const  TimerPetSelectionUI = ({route, ...props }) => {
 
     const [petsArray, set_petsArray] = useState(undefined);
     const [defaultPetObj, set_defaultPetObj] = useState(undefined);
     const [selectedIndex, set_selectedIndex] = useState(undefined);
+    const [isLoading, set_isLoading] = useState(true);
+
+    useEffect(() => {
+        stopLoading();
+    }, []);
 
     useEffect(() => {
         set_petsArray(props.petsArray);
         set_defaultPetObj(props.defaultPetObj);
         set_selectedIndex(props.selectedIndex);
     }, [props.petsArray,props.defaultPetObj,props.selectedIndex]);
+
+    const stopLoading = () => {
+        setTimeout(() => {
+            set_isLoading(false)
+        }, 2000);
+    }
 
     const nextButtonAction = () => {
       props.submitAction();
@@ -48,7 +61,7 @@ const  TimerPetSelectionUI = ({route, ...props }) => {
             <View style={[styles.petSelViewComponentStyle,{backgroundColor:'red',height: petsArray && petsArray.length < 9 ? hp('60%') : hp('75%')}]}>
                 <SelectPetComponent 
                     petsArray = {petsArray}
-                    defaultPetObj = {defaultPetObj}
+                    defaultPetObj = {props.selectedPet ? props.selectedPet : defaultPetObj}
                     selectedIndex = {selectedIndex}
                     selectedPName = {props.selectedPName}
                     isKeboard = {props.isKeboard}
@@ -57,7 +70,7 @@ const  TimerPetSelectionUI = ({route, ...props }) => {
             </View>
 
             {petsArray && petsArray.length < 9 ? <View style={[styles.petImgStyle,{bottom:hp('14%'),position:'absolute'}]}>
-                <Image source={require("./../../../../assets/images/dogImages/dogImgCat.svg")} style={styles.dogImgStyle}/>               
+                <DogCatImg style={styles.dogImgStyle}/>             
             </View> : null}
 
             <View style={[CommonStyles.bottomViewComponentStyle,{}]}>
@@ -71,6 +84,8 @@ const  TimerPetSelectionUI = ({route, ...props }) => {
                     leftButtonAction = {async () => backBtnAction()}
                 />
             </View>   
+
+            {isLoading === true ? <LoaderComponent isLoader={true} loaderText = {"Please Wait..."} isButtonEnable = {false} /> : null}  
 
          </View>
     );

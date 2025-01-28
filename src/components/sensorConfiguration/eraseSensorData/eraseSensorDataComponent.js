@@ -1,5 +1,5 @@
 import React, {useState,useEffect,useRef} from 'react';
-import {SafeAreaView,ScrollView,StatusBar,StyleSheet,Text,TouchableOpacity, View,Image} from 'react-native';
+import {StyleSheet,Text, View} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import fonts from '../../../utils/commonStyles/fonts'

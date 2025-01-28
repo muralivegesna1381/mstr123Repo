@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   BackHandler,
   FlatList,
-  Image,
   ImageBackground,
   Platform,
   StyleSheet,
@@ -14,10 +13,7 @@ import {
   View,
   Keyboard
 } from "react-native";
-import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
-} from "react-native-responsive-screen";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import BuildEnv from "../../config/environment/environmentConfig";
 import HeaderComponent from "../../utils/commonComponents/headerComponent";
 import LoaderComponent from "../../utils/commonComponents/loaderComponent";
@@ -26,10 +22,24 @@ import fonts from "../../utils/commonStyles/fonts";
 import * as Constant from "../../utils/constants/constant";
 import * as DataStorageLocal from '../../utils/storage/dataStorageLocal';
 import AlertComponent from '../../utils/commonComponents/alertComponent';
-let searchImg = require("./../../../assets/images/otherImages/svg/searchIcon.svg");
-let defaultPetImg = require("./../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
 import RNExitApp from 'react-native-exit-app';
 import * as firebaseHelper from '../../utils/firebase/firebaseHelper';
+import perf from '@react-native-firebase/perf';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
+
+import DefaultPetImg from "./../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
+import SearchImg from "./../../../assets/images/otherImages/svg/searchIcon.svg";
+import NoLogsDogImg from "./../../../assets/images/dogImages/noRecordsDog.svg";
+import BFI20Img from "./../../../assets/images/bfiGuide/svg/ic_bfi_bg_20.svg";
+import BFI30Img from "./../../../assets/images/bfiGuide/svg/ic_bfi_bg_30.svg";
+import BFI40Img from "./../../../assets/images/bfiGuide/svg/ic_bfi_bg_40.svg";
+import BFI50Img from "./../../../assets/images/bfiGuide/svg/ic_bfi_bg_50.svg";
+import BFI60Img from "./../../../assets/images/bfiGuide/svg/ic_bfi_bg_60.svg";
+import BFI70Img from "./../../../assets/images/bfiGuide/svg/ic_bfi_bg_70.svg";
+import BFIOtherImg from "./../../../assets/images/bfiGuide/svg/ic_bfi_bg_other.svg";
+
 
 const PetListBFIScoringScreen = ({ route, navigation }) => {
   const [isLoading, set_isLoading] = useState(true);
@@ -61,6 +71,7 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
 
   //Need to refresh screen when user wants to score another set of images from review screen
   useEffect(() => {
+
     initialSessionStart();
     firebaseHelper.reportScreen(firebaseHelper.screen_bfi_pet_list_scoring);
     firebaseHelper.logEvent(firebaseHelper.event_screen, firebaseHelper.screen_bfi_pet_list_scoring, "User in Pet list scoring Screen", '');
@@ -69,10 +80,10 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
       set_Date(new Date());
       clearData();
       getPetsData();
-
       getUserRole()
     });
     return () => {
+      initialSessionStop();
       focus();
     };
 
@@ -80,11 +91,7 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
 
   const getUserRole = async () => {
 
-    // let userRole = await DataStorageLocal.getDataFromAsync(Constant.MENU_ID);
-    // set_UserRole(userRole)
-
-    let userRoleDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
-    userRoleDetails = JSON.parse(userRoleDetails);
+    let userRoleDetails = UserDetailsModel.userDetailsData.userRole; 
 
     if(userRoleDetails){
       set_UserRole(userRoleDetails.RoleName)
@@ -102,18 +109,17 @@ const PetListBFIScoringScreen = ({ route, navigation }) => {
 
   //Android Physical back button action
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
-    return () => {
-      initialSessionStop();
-      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
-    };
+    // BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    // return () => {
+    //   initialSessionStop();
+    //   BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    // };
   }, []);
 
   const backBtnAction = async () => {
     
     let userRole = await DataStorageLocal.getDataFromAsync(Constant.MENU_ID);
-console.log('App ', userRole)
-    if (Platform.OS === "android" && userRole === '68') {
+    if (Platform.OS === "android" && parseInt(userRole) === 68) {
       set_popUpAlert('Exit App');
       set_popupMessage(Constant.ARE_YOU_SURE_YOU_WANT_EXIT);
       set_popUpRBtnTitle('YES');
@@ -182,126 +188,127 @@ console.log('App ', userRole)
   const getPetBFIImages = async (petID, petImgSets, petName) => {
     //setting array based on instruction type recieved
     set_isLoading(true);
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-    const options = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        ClientToken: token,
-      },
-    };
-    fetch(Environment.uri + "petBfi/getPetBfiImages/" + petID + "?petBfiImageSetIds=" + petImgSets + "&isScored=" + isScored.current,
-      options,)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data && data.response.pets.length > 0) {
-          set_isLoading(false);
-          if (isScored.current) {
-            navigation.navigate("SubmittedScoreComponent", {
-              imagesArray: data.response.pets[0].petBfiInfos,
-              petName: petName
-            });
+
+    let apiMethod = apiMethodManager.GET_PET_BFIIMAGES + petID + "?petBfiImageSetIds=" + petImgSets + "&isScored=" + isScored.current;
+    let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
+    set_isLoading(false);
+                    
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+                    
+      if (apiService.data.pets.length > 0) {
+
+        if (isScored.current) {
+          navigation.navigate("SubmittedScoreComponent", { imagesArray: apiService.data.pets[0].petBfiInfos, petName: petName });
+        }else {
+
+          if (apiService.data.pets[0].petBfiInfos.length > 1) {
+            //go to submitted images screeen
+            navigation.navigate("PetSubmittedImagesScreen", {imagesArray: apiService.data.pets[0].petBfiInfos, petName: petName});
+          } else {
+            //goto Scoring screen
+           navigation.navigate("BFIScoreMain", { bfiInfoData: apiService.data.pets[0].petBfiInfos, petName: petName });
           }
-          else {
-            if (data.response.pets[0].petBfiInfos.length > 1) {
-              //go to submitted images screeen
-              navigation.navigate("PetSubmittedImagesScreen", {
-                imagesArray: data.response.pets[0].petBfiInfos,
-                petName: petName
-              });
-            } else {
-              //goto Scoring screen
-              navigation.navigate("BFIScoreMain", { bfiInfoData: data.response.pets[0].petBfiInfos, petName: petName });
-            }
-          }
+          
         }
-        else {
-          set_isLoading(false);
-          set_popupMessage('Unable to fetch the data, Please try again later')
-          firebaseHelper.logEvent(firebaseHelper.event_getPetBfiImages_api, firebaseHelper.screen_bfi_pet_list_scoring, "getPetBfiImages Service failed", 'Service error');
-        }
-      })
-      .catch((error) => {
-        //error block happens when there is something wring with the service
-        firebaseHelper.logEvent(firebaseHelper.event_getPetBfiImages_api, firebaseHelper.screen_bfi_pet_list_scoring, "getPetBfiImages Service failed", 'Service error'+ error.message);
+      } else {
         set_isLoading(false);
-        set_popupMessage('Unable to fetch the records, Please try again later')
-      });
+        set_popupMessage('Unable to fetch the data, Please try again later');
+        set_isPopUp(true);
+        firebaseHelper.logEvent(firebaseHelper.event_getPetBfiImages_api, firebaseHelper.screen_bfi_pet_list_scoring, "getPetBfiImages Service failed", 'Service error');
+      }
+
+    } else if(apiService && apiService.isInternet === false) {
+                                
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+      firebaseHelper.logEvent(firebaseHelper.event_getPetBfiImages_api, firebaseHelper.screen_bfi_pet_list_scoring, "getPetBfiImages Service failed", 'Service error'+ apiService.error.errorMsg);
+      set_popupMessage(apiService.error.errorMsg)
+      set_isPopUp(true);
+
+    } else {
+      set_popupMessage('Unable to fetch the data, Please try again later');
+      set_isPopUp(true);
+      firebaseHelper.logEvent(firebaseHelper.event_getPetBfiImages_api, firebaseHelper.screen_bfi_pet_list_scoring, "getPetBfiImages Service failed", 'Service error');
+        
+    }
+
   };
 
   //getting pets data from service call
   const getPetsData = async () => {
+
     set_isRecords(false);
-    let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
     set_isLoading(true);
-    const options = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        ClientToken: token,
-      },
-    };
     var url_data = '';
     if (searchText.current) {
-      url_data = Environment.uri + "petBfi/getBfiPets/" + pageNum.current + "/" + pageRecords + "?searchText=" + searchText.current + "&isScored=" + isScored.current;
+      url_data = apiMethodManager.GET_BFI_PETS + pageNum.current + "/" + pageRecords + "?searchText=" + searchText.current + "&isScored=" + isScored.current;
     }
     else {
-      url_data = Environment.uri + "petBfi/getBfiPets/" + pageNum.current + "/" + pageRecords + "?isScored=" + isScored.current;
+      url_data = apiMethodManager.GET_BFI_PETS + pageNum.current + "/" + pageRecords + "?isScored=" + isScored.current;
     }
-    fetch(url_data,
-      options,)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data && data.response.pets.length > 0) {
-          // set_isRecords(true);
-          let obj;
-          for (let i = 0; i < data.response.pets.length; i++) {
-            obj = data.response.pets[i];
-            if (data.response.pets[i].bfiScore !== undefined) {
-              switch (data.response.pets[i].bfiScore) {
-                case "20":
-                  obj.scoreImg = require("./../../../assets/images/bfiGuide/svg/ic_bfi_bg_20.svg");
-                  break;
-                case "30":
-                  obj.scoreImg = require("./../../../assets/images/bfiGuide/svg/ic_bfi_bg_30.svg");
-                  break;
-                case "40":
-                  obj.scoreImg = require("./../../../assets/images/bfiGuide/svg/ic_bfi_bg_40.svg");
-                  break;
-                case "50":
-                  obj.scoreImg = require("./../../../assets/images/bfiGuide/svg/ic_bfi_bg_50.svg");
-                  break;
-                case "60":
-                  obj.scoreImg = require("./../../../assets/images/bfiGuide/svg/ic_bfi_bg_60.svg");
-                  break;
-                case "70":
-                  obj.scoreImg = require("./../../../assets/images/bfiGuide/svg/ic_bfi_bg_70.svg");
-                  break;
-                default:
-                  obj.scoreImg = require("./../../../assets/images/bfiGuide/svg/ic_bfi_bg_other.svg");
-                  break;
-              }
-            }
-            totalRecordsData.current.push(obj);
-          }
-          setData(totalRecordsData.current);
-          set_isLoading(false);
-        } else {
-          firebaseHelper.logEvent(firebaseHelper.event_getBfiPets_api, firebaseHelper.screen_bfi_pet_list_scoring, "getBfiPets_api Service failed", 'Service error');
-          if (totalRecordsData.current.length === 0)
-            set_isRecords(true);
-          set_isLoading(false);
-        }
-      })
-      .catch((error) => {
-        firebaseHelper.logEvent(firebaseHelper.event_getBfiPets_api, firebaseHelper.screen_bfi_pet_list_scoring, "getBfiPets_api Service failed", 'Service error'+ error.message);
-        set_popupMessage('Unable to fetch the records, Please try again later')
-        set_isRecords(true);
-        set_isLoading(false);
-      });
+
+    let apiMethod = url_data;
+    let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
+    set_isLoading(false);
+                   
+    if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+                    
+      if (apiService.data.pets && apiService.data.pets.length > 0) {
+        prepareBFIScore(apiService.data.pets);
+      }
+
+    } else if(apiService && apiService.isInternet === false) {
+                                
+    } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+        
+      set_popupMessage(apiService.error.errorMsg)
+      set_isPopUp(true);
+      firebaseHelper.logEvent(firebaseHelper.event_getBfiPets_api, firebaseHelper.screen_bfi_pet_list_scoring, "getBfiPets_api Service failed", 'Service error : ' + apiService.error.errorMsg);
+
+    } else {
+        
+      set_popupMessage('Unable to fetch the records, Please try again later')
+      set_isPopUp(true);
+      firebaseHelper.logEvent(firebaseHelper.event_getPetBfiImages_api, firebaseHelper.screen_bfi_pet_list_scoring, "getPetBfiImages Service failed", 'Service error');
+        
+    }
+
   };
+
+  const prepareBFIScore = (bfiScorePets) => {
+
+    let obj;
+    for (let i = 0; i < bfiScorePets.length; i++) {
+      obj = bfiScorePets[i];
+      if (bfiScorePets[i].bfiScore !== undefined) {
+        switch (bfiScorePets[i].bfiScore) {
+          case "20":
+            obj.scoreImg = BFI20Img;
+            break;
+          case "30":
+            obj.scoreImg = BFI30Img;
+            break;
+          case "40":
+            obj.scoreImg = BFI40Img;
+            break;
+          case "50":
+            obj.scoreImg = BFI50Img;
+            break;
+          case "60":
+            obj.scoreImg = BFI60Img;
+            break;
+          case "70":
+            obj.scoreImg = BFI70Img;
+            break;
+          default:
+            obj.scoreImg = BFIOtherImg;
+            break;
+          }
+      }
+      totalRecordsData.current.push(obj);
+    }
+    setData(totalRecordsData.current);
+
+  }
 
   const popOkBtnAction = () => {
     if (popupMessage === Constant.ARE_YOU_SURE_YOU_WANT_EXIT) {
@@ -353,23 +360,20 @@ console.log('App ', userRole)
             </View>
 
             <View style={[styles.ratingImageView]}>
-              <ImageBackground source={defaultPetImg} style={[styles.ratingImage1]} imageStyle={{ borderRadius: 15 }}>
+              <ImageBackground source={DefaultPetImg} style={[styles.ratingImage1]} imageStyle={{ borderRadius: 15 }}>
                 {item.photoUrl && item.photoUrl !== "" ?
                   <ImageBackground source={{ uri: item.photoUrl }} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => {
                     set_imgLoader(false)
                   }} style={[styles.ratingImage1]} imageStyle={{ borderRadius: 15 }}>
                     {imgLoader ? <ActivityIndicator size='small' color="grey" /> : null}
                   </ImageBackground> :
-                  <ImageBackground source={defaultPetImg} style={[styles.ratingImage1]} imageStyle={{ borderRadius: 15 }}></ImageBackground>}
+                  <ImageBackground source={DefaultPetImg} style={[styles.ratingImage1]} imageStyle={{ borderRadius: 15 }}></ImageBackground>}
               </ImageBackground>
-
 
               {isScored.current ? (
                 <View
                   style={Platform.isPad === true ? [styles.scoreItemBgTab] : [styles.scoreItemBg]}>
-                  <ImageBackground resizeMode="contain" style={[styles.ratingImage2, {}]}
-                    source={item.scoreImg}
-                  />
+                  <item.scoreImg width={wp("9%")} height={hp("5%")} style={styles.ratingImage2}/>
                   <Text style={Platform.isPad === true ? [styles.textStyleWhiteTab] : [styles.textStyleWhite]}>{item.bfiScore}</Text>
                 </View>
               ) : null}
@@ -397,7 +401,7 @@ console.log('App ', userRole)
 
       <View style={CommonStyles.searchBarStyle}>
         <View style={[CommonStyles.searchInputContainerStyle]}>
-          <Image source={searchImg} style={CommonStyles.searchImageStyle} />
+          <SearchImg width={wp("3%")} height={hp("3%")}/>
           <TextInput
             style={CommonStyles.searchTextInputStyle}
             underlineColorAndroid="transparent"
@@ -461,15 +465,9 @@ console.log('App ', userRole)
         </View>
       </View>
 
-      {
-        isRecords ? (
-          <View style={styles.noRecordsContainer}>
-            <Image style={[CommonStyles.nologsDogStyle]} source={require("./../../../assets/images/dogImages/noRecordsDog.svg")}></Image>
-            <Text style={[CommonStyles.noRecordsTextStyle, { marginTop: hp("2%") }]}>{Constant.NO_RECORDS_LOGS}</Text>
-            <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
-          </View>
-        ) : (
-          <View style={styles.flatListView}>
+      {(filterArray && filterArray.length > 0) || (data && data.length > 0) ? (
+
+        <View style={styles.flatListView}>
             <FlatList
               data={filterArray ? filterArray : data}
               onEndReachedThreshold={1}
@@ -486,6 +484,15 @@ console.log('App ', userRole)
               }}
             />
           </View>
+          
+        ) : (
+
+          (isLoading === false ? <View style={styles.noRecordsContainer}>
+            <NoLogsDogImg style={[CommonStyles.nologsDogStyle]}/>
+            <Text style={[CommonStyles.noRecordsTextStyle, { marginTop: hp("2%") }]}>{Constant.NO_RECORDS_LOGS}</Text>
+            <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
+          </View> : null)
+          
         )
       }
       {
@@ -527,7 +534,7 @@ const styles = StyleSheet.create({
   },
   flatListView: {
     marginTop: hp("0.5%"),
-    marginBottom: hp("30%")
+   marginBottom: hp("30%")
   },
   tabViewStyle: {
     height: hp("6%"),
@@ -638,8 +645,6 @@ const styles = StyleSheet.create({
   },
 
   ratingImage2: {
-    height: hp('5%'),
-    width: wp("9%"),
     position: "absolute",
     marginLeft: wp("3.5%"),
     marginTop: hp("-0.3%"),

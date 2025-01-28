@@ -13,9 +13,10 @@ import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import moment from 'moment';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
 
 let trace_inEnterWeightScreen;
 let trace_UpdateWeight_API_Complete;
@@ -159,10 +160,10 @@ const  EnterWeightComponent = ({route, ...props }) => {
         let mtype = undefined;
 
         if(value){
-            mtype = 'pets/updateWeight';
+            mtype = apiMethodManager.PET_UPDATE_WEIGHT;
             trace_UpdateWeight_API_Complete = await perf().startTrace('t_UpdateWeight_API');
         } else {
-            mtype = 'pets/addWeight';
+            mtype = apiMethodManager.PET_ADD_WEIGHT;
             trace_UpdateWeight_API_Complete = await perf().startTrace('t_AddWeight_API');
         }
         firebaseHelper.logEvent(firebaseHelper.event_pet_weight_new_api, firebaseHelper.screen_pet_weight_enter, "Initiated Pet Weight Update API "+mtype+" "+wValue+weightType, 'Pet Id : '+petObj.petID);
@@ -170,7 +171,6 @@ const  EnterWeightComponent = ({route, ...props }) => {
         let deciValue = actualDecimalValue ? actualDecimalValue : '';
 
         let userId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
         let wValue = actValue + '.' + deciValue;
         let weightJson = {
             "petWeightId": value ? item.petWeightId : 0,
@@ -180,39 +180,36 @@ const  EnterWeightComponent = ({route, ...props }) => {
             "weightUnit": weightType,
             "addDate":  "" + moment(new Date()).format("YYYY-MM-DD")
         }
-        let enterUpdatePetWeight = await ServiceCalls.addEditPetWeight(weightJson,token,mtype);
-        stopFBTrace();
 
-        if(enterUpdatePetWeight && enterUpdatePetWeight.logoutData){
-          AuthoriseCheck.authoriseCheck();
-          navigation.navigate('WelcomeComponent');
-          firebaseHelper.logEvent(firebaseHelper.event_pet_weight_new_api_fail, firebaseHelper.screen_pet_weight_enter, "Pet Weight Update API Fail", 'Unatherised');
-          return;
-        }
+        let apiMethod = mtype;
+        let apiService = await apiRequest.postData(apiMethod,weightJson,Constant.SERVICE_JAVA,navigation);
+        set_isLoading(false);
+        isLoadingdRef.current = 0;
+        stopFBTrace();
         
-        if(enterUpdatePetWeight && !enterUpdatePetWeight.isInternet){
-            set_isLoading(false);
-            isLoadingdRef.current = 0;
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            
+            if(apiService.status) {
+                getSOBPets();
+            } else {
+                createPopup(true,Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,1,0);
+                firebaseHelper.logEvent(firebaseHelper.event_pet_weight_new_api_fail, firebaseHelper.screen_pet_weight_enter, "Pet Weight Update API Fail", 'Service Status : false'); 
+            }
+ 
+        } else if(apiService && apiService.isInternet === false) {
             createPopup(true,Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,1,0);
             firebaseHelper.logEvent(firebaseHelper.event_pet_weight_new_api_fail, firebaseHelper.screen_pet_weight_enter, "Pet Weight Update API Fail", 'Internet : false');
             return;
-        }
-  
-        if(enterUpdatePetWeight && enterUpdatePetWeight.statusData){
-            getSOBPets();
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            createPopup(true,Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,1,0);
+            firebaseHelper.logEvent(firebaseHelper.event_pet_weight_new_api_fail, firebaseHelper.screen_pet_weight_enter, "Pet Weight Update API Fail", 'error : '+ apiService.error);
+            
         } else {
-            set_isLoading(false);
-            isLoadingdRef.current = 0;
             createPopup(true,Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,1,0);
             firebaseHelper.logEvent(firebaseHelper.event_pet_weight_new_api_fail, firebaseHelper.screen_pet_weight_enter, "Pet Weight Update API Fail", 'Service Status : false');
-        }
-  
-        if(enterUpdatePetWeight && enterUpdatePetWeight.error) {
-            set_isLoading(false);
-            isLoadingdRef.current = 0;
-            createPopup(true,Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,1,0);
-            let errors = enterUpdatePetWeight.error.length > 0 ? enterUpdatePetWeight.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_pet_weight_new_api_fail, firebaseHelper.screen_pet_weight_enter, "Pet Weight Update API Fail", 'error : '+errors);
+
         }
 
     };
@@ -221,48 +218,29 @@ const  EnterWeightComponent = ({route, ...props }) => {
 
         set_isLoading(true);
         isLoadingdRef.current = 1;
-
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
         let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let serviceCallsObj = await ServiceCalls.getPetParentPets(clientId,token);
-
+        let apiMethod = apiMethodManager.GET_PETPARENT_PETS + clientId;
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA);
         set_isLoading(false);
         isLoadingdRef.current = 0;
-    
-        if(serviceCallsObj && serviceCallsObj.logoutData){
-          AuthoriseCheck.authoriseCheck();
-          navigation.navigate('WelcomeComponent');
-          firebaseHelper.logEvent(firebaseHelper.event_dashboard_getPets_fail, firebaseHelper.screen_pet_weight_enter, "Enter Weight Getpets Service failed", 'Unautherised');
-          return;
-        }
-    
-        if(serviceCallsObj && !serviceCallsObj.isInternet){
-            createPopup(true,Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,1,0);
-            firebaseHelper.logEvent(firebaseHelper.event_dashboard_getPets_fail, firebaseHelper.screen_pet_weight_enter, "Enter Weight Getpets Service failed", 'Internet : false');
-          return;
-        }
-    
-        if(serviceCallsObj && serviceCallsObj.statusData){
-    
-          if (serviceCallsObj.responseData) {
-            await setDefaultPet(serviceCallsObj.responseData,petObj.petID);
-            createPopup(true,Constant.ALERT_INFO,'Your pet weight has been submitted successfully',1,1);
-          }
-    
-        } else {
-            firebaseHelper.logEvent(firebaseHelper.event_dashboard_getPets_fail, firebaseHelper.screen_pet_weight_enter, "Enter Weight Getpets Service failed", 'Service Status : false');
-        }
-    
-        if(serviceCallsObj && serviceCallsObj.error) {
-            let errors = serviceCallsObj.error.length > 0 ? serviceCallsObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_dashboard_getPets_fail, firebaseHelper.screen_pet_weight_enter, "Enter Weight Getpets Service failed", 'error : '+errors);
+        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+        
+            if(apiService.data.petDevices.length > 0){
+                await setDefaultPet(apiService.data.petDevices,petObj.petID);
+                createPopup(true,Constant.ALERT_INFO,'Your pet weight has been submitted successfully',1,1);
+            }
+ 
+        } else if(apiService && apiService.isInternet === false) {
+            return;
+
         }
     
     };
 
     const setDefaultPet = async (pets, petId) => {
         let obj = findArrayElementByPetId(pets, petId);
-        await DataStorageLocal.saveDataToAsync(Constant.DEFAULT_PET_OBJECT, JSON.stringify(obj));
+        AppPetsData.petsData.defaultPet = obj;
     };
 
     function findArrayElementByPetId(pets, petId) {
@@ -365,7 +343,7 @@ const  EnterWeightComponent = ({route, ...props }) => {
                                 wrapperHeight={190}
                                 // wrapperWidth={100}
                                 wrapperColor='white'
-                                wrapperBackground={'yellow'}
+                                wrapperBackground={'white'}
                                 itemHeight={60}
                                 highlightColor='green'
                                 highlightBorderWidth={1}
@@ -382,6 +360,7 @@ const  EnterWeightComponent = ({route, ...props }) => {
                                 selectedIndex={actualDecimalValue}
                                 wrapperHeight={190}
                                 wrapperColor='white'
+                                wrapperBackground={'white'}
                                 itemHeight={60}
                                 highlightColor='blue'
                                 highlightBorderWidth={1}

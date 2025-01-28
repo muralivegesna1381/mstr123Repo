@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, ImageBackground,Platform } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity,Platform, ImageBackground } from 'react-native';
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
@@ -10,7 +10,10 @@ import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
 
-let arrowIcon = require('./../../../../assets/images/dashBoardImages/svg/right-arrow.svg')
+import SensorTypeImg from "./../../../../assets/images/sensorImages/png/sensorTypeLogo.png";
+import RightArrowImg from "./../../../../assets/images/dashBoardImages/svg/right-arrow.svg";
+import SensorImg from "./../../../../assets/images/sensorImages/png/sensorIcon.png";
+
 let trace_inSensorTypeScreen;
 
 const SensorTypeComponent = ({ navigation, route, ...props }) => {
@@ -105,13 +108,6 @@ const SensorTypeComponent = ({ navigation, route, ...props }) => {
     const backBtnAction = () => {
 
         navigation.pop();
-        // if (isFromType === 'AddDevice') {
-        //     navigation.navigate('DashBoardService');
-        // } else if (isFromType === 'Devices') {
-        //     navigation.navigate('MultipleDevicesComponent');
-        // } else {
-        //     navigation.navigate('PetAddressComponent');
-        // }
 
     };
 
@@ -127,6 +123,7 @@ const SensorTypeComponent = ({ navigation, route, ...props }) => {
         sJosnObj.current.deviceType = '';
         set_selectedIndex(undefined)
         set_isActionSelected(false);
+        firebaseHelper.logEvent(firebaseHelper.event_SOB_Without_Sensor_submit, firebaseHelper.screen_SOB_sensorType, "User selected the Without Sensor", 'Device Number : ');
         await DataStorageLocal.saveDataToAsync(Constant.ONBOARDING_OBJ, JSON.stringify(sJosnObj.current));
         navigation.navigate('PetReviewComponent');
     };
@@ -159,14 +156,13 @@ const SensorTypeComponent = ({ navigation, route, ...props }) => {
                             <View style={selectedIndex === 0 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                                 <View style={styles.imgBckViewStyle}>
-                                    <ImageBackground
-                                        source={require("./../../../../assets/images/sensorImages/svg/sensorTypeLogo.svg")}
+                                <ImageBackground
+                                        source={SensorTypeImg}
                                         style={Platform.isPad ? [styles.petImgStyle, {width: wp("7%"),}] : [styles.petImgStyle]}
                                         resizeMode='contain'
                                     >
                                     </ImageBackground>
                                 </View>
-
                                 <Text style={[styles.name]}>{'AGL 2'}</Text>
                             </View>
                         </TouchableOpacity>
@@ -175,14 +171,14 @@ const SensorTypeComponent = ({ navigation, route, ...props }) => {
                             <View style={selectedIndex === 1 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                                 <View style={styles.imgBckViewStyle}>
-                                    <ImageBackground
-                                        source={require("./../../../../assets/images/sensorImages/svg/sensorTypeLogo.svg")}
+                                <ImageBackground
+                                        source={SensorTypeImg}
                                         style={Platform.isPad ? [styles.petImgStyle, {width: wp("7%"),}] : [styles.petImgStyle]}
                                         resizeMode='contain'
                                     >
                                     </ImageBackground>
+                                       
                                 </View>
-
                                 <Text style={[styles.name]}>{'CMAS'}</Text>
                             </View>
                         </TouchableOpacity>
@@ -195,13 +191,12 @@ const SensorTypeComponent = ({ navigation, route, ...props }) => {
 
                                 <View style={styles.imgBckViewStyle}>
                                     <ImageBackground
-                                        source={require("./../../../../assets/images/sensorImages/svg/sensorIcon.svg")}
-                                        style={[styles.petImgStyle, { width: Platform.isPad ? wp("9%") : wp("15%") }]}
+                                        source={SensorImg}
+                                        style={[styles.petImgStyle, { width: Platform.isPad ? wp("9%") : wp("13%") }]}
                                         resizeMode='contain'
                                     >
                                     </ImageBackground>
                                 </View>
-
                                 <Text style={[styles.name]}>{'HPN1'}</Text>
                             </View>
                         </TouchableOpacity>
@@ -215,7 +210,7 @@ const SensorTypeComponent = ({ navigation, route, ...props }) => {
                 <View style={{ height: hp('5%'), bottom:15}}>
                     <TouchableOpacity style = {{flexDirection:'row',justifyContent:'center', alignItems:'center'}} onPress={() => withoutSensorAction()}>
                         <Text style={[styles.withOutDevTextStyle]}>{'Continue without sensor'}</Text>
-                        <ImageBackground source={arrowIcon} style={[styles.arrowImgStyle, {}]} resizeMode='contain'></ImageBackground>
+                        <RightArrowImg style={[styles.arrowImgStyle, {}]}/>
                     </TouchableOpacity>
                 </View>
             </View>}
@@ -292,7 +287,7 @@ const styles = StyleSheet.create({
     },
 
     petImgStyle: {
-        width: wp("8%"),
+        width: wp("9%"),
         aspectRatio: 1,
         resizeMode: 'contain'
     },

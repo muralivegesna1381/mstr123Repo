@@ -1,5 +1,5 @@
 import React,{useEffect, useState, useRef} from 'react';
-import {View,StyleSheet,Text,ImageBackground, TouchableOpacity, FlatList} from 'react-native';
+import {View,StyleSheet,ImageBackground, TouchableOpacity, FlatList} from 'react-native';
 import {widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 const QstDatePickerComponent = ({setValue,status_QID,answerArray,selectedArray, route,...props}) => {
@@ -35,7 +35,6 @@ const QstDatePickerComponent = ({setValue,status_QID,answerArray,selectedArray, 
                     <TouchableOpacity disabled = {status_QID==="Submitted" ? true : false}  onPress={() => {
 
                             if (selectedAnswers.current.includes(item.questionAnswerId)){
-                                    // selectedAnswers.current = selectedAnswers.current.filter(item => item !== item.questionAnswerId);
                                 var indexSelected = selectedAnswers.current.findIndex(e => e === item.questionAnswerId);
                                 if (indexSelected != -1) {
                                     selectedAnswers.current.splice(indexSelected, 1);

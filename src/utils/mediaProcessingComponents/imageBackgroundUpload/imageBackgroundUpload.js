@@ -9,8 +9,8 @@ import AlertComponent from './../../commonComponents/alertComponent';
 import CommonStyles from './../../commonStyles/commonStyles';
 import * as ImageProgress from './../../mediaProcessingComponents/imageProcessComponent/imageProcessComponent';
 import * as Apolloclient from './../../../config/apollo/apolloConfig';
-import * as ServiceCalls from './../../getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../authorisedComponent/authorisedComponent';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 
 var RNFS = require('react-native-fs');
 
@@ -47,8 +47,8 @@ const ImageBackgrounUpload = ({navigation, route,...props }) => {
 
             let internetType = await internetCheck.internetTypeCheck();
             if(internetType === 'wifi'){
-                    petName.current = imgData[0].petName;
-                    startUploadingProcess(); 
+                petName.current = imgData[0].petName;
+                startUploadingProcess(); 
             } else {
 
                 await DataStorageLocal.removeDataFromAsync(Constant.IMAGES_UPLOAD_PROCESS_STARTED);  
@@ -190,50 +190,35 @@ const ImageBackgrounUpload = ({navigation, route,...props }) => {
 
     const serviceCallToBackend = async (imagesData,totalFilesFound,totalFilesNotfound) => {
 
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let sendObsServiceObj = await ServiceCalls.savePetObservation(imagesData[0],token);
-
-        if(sendObsServiceObj && sendObsServiceObj.logoutData){
-          AuthoriseCheck.authoriseCheck();
-          navigation.navigate('WelcomeComponent');
-          return;
-        }
-        
-        if(sendObsServiceObj && !sendObsServiceObj.isInternet){
-            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,1,FAIL_OBS,false,'OK','');
-            return;
-        }
-  
-        if(sendObsServiceObj && sendObsServiceObj.statusData){
-
+        let apiMethod = apiMethodManager.SAVE_PET_OBSERVATION;
+        let apiService = await apiRequest.postData(apiMethod,imagesData[0],Constant.SERVICE_JAVA,navigation);
+            
+        if(apiService && apiService.status) {
+            
             let filesNotFailed = totalFilesFound-totalFilesNotfound;
             let filesStatus = undefined;
-
+    
             if(filesNotFailed === totalFilesFound) {
                 filesStatus = 'success'
             } else  {
-
+    
                 if(filesNotFailed === 0){
                     filesStatus = 'ObsSuccessful'
                 } else {
                     filesStatus = 'someMediaFailed'
                 }
-
+    
             }
-
+    
             updateObservationData('success',imagesData[0],filesStatus);
-
-        } else {
-            
-            // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,1,FAIL_OBS,false,'OK','');
-        }
-  
-        if(sendObsServiceObj && sendObsServiceObj.error) {
-
-            // createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true,1,FAIL_OBS,false,'OK','');
-        }
-
-
+                
+        } else if(apiService && apiService.isInternet === false) {
+    
+            createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true,1,FAIL_OBS,false,'OK','');
+                
+        } 
+    
+    
     };
 
     const updateObservationData = async (status,obj,filesStatus) => {
@@ -286,8 +271,8 @@ const ImageBackgrounUpload = ({navigation, route,...props }) => {
             checkImageUploadData();
         } else {
             await DataStorageLocal.removeDataFromAsync(Constant.IMAGE_UPLOAD_DATA); 
+            await DataStorageLocal.removeDataFromAsync(Constant.IMAGES_UPLOAD_PROCESS_STARTED);
             statusOfUpload(obsData[0].obsText,'Uploading Done','done','Uploading Done','wifi');
-            await DataStorageLocal.removeDataFromAsync(Constant.IMAGES_UPLOAD_PROCESS_STARTED);   
         }
 
     };
@@ -307,6 +292,18 @@ const ImageBackgrounUpload = ({navigation, route,...props }) => {
             __typename: 'imageUploadBackgroundStatus'
           }},})
 
+    };
+
+    const deleteFileFromFirebase = () => {
+        // Create a reference to the file to delete
+        var desertRef = firebase.storage().child('images/example.jpg');
+
+        // Delete the file
+        desertRef.delete().then(function() {
+        // File deleted successfully
+        }).catch(function(error) {
+        // Uh-oh, an error occurred!
+        });
     }
 
     const createPopup = (title,msg,rTitle,isPopup) => {

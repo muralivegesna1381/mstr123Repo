@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import fonts from '../../../utils/commonStyles/fonts'
-import { Card } from 'react-native-paper';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
+import CommonStyles from '../../../utils/commonStyles/commonStyles';
 
 const LearningSegmentControlUI = ({ route, ...props }) => {
 
@@ -10,8 +11,8 @@ const LearningSegmentControlUI = ({ route, ...props }) => {
   };
 
   return (
-    <View>
-      <Card style={{ margin: 5 }}>
+
+    <View style={{ marginTop: 10, width: wp('90%'), alignSelf:'center', ...CommonStyles.shadowStyleDrop }}>
 
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
@@ -29,8 +30,6 @@ const LearningSegmentControlUI = ({ route, ...props }) => {
 
         </View>
 
-      </Card>
-
     </View>
   );
 }
@@ -41,7 +40,7 @@ const styles = StyleSheet.create({
 
   segmentButtonStyle: {
     flex: 1,
-    height: 50,
+    height: 45,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#45a934',
@@ -49,7 +48,7 @@ const styles = StyleSheet.create({
 
   segmentButtonSelectionStyle: {
     flex: 1,
-    height: 50,
+    height: 45,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#a4fba3',

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TouchableOpacity,ImageBackground,Image,FlatList,SafeAreaView,ActivityIndicator,Platform} from 'react-native';
+import {View,StyleSheet,Text,TouchableOpacity,ImageBackground,FlatList,SafeAreaView,ActivityIndicator,Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from './../../../utils/commonStyles/fonts'
 import CommonStyles from './../../../utils/commonStyles/commonStyles';
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
 
-let defaultPetImg = require( "../../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
-let downArrowImg = require("../../../../assets/images/otherImages/svg/downArrowGrey.svg");
-let upArrowImg = require("../../../../assets/images/otherImages/svg/upArrow.svg");
+import DefaultPetImg from "../../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
+import DownArrowImg from "../../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import UpArrowImg from "../../../../assets/images/otherImages/svg/upArrow.svg";
+import EyeImg from "../../../../assets/images/dashBoardImages/svg/eye.svg";
+import InfoImg from "../../../../assets/images/dashBoardImages/svg/info.svg";
+import RightArrowImg from "../../../../assets/images/otherImages/svg/rightArrowLightImg.svg";
 
 const  LeaderBoardUI = ({route, ...props }) => {
 
@@ -116,16 +119,16 @@ const  LeaderBoardUI = ({route, ...props }) => {
             <TouchableOpacity style={[styles.dropViewStyle,{flexDirection:'row'}]} disabled={campagainArray && campagainArray.length > 1 ? false : true} onPress={() => {campaignDropAction()}}>
               {props.ptActivityLimits ? <Text style={[styles.campaignHeaderStyle,{color:leaderBoardArray && leaderBoardArray.length > 0 ? 'black' : 'grey'}]}>{campagainArray && campagainArray.length > 1 ? (campagainName && campagainName.length > 25 ? campagainName.slice(0,25) + '...' : campagainName) : (campagainName && campagainName.length > 30 ? campagainName.slice(0,30) + '...' : campagainName)}</Text>
               : <Text style={[styles.campaignHeaderStyle,{color:leaderBoardArray && leaderBoardArray.length > 0 ? 'black' : 'grey'}]}>{campagainName && campagainName.length > 22 ? campagainName.slice(0,22) + '...' : campagainName}</Text>}
-              {campagainArray && campagainArray.length > 1 ? <Image style={Platform.isPad ? [styles.rightArrowStyle,{width:wp('2.5%')}] : [styles.rightArrowStyle]} source={isListOpen ? upArrowImg : downArrowImg}></Image> : null}
+              {campagainArray && campagainArray.length > 1 ? <View>{isListOpen ? <UpArrowImg style={Platform.isPad ? [styles.rightArrowStyle,{width:wp('2.5%')}] : [styles.rightArrowStyle]}/> : <DownArrowImg style={Platform.isPad ? [styles.rightArrowStyle,{width:wp('2.5%')}] : [styles.rightArrowStyle]}/>}</View> : null}
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity style={styles.viewBtnStyle} onPress={() => {campaignBtnAction()}}>
-            <Image style={Platform.isPad ? [styles.eyeIconStyle,{width:wp('4%'),}] : [styles.eyeIconStyle,]} source={require("../../../../assets/images/dashBoardImages/svg/eye.svg")}></Image>  
+            <EyeImg width={Platform.isPad ? wp('4%') :wp('6%')} height={hp('5%')}/>
           </TouchableOpacity>
 
           {props.ptActivityLimits ? <TouchableOpacity style={[styles.viewBtnStyle]} onPress={() => {showPointsView()}}>
-            <Image style={Platform.isPad ? [styles.infoIconStyle,{width:wp('3%'),}] : [styles.infoIconStyle,{}]} source={require("../../../../assets/images/dashBoardImages/svg/info.svg")}></Image>  
+            <InfoImg width={Platform.isPad ? wp('4%') :wp('5%')} height={hp('5%')}/>
           </TouchableOpacity> : null}
 
         </View>
@@ -144,15 +147,15 @@ const  LeaderBoardUI = ({route, ...props }) => {
                         set_imgLoaderLeft(false)}} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad,{}] : [styles.leaderBoardPetStyle,{alignItems:'center',justifyContent:'center'}]} imageStyle={{ borderRadius: 100}}>
                       {imgLoaderLeft ? <View style={{alignItems:'center',justifyContent:'center'}}>{enableLoader ? <ActivityIndicator size="small" color="gray"/> : null}</View> : null}
                       <View style={Platform.isPad === true ?  [styles.rankViewStyle,{width:wp('5%')}] : [styles.rankViewStyle,{marginTop:hp('0.3%')}]}>
-                        <Text style={Platform.isPad === true ? [styles.rankTextStyleiPad,{color:'#4BE0F3'}] : [styles.rankTextStyle,{color:'#4BE0F3'}]}>{leaderBoardArray[1].rank ? leaderBoardArray[1].rank : ''}</Text>
+                        <Text style={Platform.isPad === true ? [styles.rankTextStyleiPad,{color:'#4BE0F3'}] : [styles.rankTextStyle,{color:'#4BE0F3'}]}>{leaderBoardArray && leaderBoardArray.length > 1 && leaderBoardArray[1].rank ? leaderBoardArray[1].rank : ''}</Text>
                       </View>
                     </ImageBackground>
                   </View>
 
                    : 
 
-                   <View style = {{width:wp('15%'),aspectRatio:1,borderRadius: 100,borderColor:'#05e3f6',borderWidth:1.5, justifyContent:'center'}}>
-                      <ImageBackground source={defaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle]} imageStyle={{ borderRadius: 100}}>
+                    <View style = {{width:wp('15%'),aspectRatio:1,borderRadius: 100,borderColor:'#05e3f6',borderWidth:1.5, justifyContent:'center'}}>
+                      <ImageBackground source={DefaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle]} imageStyle={{ borderRadius: 100}}>
                         <View style={Platform.isPad === true ?  [styles.rankViewStyle,{width:wp('5%')}] : [styles.rankViewStyle,{marginTop:hp('0.3%')}]}>
                           <Text style={Platform.isPad === true ? [styles.rankTextStyleiPad,{color:'#4BE0F3'}] : [styles.rankTextStyle,{color:'#4BE0F3'}]}>{leaderBoardArray[1].rank ? leaderBoardArray[1].rank : ''}</Text>
                         </View>
@@ -161,8 +164,8 @@ const  LeaderBoardUI = ({route, ...props }) => {
                   }
                     
                   <View style={{marginTop:wp('2%'),alignItems:'center'}}>
-                    <Text style={Platform.isPad ? [styles.petNameStyle,{textTransform: 'uppercase'}] : [styles.petNameStyle,{textTransform: 'uppercase'}]}>{leaderBoardArray && leaderBoardArray.length > 0 ? (leaderBoardArray[1].petName.length > 12 ? leaderBoardArray[1].petName.slice(0,12)+'...' : leaderBoardArray[1].petName) : ''}</Text>
-                    <Text style={styles.petPointsStyle}>{leaderBoardArray && leaderBoardArray.length>0 ? leaderBoardArray[1].points : ''}</Text>
+                    <Text style={Platform.isPad ? [styles.petNameStyle,{textTransform: 'uppercase'}] : [styles.petNameStyle,{textTransform: 'uppercase'}]}>{leaderBoardArray && leaderBoardArray.length > 1 ? (leaderBoardArray[1].petName.length > 12 ? leaderBoardArray[1].petName.slice(0,12)+'...' : leaderBoardArray[1].petName) : ''}</Text>
+                    <Text style={styles.petPointsStyle}>{leaderBoardArray && leaderBoardArray.length > 1 ? leaderBoardArray[1].points : ''}</Text>
                   </View>
                 </View> : <View style={[styles.leaderBoardPetStyle]}></View>}
 
@@ -174,7 +177,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
                   set_imgLoaderMiddle(false)}} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad1,{}] : [styles.leaderBoardPetStyle,{width:wp('16%'),}]} imageStyle={{ borderRadius: 100}}>
                 {imgLoaderMiddle ? <View style={{alignItems:'center',justifyContent:'center',flex:1}}>{enableLoader ? <ActivityIndicator size="small" color="gray"/> : null}</View> : null}
                   <View style={Platform.isPad === true ?  [styles.rankViewStyle,{width:wp('5%'),marginTop:hp('1.5%'),right:wp('-1.5%')}] : [styles.rankViewStyle,{marginTop:hp('1.5%'),right:wp('-1.5%')}]}>
-                    <Text style={Platform.isPad === true ? [styles.rankTextStyleiPad,{color:'#6BC000'}] : [styles.rankTextStyle,{color:'#6BC000'}]}>{leaderBoardArray[0].rank}</Text>
+                    <Text style={Platform.isPad === true ? [styles.rankTextStyleiPad,{color:'#6BC000'}] : [styles.rankTextStyle,{color:'#6BC000'}]}>{leaderBoardArray && leaderBoardArray.length > 0 && leaderBoardArray[0].rank}</Text>
                   </View>
               </ImageBackground>
               </View> 
@@ -182,7 +185,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
               :
 
               <View style = {{width:wp('18%'),aspectRatio:1,borderRadius: 100,borderColor:'#51c710',borderWidth:1, justifyContent:'center'}}>
-                <ImageBackground source={defaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle,{width:wp('16%'),}]} imageStyle={{ borderRadius: 100}}>
+                <ImageBackground source={DefaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle,{width:wp('16%'),}]} imageStyle={{ borderRadius: 100}}>
                   <View style={Platform.isPad === true ?  [styles.rankViewStyle,{width:wp('5%'),marginTop:hp('1.5%'),right:wp('-1.5%')}] : [styles.rankViewStyle,{marginTop:hp('1.5%'),right:wp('-1.5%')}]}>
                     <Text style={Platform.isPad === true ? [styles.rankTextStyleiPad,{color:'#6BC000'}] : [styles.rankTextStyle,{color:'#6BC000'}]}>{leaderBoardArray[0].rank ? leaderBoardArray[0].rank : ''}</Text>
                   </View>
@@ -211,7 +214,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
                 </View>
                  :
                  <View style = {{width:wp('15%'),aspectRatio:1,borderRadius: 100,borderColor:'#f6af50',borderWidth:1.5, justifyContent:'center'}}>
-                  <ImageBackground source={defaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle]} imageStyle={{ borderRadius: 100}}>
+                  <ImageBackground source={DefaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle]} imageStyle={{ borderRadius: 100}}>
                     <View style={Platform.isPad === true ?  [styles.rankViewStyle,{width:wp('5%')}] : [styles.rankViewStyle,,{marginTop:hp('0.3%')}]}>
                       <Text style={Platform.isPad === true ? [styles.rankTextStyleiPad,{color : '#EAA850'}] : [styles.rankTextStyle,{color : '#EAA850'}]}>{leaderBoardArray[2].rank ? leaderBoardArray[2].rank : ''}</Text>
                     </View>
@@ -219,7 +222,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
                  </View>
                 }
                 <View style={{marginTop:wp('2%'),alignItems:'center'}}>
-                  <Text style={Platform.isPad ? [styles.petNameStyle,{textTransform: 'uppercase'}] : [styles.petNameStyle,{textTransform: 'uppercase'}]}>{leaderBoardArray && leaderBoardArray.length>0 ? (leaderBoardArray[2].petName.length > 12 ? leaderBoardArray[2].petName.slice(0,12)+'...' : leaderBoardArray[2].petName) : ''}</Text>
+                  <Text style={Platform.isPad ? [styles.petNameStyle,{textTransform: 'uppercase'}] : [styles.petNameStyle,{textTransform: 'uppercase'}]}>{leaderBoardArray && leaderBoardArray.length > 2 ? (leaderBoardArray[2].petName.length > 12 ? leaderBoardArray[2].petName.slice(0,12)+'...' : leaderBoardArray[2].petName) : ''}</Text>
                   <Text style={styles.petPointsStyle}>{leaderBoardArray && leaderBoardArray.length>0 ? leaderBoardArray[2].points : ''}</Text>
                 </View>
               </View> : <View style={[styles.leaderBoardPetStyle]}></View>}
@@ -235,7 +238,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
             <View>
 
               <View style = {{width:wp('15%'),aspectRatio:1,borderRadius: 100,borderColor:'#05e3f6',borderWidth:1.5, justifyContent:'center'}}>
-                <ImageBackground source={defaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle]} imageStyle={{ borderRadius: 100}}>
+                <ImageBackground source={DefaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle]} imageStyle={{ borderRadius: 100}}>
                   <View style={Platform.isPad === true ?  [styles.rankViewStyle,{width:wp('5%')}] : [styles.rankViewStyle,{top:-5,right:-5}]}>
                     <Text style={Platform.isPad === true ? [styles.rankTextStyleiPad] : [styles.rankTextStyle]}>{'2'}</Text>
                   </View>
@@ -251,7 +254,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
             <View>
               
               <View style = {{width:wp('18%'),aspectRatio:1,borderRadius: 100,borderColor:'#51c710',borderWidth:1.5, justifyContent:'center',marginTop:wp('-5%')}}>
-                <ImageBackground source={defaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle,{width:wp('16%')}]} imageStyle={{ borderRadius: 100}}>
+                <ImageBackground source={DefaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle,{width:wp('16%')}]} imageStyle={{ borderRadius: 100}}>
                   <View style={Platform.isPad === true ?  [styles.rankViewStyle,{width:wp('5%')}] : [styles.rankViewStyle]}>
                     <Text style={Platform.isPad === true ? [styles.rankTextStyleiPad] : [styles.rankTextStyle]}>{'1'}</Text>
                   </View>
@@ -268,7 +271,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
             <View>
               
               <View style = {{width:wp('15%'),aspectRatio:1,borderRadius: 100,borderColor:'#f6af50',borderWidth:1.5, justifyContent:'center'}}>
-                <ImageBackground source={defaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle]} imageStyle={{ borderRadius: 100}}>
+               <ImageBackground source={DefaultPetImg} style={Platform.isPad === true ? [styles.leaderBoardPetStyleiPad] : [styles.leaderBoardPetStyle]} imageStyle={{ borderRadius: 100}}>
                   <View style={Platform.isPad === true ?  [styles.rankViewStyle,{width:wp('5%')}] : [styles.rankViewStyle]}>
                     <Text style={Platform.isPad === true ? [styles.rankTextStyleiPad] : [styles.rankTextStyle]}>{'2'}</Text>
                   </View>
@@ -277,7 +280,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
                     
               <View style={{marginTop:wp('2%'),alignItems:'center'}}>
                 <Text style={[styles.petNameStyle,{color:'grey'}]}>{'Please wait..'}</Text>
-                <Text style={[styles.petPointsStyle,{color:'grey'}]}>{'----'}</Text>
+                <Text style={[styles.petPointsStyle,{color:'grey'}]}>{'--'}</Text>
               </View>
             </View>
 
@@ -295,7 +298,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
                   <View>
                     {leaderBoardCurrent && Object.keys(leaderBoardCurrent).length !== 0 && leaderBoardCurrent.petPhotoUrl && leaderBoardCurrent.petPhotoUrl!=="" ? 
                       <ImageBackground style={Platform.isPad ? [styles.rewardImgStyle,{width:wp('6%')}]: [styles.rewardImgStyle]} imageStyle={{borderRadius:100, borderColor:'black',borderWidth:2 }} source={{uri: leaderBoardCurrent.petPhotoUrl}}></ImageBackground>
-                      : <ImageBackground style={Platform.isPad ? [styles.rewardImgStyle,{width:wp('6%')}]: [styles.rewardImgStyle]} imageStyle={{borderRadius:100, borderColor:'black',borderWidth:2 }} source={defaultPetImg}></ImageBackground>}
+                      : <ImageBackground style={Platform.isPad ? [styles.rewardImgStyle,{width:wp('6%')}]: [styles.rewardImgStyle]} imageStyle={{borderRadius:100, borderColor:'black',borderWidth:2 }} source={DefaultPetImg}></ImageBackground>}
                   </View>
                   <View style={{marginLeft:wp('4%'),justifyContent:'center',height:hp('4%')}}>
                     <Text style={[styles.petNameStyle,{textTransform: 'uppercase'}]}>{leaderBoardCurrent && Object.keys(leaderBoardCurrent).length !== 0 ? leaderBoardCurrent.petName.length > 20 ? leaderBoardCurrent.petName.slice(0, 20) + "..." : leaderBoardCurrent.petName : ''}</Text>
@@ -304,7 +307,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
                 </View>
 
                 <View style={{alignContent:"center",justifyContent:'center'}}>
-                  <Image style={[styles.rewardImgArrowStyle]} source={require("../../../../assets/images/otherImages/svg/rightArrowLightImg.svg")}></Image>
+                  <RightArrowImg width={wp('3%')} height={hp('3%')}/>
                 </View>
               </View>
             </ImageBackground>
@@ -318,7 +321,7 @@ const  LeaderBoardUI = ({route, ...props }) => {
                   <View style={{width:wp('55%'),flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
                     <Text style={[styles.petNameStyle,{textTransform: 'uppercase'}]}>{'Reward Points'}</Text>
                     <View style={{justifyContent:'flex-end'}}>
-                        <Image style={[styles.rewardImgArrowStyle]} source={require("../../../../assets/images/otherImages/svg/rightArrowLightImg.svg")}></Image>              
+                        <RightArrowImg width={wp('3%')} height={hp('3%')}/>            
                     </View>
                   </View>
               </ImageBackground>

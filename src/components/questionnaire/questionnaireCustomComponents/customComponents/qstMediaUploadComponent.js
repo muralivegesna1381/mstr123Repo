@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Platform, FlatList, ImageBackground, Image, ActivityIndicator, NativeModules,Alert } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Platform, FlatList, ImageBackground, ActivityIndicator, NativeModules,Alert } from 'react-native';
 import fonts from './../../../../utils/commonStyles/fonts';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import CommonStyles from './../../../../utils/commonStyles/commonStyles';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
-
 import * as ImagePicker from 'react-native-image-picker';
 import MediaMeta from "react-native-media-meta";
 import CameraRoll from "@react-native-community/cameraroll";
@@ -19,12 +18,12 @@ import PhotoEditor from 'react-native-photo-editor'
 import * as generatRandomNubmer from './../../../../utils/generateRandomId/generateRandomId.js';
 import * as Constant from "./../../../../utils/constants/constant";
 import * as DataStorageLocal from "./../../../../utils/storage/dataStorageLocal";
-import DeviceInfo from "react-native-device-info";
+
+import EditMediaImg from "./../../../../../assets/images/otherImages/svg/editMedia.svg";
+import FailedImg from "./../../../../../assets/images/otherImages/svg/failedXIcon.svg";
+import DefaultPetImg from "./../../../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
 
 var RNFS = require('react-native-fs');
-
-let failedImg = require('./../../../../../assets/images/otherImages/svg/failedXIcon.svg');
-let defaultPetImg = require("./../../../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
 
 const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, mediaType, questionImageUrl, defaultPetObj, questionName, questionnaireName, status_QID, viewVideoAction, errorPermissions, submittedAnswer, showiOScamAlert, route, ...props }) => {
 
@@ -36,6 +35,11 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
   const [isImageView, set_isImageView] = useState(false);
   const [images, set_images] = useState([]);
   const [isLoading, set_isLoading] = useState(false);
+  const [petId, set_petId] = useState('');
+  const [pName, set_pName] = useState('');
+  const [sName, set_sName] = useState('');
+  const [deviceNumber, set_deviceNumber] = useState();
+  const [setupStatus, set_setupStatus] = useState('XXXXXX');
 
   let editImgCountRef = useRef(0);
   let actualEditImgCountRef = useRef(0);
@@ -87,15 +91,37 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
       set_mediaArray(tempArray1);
     }
 
+    prepareFileName();
+
   }, []);
 
-  // useEffect(() => {     
+  const prepareFileName = () => {
 
-  //   if(questionImageUrl && questionImageUrl !== ''){
-  //     prepareImage(questionImageUrl);
-  //   }
+    if(defaultPetObj) {
+      set_petId(defaultPetObj.petID);
+      
+      let pName = defaultPetObj.petName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+      pName = pName.length > 15 ? pName.substring(0, 15) : pName;
+      set_pName(pName.toLocaleLowerCase());
+      let sName = defaultPetObj.studyName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+      sName = sName !== "" ? (sName.length > 20 ? sName.substring(0, 20) : sName) : "NOSTUDY";
+      set_sName(sName.toLocaleLowerCase());
 
-  // },[questionImageUrl]);
+      if (defaultPetObj && defaultPetObj.devices && defaultPetObj.devices.length > 0) {
+        if (defaultPetObj.devices[0].isDeviceSetupDone) {
+          set_setupStatus("Complete");
+          set_deviceNumber(defaultPetObj.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, ''));
+        } else {
+          set_setupStatus("Pending");
+          set_deviceNumber(defaultPetObj.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, ''));
+        }
+      } else {
+        set_deviceNumber('NODEVICE');
+      }
+
+    }
+
+  };
 
   const prepareImage = (imgURL) => {
     let img = { uri: imgURL };
@@ -144,10 +170,9 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
     actualEditImgCountRef.current = 0;
     editedImagesArray.current = [];
     if (Platform.OS === 'android') {
-      if(DeviceInfo.getSystemVersion()>12  && mediaType === 'video'){
-        chooseMedia();
-      }
-      else{
+      if (Platform.Version > 31) {
+        chooseImage()
+      } else {
         chooseMultipleMedia();
       }
     } else {
@@ -181,30 +206,22 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
           for (let i = 0; i < response.assets.length; i++) {
             if (response.assets[i].type.includes('image')) {
 
-              var dateFile = moment().utcOffset("+00:00").format("MMDDYYYYHHmmss");
+              var dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
               if (response.assets[i].timestamp) {
-                dateFile = moment(response.assets[i].timestamp).utcOffset("+00:00").format("MMDDYYYYHHmmss");
+                dateFile = moment(response.assets[i].timestamp).utcOffset("+00:00").format("MMDDYYHHmmss");
               }
 
               let fileName = '';
 
               if (defaultPetObj) {
-                let pName = defaultPetObj.petName.length > 15 ? defaultPetObj.petName.substring(0, 15) : defaultPetObj.petName;
-                let sName = defaultPetObj.studyName.length > 20 ? defaultPetObj.studyName.substring(0, 20) : defaultPetObj.studyName;
-                // let bName = obsObject.behaviourItem.behaviorName.length > 15 ? obsObject.behaviourItem.behaviorName.substring(0,15) : obsObject.behaviourItem.behaviorName;
-                if (defaultPetObj.devices && defaultPetObj.devices.length > 0) {
-                  fileName = pName + '_' + sName + '_' + defaultPetObj.devices[0].deviceNumber + '_' + dateFile + '.jpg';
-                } else {
-                  fileName = pName + '_' + sName + '_' + "NO_DEVICE" + '_' + dateFile + '.jpg';
-                }
-
+                fileName = pName + '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '.jpg';
               }
 
+              fileName = fileName.toLocaleLowerCase();
               let isExists = undefined;
               if (mArray && mArray.length > 0) {
 
                 const isFound = mArray.some(element => {
-
                   if (element.fileName === fileName) {
                     isExists = true;
                   }
@@ -232,6 +249,8 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
                   'isEdited': false
                 };
                 mArray.push(imgObj);
+              } else {
+                createAlert(Constant.OBSERVATION_DUPLICATE_MEDIA_FILE_ERROR);
               }
 
             }
@@ -247,25 +266,18 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
               let _uri = '';
               _uri = response.assets[i].uri.replace("file:///", "/");
 
-              var dateFile = moment().utcOffset("+00:00").format("MMDDYYYYHHmmss");
+              var dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
               if (response.assets[i].timestamp) {
-                dateFile = moment(response.assets[i].timestamp).utcOffset("+00:00").format("MMDDYYYYHHmmss");
+                dateFile = moment(response.assets[i].timestamp).utcOffset("+00:00").format("MMDDYYHHmmss");
               }
 
               let fileName = '';
               if (defaultPetObj) {
-                let pName = defaultPetObj.petName.length > 15 ? defaultPetObj.petName.substring(0, 15) : defaultPetObj.petName;
-                let sName = defaultPetObj.studyName.length > 20 ? defaultPetObj.studyName.substring(0, 20) : defaultPetObj.studyName;
-                let qName = questionName.length > 15 ? questionName.substring(0, 15) : questionName;
-                let qnnaireName = questionnaireName.length > 15 ? questionnaireName.substring(0, 15) : questionnaireName;
-                if (defaultPetObj.devices && defaultPetObj.devices.length > 0) {
-                  fileName = pName + '_' + sName + '_' + defaultPetObj.devices[0].deviceNumber + '_' + dateFile + qName + '_' + qnnaireName + '.mp4';
-                } else {
-                  fileName = pName + '_' + sName + '_' + "NO_DEVICE" + '_' + dateFile + qName + '_' + qnnaireName + '.mp4';
-                }
+                fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '_' + '.mp4';
 
               }
 
+              fileName = fileName.toLocaleLowerCase().replace(/\s+/g, '');
               let isExists = undefined;
 
               if (mArray && mArray.length > 0) {
@@ -281,7 +293,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
               }
 
               if (isExists) {
-
+                  createAlert(Constant.OBSERVATION_DUPLICATE_MEDIA_FILE_ERROR);
               } else {
                 let thumImg = undefined;
                 await createThumbnail({ url: response.assets[i].uri, timeStamp: 10000, }).then(response => thumImg = response.path).catch(err => { });
@@ -308,34 +320,6 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
 
           setLoaderValue(false);
           set_isLoading(false);
-
-          // if (androidTrimmedVideos.length > 0) {
-          //   let myPromise = new Promise(function (resolve) {
-          //     androidTrimmedVideos = androidTrimmedVideos.filter((a) => a)
-          //     if (Platform.OS === 'ios') {
-          //       NativeModules.ChangeViewBridge.changeToNativeView(
-          //         androidTrimmedVideos,
-          //         eventId => {
-          //           resolve(eventId);
-          //         },
-          //       );
-
-
-          //     }
-          //   });
-          //   videoArray = await myPromise;
-          // }
-
-          // for (let i = 0; i < videoArray.length; i++) {
-
-          //   if (videoArray[i].startsWith("file://")) {
-          //     mArray[i].filePath = videoArray[i];
-          //   }
-          //   else {
-          //     mArray[i].filePath = 'file://' + videoArray[i];
-          //   }
-
-          // }
           set_mediaArray(mArray);
           set_mediaSize(mArray.length);
           setValue(mArray);
@@ -381,11 +365,19 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
 
           if (response[i].type.includes('image')) {
             let rNumber = await generatRandomNubmer.generateRandomNumber();
+            let fileName = '';
+
+            if (defaultPetObj) {
+              fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '_' + '.jpg';
+            }
+  
+            fileName = fileName.toLocaleLowerCase();
+
             let imgObj = {
               "id": rNumber,
               'filePath': response[i].path,
               'fbFilePath': '',
-              'fileName': response[i].fileName,
+              'fileName': fileName,
               'qstPhotoId': '',
               'localThumbImg': response[i].path,
               'fileType': 'image',
@@ -407,30 +399,26 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
             let _uri = '';
             _uri = response[i].realPath.replace("file:///", "/");
 
-            // if (Platform.OS === 'android') {
-            //   NativeModules.K4lVideoTrimmer.navigateToTrimmer(response[i].realPath, "10", (convertedVal) => {
-            //     convertedVal = convertedVal.replace("[", "");
-            //     convertedVal = convertedVal.replace("]", "");
-            //     androidTrimmedVideos = convertedVal.split(",");
-            //     //CALL UPDATE URLS METHOD FROM HERE
-            //     updateTrimmedURLs();
-
-            //   });
-            // }
-
-            var dateFile = moment().utcOffset("+00:00").format("YYYYMMDDHHmmss");
-
+            var dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
+            let fileName = '';
 
             await MediaMeta.get(_uri).then((metadata) => {
-              dateFile = moment(metadata.creation_time).utcOffset("+00:00").format("YYYYMMDDHHmmss");
+              dateFile = moment(metadata.creation_time).utcOffset("+00:00").format("MMDDYYHHmmss");
             }).catch((err) => { });
             let vidObj = undefined;
             let rNumber = await generatRandomNubmer.generateRandomNumber();
+
+            if (defaultPetObj) {
+              fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '_' + '.mp4';
+            }
+  
+            fileName = fileName.toLocaleLowerCase().replace(/\s+/g, '');
+
             vidObj = {
               "id": rNumber,
               'filePath': response[i].realPath,
               'fbFilePath': '',
-              'fileName': dateFile + "_" + response[i].fileName,
+              'fileName': fileName,
               'qstVideoId': '',
               'localThumbImg': thumImg1,
               'fileType': 'video',
@@ -486,62 +474,19 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
 
           if (response.assets[0].type.includes('video')) {
 
-            // let myPromise = new Promise(function (resolve) {
-            //   if (Platform.OS === 'android') {
-            //     NativeModules.K4lVideoTrimmer.navigateToTrimmer(response.assets[0].uri, "11", (convertedVal) => {
-            //       resolve(convertedVal);
-            //     });
-            //   }
-            //   if (Platform.OS === 'ios') {
-            //     NativeModules.ChangeViewBridge.changeToNativeView(
-            //       [response.assets[0].uri],
-            //       eventId => {
-            //         resolve(eventId);
-            //       },
-            //     );
-
-
-            //   }
-            // });
-
-            // cameraTrimmedpath = await myPromise;
-            // //write function here to handle video path for android and iOS
-
-            // if (Platform.OS === 'android') {
-            //   cameraTrimmedpath = cameraTrimmedpath.replace("[", "");
-            //   cameraTrimmedpath = cameraTrimmedpath.replace("]", "");
-            //   cameraTrimmedpath = 'file://' + cameraTrimmedpath;
-            // }
-            // else {
-            //   if (cameraTrimmedpath[0].startsWith("file://")) {
-            //     cameraTrimmedpath = cameraTrimmedpath[0]
-            //   }
-            //   else {
-            //     cameraTrimmedpath = 'file://' + cameraTrimmedpath[0];
-            //   }
-
-            // }
-
             let thumImg = undefined;
             await createThumbnail({ url: response.assets[0].uri, timeStamp: 10000, }).then(response => thumImg = response.path)
               .catch(err => { });
 
-            var dateFile = moment().utcOffset("+00:00").format("MMDDYYYYHHmmss");
+            var dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
 
             let fileName = '';
 
             if (defaultPetObj) {
-              let pName = defaultPetObj.petName.length > 15 ? defaultPetObj.petName.substring(0, 15) : defaultPetObj.petName;
-              let sName = defaultPetObj.studyName.length > 20 ? defaultPetObj.studyName.substring(0, 20) : defaultPetObj.studyName;
-              let qName = questionName.length > 15 ? questionName.substring(0, 15) : questionName;
-              let qnnaireName = questionnaireName.length > 15 ? questionnaireName.substring(0, 15) : questionnaireName;
-              if (defaultPetObj.devices && defaultPetObj.devices.length > 0) {
-                fileName = pName + '_' + sName + '_' + defaultPetObj.devices[0].deviceNumber + '_' + dateFile + qName + '_' + qnnaireName + '.mp4';
-              } else {
-                fileName = pName + '_' + sName + '_' + "NO_DEVICE" + '_' + dateFile + qName + '_' + qnnaireName + '.mp4';
-              }
+              fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '_' + '.mp4';
             }
 
+            fileName = fileName.toLocaleLowerCase();
             let rNumber = await generatRandomNubmer.generateRandomNumber();
             let vidObj = {
               "id": rNumber,
@@ -570,21 +515,16 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
 
         if (response.assets[0].type.includes('image')) {
 
-          var dateFile = moment().utcOffset("+00:00").format("MMDDYYYYHHmmss");
+          var dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
           let fileName = '';
 
           if (defaultPetObj) {
-            let pName = defaultPetObj.petName.length > 15 ? defaultPetObj.petName.substring(0, 15) : defaultPetObj.petName;
-            let sName = defaultPetObj.studyName.length > 20 ? defaultPetObj.studyName.substring(0, 20) : defaultPetObj.studyName;
-            let qName = questionName.length > 15 ? questionName.substring(0, 15) : questionName;
-            let qnnaireName = questionnaireName.length > 15 ? questionnaireName.substring(0, 15) : questionnaireName;
-            if (defaultPetObj.devices && defaultPetObj.devices.length > 0) {
-              fileName = pName + '_' + sName + '_' + defaultPetObj.devices[0].deviceNumber + '_' + dateFile + qName + '_' + qnnaireName + '.jpg';
-            } else {
-              fileName = pName + '_' + sName + '_' + "NO_DEVICE" + '_' + dateFile + qName + '_' + qnnaireName + '.jpg';
-            }
+          
+            fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '_' + '.jpg';
+
           }
 
+          fileName = fileName.toLocaleLowerCase();
           let imgObj = {
             "id": moment(new Date()).format("YYYYMMDDHHmmss") + response.assets[0].fileName.replace('/r', '/'),
             'filePath': response.assets[0].uri,
@@ -687,42 +627,6 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
 
   const viewAction = async (item) => {
     viewVideoAction(item)
-  };
-
-  //to handle trimmed urls for android
-  const updateTrimmedURLs = async () => {
-
-    var iArray = mediaArray.filter(item => item.fileType === 'image');
-    var vArray = mediaArray.filter(item => item.fileType === 'video');
-    var tempArray = [];
-
-    if (androidTrimmedVideos.length > 0) {
-      for (let i = 0; i < vArray.length; i++) {
-        vArray[i].filePath = androidTrimmedVideos[i].trim();
-      }
-      tempArray = [...vArray, ...iArray]
-      set_mediaArray(tempArray)
-    }
-
-  };
-
-
-
-  const editPhoto = async (mediaArray) => {
-
-    let iArray = [];
-
-    for (let i = 0; i < mediaArray.length; i++) {
-
-      if (mediaArray[i].fileType === 'image') {
-        iArray.push(mediaArray[i])
-      }
-
-    }
-
-    actualEditImgCountRef.current = iArray.length;
-    addEditedImg(iArray[editImgCountRef.current].filePath, iArray);
-
   };
 
   const addEditedImg = async (uri, iArray) => {
@@ -960,7 +864,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
                 <ImageBackground source={{ uri: mediaArray[index].localThumbImg }} style={styles.media} imageStyle={{ borderRadius: 5 }} onLoadStart={() => set_mediaLoader(true)} onLoadEnd={() => { set_mediaLoader(false) }} >
                   {mediaLoader ? <ActivityIndicator size="small" color="gray" /> : null}
                   {status_QID === 'Submitted' ? null : <TouchableOpacity style={Platform.isPad ? [styles.imageBtnStyle, { marginTop: hp('-2.5%'), }] : [styles.imageBtnStyle, { marginTop: hp('-1%'), }]} onPress={() => removeMedia(item.fileName)}>
-                    <Image source={failedImg} style={styles.imageBtnStyle1} />
+                    <FailedImg width={wp('4.5%')} height={hp('4.5%')}/>
                   </TouchableOpacity>}
 
                   {status_QID === 'Submitted' ? <View style={styles.viewStyle}>
@@ -969,8 +873,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
 
                 </ImageBackground>
                 <TouchableOpacity onPress={() => moveToPhotoEditor(item, index)}>
-                  <ImageBackground source={require("./../../../../../assets/images/otherImages/svg/editMedia.svg")} style={styles.editMedia}>
-                  </ImageBackground>
+                  <EditMediaImg style={styles.editMedia}/>
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
@@ -996,7 +899,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
                 // onLoadStart = {set_isLoading(false)}
                 // poster={photoURL}
 
-                /> : <View style={styles.media1}><ImageBackground source={defaultPetImg} style={styles.videoStyleImg} /></View>}
+                /> : <View style={styles.media1}><ImageBackground source={DefaultPetImg} style={styles.videoStyleImg} /></View>}
 
                 {status_QID === 'Submitted' ? <View style={styles.viewStyle}>
                   <Text style={styles.viewTextStyle}>{'VIEW'}</Text>
@@ -1011,7 +914,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
                 <ImageBackground source={{ uri: Platform.OS === 'ios' ? mediaArray[index].filePath : mediaArray[index].localThumbImg }} style={styles.media} imageStyle={{ borderRadius: 5 }} onLoadStart={() => set_mediaLoader(true)} onLoadEnd={() => { set_mediaLoader(false) }} >
                   {mediaLoader ? <ActivityIndicator size="small" color="gray" /> : null}
                   {status_QID === 'Submitted' ? null : <TouchableOpacity style={Platform.isPad ? [styles.imageBtnStyle, { marginTop: hp('-2.5%'), }] : [styles.imageBtnStyle, { marginTop: hp('-1%'), }]} onPress={() => removeMedia(item.fileName)}>
-                    <Image source={failedImg} style={styles.imageBtnStyle1} />
+                    <FailedImg width={wp('4.5%')} height={hp('4.5%')}/>
                   </TouchableOpacity>}
 
                   {status_QID === 'Submitted' ? <View style={styles.viewStyle}>
@@ -1025,7 +928,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
                   <ImageBackground source={{ uri: Platform.OS === 'ios' ? mediaArray[index].filePath : mediaArray[index].localThumbImg }} style={styles.media} imageStyle={{ borderRadius: 5 }} onLoadStart={() => set_mediaLoader(true)} onLoadEnd={() => { set_mediaLoader(false) }} >
                     {mediaLoader ? <ActivityIndicator size="small" color="gray" /> : null}
                     {status_QID === 'Submitted' ? null : <TouchableOpacity style={Platform.isPad ? [styles.imageBtnStyle, { marginTop: hp('-2.5%'), }] : [styles.imageBtnStyle, { marginTop: hp('-1%'), }]} onPress={() => removeMedia(item.fileName)}>
-                      <Image source={failedImg} style={styles.imageBtnStyle1} />
+                      <FailedImg width={wp('4.5%')} height={hp('4.5%')}/>
                     </TouchableOpacity>}
 
                     {status_QID === 'Submitted' ? <View style={styles.viewStyle}>
@@ -1035,8 +938,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
                   </ImageBackground>
 
                   <TouchableOpacity onPress={() => moveToPhotoEditor(item, index)}>
-                    <ImageBackground source={require("./../../../../../assets/images/otherImages/svg/editMedia.svg")} style={styles.editMedia}>
-                    </ImageBackground>
+                    <EditMediaImg style={styles.editMedia}/>
                   </TouchableOpacity>
                 </View>}
 
@@ -1048,7 +950,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
               <ImageBackground source={{ uri: mediaArray[index].fbFilePath }} style={styles.media} imageStyle={{ borderRadius: 5 }} onLoadStart={() => set_mediaLoader(true)} onLoadEnd={() => { set_mediaLoader(false) }}>
                 {mediaLoader ? <ActivityIndicator size='small' color="gray" /> : null}
                 {status_QID === 'Submitted' ? null : <TouchableOpacity style={Platform.isPad ? [styles.imageBtnStyle, { marginTop: hp('-2.5%'), }] : [styles.imageBtnStyle, { marginTop: hp('-1%'), }]} onPress={() => removeMedia(item.fileName)}>
-                  <Image source={failedImg} style={styles.imageBtnStyle1} />
+                  <FailedImg width={wp('4.5%')} height={hp('4.5%')}/>
                 </TouchableOpacity>}
 
               </ImageBackground>
@@ -1065,7 +967,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
 
     <View style={styles.container}>
 
-      {questionImageUrl && status_QID !== 'Submitted' && submittedAnswer ? <View>
+      {questionImageUrl ? <View>
         <TouchableOpacity onPress={() => prepareImage(questionImageUrl)}>
           <ImageBackground source={{ uri: questionImageUrl }} style={[CommonStyles.questImageStyles]} imageStyle={{ borderRadius: 10 }}
             onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => { set_imgLoader(false) }}>
@@ -1222,13 +1124,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
   },
-
-  imageBtnStyle1: {
-    width: wp('4.5%'),
-    height: hp('4.5%'),
-    resizeMode: 'contain'
-  },
-
+  
   media: {
     width: wp('12%'),
     aspectRatio: 1,

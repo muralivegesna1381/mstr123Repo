@@ -42,26 +42,44 @@ const  TimerPetSelectionComponent = ({navigation, route, ...props }) => {
 
      useEffect(() => {
 
-         if(route.params?.petsArray){
-            let duplicates = getUnique(route.params?.petsArray, 'petID');
-            set_petsArray(duplicates);
-            if(duplicates && route.params?.defaultPetObj){
-                for (let i=0; i < duplicates.length; i++){
-                    if(duplicates[i].petID === route.params?.defaultPetObj.petID){
-                        set_selectedPet(duplicates[i]);
-                        set_selectedIndex(i);
-                        set_selectedPName(duplicates[i].petName);
-                        set_nxtBtnEnable(true);                    
-                    }
-                }
-            }
+         if(route.params?.petsArray && route.params?.defaultPetObj){
+            prepareTimerPets(route.params?.petsArray,route.params?.defaultPetObj)
          }
 
-         if(route.params?.defaultPetObj){
-            set_defaultPetObj(route.params?.defaultPetObj);
-         }
-        
     }, [route.params?.petsArray,route.params?.defaultPetObj]);
+
+    const prepareTimerPets = async (petsArray,defaultPetObj) => {
+        
+        let duplicates = getUnique(petsArray, 'petID');
+        set_petsArray(duplicates);
+
+        let petItem = undefined;
+        let indeXValue = 0;
+        if(duplicates && defaultPetObj){
+            for (let i=0; i < duplicates.length; i++){
+                if(duplicates[i].petID === defaultPetObj.petID){
+
+                    petItem = duplicates[i];
+                    indeXValue = i;
+                                          
+                }
+            }
+        }
+
+        if(petItem) {
+            set_selectedPet(petItem);
+            set_selectedPName(petItem.petName);
+            set_defaultPetObj(petItem);
+        } else {
+            set_selectedPet(duplicates[0]);
+            set_selectedPName(duplicates[0].petName);
+            set_defaultPetObj(duplicates[0]);
+        }
+            
+        set_selectedIndex(indeXValue);
+        set_nxtBtnEnable(true);  
+
+    }
   
     const handleBackButtonClick = () => {
         //   navigateToPrevious();
@@ -97,8 +115,19 @@ const  TimerPetSelectionComponent = ({navigation, route, ...props }) => {
     };
 
     const selectPetAction = (item) => {
-       set_selectedPet(item);
+      // set_selectedPet(item);
        set_nxtBtnEnable(true);
+       
+        if(petsArray && item){
+            for (let i=0; i < petsArray.length; i++){
+                if(petsArray[i].petID === item.petID){
+                    set_selectedPet(petsArray[i]);
+                    set_selectedIndex(i);
+                    set_selectedPName(petsArray.petName);
+                    set_nxtBtnEnable(true);                    
+                }
+            }
+        }
     };
 
     return (
@@ -109,6 +138,7 @@ const  TimerPetSelectionComponent = ({navigation, route, ...props }) => {
             selectedIndex = {selectedIndex}
             selectedPName = {selectedPName}
             isKeboard = {isKeboard}
+            selectedPet = {selectedPet}
             navigateToPrevious = {navigateToPrevious}
             submitAction = {submitAction}
             selectPetAction = {selectPetAction}

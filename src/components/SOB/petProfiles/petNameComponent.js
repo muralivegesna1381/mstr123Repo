@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, Image, BackHandler } from 'react-native';
+import { View, StyleSheet, Text, BackHandler } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
@@ -11,8 +11,12 @@ import * as DataStorageLocal from "./../../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../../utils/constants/constant";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+
+import DogImg from "./../../../../assets/images/dogImages/dogImg7.svg";
+import CatImg from "./../../../../assets/images/dogImages/cat.svg";
 
 let trace_inPetNameScreen;
 
@@ -116,49 +120,34 @@ const PetNameComponent = ({ route, ...props }) => {
 
         set_isLoading(true);
         isLoadingdRef.current = 1;
-        let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
 
-        let json = {
-            ClientID: "" + clientIdTemp,
-        };
-
-        let userDetailsServiceObj = await ServiceCalls.getClientInfo(json, token);
+        let apiMethodManage = apiMethodManager.GET_USER_PROFILE;
+        let apiService = await apiRequest.getData(apiMethodManage,'',Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
+        
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
 
-        if (userDetailsServiceObj && userDetailsServiceObj.logoutData) {
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'Unautherised');
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-
-        if (userDetailsServiceObj && !userDetailsServiceObj.isInternet) {
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'Internet : false');
-            return;
-        }
-
-        if (userDetailsServiceObj && userDetailsServiceObj.statusData) {
-
-            if (userDetailsServiceObj.responseData) {
-                set_petParentObj(userDetailsServiceObj.responseData);
-                if(userDetailsServiceObj.responseData.address && Object.keys(userDetailsServiceObj.responseData.address).length !== 0) {
-                    set_petParentAddress(userDetailsServiceObj.responseData.address);
-                    set_isParentAddress(true);
-                }
-            } else {
-                firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'No data found');
+            set_petParentObj(apiService.data.user);
+            if(apiService.data.user.address && Object.keys(apiService.data.user.address).length !== 0) {
+                set_petParentAddress(apiService.data.user.address);
+                set_isParentAddress(true);
             }
 
+        } else if(apiService && apiService.isInternet === false) {
+
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'Internet : false');
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'error : ' + apiService.error.errorMsg);  
+        
         } else {
+
             firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'Service Status : false');
+
         }
 
-        if (userDetailsServiceObj && userDetailsServiceObj.error) {
-            let errors = userDetailsServiceObj.error.length > 0 ? userDetailsServiceObj.error[0].code : '';
-            firebaseHelper.logEvent(firebaseHelper.event_SOB_petName_PPAddress_API, firebaseHelper.screen_SOB_petName, "Fetching Pet Parent Address in SOB Pet Name screen", 'error : ' + errors);
-        }
     };
 
     const nextButtonAction = async () => {
@@ -263,12 +252,12 @@ const PetNameComponent = ({ route, ...props }) => {
 
                         {!isfromPetBFIOnBoarding ?
                             <View style={{ height: hp('20%'), width: wp('80%'), alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
-                                <Image style={styles.dogImgStyels} source={require("./../../../../assets/images/dogImages/dogImg7.svg")} />
-                                <Image style={styles.catStyels} source={require("./../../../../assets/images/dogImages/cat.svg")} />
+                                <DogImg width={wp('25%')} height={hp('20%')}/>
+                                <CatImg style={styles.catStyels}/>
                             </View> :
 
                             <View style={{ height: hp('15%'), width: wp('80%'), alignItems: 'center', justifyContent: 'center' }}>
-                                <Image style={styles.dogImgStyels} source={require("./../../../../assets/images/dogImages/dogImg7.svg")} />
+                                <DogImg width={wp('25%')} height={hp('20%')}/>
                                 <Text style={CommonStyles.noRecordsTextStyle1}>{"Note: Pet BFI is your go-to feature! But hey, cat lovers, hold your paws – this ones not for your feline friends"}</Text>
                             </View>
                         }

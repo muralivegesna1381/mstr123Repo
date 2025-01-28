@@ -8,9 +8,9 @@ import { useQuery } from "@apollo/react-hooks";
 import * as Queries from "../../../config/apollo/queries";
 import Highlighter from "react-native-highlight-words";
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
 import * as Apolloclient from './../../../config/apollo/apolloConfig';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 
 var PushNotification = require("react-native-push-notification");
 
@@ -327,8 +327,6 @@ const TimerData = ({route, ...props }) => {
         let clientId = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
         let timerData = await DataStorageLocal.getDataFromAsync(Constant.TIMER_OBJECT);
         let timerPetObj = await DataStorageLocal.getDataFromAsync(Constant.TIMER_SELECTED_PET);
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-
         timerData = JSON.parse(timerData);
         timerPetObj = JSON.parse(timerPetObj);
 
@@ -341,7 +339,7 @@ const TimerData = ({route, ...props }) => {
             Category: timerData.activityText,
             ClientID: ""+clientId,//parseInt(clientId)
             PetID: ""+timerPetObj.petID,
-            DeviceNumber: timerPetObj.devices[0].deviceNumber.toString(),
+            DeviceNumber: timerPetObj.devices && timerPetObj.devices.length > 0 ? timerPetObj.devices[0].deviceNumber.toString() : '',
             Duration: elapsed.toString(),
             TimerDate: sDate.toString(),
         };
@@ -350,37 +348,36 @@ const TimerData = ({route, ...props }) => {
             saveTimerDataAsync('','',false,false,'','','','','','',0,false);
         }
         firebaseHelper.logEvent(firebaseHelper.event_timer_api, firebaseHelper.screen_timer_main, "Timer ended and sending the data to backend", "Pet Id : "+timerPetObj.petID);
-        updateTimerDetails(json,token);
+        updateTimerDetails(json);
                 
     };
 
-    const updateTimerDetails = async (jsonValue,token) => {
+    const updateTimerDetails = async (jsonValue) => {
 
         set_isLoading(true);
-        let serviceCallsObj = await ServiceCalls.managePetTimerLog(jsonValue,token);
+        let apiMethod = apiMethodManager.MANAGE_PET_TIMER_LOG;
+        let apiService = await apiRequest.postData(apiMethod,jsonValue,Constant.SERVICE_MIGRATED,navigation);
         set_isLoading(false);
-        if(serviceCallsObj && serviceCallsObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
 
-        if(serviceCallsObj && !serviceCallsObj.isInternet){
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+        
+        } else if(apiService && apiService.isInternet === false) {
+
             createPopup('',false,'OK',Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,undefined,true,1); 
             firebaseHelper.logEvent(firebaseHelper.event_timer_api_success, firebaseHelper.screen_timer_main, "Timer Api Fail", "Internet : false");
-            return;
-        }
 
-        if(serviceCallsObj && serviceCallsObj.statusData){
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
+            firebaseHelper.logEvent(firebaseHelper.event_timer_api_success, firebaseHelper.screen_timer_main, "Timer Api Fail", "");
+            createPopup('',false,'OK',Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,undefined,true,1);  
+
         } else {
+
             firebaseHelper.logEvent(firebaseHelper.event_timer_api_success, firebaseHelper.screen_timer_main, "Timer Api Fail", "");
             createPopup('',false,'OK',Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,undefined,true,1);  
-        }
 
-        if(serviceCallsObj && serviceCallsObj.error) {
-            firebaseHelper.logEvent(firebaseHelper.event_timer_api_success, firebaseHelper.screen_timer_main, "Timer Api Fail", "error : ");
-            createPopup('',false,'OK',Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,undefined,true,1);  
         }
+    
     };
 
     const increaseTimer = async () => {

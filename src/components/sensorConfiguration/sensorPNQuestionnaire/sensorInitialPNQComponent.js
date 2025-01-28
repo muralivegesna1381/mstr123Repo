@@ -9,9 +9,10 @@ import * as DataStorageLocal from './../../../utils/storage/dataStorageLocal';
 import * as Constant from "./../../../utils/constants/constant"
 import * as firebaseHelper from './../../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../../utils/getServicesData/getServicesData.js';
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
-import * as AuthoriseCheck from './../../../utils/authorisedComponent/authorisedComponent';
+import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+import * as AppPetsData from '../../../utils/appDataModels/appPetsModel.js';
 
 let trace_inSensorsPnqcreen;
 
@@ -60,8 +61,7 @@ const SensorInitialPNQComponent = ({navigation, route, ...props }) => {
     };
 
     const getPet = async () => {
-        let defaultObj = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT,);
-        defaultObj = JSON.parse(defaultObj);
+        let defaultObj = AppPetsData.petsData.defaultPet;
         set_petName(defaultObj.petName);
     };
 
@@ -78,66 +78,62 @@ const SensorInitialPNQComponent = ({navigation, route, ...props }) => {
 
     const getFeedbackQuestionnaire = async () => {
 
-        let defaultPet = await DataStorageLocal.getDataFromAsync(Constant.DEFAULT_PET_OBJECT);
+        let defaultPet = await DataStorageLocal.getDataFromAsync(Constant.QUESTIONNAIRE_SELECTED_PET);
         defaultPet = JSON.parse(defaultPet);
-        
+
         let sobPets = await DataStorageLocal.getDataFromAsync(Constant.SAVE_SOB_PETS); 
         sobPets = JSON.parse(sobPets);
 
         let configObj = await DataStorageLocal.getDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
         configObj = JSON.parse(configObj);
 
-        set_isLoading(true);
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let getFQuestServiceObj = await ServiceCalls.getFeedbackQuestionnaireByPetId(configObj.petID,configObj.configDeviceModel,token);
+        let apiMethod = apiMethodManager.GET_FEEDBACK_QUESTIONNAIRE + configObj.petID + '/' + configObj.configDeviceModel + '?isDateSupported=true';
+        let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
-  
-        if(getFQuestServiceObj && getFQuestServiceObj.logoutData){
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-      
-        if(getFQuestServiceObj && !getFQuestServiceObj.isInternet){
-            set_isLoading(false);
-            navigation.navigate('DashBoardService');
-            return;
-        }
-      
-        if(getFQuestServiceObj && getFQuestServiceObj.statusData){
-  
-            if(getFQuestServiceObj.responseData) {
-              if(getFQuestServiceObj.responseData.questions && getFQuestServiceObj.responseData.questions.length > 0) {
-                navigation.navigate('CheckinQuestionnaireComponent',{petObj:defaultPet, questionObject : getFQuestServiceObj.responseData});
-              } else {
-
-                if(sobPets && sobPets.length > 0) {
-                    navigation.navigate('DashBoardService',{loginPets:sobPets});
-                } else {
-                    navigation.navigate('DashBoardService');
-                }
-
-              }
-            }
             
-        } else {
-            if(sobPets && sobPets.length > 0) {
-                navigation.navigate('DashBoardService',{loginPets:sobPets});
-            } else {
+        if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            
+            if(apiService.data.questionnaireList && apiService.data.questionnaireList.length > 0) {
+                if(apiService.data.questionnaireList[0].questions && apiService.data.questionnaireList[0].questions.length > 0) {
+                  navigation.navigate('CheckinQuestionnaireComponent',{petObj:defaultPet, questionObject : apiService.data.questionnaireList[0]});
+                } else {
+  
+                  if(sobPets && sobPets.length > 0) {
+                      navigation.navigate('DashBoardService',{loginPets:sobPets});
+                  } else {
+                      navigation.navigate('DashBoardService');
+                  }
+  
+                }
+              } else {
                 navigation.navigate('DashBoardService');
             }
-        }
-      
-        if(getFQuestServiceObj && getFQuestServiceObj.error) {
+        
+        } else if(apiService && apiService.isInternet === false) {
+
+            navigation.navigate('DashBoardService');
+
+        } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
             if(sobPets && sobPets.length > 0) {
                 navigation.navigate('DashBoardService',{loginPets:sobPets});
             } else {
                 navigation.navigate('DashBoardService');
-            }        
+            }  
+
+        } else {
+
+            if(sobPets && sobPets.length > 0) {
+                navigation.navigate('DashBoardService',{loginPets:sobPets});
+            } else {
+                navigation.navigate('DashBoardService');
+            }  
+
         }
+
     };
 
-return (
+    return (
 
         <View style={CommonStyles.mainComponentStyle}>
 

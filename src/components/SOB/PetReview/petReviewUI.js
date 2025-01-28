@@ -25,7 +25,6 @@ const PetReviewUI = ({ route, ...props }) => {
     const [popLeftTitle, set_popLeftTitle] = useState(false);
     const [popRightTitle, set_popRightTitle] = useState(false);
     const [isSOBSubmitted, set_isSOBSubmitted] = useState(false);
-    const [petAddress, set_petAddress] = useState(undefined);
     const [isFromPetBFI, set_isFromPetBFI] = useState(false);
 
     useEffect(() => {

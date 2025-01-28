@@ -8,11 +8,11 @@ import AlertComponent from '../../utils/commonComponents/alertComponent';
 import CommonStyles from '../../utils/commonStyles/commonStyles';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview'
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
-import * as Constant from "./../../utils/constants/constant"
+import * as Constant from "./../../utils/constants/constant";
+import FailedImg from "../../../assets/images/otherImages/svg/failedXIcon.svg";
 
 let hidePswdImg = require('../../../assets/images/otherImages/png/hide-password.png');
 let showPsdImg = require('../../../assets/images/otherImages/png/show-password.png');
-let failedImg = require('../../../assets/images/otherImages/svg/failedXIcon.svg');
 let tickImg = require('../../../assets/images/otherImages/png/tick.png');
 
 const  ChangePasswordUI = ({route, ...props }) => {
@@ -202,27 +202,27 @@ const  ChangePasswordUI = ({route, ...props }) => {
                             {enableConfirmPsd ? <View style={{marginTop:hp('2%')}}>
 
                                 <View style={{flexDirection:'row',alignItems:'center'}}>
-                                    <Image source={!psdLengthVal ? failedImg : tickImg } style={styles.validateIconStyle} />
+                                    {!psdLengthVal ? <FailedImg width = {wp('3%')} height = {hp('3%')} style={{marginLeft:hp('1%'),marginRight:wp('1%'),}} /> : <Image source={tickImg } style={styles.validateIconStyle}/>}                                    
                                     <Text style={styles.validateTextStyle}>{'At least 8 characters in length'}</Text>
                                 </View>
 
                                 <View style={{flexDirection:'row',alignItems:'center'}}>
-                                    <Image source={!regULVal ? failedImg : tickImg } style={styles.validateIconStyle} />
+                                    {!regULVal ? <FailedImg width = {wp('3%')} height = {hp('3%')} style={{marginLeft:hp('1%'),marginRight:wp('1%'),}} /> : <Image source={tickImg } style={styles.validateIconStyle}/>}                                    
                                     <Text style={styles.validateTextStyle}>{'At least one upper & one lower case letters (A-Z) (a-z)'}</Text>
                                 </View>
 
                                 <View style={{flexDirection:'row',alignItems:'center'}}>
-                                    <Image source={!regNumVal ? failedImg : tickImg } style={styles.validateIconStyle} />
+                                    {!regNumVal ? <FailedImg width = {wp('3%')} height = {hp('3%')} style={{marginLeft:hp('1%'),marginRight:wp('1%'),}} /> : <Image source={tickImg } style={styles.validateIconStyle}/>}                                    
                                     <Text style={styles.validateTextStyle}>{'At least one number (i.e 0-9)'}</Text>
                                 </View>
 
                                 <View style={{flexDirection:'row',alignItems:'center'}}>
-                                    <Image source={!regSPCVal ? failedImg : tickImg } style={styles.validateIconStyle} />
+                                    {!regSPCVal ? <FailedImg width = {wp('3%')} height = {hp('3%')} style={{marginLeft:hp('1%'),marginRight:wp('1%'),}} /> : <Image source={tickImg } style={styles.validateIconStyle}/>}                                    
                                     <Text style={styles.validateTextStyle}>{'At least one special character (!,@,#,$,%,^,&,*)'}</Text>
                                 </View>
 
                                 <View style={{flexDirection:'row',alignItems:'center'}}>
-                                    <Image source={!isMatchPsd ? failedImg : tickImg } style={styles.validateIconStyle} />
+                                    {!isMatchPsd ? <FailedImg width = {wp('3%')} height = {hp('3%')} style={{marginLeft:hp('1%'),marginRight:wp('1%'),}} /> : <Image source={tickImg } style={styles.validateIconStyle}/>}                                    
                                     <Text style={styles.validateTextStyle}>{'New password should not match with the current password'}</Text>
                                 </View>
 

@@ -111,7 +111,7 @@ const PetWeightComponent = ({ route, ...props }) => {
                 }
                 setTimeout(() => {
                     set_showPicker(true);
-                }, 300)
+                }, 100)
             } else {
                 set_showPicker(true);
             }
@@ -197,7 +197,7 @@ const PetWeightComponent = ({ route, ...props }) => {
                                 wrapperHeight={190}
                                 // wrapperWidth={100}
                                 wrapperColor='white'
-                                wrapperBackground={'yellow'}
+                                wrapperBackground={'white'}
                                 itemHeight={60}
                                 highlightColor='green'
                                 highlightBorderWidth={1}
@@ -215,6 +215,7 @@ const PetWeightComponent = ({ route, ...props }) => {
                                 wrapperHeight={190}
                                 // wrapperWidth={100}
                                 wrapperColor='white'
+                                wrapperBackground={'white'}
                                 itemHeight={60}
                                 highlightColor='blue'
                                 highlightBorderWidth={1}

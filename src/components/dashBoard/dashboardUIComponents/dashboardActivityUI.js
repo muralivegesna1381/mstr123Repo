@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {View,StyleSheet,TouchableOpacity,Text,TextInput,Image,Platform,ScrollView,ImageBackground,Dimensions} from 'react-native';
+import {View,TouchableOpacity,Text,Platform,ImageBackground,Dimensions} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import * as Constant from "../../../utils/constants/constant";
@@ -12,10 +12,16 @@ import {LineChart,} from "react-native-chart-kit";
 import Toast from 'react-native-simple-toast';
 import moment from 'moment/moment';
 
-let fmUpImg  = require("../../../../assets/images/dashBoardImages/svg/fmUpImg.svg");
-let fmDownImg  = require("../../../../assets/images/dashBoardImages/svg/fmDownImg.svg");
-
-const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDone,isDeviceMissing,isTimerEnable,isObsEnable,isModularityService,setGoelAction,setQuickSetupAction,goalVisualizationAction,obsVideoUploadStatus,obsImgUploadStatus,questUploadStatus,isFmGoalSet,isFmGraph,isWeightPer,isFoodHistory,navFRecommand,isSleepGraph,foodHistoryObj,isFeedingReq,route, ...props }) => {
+import RightArrowBtnImg from "./../../../../assets/images/dashBoardImages/svg/right-arrow.svg";
+import FMUpImg from "./../../../../assets/images/dashBoardImages/svg/fmUpImg.svg";
+import FMDownImg from "./../../../../assets/images/dashBoardImages/svg/fmDownImg.svg";
+import HomeFoodImg from "./../../../../assets/images/dashBoardImages/svg/home-food.svg";
+import DashTimerImg from "../../../../assets/images/dashBoardImages/svg/dashTimerIcon.svg";
+import DashQuickVideoImg from "../../../../assets/images/dashBoardImages/svg/dashQuickVideo.svg";
+import DashChatImg from "../../../../assets/images/dashBoardImages/svg/chatIcon.svg";
+import DashChatQSettingsImg from "../../../../assets/images/dashBoardImages/svg/chatQuickIcon.svg";
+        
+const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isModularityService,setGoelAction,setQuickSetupAction,goalVisualizationAction,obsVideoUploadStatus,obsImgUploadStatus,questUploadStatus,navFRecommand,foodHistoryObj,petPermissionsData,dashboardPetsData,route, ...props }) => {
 
     const [runningValue, set_runningValue] = useState('');
     const [walkingValue, set_walkingValue] = useState('');
@@ -83,7 +89,6 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
         if(behVisualData){
             prepareFMData(behVisualData);
         }
-
     }, [behVisualData]);
 
     useEffect(() => {
@@ -93,7 +98,7 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
             prepareHistoryData(weightHistoryData1);
         }
 
-    }, [weightHistoryData1]);
+    }, [weightHistoryData1,petPermissionsData]);
 
     const Gradient1 = () => (
       <Defs key={'grad1'}>
@@ -189,6 +194,8 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
             } else {
                 set_fmLastWeekAvg(avg);
             }
+
+            // set_fmLastWeekAvg(avg);
             
 
         } else {
@@ -223,54 +230,7 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
                 value: fmData.sleepInfo.daySleep,
                 svg: { fill: 'url(#grad2)'},
             }];
-            // fmData.sleepInfo.nightSleep = 100
-            // fmData.sleepInfo.daySleep = 300
-            // if(fmData.sleepInfo.nightSleep < fmData.sleepInfo.daySleep) {
-
-            //     tempObj.push(
-            //         {
-            //             key: `pie-${0}`,
-            //             value: fmData.sleepInfo.nightSleep,
-            //             svg: { fill: 'url(#grad1)'},
-            //         },
-            //         {
-            //             key: `pie-${1}`,
-            //             value: fmData.sleepInfo.daySleep,
-            //             svg: { fill: 'url(#grad2)'},
-            //         }
-            //     );
-                
-            // }if(fmData.sleepInfo.nightSleep > fmData.sleepInfo.daySleep) {
-
-            //     tempObj.push(
-            //         {
-            //             key: `pie-${0}`,
-            //             value: fmData.sleepInfo.daySleep,
-            //             svg: { fill: 'url(#grad1)'},
-            //         },
-            //         {
-            //             key: `pie-${1}`,
-            //             value: fmData.sleepInfo.nightSleep,
-            //             svg: { fill: 'url(#grad2)'},
-            //         }
-            //     );
-
-            // } else {
-            //     tempObj.push(
-            //         {
-            //             key: `pie-${0}`,
-            //             value: fmData.sleepInfo.daySleep,
-            //             svg: { fill: 'url(#grad1)'},
-            //         },
-            //         {
-            //             key: `pie-${1}`,
-            //             value: fmData.sleepInfo.nightSleep,
-            //             svg: { fill: 'url(#grad2)'},
-            //         }
-            //     );
-            // }
-
-            
+       
             set_sleepData(tempObj);
             set_nightSleepValue(fmData.sleepInfo.nightSleep);
             set_daySleepValue(fmData.sleepInfo.daySleep);
@@ -279,6 +239,7 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
             } else {
                 set_sleepLastWeekAvg(avg);
             }
+            // set_sleepLastWeekAvg(avg);
             
         } else {
             set_isSleepData(false);
@@ -461,7 +422,6 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
       tryLaterTextStyle,
       fMCenterTextStyle,
       upDownImgStyle,
-      foodImgImgStyle,
       questArrowImgStyle,
       activityFoodTextStyle,
       activityFoodTextStyle1
@@ -471,7 +431,7 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
     
     <View>
 
-    {isFmGraph && !isDeviceMissing && isDeviceSetupDone ? <View style = {{width:wp('93.5%'),justifyContent:'center',alignSelf:'center',marginTop:hp('1%'),marginBottom:hp('2%')}}>
+    {(petPermissionsData && petPermissionsData.isFmGraph) && (dashboardPetsData && (!dashboardPetsData.isDeviceMissing && dashboardPetsData.isDeviceSetupDone)) ? <View style = {{width:wp('93.5%'),justifyContent:'center',alignSelf:'center',marginTop:hp('1%'),marginBottom:hp('2%')}}>
                 
         <View style = {{marginTop:hp('2%'),justifyContent:'space-between'}}>
 
@@ -480,7 +440,7 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
                 <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('90%'),marginBottom:hp('1%')}}>
                     <Text style={[activityHeaderTextStyle]}>{'Daily Behavior'}</Text>
                     <TouchableOpacity style={{alignItems:'center'}} onPress={() => {goalVisualizationActionLoc(1)}}>
-                        <Image source={require('./../../../../assets/images/dashBoardImages/svg/right-arrow.svg')} style={[questArrowImgStyle,{}]}></Image>
+                        <RightArrowBtnImg style={[questArrowImgStyle,{}]}/>
                     </TouchableOpacity>
                 </View>
                 
@@ -490,20 +450,6 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
 
                         <View style={{flex:1.6,minHeight: hp("17%")}}>
                                 
-                                {/* <PieChart
-                                    sort={(a,b) => b.value - a.value}
-                                    padAngle={0}
-                                    style={{ height: 160, width: 160 }}
-                                    data={data1}
-                                    spacing={0.1}
-                                    startAngle={Math.PI * 2  }
-                                    endAngle={ 0 }
-                                    outerRadius={'100%'}>
-
-                                    <Gradient1 ></Gradient1>
-                                    <Gradient2 ></Gradient2>
-
-                                </PieChart> */}
                             <PieChart style={{ height:Platform.isPad ? hp("20%") : hp("18%"),width: Platform.isPad ? wp("40%") : wp("40%")}} sort={(a,b) => b.value - a.value} outerRadius={'70%'}  padAngle={0} data={dailyFMdata}>
                                 <Gradient1 ></Gradient1>
                                 <Gradient2 ></Gradient2>
@@ -531,7 +477,7 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
 
                             <View style={{flexDirection:'row',width: Platform.isPad ? wp('35%') : wp('30%'),marginTop:hp("0.5%"),alignItems:'center' }}>
                                 <Text style={[Platform.isPad ? [timeTextStyle2iPad,{color:isFMAVGIncrease ? '#6BC100' : '#FF9203'}] : [timeTextStyle2,{color:isFMAVGIncrease ? '#6BC100' : '#FF9203'}]]}>{Math.abs(fmLastWeekAvg)}</Text>
-                                <Image source={isFMAVGIncrease ? fmUpImg : fmDownImg} style={Platform.isPad ? [upDownImgStyle,{width:wp('2%'),tintColor:isFMAVGIncrease ? '#6BC100' : '#FF9203'}] : [upDownImgStyle]}/>
+                                {isFMAVGIncrease ? <FMUpImg width={wp('4%')} height={wp('4%')} style={Platform.isPad ? [upDownImgStyle,{width:wp('2%'),tintColor:isFMAVGIncrease ? '#6BC100' : '#FF9203'}] : [upDownImgStyle]}/> : <FMDownImg width={wp('4%')} height={wp('4%')}/>}
                                 <Text style={[Platform.isPad ? timeTextStyleiPad : timeTextStyle]}>{' % From last week'}</Text>
                             </View>
                         </View>
@@ -553,7 +499,7 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
 
         </View> : null}
 
-            {isSleepGraph && !isDeviceMissing && isDeviceSetupDone ? <View style = {{width:wp('93.5%'),justifyContent:'center',alignSelf:'center',marginBottom:hp('2%')}}>
+            {(petPermissionsData && petPermissionsData.isSleepGraph) && (dashboardPetsData && (!dashboardPetsData.isDeviceMissing && dashboardPetsData.isDeviceSetupDone)) ? <View style = {{width:wp('93.5%'),justifyContent:'center',alignSelf:'center',marginBottom:hp('2%')}}>
                 
                 <View style = {{justifyContent:'space-between'}}>
 
@@ -562,7 +508,7 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
                         <View style={{flexDirection:'row',justifyContent:'space-between',width:wp('90%'),marginBottom:hp('1%')}}>
                             <Text style={[activityHeaderTextStyle]}>{'Sleep Behavior'}</Text>
                             <TouchableOpacity style={{alignItems:'center'}} onPress={() => {goalVisualizationActionLoc(2)}}>
-                                <Image source={require('./../../../../assets/images/dashBoardImages/svg/right-arrow.svg')} style={[questArrowImgStyle,{}]}></Image>
+                                <RightArrowBtnImg style={[questArrowImgStyle,{}]}/>
                             </TouchableOpacity>
                         </View>
 
@@ -607,7 +553,7 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
 
                                     <View style={{flexDirection:'row',width: Platform.isPad ? wp('35%') : wp('30%'),marginTop:hp("0.5%"),alignItems:'center' }}>
                                         <Text style={[Platform.isPad ? timeTextStyle2iPad : timeTextStyle2,{color: isSleepAVGIncrease ? '#6BC100' : '#FF9203'}]}>{Math.abs(sleepLastWeekAvg)}</Text>
-                                        <Image source={isSleepAVGIncrease ? fmUpImg : fmDownImg} style={Platform.isPad ? [upDownImgStyle,{width:wp('2%'),tintColor:isSleepAVGIncrease ? '#6BC100' : '#FF9203'}] : [upDownImgStyle]}/>
+                                        {isSleepAVGIncrease ? <FMUpImg width={wp('4%')} height={wp('4%')} style={Platform.isPad ? [upDownImgStyle,{width:wp('2%'),tintColor:isSleepAVGIncrease ? '#6BC100' : '#FF9203'}] : [upDownImgStyle]}/> : <FMDownImg width={wp('4%')} height={wp('4%')} style={Platform.isPad ? [upDownImgStyle,{width:wp('2%'),tintColor:isSleepAVGIncrease ? '#6BC100' : '#FF9203'}] : [upDownImgStyle]}/>}
                                         <Text style={[Platform.isPad ? timeTextStyleiPad : timeTextStyle]}>{' % From last week'}</Text>
                                     </View>
                                 </View>
@@ -629,7 +575,7 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
 
             </View> : null}
 
-            {isFmGoalSet && !isDeviceMissing && isDeviceSetupDone ?  <View style = {{width:wp('93%'),justifyContent:'center',marginBottom:hp('2%'),alignSelf:'center'}}>
+            {(petPermissionsData && petPermissionsData.isFmGoalSet) && (dashboardPetsData && dashboardPetsData.isDeviceSetupDone) && (dashboardPetsData && (!dashboardPetsData.isDeviceMissing && dashboardPetsData.isDeviceSetupDone)) ?  <View style = {{width:wp('93%'),justifyContent:'center',marginBottom:hp('2%'),alignSelf:'center'}}>
 
                 <View style = {{justifyContent:'space-between'}}>
                     <Text style={[activityHeaderTextStyle,{marginBottom:hp('1%')}]}>{'Forward Motion Goal'}</Text>
@@ -691,7 +637,7 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
 
             </View> : null}
 
-            {isWeightPer ? <View style = {{width:wp('93.5%'),marginBottom:hp('2.5%'),alignSelf:'center'}}>
+            {petPermissionsData && petPermissionsData.isWeightPer ? <View style = {{width:wp('93.5%'),marginBottom:hp('2.5%'),alignSelf:'center'}}>
 
             <Text style={[activityHeaderTextStyle,{marginBottom:hp('1%')}]}>{'Weight'}</Text>
 
@@ -789,26 +735,26 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
 
             </View> : null}
 
-            {isFoodHistory ? <View style = {[tyleActivityStyle,{...CommonStyles.shadowStyle,width:wp('92%'),minHeight:hp('8%'),justifyContent:'center',marginBottom:hp('2%'),alignItems:'center',alignSelf:'center'}]}>
+            {petPermissionsData && petPermissionsData.isFoodHistory ? <View style = {[tyleActivityStyle,{...CommonStyles.shadowStyle,width:wp('92%'),minHeight:hp('8%'),justifyContent:'center',marginBottom:hp('2%'),alignItems:'center',alignSelf:'center'}]}>
 
                 <View style = {{flexDirection:'row', justifyContent:'space-between',width:wp('85%')}}>
 
-                    <View style = {{flex:0.7}}>
-                        <Image source={require('./../../../../assets/images/dashBoardImages/svg/home-food.svg')} style={[foodImgImgStyle,{}]}></Image>
+                    <View style = {{flex:0.7, justifyContent:'center'}}>
+                        <HomeFoodImg width = {wp("12%")} height = {hp("5%")} resizeMode = {'contain'}/> 
                     </View>
 
                     <View style = {{flex:3,justifyContent:'center'}}>
                         <Text style={[activityFoodTextStyle]}>{'Recommended Food for Today'}</Text>
                             {foodHistoryObj && foodHistoryObj.dietName ? <View style = {{justifyContent:'center',marginTop:hp('0.5%')}}>
                                 <Text style={[activityFoodTextStyle1]}>{foodHistoryObj ? foodHistoryObj.dietName : ''}</Text>
-                                {isFeedingReq && (foodHistoryObj.recommendedRoundedCups > 0 || foodHistoryObj.recommendedRoundedGrams > 0) ? <Text style={[activityFoodTextStyle1]}>{foodHistoryObj && foodHistoryObj.unitId === 4 ? foodHistoryObj.recommendedRoundedCups+' ('+foodHistoryObj.recommendedAmountCups +') ' +foodHistoryObj.unit: foodHistoryObj.recommendedRoundedGrams + ' '+foodHistoryObj.unit}</Text> : null}
+                                {petPermissionsData && petPermissionsData.isFeedingReq && (foodHistoryObj.recommendedRoundedCups > 0 || foodHistoryObj.recommendedRoundedGrams > 0) ? <Text style={[activityFoodTextStyle1]}>{foodHistoryObj && foodHistoryObj.unitId === 4 ? foodHistoryObj.recommendedRoundedCups+' ('+foodHistoryObj.recommendedAmountCups +') ' +foodHistoryObj.unit: foodHistoryObj.recommendedRoundedGrams + ' '+foodHistoryObj.unit}</Text> : null}
                             </View> : null}
                     </View>
 
                     <View style = {{flex:0.3,justifyContent:'center'}}>
 
                         <TouchableOpacity style={{alignItems:'center'}} onPress={() => {navFoodRecommand()}}>
-                            <Image source={require('./../../../../assets/images/dashBoardImages/svg/right-arrow.svg')} style={[questArrowImgStyle,{}]}></Image>
+                            <RightArrowBtnImg style={[questArrowImgStyle,{}]}/>
                         </TouchableOpacity>
                     </View>
 
@@ -820,30 +766,30 @@ const  DashboardActivityUI = ({behVisualData,weightHistoryData1,isDeviceSetupDon
 
                 <ImageBackground style={quickselctionViewStyle} resizeMode="stretch" source={require("../../../../assets/images/dashBoardImages/png/quicActionsBk.png")}>
 
-                    {isTimerEnable && !isModularityService ? <View style={quickActionsInnerViewStyle}>
+                    {(petPermissionsData && petPermissionsData.isTimerEnable) && !isModularityService ? <View style={quickActionsInnerViewStyle}>
                         <TouchableOpacity style={{alignItems:'center'}} onPress={() => {setQuickSetupAction('Timer')}}>
-                            <Image source={require("../../../../assets/images/dashBoardImages/svg/dashTimerIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('3.5%')}] :[quickbtnInnerImgStyle]}/>
+                            <DashTimerImg width = {wp('5%')} height = {hp('3%')} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('3.5%')}] :[quickbtnInnerImgStyle]}/>
                             <Text style={quickbtnInnerTextStyle}>{"TIMER"}</Text>
                         </TouchableOpacity>                          
                     </View> : (isModularityService ? <View style={quickActionsInnerViewStyle}><ActivityIndicator size="small" color="gray"/></View> : null)}
 
-                    {isObsEnable && !isModularityService ? <View style={quickActionsInnerViewStyle}>
+                    {(petPermissionsData && petPermissionsData.isObsEnable) && !isModularityService ? <View style={quickActionsInnerViewStyle}>
                         <TouchableOpacity style={{alignItems:'center'}} onPress={() => {setQuickSetupAction('Quick Video')}}>
-                            <Image source={require("../../../../assets/images/dashBoardImages/svg/dashQuickVideo.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                            <DashQuickVideoImg width = {wp('5%')} height = {hp('3%')} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle,{width:wp('5%')}]}/>
                             <Text style={quickbtnInnerTextStyle}>{"QUICK VIDEO"}</Text>
                         </TouchableOpacity>                          
                     </View> : (isModularityService ? <View style={quickActionsInnerViewStyle}><ActivityIndicator size="small" color="gray"/></View> : null)}
 
                     <View style={quickActionsInnerViewStyle}>
                         <TouchableOpacity style={{alignItems:'center'}} onPress={() => {setQuickSetupAction('Chat')}}>
-                            <Image source={require("../../../../assets/images/dashBoardImages/svg/chatIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                            <DashChatImg width = {wp('5%')} height = {hp('3%')} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
                             <Text style={quickbtnInnerTextStyle}>{"CHAT"}</Text>
                         </TouchableOpacity>                          
                     </View>
 
                     <View style={quickActionsInnerViewStyle}>
                         <TouchableOpacity style={{alignItems:'center'}} onPress={() => {setQuickSetupAction('Support')}}>
-                            <Image source={require("../../../../assets/images/dashBoardImages/svg/chatQuickIcon.svg")} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
+                            <DashChatQSettingsImg width = {wp('5%')} height = {hp('3%')} style={Platform.isPad ? [quickbtnInnerImgStyle,{width:wp('4%')}] :[quickbtnInnerImgStyle]}/>
                             <Text style={quickbtnInnerTextStyle}>{"SUPPORT"}</Text>
                         </TouchableOpacity>                          
                     </View>

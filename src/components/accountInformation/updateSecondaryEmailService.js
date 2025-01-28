@@ -5,12 +5,12 @@ import * as DataStorageLocal from '../../utils/storage/dataStorageLocal';
 import * as Constant from "../../utils/constants/constant";
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
 
 let t_inChangeSecondaryEmailScreen;
 let trace_SecondaryEmail_API_Complete;
-
 let POP_ID_REMOVE = 1;
 
 const UpdateSecondaryEmailService = ({ navigation, route, ...props }) => {
@@ -30,6 +30,10 @@ const UpdateSecondaryEmailService = ({ navigation, route, ...props }) => {
     const [petParentAddress, set_petParentAddress] = useState(undefined);
     const [popID, set_popID] = useState(0);
     const [enableRemoveBtn, set_enableRemoveBtn] = useState(false);
+    const [prefObj, set_prefObj] = useState(undefined);
+    const [prefTimeText, set_prefTimeText] = useState(undefined);
+    const [weightUnitId, set_weightUnitId] = useState(1)
+    const [unitId, set_unitId] = useState(4);
 
     let popIdRef = useRef(0);
     let isLoadingdRef = useRef(0);
@@ -68,15 +72,28 @@ const UpdateSecondaryEmailService = ({ navigation, route, ...props }) => {
         }
 
         if (route.params?.isNotification) {
-            
+
             set_isNotification(route.params?.isNotification)
         }
 
-        if(route.params?.petParentAddress) {
+        if (route.params?.petParentAddress) {
             set_petParentAddress(route.params?.petParentAddress);
         }
 
-    }, [route.params?.fullName, route.params?.phoneNo, route.params?.firstName, route.params?.secondName,route.params?.isNotification,route.params?.secondaryEmail,route.params?.petParentAddress]);
+        if (route.params?.prefObj) {
+            set_prefObj(route.params?.prefObj)
+        }
+
+    }, [route.params?.fullName, route.params?.phoneNo, route.params?.firstName, route.params?.secondName, route.params?.isNotification, route.params?.secondaryEmail, route.params?.petParentAddress, route.params?.prefObj]);
+
+    useEffect(() => {
+
+        if (route.params?.prefObj) {
+            set_unitId(route.params?.prefObj.preferredFoodRecUnitId)
+            set_prefTimeText(route.params?.prefObj.preferredFoodRecTime);
+            set_weightUnitId(route.params?.prefObj.preferredWeightUnitId);
+        }
+    }, [route.params?.prefObj]);
 
     const handleBackButtonClick = () => {
         navigateToPrevious();
@@ -103,21 +120,25 @@ const UpdateSecondaryEmailService = ({ navigation, route, ...props }) => {
     };
 
     // Service call to update the User name
-    const UpdateAction = async (email,isNotification) => {
+    const UpdateAction = async (email, isNotification) => {
 
         set_isLoading(true);
         isLoadingdRef.current = 1;
         let clientIdTemp = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-        let userId = await DataStorageLocal.getDataFromAsync(Constant.USER_ID);
+        let userId = UserDetailsModel.userDetailsData.userRole.UserId;
         let json = {
             ClientID: "" + clientIdTemp,
-            UserId : userId,
+            UserId: userId,
             FirstName: firstName,
-            LastName: lastName ,
+            LastName: lastName,
             PhoneNumber: phnNo,
-            SecondaryEmail:email,
-            NotifyToSecondaryEmail:isNotification,
-            PetParentAddress : petParentAddress ? petParentAddress : {}
+            IsdCodeId: route.params?.isdCode_Id ? route.params?.isdCode_Id : '',
+            SecondaryEmail: email,
+            NotifyToSecondaryEmail: isNotification,
+            PetParentAddress: petParentAddress ? petParentAddress : {},
+            PreferredFoodRecTime: prefTimeText,
+            PreferredWeightUnitId: weightUnitId,
+            PreferredFoodRecUnitId: unitId
         };
         changeInfoApi(json);
 
@@ -126,61 +147,40 @@ const UpdateSecondaryEmailService = ({ navigation, route, ...props }) => {
     const changeInfoApi = async (json) => {
 
         trace_SecondaryEmail_API_Complete = await perf().startTrace('t_ChangeClientInfo_SecondaryEmail_API');
-        let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-        let cNameServiceObj = await ServiceCalls.changeClientInfo(json, token);
+
+        let apiMethod = apiMethodManager.CHANGE_CLIENT_INFO;
+        let apiService = await apiRequest.postData(apiMethod, json, Constant.SERVICE_MIGRATED, navigation);
         set_isLoading(false);
         isLoadingdRef.current = 0;
         stopFBTrace();
 
-        if (cNameServiceObj && cNameServiceObj.logoutData) {
-            firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_api_fail, firebaseHelper.screen_change_secondary_email, "Update Secondary email Api failed", 'Auto logged out');
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
-
-        if (cNameServiceObj && !cNameServiceObj.isInternet) {
-            firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_api_fail, firebaseHelper.screen_change_secondary_email, "Update Secondary email Api failed", 'Internet : ' + 'No Internet');
-            createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true,'OK',false,0,1,false);
-            return;
-        }
-
-        if (cNameServiceObj && cNameServiceObj.statusData) {
-
-            if(cNameServiceObj.responseData){
-
-                if(cNameServiceObj.responseData.Key){
-                    createPopup(Constant.ALERT_INFO, 'Changes made successfully', true,'OK',false,0,1,true);
-                } else if(cNameServiceObj.responseData.Value && cNameServiceObj.responseData.Value !=='') {
-                    firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_api_fail, firebaseHelper.screen_change_secondary_email, "Update Secondary email Api failed", 'error : ', cNameServiceObj.responseData.Value);
-                    createPopup(Constant.ALERT_DEFAULT_TITLE, cNameServiceObj.responseData.Value, true, 'OK', false,0,1,false);
-                } else {
-                    createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SECONDARY_EMAIL_ERROR_UPDATE, true, 'OK', false,0,1,false);
-                }
-                              
-            } else {                 
-                firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_api_fail, firebaseHelper.screen_change_secondary_email, "Update Secondary email Api failed", 'Responce null');
-                createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SECONDARY_EMAIL_ERROR_UPDATE, true, 'OK', false,0,1,false);
+        if (apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
+            if (apiService.data.Key) {
+                createPopup(Constant.ALERT_INFO, 'Changes made successfully', true, 'OK', false, 0, 1, true);
+            } else if (apiService.data.Value && apiService.data.Value !== '') {
+                firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_api_fail, firebaseHelper.screen_change_secondary_email, "Update Secondary email Api failed", 'error : ', apiService.data.Value);
+                createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.data.Value, true, 'OK', false, 0, 1, false);
+            } else {
+                createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SECONDARY_EMAIL_ERROR_UPDATE, true, 'OK', false, 0, 1, false);
             }
+
+        } else if (apiService && apiService.isInternet === false) {
+            firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_api_fail, firebaseHelper.screen_change_secondary_email, "Update Secondary email Api failed", 'Internet : ' + 'No Internet');
+            createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 'OK', false, 0, 1, false);
+
+        } else if (apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+            createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true, 'OK', false, 0, 1, false);
+            firebaseHelper.logEvent(firebaseHelper.event_change_name_api_fail, firebaseHelper.screen_change_name, "User Name Api failed", 'error');
 
         } else {
-            if(cNameServiceObj && cNameServiceObj.responseData === 'Email already exists'){
-                firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_api_fail, firebaseHelper.screen_change_secondary_email, "Update Secondary email Api failed", 'error : '+cNameServiceObj.responseData);
-                createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.EMAIL_ALREADY_EXISTS, true, 'OK', false,0,false);
-            } else {
-                firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_api_fail, firebaseHelper.screen_change_secondary_email, "Update Secondary email Api failed", 'error : Service error');
-                createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SECONDARY_EMAIL_ERROR_UPDATE, true, 'OK', false,0,1,false);
-            }
-            
+            firebaseHelper.logEvent(firebaseHelper.event_change_name_api_fail, firebaseHelper.screen_change_name, "User Name Api failed", 'error : Service error');
+            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_UPDATE_ERROR_MSG, true, 'OK', false, 0, 1, false);
+
         }
 
-        if (cNameServiceObj && cNameServiceObj.error) {
-            firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_api_fail, firebaseHelper.screen_change_secondary_email, "Update Secondary email Api failed", 'error : Service Error');
-            createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true, 'OK', false,0,1,false);
-        }
     };
 
-    const createPopup = (title, msg, value,rgtTitle,isLeftBtn,idPop, popRef,isNavi) => {
+    const createPopup = (title, msg, value, rgtTitle, isLeftBtn, idPop, popRef, isNavi) => {
         popIdRef.current = popRef;
         set_popAlert(title);
         set_popUpMessage(msg);
@@ -192,7 +192,7 @@ const UpdateSecondaryEmailService = ({ navigation, route, ...props }) => {
     };
 
     // Popup Ok button Action
-    const popOkBtnAction = () => {
+    const popOkBtnAction = async () => {
 
         if (isNavigate) {
             popIdRef.current = 0;
@@ -202,37 +202,37 @@ const UpdateSecondaryEmailService = ({ navigation, route, ...props }) => {
 
         if (POP_ID_REMOVE === popID) {
             // firebaseHelper.logEvent(firebaseHelper.event_secondaryEmail_remove_btn, firebaseHelper.screen_change_secondary_email, "Pet Parent clicked on remove secondary email", 'Secondary email : ', secondaryEmail);
-            UpdateAction('',false)
+            UpdateAction('', false)
         }
 
-        createPopup('', '', false,'OK',false,0,0,false);
-        
+        createPopup('', '', false, 'OK', false, 0, 0, false);
+
     };
 
     const removeButtonAction = () => {
-        createPopup('Alert', 'Are you sure, you want to remove the secondary email?', true,'YES',true,1,1,false);
+        createPopup('Alert', 'Are you sure, you want to remove the secondary email?', true, 'YES', true, 1, 1, false);
     };
 
     const popUpLeftBtnAction = () => {
-        createPopup('', '', false,'OK',false,0,0,false);
+        createPopup('', '', false, 'OK', false, 0, 0, false);
     };
 
     return (
         <UpdateSecondaryEmailUI
-            secondaryEmail = {secondaryEmail}
-            isNotification = {isNotification}
+            secondaryEmail={secondaryEmail}
+            isNotification={isNotification}
             isLoading={isLoading}
             isPopUp={isPopUp}
             popUpMessage={popUpMessage}
             popAlert={popAlert}
-            isPopLeft = {isPopLeft}
-            popRightBtnTitle = {popRightBtnTitle}
-            enableRemoveBtn = {enableRemoveBtn}
+            isPopLeft={isPopLeft}
+            popRightBtnTitle={popRightBtnTitle}
+            enableRemoveBtn={enableRemoveBtn}
             navigateToPrevious={navigateToPrevious}
             UpdateAction={UpdateAction}
-            removeButtonAction = {removeButtonAction}
+            removeButtonAction={removeButtonAction}
             popOkBtnAction={popOkBtnAction}
-            popUpLeftBtnAction = {popUpLeftBtnAction}
+            popUpLeftBtnAction={popUpLeftBtnAction}
         />
     );
 

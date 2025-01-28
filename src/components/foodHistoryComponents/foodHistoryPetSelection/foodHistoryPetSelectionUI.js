@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Image,Platform,Text} from 'react-native';
+import {View,StyleSheet,Platform,Text} from 'react-native';
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import fonts from '../../../utils/commonStyles/fonts'
 import SelectPetComponent from '../../../utils/selectPetComponent/selectPetComponent';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
+import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 
 const  FoodHistoryPetSelectionUI = ({route, ...props }) => {
 
     const [petsArray, set_petsArray] = useState(undefined);
     const [defaultPetObj, set_defaultPetObj] = useState(undefined);
     const [selectedIndex, set_selectedIndex] = useState(undefined);
+    const [isLoading, set_isLoading] = useState(true);
+
+    useEffect(() => {
+        stopLoading();
+    }, []);
 
     useEffect(() => {
         set_petsArray(props.petsArray);
@@ -22,6 +28,12 @@ const  FoodHistoryPetSelectionUI = ({route, ...props }) => {
     const nextButtonAction = () => {
       props.submitAction();
     };
+
+    const stopLoading = () => {
+        setTimeout(() => {
+            set_isLoading(false)
+        }, 2000);
+    }
 
     const backBtnAction = () => {
         props.navigateToPrevious();
@@ -55,13 +67,8 @@ const  FoodHistoryPetSelectionUI = ({route, ...props }) => {
                     selectPetAction = {selectPetAction}
                 />
             </View> : <View style={{justifyContent:'center',alignItems:'center',height:hp('58%'),width:wp('90%'),alignSelf:'center'}}>
-                            {/* <Text style={CommonStyles.noRecordsTextStyle}>{"You're all caught up!"}</Text> */}
-                            <Text style={[styles.noRecordsTextStyle1]}>{'Please visit this space regularly to submit the Food Intake for a pet.'}</Text>
-                        </View> }
-
-            {/* {petsArray && petsArray.length < 9 ? <View style={[styles.petImgStyle,{bottom:hp('14%'),position:'absolute'}]}>
-                <Image source={require("./../../../../assets/images/dogImages/dogImgCat.svg")} style={styles.dogImgStyle}/>               
-            </View> : null} */}
+                        <Text style={[styles.noRecordsTextStyle1]}>{'Please visit this space regularly to submit the Food Intake for a pet.'}</Text>
+                    </View> }
 
             <View style={[CommonStyles.bottomViewComponentStyle,{}]}>
                 <BottomComponent
@@ -73,7 +80,9 @@ const  FoodHistoryPetSelectionUI = ({route, ...props }) => {
                     rightButtonAction = {async () => nextButtonAction()}
                     leftButtonAction = {async () => backBtnAction()}
                 />
-            </View>   
+            </View>  
+
+            {isLoading === true ? <LoaderComponent isLoader={true} loaderText = {"Please Wait..."} isButtonEnable = {false} /> : null}  
 
          </View>
     );

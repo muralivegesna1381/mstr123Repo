@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, ImageBackground, Image, Text, ActivityIndicator, TextInput, FlatList, Keyboard, Platform } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ImageBackground, Text, ActivityIndicator, TextInput, FlatList, Keyboard, Platform } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
 import * as Constant from "../../utils/constants/constant";
 import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
 
-let defaultPetImg = require("./../../../assets/images/otherImages/svg/defaultDogIcon_dog.svg");
-let searchImg = require('./../../../assets/images/otherImages/svg/searchIcon.svg');
-let noLogsDogImg = require("./../../../assets/images/dogImages/noRecordsDog.svg");
+import PetEditImg from "./../../../assets/images/otherImages/svg/petEditCarasoul.svg";
+import DefaultPetImg from "./../../../assets/images/otherImages/png/defaultDogIcon_dog.png";
+import SearchImg from "./../../../assets/images/otherImages/svg/searchIcon.svg";
+import NoLogsDogImg from "./../../../assets/images/dogImages/noRecordsDog.svg";
 
-const PetsSelectionCarousel = ({ route, petsArray, setValue, setSlideValue, isSwipeEnable, defaultPet, activeSlides, isFromScreen, selectedPetAction, dismissSearch, ...props }) => {
+const PetsSelectionCarousel = ({ route,defaultPet, petsArray,setValue, setSlideValue, isSwipeEnable, activeSlides, isFromScreen, selectedPetAction, dismissSearch, ...props }) => {
 
   const [ndexValue, set_indexValue] = useState(0);
   const [imgLoader, set_imgLoader] = useState(true);
@@ -25,7 +27,7 @@ const PetsSelectionCarousel = ({ route, petsArray, setValue, setSlideValue, isSw
 
   React.useLayoutEffect(() => {
 
-    if (defaultPet) {
+    if (defaultPet && petsArray && petsArray.length > 0) {
       let ind = getIndex(petsArray, defaultPet.petID);
       set_indexValue(ind);
     }
@@ -41,16 +43,13 @@ const PetsSelectionCarousel = ({ route, petsArray, setValue, setSlideValue, isSw
 
   useEffect(() => {
 
-    // if(dismissSearch) {
     removeSearch()
-    // }
 
   }, [dismissSearch]);
 
   const checkForSearchAvailable = async () => {
 
-    let userRoleDetails = await DataStorageLocal.getDataFromAsync(Constant.USER_ROLE_DETAILS);
-    userRoleDetails = JSON.parse(userRoleDetails);
+    let userRoleDetails = UserDetailsModel.userDetailsData.userRole;
 
     if(userRoleDetails && (userRoleDetails.RoleName === "Hill's Vet Technician" || userRoleDetails.RoleName === "External Vet Technician")) {
       set_showSearch(true)
@@ -62,12 +61,15 @@ const PetsSelectionCarousel = ({ route, petsArray, setValue, setSlideValue, isSw
 
   const renderScrollItem = (item) => {
 
-    let ind = getIndex(petsArray, carouselRef.current.props.data[item].petID);
-    if (activeSlides === ind && petsArray.length > 1) { } else {
-      setValue(carouselRef.current.props.data[item]);
-      carouselRef.current.snapToItem(ind);
+    if(petsArray && petsArray.length > 0) {
+      let ind = getIndex(petsArray, carouselRef.current.props.data[item].petID);
+      if (activeSlides === ind && petsArray.length > 1) { } else {
+        setValue(carouselRef.current.props.data[item]);
+        carouselRef.current.snapToItem(ind);
+      }
+      set_indexCount(ind);
+
     }
-    set_indexCount(ind);
 
   };
 
@@ -131,7 +133,7 @@ const PetsSelectionCarousel = ({ route, petsArray, setValue, setSlideValue, isSw
           <View style={{ flexDirection: 'row', height: hp("6%"), alignItems: 'center' }}>
             <View>
               {item && item.photoUrl ? <ImageBackground resizeMode='stretch' style={CommonStyles.searchIconStyle} imageStyle={{ borderRadius: 5 }} source={{ uri: item.photoUrl }} ></ImageBackground>
-                : <ImageBackground imageStyle={{ borderRadius: 5 }} resizeMode='contain' style={CommonStyles.searchIconStyle} source={defaultPetImg} ></ImageBackground>}
+                : <ImageBackground imageStyle={{ borderRadius: 5 }} resizeMode='contain' style={CommonStyles.searchIconStyle} source={DefaultPetImg} ></ImageBackground>}
             </View>
             <View style={{ marginLeft: hp('1%') }}>
               <Text style={CommonStyles.searchTexStyle} >{item.petName}</Text>
@@ -151,21 +153,21 @@ const PetsSelectionCarousel = ({ route, petsArray, setValue, setSlideValue, isSw
 
       <TouchableOpacity disabled={!isSwipeEnable} style={styles.petComponentStyle} onPress={() => { renderScrollItem(index) }}>
         {index === activeSlides ?
-          <ImageBackground source={require("./../../../assets/images/otherImages/png/ActiveSlider.png")} style={styles.gradientImgStyle} imageStyle={{ borderRadius: Platform.isPad ? 10 : 5, borderColor: 'white', borderWidth: 0.5 }}>
+          <ImageBackground source={require("./../../../assets/images/otherImages/png/ActiveSlider.png")} style={styles.gradientImgStyle} imageStyle={{ borderRadius: Platform.isPad ? 10 : 10, borderColor: 'white', borderWidth: 0.5 }}>
 
-            <ImageBackground source={defaultPetImg} style={[styles.backdrop, {}]} imageStyle={{ borderRadius: 8, borderColor: 'white', borderWidth: 0.5 }}>
+            <ImageBackground source={DefaultPetImg} style={[styles.backdrop, {}]} imageStyle={{ borderRadius: 8, borderColor: 'white', borderWidth: 0.5 }}>
               {item.photoUrl && item.photoUrl !== "" ? <ImageBackground source={{ uri: item.photoUrl }} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => {
                 set_imgLoader(false)
               }} style={[styles.backdrop, {}]} imageStyle={{ borderRadius: 5 }}>
                 {imgLoader ? <ActivityIndicator size='small' color="grey" /> : null}
               </ImageBackground> :
-                <ImageBackground source={defaultPetImg} style={[styles.backdrop, {}]} imageStyle={{ borderRadius: 5 }}></ImageBackground>}
+                <ImageBackground source={DefaultPetImg} style={[styles.backdrop, {}]} imageStyle={{ borderRadius: 5 }}></ImageBackground>}
             </ImageBackground>
 
             <View style={{ height: hp("8%"), alignSelf: 'center', flex: 2, justifyContent: 'center' }}>
 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text numberOfLines={1} style={[styles.petTitle]}>{item.petName && item.petName.length > 15 ? (Platform.isPad ? item.petName.slice(0, 25).toUpperCase() + "..." : item.petName.slice(0, 15).toUpperCase() + "...")  : item.petName.toUpperCase()}</Text>
+                <Text numberOfLines={1} style={[styles.petTitle]}>{item.petName && item.petName.length > 25 ? (Platform.isPad ? item.petName.slice(0, 25).toUpperCase() + "..." : item.petName.slice(0, 15).toUpperCase() + "...")  : item.petName.toUpperCase()}</Text>
               </View>
 
               <View>
@@ -177,22 +179,22 @@ const PetsSelectionCarousel = ({ route, petsArray, setValue, setSlideValue, isSw
 
             {index === activeSlides && isFromScreen === "Dashboard" ?
               <TouchableOpacity style={styles.editPetBtnStyle} onPress={() => { editPetAction(item) }}>
-                <Image source={require("./../../../assets/images/otherImages/svg/petEditCarasoul.svg")} style={[styles.editImgStyle, { width: Platform.isPad ? wp("4%") : wp("6%"), marginTop: Platform.isPad ? hp("-1%") : hp("0%") }]}></Image>
+                <PetEditImg width={Platform.isPad ? wp("4%") : wp("6%")} height={hp("6%")} style={{ marginTop: Platform.isPad ? hp("-1%") : hp("-1.64%"),marginRight: Platform.isPad ? hp("-1%") : wp("-0.02%"), alignSelf:'flex-end' }}/>
               </TouchableOpacity> : null}
 
           </ImageBackground> :
 
           <View style={{ flexDirection: 'row', flex: 1 }}>
 
-            <ImageBackground source={require("./../../../assets/images/otherImages/png/unActiveSlider.png")} style={[styles.gradientImgStyle, { height: hp('7.6%'), marginTop: hp('-0.3%') }]} imageStyle={{ borderRadius: Platform.isPad ? 10 : 5 }}>
+            <ImageBackground source={require("./../../../assets/images/otherImages/png/unActiveSlider.png")} style={[styles.gradientImgStyle, { height: hp('7.6%'), marginTop: hp('-0.3%') }]} imageStyle={{ borderRadius: Platform.isPad ? 10 : 10 }}>
 
-              <ImageBackground source={defaultPetImg} style={[styles.backdrop, {}]} imageStyle={{ borderRadius: 8, borderColor: 'white', borderWidth: 0.5 }}>
+            <ImageBackground source={DefaultPetImg} style={[styles.backdrop, {}]} imageStyle={{ borderRadius: 8, borderColor: 'white', borderWidth: 0.5 }}>
                 {item.photoUrl && item.photoUrl !== "" ? <ImageBackground source={{ uri: item.photoUrl }} onLoadStart={() => set_imgLoader(true)} onLoadEnd={() => {
                   set_imgLoader(false)
                 }} style={index === activeSlides ? [styles.backdrop, {}] : [styles.backdrop]} imageStyle={{ borderRadius: 5 }}>
                   {imgLoader ? <ActivityIndicator size="small" color="grey" /> : null}
                 </ImageBackground> :
-                  <ImageBackground source={defaultPetImg} style={index === activeSlides ? [styles.backdrop, {}] : [styles.backdrop]} imageStyle={{ borderRadius: 5 }}></ImageBackground>}
+                  <ImageBackground source={DefaultPetImg} style={index === activeSlides ? [styles.backdrop, {}] : [styles.backdrop]} imageStyle={{ borderRadius: 5 }}></ImageBackground>}
 
               </ImageBackground>
 
@@ -221,10 +223,12 @@ const PetsSelectionCarousel = ({ route, petsArray, setValue, setSlideValue, isSw
   return (
 
     <View style={{ justifyContent: 'center' }}>
+      
       {petsArray && petsArray.length > Constant.NO_OF_PETS && showSearch ? <View style={Platform.isPad ? [CommonStyles.searchBarStyle, { borderRadius: 10 }] : [CommonStyles.searchBarStyle]}>
 
         <View style={[CommonStyles.searchInputContainerStyle]}>
-          <Image source={searchImg} style={Platform.isPad ? [CommonStyles.searchImageStyle, { width: wp("3%"), }] : [CommonStyles.searchImageStyle]} />
+          {/* <Image source={searchImg} style={Platform.isPad ? [CommonStyles.searchImageStyle, { width: wp("3%"), }] : [CommonStyles.searchImageStyle]} /> */}
+          <SearchImg width={wp("3%")} height={hp("4%")}/>
           <TextInput style={CommonStyles.searchTextInputStyle}
             underlineColorAndroid="transparent"
             placeholder="Search a pet"
@@ -239,29 +243,6 @@ const PetsSelectionCarousel = ({ route, petsArray, setValue, setSlideValue, isSw
       </View> : null}
 
       <View style={styles.mainComponentStyle}>
-
-        {/* {isFromScreen !== 'Dashboard' ? <ImageBackground style={[styles.backViewGradientStyle]} imageStyle={{ borderRadius: 5 }} source={require("./../../../assets/images/otherImages/png/petCarasoulBck.png")}>
-
-          <View style={[styles.imageViewStyle]}>
-            <Carousel
-              ref={carouselRef}
-              data={petsArray}
-              renderItem={renderItem}
-              sliderWidth={wp('100%')}
-              itemWidth={wp('48%')}
-              layout={'default'}
-              activeSlideAlignment={'start'}
-              firstItem={activeSlides}
-              asParallaxImages={true}
-              onSnapToItem={data => renderScrollItem(data)}
-              scrollEnabled={isSwipeEnable}
-              inactiveSlideOpacity={1}
-              useScrollView={true}
-              enableSnap={true}
-            />
-          </View>
-
-        </ImageBackground> : */}
 
           <View style={[styles.imageViewStyle]}>
             <Carousel
@@ -293,7 +274,7 @@ const PetsSelectionCarousel = ({ route, petsArray, setValue, setSlideValue, isSw
             keyExtractor={(item, index) => "" + index}
           /> :
           <View style={{ flexDirection: 'row', alignItems: 'center', width: wp("90%"), }}>
-            <Image style={[CommonStyles.searchNologsDogStyle]} source={noLogsDogImg}></Image>
+            <NoLogsDogImg width = {wp('14%')} height = {hp('5%')} style={[CommonStyles.searchNologsDogStyle]}/>
             <View>
               <Text style={CommonStyles.noRecTexStyle} >{Constant.NO_RECORDS_LOGS}</Text>
               <Text style={CommonStyles.noRecSubTextStyle} >{Constant.NO_RECORDS_LOGS1}</Text>
@@ -318,7 +299,6 @@ const styles = StyleSheet.create({
     width: wp('100%'),
     minHeight: hp('8%'),
     marginLeft: wp('1%'),
-    // backgroundColor:'grey',
   },
 
   petComponentStyle: {
@@ -346,14 +326,12 @@ const styles = StyleSheet.create({
     ...CommonStyles.textStyleExtraBold,
     fontSize: fonts.fontSmall,
     color: 'white',
-    // marginBottom:hp('0.3%'),
   },
 
   petSubTitle: {
     ...CommonStyles.textStyleSemiBold,
     fontSize: fonts.fontTiny,
     color: 'white',
-    // marginBottom:hp('0.3%'),
   },
 
   imageViewStyle: {
@@ -364,33 +342,15 @@ const styles = StyleSheet.create({
 
   },
 
-  imageViewStyle1: {
-    width: wp('100%'),
-    alignSelf: 'flex-start',
-    marginRight: wp('2%'),
-  },
-
   editPetBtnStyle: {
     width: wp("8%"),
     aspectRatio: 1,
   },
 
   editImgStyle: {
-    width: wp("6%"),
-    height: wp("6%"),
     resizeMode: 'contain',
     overflow: 'hidden',
-    alignSelf: 'flex-end',
-    // marginRight: -1,
-    // marginTop: 0.8,        
-  },
-
-  backViewGradientStyle: {
-    resizeMode: 'contain',
-    flex: 1,
-    height: hp("8%"),
-    justifyContent: 'center',
-    marginLeft: -3,
+    alignSelf: 'flex-end',     
   },
 
   gradientImgStyle: {

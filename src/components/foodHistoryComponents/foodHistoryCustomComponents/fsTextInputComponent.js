@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {StyleSheet,View,} from 'react-native';
+import {StyleSheet,View,Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
-import fonts from '../../../utils/commonStyles/fonts'
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import { TextInput } from 'react-native-paper';
 
@@ -26,7 +25,7 @@ const FsTextInputComponent = ({navigation, route,inputText,labelText,setValue,is
 
         <View style={[styles.mainComponentStyle]}>
 
-            <View style={[styles.textInputContainerStyle,{width:widthTextInput}]} >
+            <View style={[styles.textInputContainerStyle,{width:widthTextInput,height: Platform.OS === 'android' ? hp('7.0%'): hp('5.5%')}]} >
 
                 <TextInput
                     label = {labelText}
@@ -43,7 +42,7 @@ const FsTextInputComponent = ({navigation, route,inputText,labelText,setValue,is
                     // mode="outlined"
                     secureTextEntry = {isSecureText}
                     underlineColor={'transparent'}
-                    style = {[styles.textInputStyle,{width:widthTextInput}]}
+                    style = {[styles.textInputStyle,{width:widthTextInput,height: Platform.OS === 'android' ? hp('7.0%'): hp('5.5%')}]}
                     activeUnderlineColor = {'#7F7F81'}
                     // selectionColor={'transparent'} 
                     theme={{
@@ -78,18 +77,16 @@ const styles = StyleSheet.create({
         ...CommonStyles.textStyleBold,
         fontSize: 14,
         color:'#6BC100',
-        height: hp('5.5%'),
         width:wp('35%'),
         backgroundColor: 'transparent',
     },
 
     textInputContainerStyle: {
         flexDirection: 'row',
-        height: hp('5.5%'),
         borderRadius: wp('1%'),
         borderWidth: 1,
         borderColor: '#dedede',
-        backgroundColor:'white',
+        backgroundColor:'transparent',
     },
 
 });

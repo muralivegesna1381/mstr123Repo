@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,Image,ImageBackground} from 'react-native';
+import {View,StyleSheet,Text,Image} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
 import fonts from './../../../utils/commonStyles/fonts'

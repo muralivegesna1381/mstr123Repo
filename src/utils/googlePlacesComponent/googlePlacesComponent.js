@@ -1,68 +1,58 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {View,StyleSheet,Text,FlatList,TouchableOpacity,Image,Keyboard,TextInput,Platform} from 'react-native';
+import React, { useState, useRef } from 'react';
+import {View,StyleSheet,Text,FlatList,TouchableOpacity,TextInput,Platform,Image} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import * as AppKeys from "./../../utils/appKeys/appKeys.js";
 
-let searchImg = require('./../../../assets/images/otherImages/svg/searchIcon.svg');
-let failedImg = require('../../../assets/images/otherImages/svg/clear_white_icon.svg');
+import SearchImg from "./../../../assets/images/otherImages/svg/searchIcon.svg";
+import FailedImg from "../../../assets/images/otherImages/svg/clear_white_icon.svg";
 
+const failedImg = require('./../../../assets/images/otherImages/png/wrong.png')
 const  GooglePlacesComponent = ({isBackBtnEnable,route,setValue,invalidAddress, ...props }) => {
 
-    const [imgLoader, set_imgLoader] = useState([]);
     const [placeName, set_placeName] = useState(undefined);
     const [isListOpen, set_isListOpen] = useState(false);
     const [placesArray, set_placesArray] = useState(undefined);
 
-    let isKeyboard = useRef(false);
-    const flatListRef = React.useRef();
     let isShowSearch = useRef(undefined);
-
-    const hideKeyboard = () => {
-        Keyboard.dismiss();
-    };
 
     const getGooglePlaces = async (searchText) => {
 
         set_placeName(searchText);
-        let addressServiceObj = await ServiceCalls.getGooglePlacesApi(searchText,AppKeys.GOOGLE_PLACES_KEY);
- 
-        if (addressServiceObj && addressServiceObj.logoutData) {
-            AuthoriseCheck.authoriseCheck();
-            navigation.navigate('WelcomeComponent');
-            return;
-        }
 
-        if (addressServiceObj && !addressServiceObj.isInternet) {
-            // createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true);
-            return;
-        }
+        // await fetch("https://maps.googleapis.com/maps/api/place/autocomplete/json?key=" + AppKeys.GOOGLE_PLACES_KEY + "&input=" + searchText + "&components=country:us|country:uk|country:ca",
+        await fetch("https://maps.googleapis.com/maps/api/place/autocomplete/json?key=" + AppKeys.GOOGLE_PLACES_KEY + "&input=" + searchText,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "ClientToken": ''
+                },
+            }
+        ).then((response) => response.json()).then(async (data) => {
 
-        if (addressServiceObj && addressServiceObj.statusData) {
+            if (data) {
 
-            if(addressServiceObj.responseData && addressServiceObj.responseData.length > 0) {
+                if(data.predictions && data.predictions.length > 0) {
 
-                if(isShowSearch.current) {
-                    set_isListOpen(true);
+                    if(isShowSearch.current) {
+                        set_isListOpen(true);
+                    } else {
+                        set_isListOpen(false);
+                    }
+                    
                 } else {
                     set_isListOpen(false);
                 }
-                
+                set_placesArray(data.predictions);   
+    
             } else {
-                set_isListOpen(false);
             }
-            set_placesArray(addressServiceObj.responseData);            
-
-        } else {
-            // createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
-        }
-
-        if (addressServiceObj && addressServiceObj.error) {
-            // createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true);
-        }
+    
+        }).catch((error) => {
+        });
 
     };
 
@@ -88,13 +78,8 @@ const  GooglePlacesComponent = ({isBackBtnEnable,route,setValue,invalidAddress, 
                 
                 {<TouchableOpacity style={{width:wp('70'),justifyContent:'center'}} onPress={() => {selectedPlaceAction(item,index)}}>
                     <View style = {{flexDirection:'row',alignItems:'center'}}>
-                        {/* <View>
-                            {item && item.photoUrl ? <ImageBackground resizeMode='stretch' style={CommonStyles.searchIconStyle} imageStyle={{ borderRadius: 5}} source={{uri:item.photoUrl}} ></ImageBackground>
-                            : <ImageBackground imageStyle={{ borderRadius: 5}} resizeMode='contain' style={CommonStyles.searchIconStyle} source={defaultPetImg} ></ImageBackground> }
-                        </View> */}
                         <View style = {{marginLeft:hp('1%')}}>
                             <Text numberOfLines={2} style={[CommonStyles.searchTexStyle,{fontSize: fonts.fontXSmall,}]} >{item.description}</Text>
-                            {/* <Text style={CommonStyles.searchSubTexStyle} >{item.petBreed}</Text> */}
                         </View>
                     </View>
                     
@@ -112,7 +97,7 @@ const  GooglePlacesComponent = ({isBackBtnEnable,route,setValue,invalidAddress, 
                             
                 <View style={[CommonStyles.searchInputContainerStyle,{width: wp('79%'),height:hp('5%')}]}>
                     
-                    <Image source={searchImg} style={[CommonStyles.searchImageStyle,{width: Platform.isPad ? wp("2.5%") : wp("4%"),}]} />
+                    <SearchImg width={Platform.isPad ? wp("2.5%") : wp("3%")} height={hp("4%")} style = {{marginLeft : wp('2%')}}/>
                     <TextInput style={[CommonStyles.searchTextInputStyle,{height:hp('5%'),width:wp('15%')}]}
                         underlineColorAndroid="transparent"
                         placeholder="Enter your door address to search..."
@@ -126,9 +111,9 @@ const  GooglePlacesComponent = ({isBackBtnEnable,route,setValue,invalidAddress, 
                         onKeyPress={({ nativeEvent }) => {nativeEvent.key === 'Backspace' ? isShowSearch.current = true : null}}
                     />
 
-                    {placeName ? <TouchableOpacity onPress={() => {set_placeName(undefined),set_isListOpen(undefined)}} style={{width: wp("4%"),marginRight: wp("4%"),alignItems:'center'}}>
-                        <Image source={failedImg} style={[CommonStyles.searchImageStyle,{ width: Platform.isPad ? wp("1.5%") : wp("2.5%"),tintColor:'grey'}]}/>
-                    </TouchableOpacity> : null}
+                    {<TouchableOpacity onPress={() => {set_placeName(undefined),set_isListOpen(undefined)}} style={{width: wp("4%"),marginRight: wp("4%"),alignItems:'center'}}>
+                        <Image source={failedImg} style={[CommonStyles.searchImageStyle,{ width: Platform.isPad ? wp("1.5%") : wp("3%"),height : hp("2.5%"),tintColor:'grey', }]}></Image>
+                    </TouchableOpacity> }
 
                 </View> 
 

@@ -9,9 +9,9 @@ import CommonStyles from '../../../../utils/commonStyles/commonStyles';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview'
 import LoaderComponent from './../../../../utils/commonComponents/loaderComponent';
 
-let downArrowImg = require('./../../../../../assets/images/otherImages/svg/downArrowGrey.svg');
-let searchImg = require('./../../../../../assets/images/otherImages/svg/searchIcon.svg');
-let xImg = require('./../../../../../assets/images/otherImages/png/xImg.png');
+import DownArrowImg from "./../../../../../assets/images/otherImages/svg/downArrowGrey.svg";
+import SearchImg from "./../../../../../assets/images/otherImages/svg/searchIcon.svg";
+import XImg from "./../../../../../assets/images/otherImages/png/xImg.png";
 
 const  ObservationUI = ({route, ...props }) => {
 
@@ -181,7 +181,7 @@ const  ObservationUI = ({route, ...props }) => {
                 </View>
 
                 <View style={{justifyContent:'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
+                  <DownArrowImg width={wp('5%')} height={hp('5%')}/>
                 </View>
      
               </TouchableOpacity>
@@ -218,7 +218,7 @@ const  ObservationUI = ({route, ...props }) => {
 
           <View style={{flexDirection:'row',alignItems:'center',width:wp('90%'),}}>
             <View style={styles.topView}>
-              <Image source={searchImg} style={styles.searchImageStyle} />
+              <SearchImg width={wp('3.5%')} height={hp('3.5%')} style={styles.searchImageStyle}/>
                 <TextInput
                   style={styles.textInputStyle}
                   onChangeText={(text) => searchFilterFunction(text)}
@@ -236,7 +236,7 @@ const  ObservationUI = ({route, ...props }) => {
             </View>
 
             <TouchableOpacity onPress={onCancel} style={[styles.topButtonView,{marginLeft:wp('2%')}]} >
-              <Image source={xImg} style={styles.xImageStyle} />
+              <Image source={XImg} style={styles.xImageStyle} />
             </TouchableOpacity>
           </View>
 
@@ -295,13 +295,6 @@ const  ObservationUI = ({route, ...props }) => {
       width: wp("70%"),
       borderRadius: hp("0.5%"),
       alignSelf: "center",
-    },
-
-    imageStyle: {
-      margin: "4%",
-      height: 20,
-      width: 20,
-      resizeMode: "contain",
     },
 
     xImageStyle: {
@@ -376,10 +369,6 @@ const  ObservationUI = ({route, ...props }) => {
     },
 
     searchImageStyle : {
-      height: hp("2%"),
-      width: wp("2%"),
-      flex:0.2,
-      resizeMode:'contain',
       marginLeft: hp("2%"),
     },
 

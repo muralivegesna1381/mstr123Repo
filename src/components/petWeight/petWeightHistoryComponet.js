@@ -1,12 +1,11 @@
 import React, { useState,useRef } from 'react';
 import {BackHandler} from 'react-native';
 import PetWeightHistoryUI from './petWeightHistoryUI';
-import * as DataStorageLocal from "../../utils/storage/dataStorageLocal";
 import * as Constant from "./../../utils/constants/constant";
 import * as firebaseHelper from './../../utils/firebase/firebaseHelper';
-import * as AuthoriseCheck from './../../utils/authorisedComponent/authorisedComponent';
 import perf from '@react-native-firebase/perf';
-import * as ServiceCalls from './../../utils/getServicesData/getServicesData.js';
+import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
+import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 
 let trace_inWeightHistoryScreen;
 let trace_WeightHistory_API_Complete;
@@ -81,44 +80,36 @@ const PetWeightHistoryComponent = ({navigation, route, ...props }) => {
     const getWeightHistory = async (petID) => {
 
       trace_WeightHistory_API_Complete = await perf().startTrace('t_WeightHistory_API');
-      let token = await DataStorageLocal.getDataFromAsync(Constant.APP_TOKEN);
-      let getWeightServiceObj = await ServiceCalls.weightHistory(petID,token);
-
+      let apiMethod = apiMethodManager.GET_PET_WEIGHT_HISTORY_DATE_RECORDS + petID;
+      let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
       stopFBTrace();
       set_isLoading(false);
       isLoadingdRef.current = 0;
-
-      if(getWeightServiceObj && getWeightServiceObj.logoutData){
-        AuthoriseCheck.authoriseCheck();
-        navigation.navigate('WelcomeComponent');
-        return;
-      }
+                
+      if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
         
-      if(getWeightServiceObj && !getWeightServiceObj.isInternet){
+        if(apiService.data.petWeightHistories && apiService.data.petWeightHistories.length > 0){
+          set_weightHistoryArray(apiService.data.petWeightHistories);  
+          set_weightDflt(apiService.data.petWeightHistories[0]);
+          set_noLogsShow(false);        
+        } else {
+          set_noLogsShow(true);
+        }
+ 
+      } else if(apiService && apiService.isInternet === false) {
         createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
         return;
-      }
-  
-      if(getWeightServiceObj && getWeightServiceObj.statusData){
-          if(getWeightServiceObj.responseData && getWeightServiceObj.responseData.length > 0){
-            set_weightHistoryArray(getWeightServiceObj.responseData);  
-            set_weightDflt(getWeightServiceObj.responseData[0]);
-            set_noLogsShow(false);        
-          } else {
-            set_noLogsShow(true);
-          }
-        
+
+      } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+        set_noLogsShow(true);
+        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
+        firebaseHelper.logEvent(firebaseHelper.event_pet_weight_history_api_fail, firebaseHelper.screen_pet_history_weight, "Pet Weight History API Fail", 'error : '+apiService.error);
+
       } else {
         set_noLogsShow(true);
         createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
         firebaseHelper.logEvent(firebaseHelper.event_pet_weight_history_api_fail, firebaseHelper.screen_pet_history_weight, "Pet Weight History API Fail", 'Service Status : false');
-      }
-  
-      if(getWeightServiceObj && getWeightServiceObj.error) {
-        set_noLogsShow(true);
-        createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
-        let errors = getWeightServiceObj.error.length > 0 ? getWeightServiceObj.error[0].code : '';
-        firebaseHelper.logEvent(firebaseHelper.event_pet_weight_history_api_fail, firebaseHelper.screen_pet_history_weight, "Pet Weight History API Fail", 'error : '+errors);
+
       }
 
     };
