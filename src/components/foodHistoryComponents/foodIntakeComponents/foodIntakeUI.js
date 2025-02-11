@@ -458,7 +458,7 @@ const FoodIntakeUI = ({ route, ...props }) => {
                 {<View style={{ marginTop: hp('2%') }}>
 
                     <TouchableOpacity disabled = {!props.foodEditObj ? false : true} style={[CommonStyles.dateBtnStyle, {}]} onPress={() => { dateTopBtnAction() }}>
-                        <Text style={[CommonStyles.dateBtnTextStyle]}>{datePickerDate ? datePickerDate.toString() : 'Date'}</Text>
+                        <Text style={[CommonStyles.dateBtnTextStyle,{fontSize : Platform.isPad && 20 }]}>{datePickerDate ? datePickerDate.toString() : 'Date'}</Text>
                         <CalenderButtonImg width={Platform.isPad ? wp('4%') : wp('6%')} style={[CommonStyles.searchCalImageStyle]}/>
                     </TouchableOpacity>
 

@@ -107,7 +107,7 @@ const  AllDevicesUI = ({route, ...props }) => {
 
         if(item.firmware && item.firmware !== '' && item.firmwareNew && item.firmwareNew !== '') {
           if(parseFloat(item.firmware) < parseFloat(item.firmwareNew)) {
-              firmwareCheck = true;
+            firmwareCheck = true;
           }
 
         }
@@ -154,7 +154,6 @@ const  AllDevicesUI = ({route, ...props }) => {
                         </View>
                         
                       ) : null)}
-                      
 
                   </View>  
 
@@ -208,7 +207,7 @@ const  AllDevicesUI = ({route, ...props }) => {
           {props.showSearch ? <View style={Platform.isPad ? [CommonStyles.searchBarStyle, { borderRadius: 10,width: wp('90%') }] : [CommonStyles.searchBarStyle,{width: wp('90%'),}]}>
 
             <View style={[CommonStyles.searchInputContainerStyle]}>
-              <SearchImg width={ wp("3%")} height={ hp("4%")} style={[CommonStyles.searchImageStyle]}/>
+              <SearchImg width={ wp("3%")} height={ hp("4%")} style={[CommonStyles.searchImageStyle,{marginLeft : wp("2%")}]}/>
               <TextInput style={[CommonStyles.searchTextInputStyle]}
                 underlineColorAndroid="transparent"
                 placeholder="Search by pet or device number"

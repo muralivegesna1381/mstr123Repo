@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet,Platform } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import fonts from './fonts'
 
@@ -333,7 +333,7 @@ const CommonStyles = StyleSheet.create({
         color: 'black',
         height: hp('5%'),
         paddingLeft: wp('2%'),
-        fontSize: 15,
+        fontSize: Platform.isPad ? 20 : 15,
         fontFamily: 'Barlow-Regular',
         justifyContent: 'center',
         alignItems: 'center',
@@ -531,7 +531,7 @@ const CommonStyles = StyleSheet.create({
     },
 
     tabBtnTextStyle : {
-        fontSize: 16,
+        fontSize: Platform.isPad ? 20 : 16,
         fontFamily: 'Barlow-SemiBold',
         color: 'black', 
     },

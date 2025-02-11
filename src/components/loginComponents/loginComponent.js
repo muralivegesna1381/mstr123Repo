@@ -258,8 +258,6 @@ const LoginComponent = ({ navigation, route, ...props }) => {
         set_firstTimeUser(false);
         isFirstTime.current = false;
         saveFirstTimeUser(false,client,userId);
-        set_isLoading(false);
-        isLoadingdRef.current = 0;
         saveUserLogStatus(client,userId);
         saveDefaultPet(apiService.data.petDevices);
       

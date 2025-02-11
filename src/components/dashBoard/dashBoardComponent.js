@@ -16,9 +16,8 @@ import Highlighter from "react-native-highlight-words";
 import * as CheckPermissionsAndroid from './../../utils/permissionsComponents/permissionsAndroid';
 import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
 import * as ObservationModel from "./../../components/observationsJournal/observationModel/observationModel.js";
-import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js';
-import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 import * as clearAppDataModel from "./../../utils/appDataModels/clearAppDataModel.js";
+import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
 
 const  DasBoardComponent = ({route, ...props }) => {
 
@@ -29,7 +28,8 @@ const  DasBoardComponent = ({route, ...props }) => {
     const { loading:loadingImgs, data:uploadImgMediaData } = useQuery(Queries.IMAGE_UPLOAD_BACKGROUND_STATUS, { fetchPolicy: "cache-only" });
     const { loading:loadingVids, data:uploadVideosData } = useQuery(Queries.VIDEO_UPLOAD_BACKGROUND_STATUS, { fetchPolicy: "cache-only" });
     const { loading: captureBFILoading, data: captureBFIData } = useQuery(Queries.UPLOAD_CAPTURE_BFI_BACKGROUND_STATUS, { fetchPolicy: "cache-only" });
-  
+    const { loading:questLoading, data : questData } = useQuery(Queries.UPDATE_Quest_LIST, { fetchPolicy: "cache-only" });
+
     const [uploadStatus, set_uploadStatus] = useState(undefined);
     const [observationText, set_observationText] = useState(undefined);
     const [fileName, set_fileName] = useState(undefined);
@@ -278,6 +278,12 @@ const  DasBoardComponent = ({route, ...props }) => {
     }
         
     }, [uploadImgMediaData]);
+
+    useEffect(() => {
+      if (questData && questData.data.__typename === 'UpdateQuestList') {
+        props.enableQuestionnaire();
+      } 
+    }, [questData]);
 
     const requestStoragePermission = async () => {
       try {
@@ -601,10 +607,29 @@ const  DasBoardComponent = ({route, ...props }) => {
       if(!internet){
         createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,"OK",false,true); 
       } else {
+        
         updateTimer('Questionnaire','Continue');
         props.clearObjects();
         await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(AppPetsData.petsData.defaultPet));
         navigation.navigate('QuestionnaireStudyComponent',{isFrom:'Dashboard'});
+        // let questPets = await DataStorageLocal.getDataFromAsync(Constant.QUESTIONNAIR_PETS_ARRAY);
+        // questPets = JSON.parse(questPets);
+        // let pet = AppPetsData.petsData.defaultPet;
+        // var petObj = undefined
+        // if(questPets && pet) {
+        //   petObj = questPets.filter(item => item.petID === pet.petID);
+        //   if(petObj) {
+
+        //     await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(AppPetsData.petsData.defaultPet));
+        //     navigation.navigate('QuestionnaireStudyComponent',{isFrom:'Dashboard'});
+
+        //   } else {
+        //     createPopup(Constant.ALERT_NETWORK,Constant.SERVICE_FAIL_MSG,"OK",false,true); 
+        //   }
+        // } else {
+        //   createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,"OK",false,true); 
+        // }
+
       }
 
     };
@@ -825,7 +850,33 @@ const  DasBoardComponent = ({route, ...props }) => {
 
         if(item.action === 'Capture Images') {
           updateTimer('PetListComponent','Continue');
-          navigation.navigate('PetListComponent');
+          let userDetails = UserDetailsModel.userDetailsData.userRole;
+          let userDetails1 =  await DataStorageLocal.getDataFromAsync(Constant.USER_NAME);
+          userDetails1 = JSON.parse(userDetails1)
+          let petObj = {
+            birthday:AppPetsData.petsData.defaultPet.birthday,
+            "brandId":AppPetsData.petsData.defaultPet.brandId,
+            "brandName":AppPetsData.petsData.defaultPet.brandName,
+            "feedUnit":AppPetsData.petsData.defaultPet.feedUnit,
+            "foodIntake":AppPetsData.petsData.defaultPet.foodIntake,
+            "gender":AppPetsData.petsData.defaultPet.gender,
+            "isNeutered":AppPetsData.petsData.defaultPet.isNeutered,
+            "isPetWithPetParent":AppPetsData.petsData.defaultPet.isPetWithPetParent,
+            "petAge":AppPetsData.petsData.defaultPet.petAge,
+            "petBreed":AppPetsData.petsData.defaultPet.petBreed,
+            "petID":AppPetsData.petsData.defaultPet.petID,
+            "petName":AppPetsData.petsData.defaultPet.petName,
+            "petParentEmail":userDetails ? userDetails.Email : '',
+            "petParentId":userDetails ? userDetails.ClientID : '',
+            "petParentName":userDetails1 ? userDetails1.fullName : '',
+            "petStatus":AppPetsData.petsData.defaultPet.petStatus,
+            "speciesId":AppPetsData.petsData.defaultPet.speciesId,
+            "weight":AppPetsData.petsData.defaultPet.weight,
+            "weightUnit":AppPetsData.petsData.defaultPet.weightUnit,
+          }
+
+          // navigation.navigate('PetListComponent');
+          navigation.navigate('PetInformationComponent', {petData: petObj});
         } else if(item.action === 'Score Pet') {
 
           updateTimer('SelectBSCScoringComponent','Continue');

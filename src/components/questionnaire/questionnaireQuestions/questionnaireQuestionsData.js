@@ -826,7 +826,8 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
             }
 
             let dict = await QestionnaireDataObj.getAnswer(questionnaireId,petId);
-            let isAnswered = await saveSectionsAnsweredNext(completeQuestions,dict,petId);
+            const questions = completeQuestions.filter(question => question.isSkip === false);
+            let isAnswered = await saveSectionsAnsweredNext(questions,dict,petId);
             set_sectionsAnswered(isAnswered);
         }
 
@@ -845,9 +846,11 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                 props.updateQstServiceDict(dict, completeQuestionsSet.current);
                 let isAnswered
                 if(noOfSections.current.length > 1) {
-                    isAnswered = await saveSectionsAnsweredNext(completeQuestions,dict,petId);
+                    const questions = completeQuestions.filter(question => question.isSkip === false);
+                    isAnswered = await saveSectionsAnsweredNext(questions,dict,petId);
                 } else {
-                    isAnswered = await saveWithoutSectionsAnswered(completeQuestions,dict,petId);
+                    const questions = completeQuestions.filter(question => question.isSkip === false);
+                    isAnswered = await saveWithoutSectionsAnswered(questions,dict,petId);
                 }
 
                 if(isAnswered) {
@@ -915,7 +918,6 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
         let noSections = 0;
 
         questions.map((item,index) => {
-            
             if(item.sectionOrder) {
                 noSections = item.sectionOrder
             }
@@ -931,8 +933,8 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
 
                 result = questions.filter(item => item.sectionOrder === sec+1);
                 var mandateAnsweredQuestions = 0;
+                var isSkipValue = 0;
                 let mandateQuestions = result.filter(item => item.isMandatory);
-
                 if(mandateQuestions.length === 0) {
                     var answeredQuestions = 0;
                     for (let mnd = 0; mnd < result.length; mnd++) {
@@ -956,7 +958,7 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                         if(dict1) {                              
                             mandateAnsweredQuestions = mandateAnsweredQuestions + 1; 
                         } 
-                            
+     
                     }
     
                     if(mandateAnsweredQuestions === mandateQuestions.length && mandateQuestions.length !== 0) {
@@ -964,12 +966,13 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
                         totalAnsweredSections = totalAnsweredSections + 1;
                             
                     } 
+
+                    
                 }
                 
             }
 
         }
-        
         return totalAnsweredSections;
 
     };
@@ -1114,10 +1117,11 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
         if(temp && temp.length > 0) {
             set_questionsArray(temp);
             set_questionsArrayInitial(temp);
-        }
+        }   
+        
 
-        await checkNoSections(obj,completeQuestionsSet.current);
         await updateQuestionnaireQuestions(obj,value,obj.isMandatory,obj.questionType);
+        await checkNoSections(obj,completeQuestionsSet.current);
         
     };
 

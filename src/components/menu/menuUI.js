@@ -1,4 +1,4 @@
-import {View,StyleSheet,Text,TouchableOpacity, FlatList} from 'react-native';
+import {View,StyleSheet,Text,TouchableOpacity, FlatList,Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import Fonts from './../../utils/commonStyles/fonts'
 import CommonStyles from './../../utils/commonStyles/commonStyles';
@@ -49,7 +49,7 @@ const  MenuUI = ({route, ...props }) => {
 
                 <TouchableOpacity  onPress={() => menuBtnAction(item, index)}>
                   <View style={styles.flatview}>
-                    <item.iconImg/>
+                    <item.iconImg width={Platform.isPad ? wp('20%') : wp('15%')} height={Platform.isPad ? hp('10%') : hp('7%')} style={{}}/>
                   </View>
                   <Text style={[styles.labelTextStyle]}>{item.title}</Text>
                 </TouchableOpacity>

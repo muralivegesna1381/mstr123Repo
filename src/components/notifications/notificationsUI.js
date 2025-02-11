@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text,FlatList,TouchableOpacity,Platform,SectionList } from 'react-native';
+import { View, StyleSheet, Text,TouchableOpacity,Platform,SectionList } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from '../../utils/commonComponents/headerComponent';
 import CommonStyles from '../../utils/commonStyles/commonStyles';
@@ -11,16 +11,12 @@ import CalendarPicker from 'react-native-calendar-picker';
 import moment from 'moment';
 
 import RightArrowImg from "./../../../assets/images/otherImages/svg/rightArrowLightImg.svg";
-import CalenderButtonImg from "./../../../assets/images/otherImages/svg/calender.svg";
 import DropDownImg from "./../../../assets/images/otherImages/svg/dropDownDate.svg";
 
 const NotificationsUI = ({ route, ...props }) => {
 
     let fStartDate = useRef(undefined);
     let fEndDate = useRef(undefined)
-    const [firstScroll,setFirst] = useState(null)
-
-    const currrentY = useRef(null);
 
     React.useEffect(() => {
         
@@ -136,10 +132,7 @@ const NotificationsUI = ({ route, ...props }) => {
                     {props.showMarkBtn ? <TouchableOpacity style={{ width: wp('35%'),height: hp('4%')}} onPress={() => { markAllRead() }}>
                         <Text style={[styles.selectedDateStyle, { color: 'red' }]}>{"Mark all as read"}</Text>
                     </TouchableOpacity> : null}
-
-                    {/* {!props.showMarkBtn ? <TouchableOpacity style={{ width: wp('35%'),height: hp('4%')}} onPress={() => { markAllRead() }}>
-                        <Text style={[styles.selectedDateStyle, { color: 'red' }]}>{"Reset dates"}</Text>
-                    </TouchableOpacity> : null} */}
+                    
                     </View>
 
                 </View>}
@@ -191,24 +184,24 @@ const NotificationsUI = ({ route, ...props }) => {
               <View style={CommonStyles.datePickerSubViewStyle}>
 
               <CalendarPicker
-                        startFromMonday={true}
-                        allowRangeSelection={true}
-                        minDate={props.minDate}
-                        maxDate={new Date()}
-                        selectedStartDate={moment(props.fCalenderSdate).toDate()} // Set custom start date
-                        selectedEndDate={moment(props.fCalenderedate).toDate()} 
-                        allowBackwardRangeSelect={true}
-                        todayBackgroundColor="#808080"
-                        selectedDayColor="#CDE8B1"
-                        selectedDayTextColor="black"
-                        nextTitleStyle={{ fontFamily: 'Barlow-SemiBold' }}
-                        previousTitleStyle={{ fontFamily: 'Barlow-SemiBold' }}
-                        selectedRangeStartStyle={{ backgroundColor: "#6BC100" }}
-                        selectedRangeEndStyle={{ backgroundColor: "#6BC100" }}
-                        nextTitle='Next'
-                        previousTitle='Previous'
-                        width={370}
-                        height={370}
+                    startFromMonday={true}
+                    allowRangeSelection={true}
+                    minDate={props.minDate}
+                    maxDate={new Date()}
+                    selectedStartDate={moment(props.fCalenderSdate).toDate()} // Set custom start date
+                    selectedEndDate={moment(props.fCalenderedate).toDate()} 
+                    allowBackwardRangeSelect={true}
+                    todayBackgroundColor="#808080"
+                    selectedDayColor="#CDE8B1"
+                    selectedDayTextColor="black"
+                    nextTitleStyle={{ fontFamily: 'Barlow-SemiBold' }}
+                    previousTitleStyle={{ fontFamily: 'Barlow-SemiBold' }}
+                    selectedRangeStartStyle={{ backgroundColor: "#6BC100" }}
+                    selectedRangeEndStyle={{ backgroundColor: "#6BC100" }}
+                    nextTitle='Next'
+                    previousTitle='Previous'
+                    width={Platform.isPad? 550 :370}
+                    height={Platform.isPad? 550 :370}
                         textStyle={{ fontFamily: 'Barlow-SemiBold', color: 'black', }}
                         onDateChange={(date, type) => {
                             if (type === 'START_DATE' && date) {
@@ -288,7 +281,7 @@ const styles = StyleSheet.create({
     },
 
     selectedDateStyle: {
-        fontSize: 16,
+        fontSize: Fonts.fontXSmall,
         ...CommonStyles.textStyleSemiBold,
         color: '#A0A0A0',
         marginLeft: hp('2%'),

@@ -136,22 +136,18 @@ const  SendFeedbackComponent = ({navigation, route, ...props }) => {
       let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
       set_isLoading(false);
       isLoadingdRef.current = 0;
-      stopFBTraceSubmitFeedbackByPetParent();
-
+      stopFBTraceSubmitFeedbackByPetParent();        
       if(apiService && apiService.data && apiService.status) {
         createPopup(true,Constant.ALERT_INFO,'Your feedback has been submitted successfully',1,1);
       } else if(apiService && apiService.isInternet === false) {
         createPopup(true,Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,1,0);
         return;
-
       } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
         createPopup(true,Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,1,0);
         firebaseHelper.logEvent(firebaseHelper.event_send_feedback_details_api_failure, firebaseHelper.screen_send_feedback, "Send Feedback details API failed", ''+apiService.error.errorMsg);
-          
       } else {
         createPopup(true,Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,1,0);  
-        firebaseHelper.logEvent(firebaseHelper.event_send_feedback_details_api_failure, firebaseHelper.screen_send_feedback, "Send Feedback details API failed", 'error : '+'Status Failed');
-        
+        firebaseHelper.logEvent(firebaseHelper.event_send_feedback_details_api_failure, firebaseHelper.screen_send_feedback, "Send Feedback details API failed", 'error : '+'Status Failed');       
       }
     }
 

@@ -25,8 +25,7 @@ const UploadObsVideoUI = ({ route, ...props }) => {
   const [imgName, set_imgName] = useState(undefined);
   const [videoName, set_videoName] = useState(undefined);
   const [isMediaSelection, set_isMediaSelection] = useState(false);
-  const [optionsArray, set_optionsArray] = useState([])
-
+  const [optionsArray, set_optionsArray] = useState([]);
   const [isPopUp, set_isPopUp] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
   const [popUpAlert, set_popUpAlert] = useState(undefined);
@@ -126,7 +125,7 @@ const UploadObsVideoUI = ({ route, ...props }) => {
                         <ImageBackground source={{ uri: mediaArray[index].localThumbImg }} style={styles.media} imageStyle={{ borderRadius: 5 }}>
 
                           <TouchableOpacity style={styles.imageBtnStyle} onPress={() => removeMedia(item)}>
-                            <FailedImg width={wp("6%")} height={hp("6%")} style={styles.imageBtnStyle1}/>
+                          <FailedImg width={Platform.isPad? wp("4%") : wp("6%")} height={Platform.isPad? hp("9%") : hp("7%")} style={styles.imageBtnStyle1}/>
                           </TouchableOpacity>
 
                         </ImageBackground> : 
@@ -134,7 +133,7 @@ const UploadObsVideoUI = ({ route, ...props }) => {
                         <ImageBackground source={DefaultDogImg} style={styles.media} imageStyle={{ borderRadius: 5 }}>
 
                           <TouchableOpacity style={styles.imageBtnStyle} onPress={() => removeMedia(item)}>
-                            <FailedImg width={wp("6%")} height={hp("6%")} style={styles.imageBtnStyle1}/>
+                          <FailedImg width={Platform.isPad? wp("4%") : wp("6%")} height={Platform.isPad? hp("9%") : hp("7%")} style={styles.imageBtnStyle1}/>
                           </TouchableOpacity>
 
                         </ImageBackground>
@@ -144,7 +143,7 @@ const UploadObsVideoUI = ({ route, ...props }) => {
                         <ImageBackground source={{ uri: Platform.OS === 'ios' ? mediaArray[index].filePath : mediaArray[index].localThumbImg }} style={styles.media} imageStyle={{ borderRadius: 5 }}>
 
                           <TouchableOpacity style={styles.imageBtnStyle} onPress={() => removeMedia(item)}>
-                            <FailedImg width={wp("6%")} height={hp("6%")} style={styles.imageBtnStyle1}/>
+                          <FailedImg width={Platform.isPad? wp("4%") : wp("6%")} height={Platform.isPad? hp("9%") : hp("7%")} style={styles.imageBtnStyle1}/>
                           </TouchableOpacity>
 
                         </ImageBackground> :
@@ -152,7 +151,7 @@ const UploadObsVideoUI = ({ route, ...props }) => {
                         <ImageBackground source={{ uri: mediaArray[index].fbFilePath }} style={styles.media} imageStyle={{ borderRadius: 5 }}>
 
                           <TouchableOpacity style={styles.imageBtnStyle} onPress={() => removeMedia(item)}>
-                            <FailedImg width={wp("6%")} height={hp("6%")} style={styles.imageBtnStyle1}/>
+                          <FailedImg width={Platform.isPad? wp("4%") : wp("6%")} height={Platform.isPad? hp("9%") : hp("7%")} style={styles.imageBtnStyle1}/>
                           </TouchableOpacity>
 
                         </ImageBackground>)
@@ -339,7 +338,9 @@ const styles = StyleSheet.create({
   imageBtnStyle1: {
     width: wp('6%'),
     height: hp('6%'),
-    resizeMode: 'contain'
+    resizeMode: 'contain',
+    marginRight: wp('-1%'),
+    marginTop: hp('-5%'),
   },
 
   imageBtnStyle2: {

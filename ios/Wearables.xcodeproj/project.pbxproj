@@ -30,7 +30,6 @@
 		8D2443B294EC47DABDA3E5B8 /* Barlow-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A4076C60D3744E61ABDE5E6A /* Barlow-Regular.ttf */; };
 		8D26CACA9C7D4EC98243FE20 /* Barlow-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 80D700878B8743BBBC573E55 /* Barlow-Thin.ttf */; };
 		97FAC2D0C5E74436995C657E /* Poppins-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DA6EE797C2E94BC28628E751 /* Poppins-ExtraBoldItalic.ttf */; };
-		9A0428E82CA6C9AF00770F3E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A0428E72CA6C9AF00770F3E /* GoogleService-Info.plist */; };
 		9A3892F52C7F1C29007A53E8 /* EncryptPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A3892F22C7F1C29007A53E8 /* EncryptPassword.swift */; };
 		9A3892F62C7F1C29007A53E8 /* EncryptPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3892F42C7F1C29007A53E8 /* EncryptPassword.m */; };
 		9A3892FB2C7F1C35007A53E8 /* NSString+TripleDES.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3892F72C7F1C34007A53E8 /* NSString+TripleDES.m */; };
@@ -38,6 +37,7 @@
 		9A4B7B0B2C7DCE9F00039E79 /* Barlow-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9ACDAE052C761311007CC0F1 /* Barlow-ExtraBold.ttf */; };
 		9A5CB12C2CB2CF42005E3943 /* ObjectDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AC7DA442CA552E500224E36 /* ObjectDetection.m */; };
 		9A5CB12D2CB2CF48005E3943 /* ObjectDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC7DA452CA552E500224E36 /* ObjectDetection.swift */; };
+		9A8DDF182D4D0C87003B32E9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9A8DDF172D4D0C87003B32E9 /* GoogleService-Info.plist */; };
 		9A9C3DDA2CA71D2400ABA5B8 /* ZendeskChatbot.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A8C19C12CA31B0300542844 /* ZendeskChatbot.m */; };
 		9A9C3DDB2CA71D2A00ABA5B8 /* ZendeskChatbot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A8C19C02CA31B0300542844 /* ZendeskChatbot.swift */; };
 		9A9C3DDE2CA71DEE00ABA5B8 /* NativeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC7DA492CA554CC00224E36 /* NativeViewController.swift */; };
@@ -107,7 +107,6 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Wearables/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-Wearables-WearablesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wearables-WearablesTests.release.xcconfig"; path = "Target Support Files/Pods-Wearables-WearablesTests/Pods-Wearables-WearablesTests.release.xcconfig"; sourceTree = "<group>"; };
 		934ABA28925B497E92F1C21C /* Poppins-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Italic.ttf"; path = "../assets/fonts/Poppins-Italic.ttf"; sourceTree = "<group>"; };
-		9A0428E72CA6C9AF00770F3E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9A3269E72CA718B30012D98B /* CoreAudioTypes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudioTypes.framework; path = System/Library/Frameworks/CoreAudioTypes.framework; sourceTree = SDKROOT; };
 		9A3892EC2C7F1BFA007A53E8 /* Wearables-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Wearables-Bridging-Header.h"; sourceTree = "<group>"; };
 		9A3892ED2C7F1BFB007A53E8 /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
@@ -120,6 +119,7 @@
 		9A3892FA2C7F1C35007A53E8 /* GTMDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMDefines.h; sourceTree = "<group>"; };
 		9A8C19C02CA31B0300542844 /* ZendeskChatbot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZendeskChatbot.swift; sourceTree = "<group>"; };
 		9A8C19C12CA31B0300542844 /* ZendeskChatbot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZendeskChatbot.m; sourceTree = "<group>"; };
+		9A8DDF172D4D0C87003B32E9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../WearablesCode/Wearables Firebase Json files/Production/iOS/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9A9C3DE12CA7203000ABA5B8 /* VideoMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoMainViewController.m; sourceTree = "<group>"; };
 		9A9C3DE32CA7206600ABA5B8 /* RangeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSlider.swift; sourceTree = "<group>"; };
 		9AB2E6B72CAD75F7006AC9E2 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = opencv2.framework; path = ../../opencv2.framework; sourceTree = "<group>"; };
@@ -286,7 +286,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				9A0428E72CA6C9AF00770F3E /* GoogleService-Info.plist */,
+				9A8DDF172D4D0C87003B32E9 /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* Wearables */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* WearablesTests */,
@@ -494,6 +494,7 @@
 				FDF9A82365804E338F6C5FF7 /* Barlow-Bold.ttf in Resources */,
 				54469A415CB94F8AB94DC4AB /* Barlow-BoldItalic.ttf in Resources */,
 				9F5AF07C1A31448290D517D6 /* Barlow-ExtraBoldItalic.ttf in Resources */,
+				9A8DDF182D4D0C87003B32E9 /* GoogleService-Info.plist in Resources */,
 				6D97ED24783441D48417C734 /* Barlow-ExtraLight.ttf in Resources */,
 				EC70770B5A274F57969157E9 /* Barlow-ExtraLightItalic.ttf in Resources */,
 				E9C6D9666E474FE1BF6008EE /* Barlow-Italic.ttf in Resources */,
@@ -511,7 +512,6 @@
 				504C22E2455E49E58E5C24B2 /* Poppins-Bold.ttf in Resources */,
 				217AE803F89E44BEA4AA4AE7 /* Poppins-BoldItalic.ttf in Resources */,
 				0EBD51C33E4447C090202C30 /* Poppins-ExtraBold.ttf in Resources */,
-				9A0428E82CA6C9AF00770F3E /* GoogleService-Info.plist in Resources */,
 				97FAC2D0C5E74436995C657E /* Poppins-ExtraBoldItalic.ttf in Resources */,
 				9AB2E6BE2CAD7645006AC9E2 /* Main.storyboard in Resources */,
 				A34A624DAFD24C49A1E85B0D /* Poppins-ExtraLight.ttf in Resources */,
@@ -787,7 +787,7 @@
 				CODE_SIGN_ENTITLEMENTS = Wearables/Wearables.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4.9;
+				CURRENT_PROJECT_VERSION = 5.0;
 				DEVELOPMENT_TEAM = GUTBJ785HC;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -796,7 +796,7 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Wearables/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = WAG;
+				INFOPLIST_KEY_CFBundleDisplayName = Wearables;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "To connect to your pet's sensor, We need to enable Bluetooth on your device.";
@@ -807,27 +807,30 @@
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "The app uses your phone microphone while recording the observation video";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app requires Photo Library permissions";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires Photo Library permissions";
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.9;
+				MARKETING_VERSION = 5.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ctepl.wearablesclinicaltrialsdev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.HPN.wearablesclinicaltrials;
 				PRODUCT_NAME = Wearables;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "Wearables-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -841,7 +844,7 @@
 				CODE_SIGN_ENTITLEMENTS = Wearables/Wearables.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4.9;
+				CURRENT_PROJECT_VERSION = 5.0;
 				DEVELOPMENT_TEAM = GUTBJ785HC;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -850,7 +853,7 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Wearables/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = WAG;
+				INFOPLIST_KEY_CFBundleDisplayName = Wearables;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "To connect to your pet's sensor, We need to enable Bluetooth on your device.";
@@ -861,27 +864,30 @@
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "The app uses your phone microphone while recording the observation video";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app requires Photo Library permissions";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires Photo Library permissions";
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.9;
+				MARKETING_VERSION = 5.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ctepl.wearablesclinicaltrialsdev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.HPN.wearablesclinicaltrials;
 				PRODUCT_NAME = Wearables;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "Wearables-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

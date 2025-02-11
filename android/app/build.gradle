@@ -84,11 +84,11 @@ android {
 
     namespace "com.wearables"
     defaultConfig {
-        applicationId "com.ctepl.wearablesclinicaltrialsdev"
+        applicationId "com.cte.wearables"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 20
-        versionName "4.9.0"
+        versionCode 50
+        versionName "5.0.0"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
         // Other configurations

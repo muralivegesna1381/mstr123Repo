@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Text, BackHandler } from 'react-native';
+import { View, StyleSheet, Text, BackHandler, Platform } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
@@ -252,8 +252,8 @@ const PetNameComponent = ({ route, ...props }) => {
 
                         {!isfromPetBFIOnBoarding ?
                             <View style={{ height: hp('20%'), width: wp('80%'), alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
-                                <DogImg width={wp('25%')} height={hp('20%')}/>
-                                <CatImg style={styles.catStyels}/>
+                                <DogImg width={wp('25%')} height={hp('25%')}/>
+                                <CatImg width={wp('30%')} height={hp('30%')} style={styles.catStyels}/>
                             </View> :
 
                             <View style={{ height: hp('15%'), width: wp('80%'), alignItems: 'center', justifyContent: 'center' }}>

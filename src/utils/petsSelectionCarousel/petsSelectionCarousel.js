@@ -5,7 +5,6 @@ import Carousel, { Pagination } from 'react-native-snap-carousel';
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
 import * as Constant from "../../utils/constants/constant";
-import * as DataStorageLocal from "./../../utils/storage/dataStorageLocal";
 import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
 
 import PetEditImg from "./../../../assets/images/otherImages/svg/petEditCarasoul.svg";
@@ -179,7 +178,7 @@ const PetsSelectionCarousel = ({ route,defaultPet, petsArray,setValue, setSlideV
 
             {index === activeSlides && isFromScreen === "Dashboard" ?
               <TouchableOpacity style={styles.editPetBtnStyle} onPress={() => { editPetAction(item) }}>
-                <PetEditImg width={Platform.isPad ? wp("4%") : wp("6%")} height={hp("6%")} style={{ marginTop: Platform.isPad ? hp("-1%") : hp("-1.64%"),marginRight: Platform.isPad ? hp("-1%") : wp("-0.02%"), alignSelf:'flex-end' }}/>
+                <PetEditImg width={Platform.isPad ? wp("4%") : wp("6%")} height={hp("6%")} style={{ marginTop: Platform.isPad ? hp("-1.8%") : hp("-1.64%"),marginRight: Platform.isPad ? hp("0.1%") : wp("-0.02%"), alignSelf:'flex-end' }}/>
               </TouchableOpacity> : null}
 
           </ImageBackground> :

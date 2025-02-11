@@ -173,7 +173,7 @@ const PetTypeComponent = ({ route, ...props }) => {
                 <View style={selectedIndex === index ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                     <View style={styles.imgBckViewStyle}>
-                        {item.speciesName === 'Canine' ? <DogImg width={Platform.isPad ? wp("4%") : wp("8%")} height={Platform.isPad ? hp("4%") : hp("8%")}/> : <CatImg width={Platform.isPad ? wp("4%") : wp("8%")} height={Platform.isPad ? hp("4%") : hp("8%")}/>}
+                        {item.speciesName === 'Canine' ? <DogImg width={Platform.isPad ? wp("5%") : wp("8%")} height={Platform.isPad ? hp("4%") : hp("8%")}/> : <CatImg width={Platform.isPad ? wp("5%") : wp("8%")} height={Platform.isPad ? hp("4%") : hp("8%")}/>}
                     </View>
 
                     <Text style={[styles.name]}>{item.speciesName === 'Canine' ? 'Dog' : "Cat"}</Text>

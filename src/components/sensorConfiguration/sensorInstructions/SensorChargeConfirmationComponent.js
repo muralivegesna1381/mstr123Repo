@@ -1,5 +1,5 @@
 import React, {useState,useEffect,useRef} from 'react';
-import {Text, View,StyleSheet,BackHandler,Platform} from 'react-native';
+import {Text, View,StyleSheet,BackHandler,Platform, Image} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import fonts from '../../../utils/commonStyles/fonts'
@@ -15,7 +15,7 @@ import perf from '@react-native-firebase/perf';
 import * as PermissionsiOS from './../../../utils/permissionsComponents/permissionsiOS';
 import * as CheckPermissionsAndroid from './../../../utils/permissionsComponents/permissionsAndroid';
 
-import HPN1SensorImg from "./../../../../assets/images/sensorImages/svg/hpn1SensorIcon.svg";
+import HPN1SensorImg from "./../../../../assets/images/sensorImages/png/hpn1SensorIcon.png";
 import SensorInstImg from "./../../../../assets/images/sensorImages/svg/sensorInstBleIcon.svg";
 import ConfigSensorMenuImg from "./../../../../assets/images/otherImages/svg/configsensorMenu.svg";
 import SensorBatteryImg from "./../../../../assets/images/sensorImages/svg/sensorInstBatteryIcon.svg";
@@ -196,7 +196,7 @@ return (
                 <View style={styles.instViewStyle}>
 
                     <View style={{flexDirection:'row',alignItems:'center'}}>
-                        {sensorType && sensorType.includes('HPN1') ? <HPN1SensorImg width={wp('10%')} height={hp('10%')} style={styles.iconStyles}/> : <ConfigSensorMenuImg width={wp('10%')} height={hp('10%')} style={styles.iconStyles}/>}
+                        {sensorType && sensorType.includes('HPN1') ? <Image source={HPN1SensorImg} style={styles.iconStyles}></Image> : <ConfigSensorMenuImg width={wp('10%')} height={hp('10%')} style={styles.iconStyles}/>}
                         {sensorType && sensorType.includes('HPN1') ? <Text style={[styles.instTxtStyle]}>{'The sensor should be'}<Text style={[styles.instTxtStyleBold]}>{' plugged into charging'}</Text> </Text> 
                         : <Text style={[styles.instTxtStyle]}>{'The sensor should be unplugged from charger'} </Text>} 
                     </View>
@@ -302,6 +302,11 @@ const styles = StyleSheet.create({
         color: 'black',
         fontSize: fonts.fontMedium,
         ...CommonStyles.textStyleBold,
+    },
+
+    iconStyles : {
+      width: wp('10%'),
+      aspectRatio:1
     },
 
 });

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View,StyleSheet,Text,TouchableWithoutFeedback, ImageBackground,ScrollView} from 'react-native';
+import {View,StyleSheet,Text,TouchableWithoutFeedback,ScrollView,Platform} from 'react-native';
 import BottomComponent from "../../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
@@ -60,7 +60,7 @@ const  TimerActivityUI = ({route, ...props }) => {
                             <View style={selectedIndex === 0 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                                 <View style={styles.imgBckViewStyle}>
-                                    <RunningImg width={wp('8%')} height={hp('8%')}/>
+                                    <RunningImg width={Platform.isPad ? wp('6%') : wp('8%')} height={hp('8%')}/>
                                 </View>
                                 <Text style={[styles.name]}>{'Running'}</Text>
                             </View>
@@ -70,7 +70,7 @@ const  TimerActivityUI = ({route, ...props }) => {
                             <View style={selectedIndex === 1 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                                 <View style={styles.imgBckViewStyle}>
-                                    <WalkingImg width={wp('8%')} height={hp('8%')}/>
+                                    <WalkingImg width={Platform.isPad ? wp('6%') : wp('8%')} height={hp('8%')}/>
                                 </View>
                                 <Text style={[styles.name]}>{'Walking'}</Text>
                             </View>
@@ -84,7 +84,7 @@ const  TimerActivityUI = ({route, ...props }) => {
                             <View style={selectedIndex === 2 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                                 <View style={styles.imgBckViewStyle}>
-                                    <PlayingImg width={wp('8%')} height={hp('8%')}/>
+                                    <PlayingImg width={Platform.isPad ? wp('6%') : wp('8%')} height={hp('8%')}/>
                                 </View>
                                 <Text style={[styles.name]}>{'Fetch'}</Text>
                             </View>
@@ -94,7 +94,7 @@ const  TimerActivityUI = ({route, ...props }) => {
                             <View style={selectedIndex === 3 ? [styles.activityBckView] : [styles.unActivityBckView]}>
 
                                 <View style={styles.imgBckViewStyle}>
-                                    <RopeTug width={wp('8%')} height={hp('8%')}/>
+                                    <RopeTug width={Platform.isPad ? wp('6%') : wp('8%')} height={hp('8%')}/>
                                 </View>
                                 <Text style={[styles.name]}>{'Rope Tug'}</Text>
                             </View>

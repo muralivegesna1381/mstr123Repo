@@ -300,7 +300,7 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
                                         </View>
                                     </View>
                                     <View style={{ justifyContent: 'center' }}>
-                                        <RightArrowImg style={styles.imageStyle}/>
+                                        <RightArrowImg width= {wp('4%')} height={ hp('4%')} style={styles.imageStyle}/>
                                     </View>
                                 </TouchableOpacity>
                             </View>
@@ -337,7 +337,7 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
                                 <View style={{ width: wp("30%") }}>
                                     <TouchableOpacity style={styles.cBtnStyle} onPress={() => { set_isDropdown(!isDropdown) }}>
                                         <Text style={styles.cTextStyle}>{petFoodAmountUnits}</Text>
-                                        <DownArrowImg style={styles.downArrowStyle}/>
+                                        <DownArrowImg width= {wp('4%')} height={ hp('4%')} style={styles.downArrowStyle}/>
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     },
     textInputStyle: {
         ...CommonStyles.textStyleRegular,
-        fontSize: fonts.fontMedium1,
+        fontSize: fonts.fontMedium,
         flex: 2.5,
         marginLeft: hp("2%"),
         marginRight: hp("2%"),

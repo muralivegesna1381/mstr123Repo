@@ -9,6 +9,7 @@ import * as apiRequest from './../../utils/getServicesData/apiServiceManager.js'
 import * as apiMethodManager from './../../utils/getServicesData/apiMethodManger.js';
 import moment from 'moment';
 import * as AppPetsData from '../../utils/appDataModels/appPetsModel.js';
+import { enableScreens } from 'react-native-screens';
 
 let trace_inNotificationScreen;
 const MARK_ALL_READ = 100;
@@ -107,13 +108,12 @@ const NotificationsComponent = ({ navigation, route, ...props }) => {
         notificationsSDate.current = moment(tempDte).format('YYYY-MM-DD');
         notificationsEDate.current = moment(new Date()).format('YYYY-MM-DD');
         totalNotificationsRef.current = [];
-        getNotifications(pageNo.current,totalNotificationsCount.current,'','');
+        getNotifications(pageNo.current,totalNotificationsCount.current,notificationsSDate.current,notificationsEDate.current);
     };
 
     const getNotifications = async (pageNo,count,startDate, endDate) => {
 
         let client = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-
         set_isLoading(true);
         let apiMethod = apiMethodManager.GET_NOTIFICATIONS + client + "/" + pageNo + "/" + count +'?searchText='+''+'&fromDate='+startDate+'&toDate='+endDate;
         let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);

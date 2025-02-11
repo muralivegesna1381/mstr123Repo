@@ -14,6 +14,7 @@ import { useQuery} from "@apollo/react-hooks";
 import * as internetCheck from "./../../../utils/internetCheck/internetCheck";
 import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
 import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
+import * as generatRandomNubmer from './../../../utils/generateRandomId/generateRandomId.js';
 
 let trace_inQuestionnaireQuestionsScreen;
 let trace_Questions_Submit_API_Complete;
@@ -501,7 +502,6 @@ const QuestionnaireQuestionsService = ({navigation, route,...props}) => {
                 return;
             } else {
                 createPopup(Constant.NETWORK_TYPE_WIFI_QUEST,Alert_Network_Id,Constant.ALERT_DEFAULT_TITLE,'OK',false,true,1); 
-
             }
 
         } else {
@@ -645,8 +645,9 @@ const QuestionnaireQuestionsService = ({navigation, route,...props}) => {
         await trace_Questions_Submit_API_Complete.stop();
     };
 
-    const updateDashboardData = () => {
-        Apolloclient.client.writeQuery({query: Queries.UPDATE_Quest_LIST,data: {data: { questData:petId,__typename: 'UpdateQuestList'}},});
+    const updateDashboardData = async () => {
+        let rNumber = await generatRandomNubmer.generateRandomNumber();
+        Apolloclient.client.writeQuery({query: Queries.UPDATE_Quest_LIST,data: {data: { questData:rNumber,__typename: 'UpdateQuestList'}},});
         Apolloclient.client.writeQuery({query: Queries.UPDATE_DASHBOARD_DATA,data: {data: { data:'refresh',__typename: 'UpdateDashboardData'}},});
     };
 

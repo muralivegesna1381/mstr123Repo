@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {StyleSheet,View,Text,Image} from 'react-native';
+import {StyleSheet,View,Text,Image,Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import CommonStyles from '../commonStyles/commonStyles';
 import Fonts from '../../utils/commonStyles/fonts';
+
 import LoaderBckView from "../../../assets/images/timerImages/svg/bgTimerFilter.svg"
+import LoaderBckViewiPad from "../../../assets/images/timerImages/svg/bgTimerFilteriPad.svg"
 
 const LoaderComponent = ({navigation, route,loaderText,isButtonEnable,heightLoader,isLoader,showLoderBox,loaderText2,...props }) => {
 
@@ -33,7 +35,7 @@ const LoaderComponent = ({navigation, route,loaderText,isButtonEnable,heightLoad
         <View style={[styles.mainActivity,{height:hp(heightL),zIndex:999}]}>
 
             {showLoaderBox1 === 'show' ? <View style={{alignItems:'center', justifyContent:'center'}}>
-                <LoaderBckView/>
+                { Platform.isPad ? <LoaderBckViewiPad/> : <LoaderBckView/>}
                 <View style = {styles.loaderBckViewStyle}>
                     <View>                        
                         <Image source={require ('../../../assets/images/gifImages/Doganimation.gif')} style={[styles.dogStyle]}></Image>

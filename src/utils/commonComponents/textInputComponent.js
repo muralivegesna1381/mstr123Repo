@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {StyleSheet,View,} from 'react-native';
+import {StyleSheet,View,Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
@@ -30,7 +30,7 @@ const TextInputComponent = ({navigation, route,inputText,labelText,setValue,isEd
 
                 <TextInput
                     label = {labelText}
-                    value ={ inputText}
+                    value ={ Platform.isPad ? inputText : inputText && inputText.length > 30 ? inputText.slice(0,30) + '...' : inputText}
                     editable = {isEditable}
                     maxLength = {maxLengthVal}
                     keyboardType = {keyboardType}
@@ -68,8 +68,8 @@ const styles = StyleSheet.create({
         fontSize: fonts.fontMedium,
         color:'black',
         width: wp('80%'),
-        // flex:1,
-        height: hp('9%'),
+        flex:1,
+        // height: hp('9%'),
 
     },
 

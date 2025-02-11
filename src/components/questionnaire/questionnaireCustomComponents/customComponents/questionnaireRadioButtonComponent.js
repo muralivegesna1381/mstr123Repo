@@ -81,8 +81,8 @@ const questionnaireRadioButtonComponent = ({navigation,value,answersArray,select
         }
 
       } else {
-        set_checkValue({option:selectedAnswer.option,rAnswer: selectedAnswer.rAnswer,submitQuestionnaire:false,ansOptionMediaFileName : selectedAnswer.ansOptionMediaFileName});
-        if(selectedAnswer.option && selectedAnswer.option.toUpperCase() === Constant.MSELECTION_OTHER_SPECIFY.toUpperCase()) {
+        selectedAnswer && set_checkValue({option:selectedAnswer.option,rAnswer: selectedAnswer.rAnswer,submitQuestionnaire:false,ansOptionMediaFileName : selectedAnswer.ansOptionMediaFileName});
+        if(selectedAnswer && selectedAnswer.option && selectedAnswer.option.toUpperCase() === Constant.MSELECTION_OTHER_SPECIFY.toUpperCase()) {
           set_isOthers(true);
           set_textAnswer(selectedAnswer.rAnswer);
         }

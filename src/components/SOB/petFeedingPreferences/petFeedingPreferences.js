@@ -281,7 +281,7 @@ const PetFeedingPreferencesComponentUI = ({ navigation, route, ...props }) => {
                                             </View>
 
                                             <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                                                {selectedItems.current.includes(item.feedingPreferenceId) ? <Tickmg style={[styles.petImgStyle, {}]}/> : <NoTickImg style={[styles.petImgStyle, {}]}/>}
+                                                {selectedItems.current.includes(item.feedingPreferenceId) ? <Tickmg width= {wp("8%")} height= {hp("8%")} style={[styles.petImgStyle, {}]}/> : <NoTickImg width= {wp("8%")} height= {hp("8%")} style={[styles.petImgStyle, {}]}/>}
                                             </View>
 
                                             <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', alignItems: 'center' }}>

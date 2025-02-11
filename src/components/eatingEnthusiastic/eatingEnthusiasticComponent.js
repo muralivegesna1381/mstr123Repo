@@ -88,12 +88,11 @@ const  EatingEnthusiasticComponent = ({navigation, route, ...props }) => {
             
         } else if(apiService && apiService.isInternet === false) {
             createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
-                    
         } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+
             createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);
             firebaseHelper.logEvent(firebaseHelper.event_get_pet_eating_enthusiasm_scale_api_failure, firebaseHelper.screen_eating_enthusiasm, "Get eating enthusiasm scale api failed", 'error : ', apiService.error.errorMsg);
             
-        } else if(apiService && apiService.logoutError !== null) {            
         } else {
 
             createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);

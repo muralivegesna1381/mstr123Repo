@@ -327,15 +327,29 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
                     
                     let isNotAnswered = false;
 
+                    if(item.questionTypeId === 6 && item.isMandatory) {
+                        let value = getQuestionnaireQuestions(item.questionId)
+                        if(value && value >= 0) {} else {
+                            updateQuestionnaireQuestions(item,item.floor,item.isMandatory,item.questionType);
+                        }
+                    }
+
+                    if(item.questionTypeId === 9 && item.isMandatory) {
+
+                        let value = getQuestionnaireQuestions(item.questionId)
+                        if(value) {} else {
+                            updateQuestionnaireQuestions(item,new Date(),item.isMandatory,item.questionType);
+                        }
+                    }
+
                     for (let i = 0; i < questionsArray.length; i++) {
                         if(((questionsArray[i].questionOrder < item.questionOrder)) ) { 
                             
                             if(questionsArray[i].isMandatory) {
-                                if(questionsArray[i] && questionsArray[i].questionTypeId === QUEST_SCALE){
+                                // if(questionsArray[i] && questionsArray[i].questionTypeId === QUEST_SCALE){
 
-                                } else {
-
-                                    if(!getQuestionnaireQuestions(questionsArray[i].questionId)) {                                  
+                                // } else {
+                                    if(getQuestionnaireQuestions(questionsArray[i].questionId) === undefined || getQuestionnaireQuestions(questionsArray[i].questionId) === '') {                                  
                                         isNotAnswered = true;
                                         break;
                                     } else {
@@ -363,7 +377,7 @@ const QuestionnaireQuestionsUI = ({navigation, route,...props}) => {
     
                                     }
 
-                                }
+                                // }
 
                             } else {
                                 

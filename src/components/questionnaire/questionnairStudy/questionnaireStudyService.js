@@ -113,6 +113,8 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
     // API to fetch the Questionnaires for a selected pet
     const getQuestionnaireData = async (petId) => {
 
+      set_isLoading(true);
+      isLoadingdRef.current = 1;
       trace_Questionnaire_API_Complete = await perf().startTrace('t_GetQuestionnaireByPetId_API');
       firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api, firebaseHelper.screen_questionnaire_study, "Initiated API to get Questionnaires", 'Pet Id : '+petId);
 

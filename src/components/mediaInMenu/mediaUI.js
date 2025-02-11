@@ -130,7 +130,6 @@ const MediaUI = ({ navigation, route, ...props }) => {
     );
   };
 
-
   const renderItem = ({ item }) => {
     const mediaItems = [
       ...(item.videos && item.videos.length > 0 ? item.videos : []),

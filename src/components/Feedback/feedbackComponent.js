@@ -70,16 +70,12 @@ const FeedbackComponent = ({navigation, route, ...props }) => {
       } else if(apiService && apiService.isInternet === false) {
         createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,true);
         return;
-
       } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
         createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true);
         firebaseHelper.logEvent(firebaseHelper.event_feedback_details_api_failure, firebaseHelper.screen_feedback, "Getting Feedback details API Fail", 'error : '+apiService.error.errorMsg);
-          
-      } else if(apiService && apiService.logoutError !== null) {            
-      }else {
+      } else {
         createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true);
         firebaseHelper.logEvent(firebaseHelper.event_feedback_details_api_failure, firebaseHelper.screen_feedback, "Getting Feedback details API Fail", 'Service Status : false');
-        
       }
       
     };

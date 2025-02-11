@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, FlatList, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, BackHandler, FlatList, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View,Platform } from 'react-native';
 import ImageView from "react-native-image-viewing";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import BottomComponent from '../../utils/commonComponents/bottomComponent';
@@ -302,9 +302,11 @@ const BFIScoreMain = ({ route, navigation }) => {
       }
 
     } else if(apiService && apiService.isInternet === false) {
+        
       createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, 'OK', false, true);
                         
     } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+        
       firebaseHelper.logEvent(firebaseHelper.event_getscore_ids_api, firebaseHelper.screen_submit_bfiScore, "savePetBfiImages Service failed", 'Service error : ' + apiService.error.errorMsg);
 
     } else {
@@ -338,12 +340,12 @@ const BFIScoreMain = ({ route, navigation }) => {
       <TouchableOpacity onPress={() => { updateSelectedItem(item, index) }}>
         <View style={styles.flatListContainer}>
           {index > -1 && index === currentBFISelected ?
-            <ImageBackground style={styles.listItemBg} source={petImgArray[currentBFISelected]} >
+            <ImageBackground height= {Platform.isPad ? wp('15%') : wp('20%')} width= {Platform.isPad ? wp('15%') : wp('20%')} style={styles.listItemBg} source={petImgArray[currentBFISelected]} >
               <Text style={styles.itemTextStyleActive}>{item.name}</Text>
             </ImageBackground>
             :
             <View style= {{alignItems:'center',justifyContent:'center'}}>
-              <BFIEmptyImg style={styles.listItemBg}/>
+              <BFIEmptyImg height= {Platform.isPad ? wp('15%') : wp('20%')} width= {Platform.isPad ? wp('15%') : wp('20%')} style={styles.listItemBg}/>
               <Text style={[styles.itemTextStyleInActive,{position:'absolute'}]}>{item.name}</Text>
             </View>
            
@@ -582,9 +584,9 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   listItemBg: {
-    height: wp('20%'),
-    width: wp('20%'),
-    margin: wp('4%'),
+    height: Platform.isPad ? wp('15%') : wp('20%'),
+    width: Platform.isPad ? wp('15%') : wp('20%'),
+    margin: Platform.isPad ? wp('2.5%') : wp('4%'),
     justifyContent: 'center',
     alignItems: 'center'
   },

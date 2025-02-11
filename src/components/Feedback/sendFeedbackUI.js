@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,StyleSheet,Text,TextInput,Keyboard,TouchableOpacity,Image,FlatList} from 'react-native';
+import {View,StyleSheet,Text,TextInput,Keyboard,TouchableOpacity,Image,FlatList,Platform} from 'react-native';
 import BottomComponent from "./../../utils/commonComponents/bottomComponent";
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import HeaderComponent from './../../utils/commonComponents/headerComponent';
@@ -107,149 +107,148 @@ const  SendFeedbackUI = ({route, ...props }) => {
     };
 
     const onCancel = () => {
-
-        Keyboard.dismiss();
-        set_searchText(undefined);
-        set_isSearchView(false);
-        set_filterFeedbackArray(feedBackScreensData);
+      Keyboard.dismiss();
+      set_searchText(undefined);
+      set_isSearchView(false);
+      set_filterFeedbackArray(feedBackScreensData);
     };
     
     return (
-        <View style={[styles.mainComponentStyle]}>
+      <View style={[styles.mainComponentStyle]}>
 
-          <View style={[CommonStyles.headerView]}>
-                <HeaderComponent
-                    isBackBtnEnable={true}
-                    isSettingsEnable={false}
-                    isChatEnable={false}
-                    isTImerEnable={false}
-                    isTitleHeaderEnable={true}
-                    title={'Send Feedback'}
-                    backBtnAction = {() => backBtnAction()}
-                />
-            </View>
+        <View style={[CommonStyles.headerView]}>
+          <HeaderComponent
+            isBackBtnEnable={true}
+            isSettingsEnable={false}
+            isChatEnable={false}
+            isTImerEnable={false}
+            isTitleHeaderEnable={true}
+            title={'Send Feedback'}
+            backBtnAction = {() => backBtnAction()}
+          />
+        </View>
             
 
-              <View style={{width: wp('80%'),height: hp('70%'),marginTop: hp("8%"),alignSelf:'center'}}>
+        <View style={{width: wp('80%'),height: hp('70%'),marginTop: hp("8%"),alignSelf:'center'}}>
 
-              <KeyboardAwareScrollView  bounces={true} showsVerticalScrollIndicator={false} enableOnAndroid={true} scrollEnabled={true} scrollToOverflowEnabled={true} enableAutomaticScroll={true}>
+          <KeyboardAwareScrollView  bounces={true} showsVerticalScrollIndicator={false} enableOnAndroid={true} scrollEnabled={true} scrollToOverflowEnabled={true} enableAutomaticScroll={true}>
 
-                <Text style={[CommonStyles.headerTextStyle,{marginBottom: hp("2%")}]}>{'Enter your feedback'}</Text>
+            <Text style={[CommonStyles.headerTextStyle,{marginBottom: hp("2%")}]}>{'Enter your feedback'}</Text>
                   
-                  <View style={styles.SectionStyle}>
+            <View style={styles.SectionStyle}>
 
-                    <TextInput
-                      style={styles.textInputStyle}
-                      maxLength={300}
-                      multiline={true}
-                      placeholder={'Tell us your Feedback (Max : 300 characters)*'}
-                      underlineColorAndroid="transparent"
-                      placeholderTextColor="#808080"
-                      value={feedbackText}
-                      onChangeText={async (text) => {validateObsText(text.trimStart())}}
-                    />  
-                  </View> 
+              <TextInput
+                style={styles.textInputStyle}
+                maxLength={300}
+                multiline={true}
+                placeholder={'Tell us your Feedback (Max : 300 characters)*'}
+                underlineColorAndroid="transparent"
+                placeholderTextColor="#808080"
+                value={feedbackText}
+                onChangeText={async (text) => {validateObsText(text.trimStart())}}
+              />  
+            </View> 
 
-                  <View style={{width: wp('80%'),marginTop: hp('2%'),alignItems:'center'}}>
+            <View style={{width: wp('80%'),marginTop: hp('2%'),alignItems:'center'}}>
 
-                    <TouchableOpacity style={{flexDirection:'row',borderWidth: 0.5,borderColor: "#D8D8D8",borderRadius: hp("0.5%"),width: wp("80%"),}} onPress={() => {selectBehaviourDrop();}}>
+              <TouchableOpacity style={{flexDirection:'row',borderWidth: 0.5,borderColor: "#D8D8D8",borderRadius: hp("0.5%"),width: wp("80%"),}} onPress={() => {selectBehaviourDrop();}}>
 
-                      <View>
-                        <View style={[styles.SectionStyle1,{}]}>
+                <View>
+                  <View style={[styles.SectionStyle1,{}]}>
 
-                          <View style={{flexDirection:'column',}}>
-                            <Text style={styles.dropTextLightStyle}>{'Select Feature name*'}</Text>
-                            {screenName ? <Text style={[styles.dropTextStyle]}>{screenName}</Text> : null}
-                          </View>
+                    <View style={{flexDirection:'column',}}>
+                      <Text style={styles.dropTextLightStyle}>{'Select Feature name*'}</Text>
+                      {screenName ? <Text style={[styles.dropTextStyle]}>{screenName}</Text> : null}
+                    </View>
                               
-                        </View>
-                      </View>
-
-                      <View style={{justifyContent:'center'}}>
-                        <DownArrowImg width = {wp('4%')} height = {hp('4%')}/>
-                      </View>
-     
-                    </TouchableOpacity>
-
                   </View>
+                </View>
 
-               </KeyboardAwareScrollView>
-
-              </View>
-
-            <View style={CommonStyles.bottomViewComponentStyle}>
-                <BottomComponent
-                    rightBtnTitle = {'SUBMIT'}
-                    leftBtnTitle = {'BACK'}
-                    isLeftBtnEnable = {true}
-                    rigthBtnState = {nxtBtnEnable}
-                    isRightBtnEnable = {true}
-                    rightButtonAction = {async () => nextButtonAction()}
-                    leftButtonAction = {async () => backBtnAction()}
-                />
-            </View>   
-
-            {isPopUp ? <View style={CommonStyles.customPopUpStyle}>
-                <AlertComponent
-                    header = {props.popUpAlert}
-                    message={props.popUpMessage}
-                    isLeftBtnEnable = {false}
-                    isRightBtnEnable = {true}
-                    leftBtnTilte = {'Cancel'}
-                    rightBtnTilte = {'OK'}
-                    popUpRightBtnAction = {() => popOkBtnAction()}
-                />
-            </View> : null}
-
-            {isSearchView ? <View style={styles.popSearchViewStyle}>
-
-            <View style={{flexDirection:'row',alignItems:'center',width:wp('90%'),}}>
-                <View style={styles.topView}>
-                   <SearchImg width = {wp('5%')} height = {hp('5%')} style={styles.searchImageStyle}/>
-
-                    <TextInput
-                        style={styles.textInputStyle}
-                        onChangeText={(text) => searchFilterFunction(text)}
-                        value={searchText}
-                        underlineColorAndroid="transparent"
-                        placeholder="Search here"
-                        returnKeyLabel="Search"
-                        returnKeyType="search"
-                        onSubmitEditing={Keyboard.dismiss}
-                    />
-
-                    {searchText && searchText.length> 0 ? <TouchableOpacity onPress={onCancelSearch} style={styles.topButtonView} >
-                      <Text style={[styles.name, { color: "black", }]} > {"CLEAR"}</Text>
-                    </TouchableOpacity> : null}
-
-              </View>
-
-              <TouchableOpacity onPress={onCancel} style={[styles.topButtonView,{marginLeft:wp('2%')}]} >
-                  <Image source={xImg} style={styles.xImageStyle} />
-                </TouchableOpacity>
+                <View style={{justifyContent:'center'}}>
+                  <DownArrowImg width = {wp('4%')} height = {hp('4%')}/>
+                </View>
+     
+              </TouchableOpacity>
 
             </View>
 
-              <FlatList
-                style={styles.flatcontainer}
-                data={filterFeedbackArray}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item, index }) => (
-                  <TouchableOpacity onPress={() => actionOnRow(item)}>
-                      <View style={styles.flatview}>
-                        <Text numberOfLines={2} style={[styles.name]}>{item}</Text>
-                      </View>
-                  </TouchableOpacity>
-                )}
-                enableEmptySections={true}
-                keyExtractor={(item) => item}
+          </KeyboardAwareScrollView>
+
+        </View>
+
+        <View style={CommonStyles.bottomViewComponentStyle}>
+          <BottomComponent
+            rightBtnTitle = {'SUBMIT'}
+            leftBtnTitle = {'BACK'}
+            isLeftBtnEnable = {true}
+            rigthBtnState = {nxtBtnEnable}
+            isRightBtnEnable = {true}
+            rightButtonAction = {async () => nextButtonAction()}
+            leftButtonAction = {async () => backBtnAction()}
+          />
+        </View>   
+
+        {isPopUp ? <View style={CommonStyles.customPopUpStyle}>
+          <AlertComponent
+            header = {props.popUpAlert}
+            message={props.popUpMessage}
+            isLeftBtnEnable = {false}
+            isRightBtnEnable = {true}
+            leftBtnTilte = {'Cancel'}
+            rightBtnTilte = {'OK'}
+            popUpRightBtnAction = {() => popOkBtnAction()}
+          />
+        </View> : null}
+
+        {isSearchView ? <View style={styles.popSearchViewStyle}>
+
+          <View style={{flexDirection:'row',alignItems:'center',width:wp('90%'),}}>
+            <View style={styles.topView}>
+              <SearchImg width = {Platform.isPad ? wp('3%') : wp('4%')} height = {hp('3%')} style={styles.searchImageStyle}/>
+
+              <TextInput
+                style={styles.textInputStyle}
+                onChangeText={(text) => searchFilterFunction(text)}
+                value={searchText}
+                underlineColorAndroid="transparent"
+                placeholder="Search here"
+                returnKeyLabel="Search"
+                returnKeyType="search"
+                onSubmitEditing={Keyboard.dismiss}
               />
+
+              {searchText && searchText.length> 0 ? <TouchableOpacity onPress={onCancelSearch} style={styles.topButtonView} >
+                <Text style={[styles.name, { color: "black", }]} > {"CLEAR"}</Text>
+              </TouchableOpacity> : null}
+
+            </View>
+
+            <TouchableOpacity onPress={onCancel} style={[styles.topButtonView,{marginLeft:wp('2%')}]} >
+              <Image source={xImg} style={styles.xImageStyle} />
+            </TouchableOpacity>
+
+          </View>
+              
+          <FlatList
+            style={styles.flatcontainer}
+            data={filterFeedbackArray}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) => (
+              <TouchableOpacity onPress={() => actionOnRow(item)}>
+                <View style={styles.flatview}>
+                  <Text numberOfLines={2} style={[styles.name]}>{item}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+            enableEmptySections={true}
+            keyExtractor={(item) => item}
+          />
                 
-            </View> : null}
+        </View> : null}
 
-            {isLoading === true ? <LoaderComponent isLoader={true} loaderText = {props.loaderMsg} isButtonEnable = {false} /> : null} 
+        {isLoading === true ? <LoaderComponent isLoader={true} loaderText = {props.loaderMsg} isButtonEnable = {false} /> : null} 
 
-         </View>
+      </View>
     );
   }
   
@@ -295,7 +294,7 @@ const  SendFeedbackUI = ({route, ...props }) => {
     },
 
     xImageStyle: {
-      width: wp("8%"),
+      width: Platform.isPad ? wp("4%") :  wp("8%"),
       height: wp("8%"),
       resizeMode: "contain",
     },

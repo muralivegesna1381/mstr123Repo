@@ -197,11 +197,11 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
                 <View style={[CommonStyles.tabViewStyle, { marginTop: wp('2%') }]}>
 
                     <TouchableOpacity style={[props.tabSelection === 0 ? CommonStyles.tabViewEnableBtnStyle : CommonStyles.tabViewBtnStyle]} onPress={() => { tabBarBtnAction(0) }}>
-                        <Text style={[CommonStyles.tabBtnTextStyle]}>{'Intake'}</Text>
+                        <Text style={[CommonStyles.tabBtnTextStyle,{fontSize : Platform.isPad && 20 }]}>{'Intake'}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={[props.tabSelection === 1 ? CommonStyles.tabViewEnableBtnStyle : CommonStyles.tabViewBtnStyle]} onPress={() => { tabBarBtnAction(1) }}>
-                        <Text style={[CommonStyles.tabBtnTextStyle, { marginRight: hp('0.2%') }]}>{'History'}</Text>
+                        <Text style={[CommonStyles.tabBtnTextStyle, { fontSize : Platform.isPad && 20,marginRight: hp('0.2%') }]}>{'History'}</Text>
                     </TouchableOpacity>
 
                 </View>
@@ -209,8 +209,8 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
                 <View style={{ marginTop: hp('2%') }}>
 
                     {props.tabSelection === 0 ? <TouchableOpacity style={[CommonStyles.dateBtnStyle, {}]} onPress={() => { dateTopBtnAction() }}>
-                        {props.tabSelection === 0 ? <Text style={[CommonStyles.dateBtnTextStyle]}>{props.datePickerDate ? moment(new Date(props.datePickerDate)).format('MM-DD-YYYY') : 'Date'}</Text> :
-                            <Text style={[CommonStyles.dateBtnTextStyle]}>{fCalenderSdate && fCalenderSdate ? (fCalenderSdate === fCalenderedate ? fCalenderSdate : fCalenderSdate + (fCalenderedate ? " to " + fCalenderedate : "")) : (fCalenderSdate ? fCalenderSdate : "Date")}</Text>}
+                        {props.tabSelection === 0 ? <Text style={[CommonStyles.dateBtnTextStyle,{fontSize : Platform.isPad && 20 }]}>{props.datePickerDate ? moment(new Date(props.datePickerDate)).format('MM-DD-YYYY') : 'Date'}</Text> :
+                            <Text style={[CommonStyles.dateBtnTextStyle,{fontSize : Platform.isPad && 20 }]}>{fCalenderSdate && fCalenderSdate ? (fCalenderSdate === fCalenderedate ? fCalenderSdate : fCalenderSdate + (fCalenderedate ? " to " + fCalenderedate : "")) : (fCalenderSdate ? fCalenderSdate : "Date")}</Text>}
                         <CalenderButtonImg width={Platform.isPad ? wp('4%') : wp('6%')} style={[CommonStyles.searchCalImageStyle]} />
                     </TouchableOpacity> :
                         <View style={{ flexDirection: 'row', width: wp('93%'), justifyContent: 'space-between' }}>

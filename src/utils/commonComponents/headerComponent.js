@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import {StyleSheet,Text,TouchableOpacity, View,Image} from 'react-native';
+import {StyleSheet,Text,TouchableOpacity, View,Image,Platform} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from '../commonStyles/fonts'
 import CommonStyles from '../commonStyles/commonStyles';
@@ -46,7 +46,7 @@ const HeaderComponent = ({navigation, route,isChatEnable, isInfoEnable,isTImerEn
 
                     <View style={{justifyContent:'center'}}>
                         <TouchableOpacity onPress = {() => backBtnAction()} style={{flexDirection:'row',alignItems:'center',}} disabled = {isBackBtnEnable ? false : true}>
-                            {isBackBtnEnable ? <View style={styles.backBtnEnableStyle}><BackBtnImg/></View> : null}
+                            {isBackBtnEnable ? <View style={styles.backBtnEnableStyle}><BackBtnImg width= {wp('4%')} height={ hp('2%')} style={{marginTop: Platform.isPad && hp("0.4%")}}/></View> : null}
                             <View ><HeaderIcon style={{marginLeft: isBackBtnEnable ? wp("1%") : wp("3%"),marginRight: wp("2%"), width:wp('5%'),aspectRatio:1,resizeMode:''}}/></View>
                         </TouchableOpacity>
                     </View>
@@ -62,7 +62,7 @@ const HeaderComponent = ({navigation, route,isChatEnable, isInfoEnable,isTImerEn
                         </TouchableOpacity> : null}
 
                         {isNotificationsEnable ? <TouchableOpacity style = {{width:wp('20%'),alignItems:'center'}} onPress = {() => notificationAction()}>
-                            {isNotitficationCount ? <NotificationRedImg/> : <NotificationImg/>}
+                            {isNotitficationCount ? <NotificationRedImg width= {wp('4%')} height={ hp('4%')}/> : <NotificationImg width= {wp('4%')} height={ hp('4%')}/>}
                         </TouchableOpacity> : null}
 
                         {isInfoEnable ? <TouchableOpacity onPress = {() => infoBtnAction()}>

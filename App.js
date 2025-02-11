@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Alert, StatusBar, Platform, Text, TextInput} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AppNavigator from './src/navigation/appNavigator';
 import * as DataStorageLocal from "./src/utils/storage/dataStorageLocal";
@@ -12,7 +11,6 @@ import PushNotification, { Importance } from 'react-native-push-notification';
 import QuestionnaireMediaUpload from './src/utils/questionnaireMediaUpload/questionnaireMediaUpload';
 import ImageBackgrounUpload from './src/utils/mediaProcessingComponents/imageBackgroundUpload/imageBackgroundUpload';
 import VideoBackgroundUpload from './src/utils/mediaProcessingComponents/videoBackgroundUpload/videoBackgroundUpload';
-import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 import CaptureBFIUpload from './src/bfiComponents/captureImages/imageCapture/captureBFIUpload';
 import auth from '@react-native-firebase/auth';
 import { firebase } from '@react-native-firebase/analytics';
@@ -149,6 +147,7 @@ function App() {
   };
   
   const messageListener = async () => {
+    
     messaging().setBackgroundMessageHandler(async remoteMessage => {
       const { title, body } = remoteMessage.notification;
       Alert.alert(title, body);
@@ -156,6 +155,9 @@ function App() {
     messaging().onMessage(async remoteMessage => {
       const { title, body } = remoteMessage.notification;
       Alert.alert(title, body);
+    });
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      //remoteMessage.notification
     });
   };
 

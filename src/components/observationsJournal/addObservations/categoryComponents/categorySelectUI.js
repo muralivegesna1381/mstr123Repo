@@ -51,14 +51,14 @@ const CategorySelectUI = ({ route, ...props }) => {
 
                     <TouchableOpacity onPress={() => selectCategory('Photos', 0)}>
                         <View style={props.selectedIndex === 0 ? [styles.activityBckView] : [styles.unActivityBckView]}>
-                            <PhotoObsImg style={Platform.isPad ? [styles.petImgStyle, {width: wp("8%")}] : [styles.petImgStyle]}/>
+                            <PhotoObsImg width={ wp("8%")} height={Platform.isPad ? hp('7%') : hp('6%')} style={[styles.petImgStyle]}/>
                             <Text style={[styles.name]}>{'Photos'}</Text>
                         </View>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => selectCategory('Videos', 1)}>
                         <View style={props.selectedIndex === 1 ? [styles.activityBckView] : [styles.unActivityBckView]}>
-                            <VideoObsImg style={Platform.isPad ? [styles.petImgStyle, {width: wp("8%")}] : [styles.petImgStyle]}/>
+                            <VideoObsImg width={ wp("8%")} height={Platform.isPad ? hp('7%') : hp('6%')} style={[styles.petImgStyle]}/>
                             <Text style={[styles.name]}>{'Videos'}</Text>
                         </View>
                     </TouchableOpacity>

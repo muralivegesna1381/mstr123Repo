@@ -368,6 +368,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       return;
             
     } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
+      
       set_isLoading(false);
       firebaseHelper.logEvent(firebaseHelper.event_dBoard_getVisual_fail, firebaseHelper.screen_dashboard, "Dashboard Get Visualization Service failed", 'errors : ' + apiService.error.errorMsg);
       
@@ -399,6 +400,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       }
             
     } else if(apiService && apiService.isInternet === false) {
+      
       set_isLoading(false);
       createPopup(Constant.ALERT_NETWORK,Constant.NETWORK_STATUS,'OK', false,true);
       return;
@@ -516,6 +518,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
 
     modularArray = tempArray;
     firebaseHelper.logEvent(firebaseHelper.event_dashboard_defaultPet_modularity, firebaseHelper.screen_dashboard, "DBoard Default Pet Permissions", 'P Set : '+JSON.stringify(modularArray));
+    
     if (modularArray.includes(PERMISSION_FM_CHAT) && defaultPet.showFmChart) { 
       modularPermissions.modularPermissionsData.isFmGraph = true;
       modularPermissions.modularPermissionsData.isFmDataService = true;
@@ -740,7 +743,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       firebaseHelper.logEvent(firebaseHelper.event_dashboard_getCampaign_fail, firebaseHelper.screen_dashboard, "Dashboard Get Campaign Service Failed", 'error : '+apiService.error.errorMsg);
 
     } else {
-
+      //set_isLoading(false);
       firebaseHelper.logEvent(firebaseHelper.event_dashboard_getCampaign_fail, firebaseHelper.screen_dashboard, "Dashboard Get Campaign Service Failed", 'error : '+'Status failed');
       
     }
@@ -822,7 +825,6 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       return;
             
     } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
-      
       firebaseHelper.logEvent(firebaseHelper.event_dBoard_Get_Permi_Pets_fail, firebaseHelper.screen_dashboard, "Dashboard Get Pet Permissions Service failed", 'error : ' + apiService.error.errorMsg);
       
     } else {
@@ -1030,6 +1032,10 @@ const DasBoardService = ({ navigation, route, ...props }) => {
     
   };
 
+  const enableQuestionnaire = () => {
+    set_isLoading(true);
+  }
+
   return (
 
     <DasBoardComponent
@@ -1081,6 +1087,7 @@ const DasBoardService = ({ navigation, route, ...props }) => {
       selectedPetAction = {selectedPetAction}
       quickObservationAction = {quickObservationAction}
       notificationAction = {notificationAction}
+      enableQuestionnaire = {enableQuestionnaire}
     />
   );
 

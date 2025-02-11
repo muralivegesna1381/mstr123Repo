@@ -25,9 +25,6 @@ import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 import * as UserDetailsModel from "./../../utils/appDataModels/userDetailsModel.js";
 import perf from '@react-native-firebase/perf';
 
-
-//Test
-
 import RetakeImg from "./../../../assets/images/bfiGuide/svg/re-take.svg";
 import PetFrontImg from "./../../../assets/images/bfiGuide/svg/ic_front.svg";
 import PetBackImg from "./../../../assets/images/bfiGuide/svg/ic_back.svg";
@@ -150,7 +147,8 @@ const PetImageCaptureComponent = ({ route, navigation, props }) => {
       //Rotate Top,Left and Right Side image
       set_loaderText(Constant.LOADING_MSG_IMAGE_PROCESSING)
       if (route.params?.indexPos === 2 || route.params?.indexPos === 3 || route.params?.indexPos === 4 || route.params?.indexPos === 5) {
-        rotateImage(route.params?.imagePath, route.params?.imageCroppedPath)
+        // rotateImage(route.params?.imagePath, route.params?.imageCroppedPath)
+        savePhotoInLocalGallery(route.params?.imagePath, route.params?.imageCroppedPath)
       } else {
         savePhotoInLocalGallery(route.params?.imagePath, route.params?.imageCroppedPath)
       }

@@ -185,13 +185,13 @@ return (
           {sensorType && sensorType.includes('HPN1') ? <Text style={[styles.txtStyle]}>{'Please ensure your HPN1 sensor is plugged into charging throughout the device setup.'} </Text> : <Text style={[styles.txtStyle]}>{'Please charge the sensor for at least'}<Text style={[styles.txtStyleBold]}>{' 30 minutes '}</Text><Text style={[styles.txtStyle]}>{'before initiating device setup.'}</Text></Text>}
         </View>
 
-        <View style = {sensorType && sensorType.includes('HPN1') ? [styles.videoViewStyle,{marginLeft:wp('-10%'),}] : [styles.videoViewStyle,{}]}>
+        <View style = {sensorType && sensorType.includes('HPN1') ? [styles.videoViewStyle,{marginLeft:wp('-10%')}] : [styles.videoViewStyle,{}]}>
 
           {sensorImages && sensorImages.length > 0 ? 
             <ImageSequence
               images={sensorImages}
               framesPerSecond={6}
-              style={sensorType && sensorType.includes('HPN1') ? [styles.videoStyle] : (Platform.isPad ? [styles.videoStyle1,{height:hp('50%')}] : [styles.videoStyle1])} 
+              style={sensorType && sensorType.includes('HPN1') ? [styles.videoStyle,{width:Platform.isPad ? wp('80%') : wp('120%'), alignSelf:'center',marginLeft:wp('10%')}] : (Platform.isPad ? [styles.videoStyle1,{height:hp('50%')}] : [styles.videoStyle1])} 
             /> 
           : null}
         </View> 
@@ -263,8 +263,9 @@ const styles = StyleSheet.create({
     },
 
     videoStyle : {
-        width:wp('120%'),
-        height:hp('30%'),
+      width:wp('120%'),
+      height:hp('30%'),
+      resizeMode:'contain'
     },
 
     videoStyle1 : {

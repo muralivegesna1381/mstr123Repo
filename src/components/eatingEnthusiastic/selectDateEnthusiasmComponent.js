@@ -135,8 +135,7 @@ const  SelectDateEnthusiasmComponent = ({navigation, route, ...props }) => {
             createPopup(Constant.ALERT_DEFAULT_TITLE,apiService.error.errorMsg,true); 
             firebaseHelper.logEvent(firebaseHelper.event_submit_pet_feeding_time_api_failure, firebaseHelper.screen_eating_enthusiasm_time, "Submit Pet Feeding Time Api failed", 'error : '+apiService.error.errorMsg);          
           
-        } else if(apiService && apiService.logoutError !== null) {            
-        }else {
+        } else {
             createPopup(Constant.ALERT_DEFAULT_TITLE,Constant.SERVICE_FAIL_MSG,true); 
             firebaseHelper.logEvent(firebaseHelper.event_submit_pet_feeding_time_api_failure, firebaseHelper.screen_eating_enthusiasm_time, "Submit Pet Feeding Time Api failed", 'error : '+'Status Failed');
             

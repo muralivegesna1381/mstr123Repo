@@ -27,7 +27,8 @@ const PetInformationComponent = ({ navigation, route, ...props }) => {
     }, [route.params?.petData]);
 
     const navigateToPrevious = () => {
-        navigation.navigate('PetListComponent');
+        // navigation.navigate('PetListComponent');
+        navigation.pop();
     };
 
     const nextButtonAction = () => {
