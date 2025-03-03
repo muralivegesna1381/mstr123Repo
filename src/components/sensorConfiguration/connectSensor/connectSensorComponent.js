@@ -196,6 +196,14 @@ const  ConnectSensorComponent = ({ route, ...props }) => {
 
                     if(!statusType.current && (deviceModal.current === 'CMAS' || deviceModal.current === 'AGL2')){
                         set_isFirstTime(true);
+                        pheriId.current = data.peripheralId;
+                        const writeVal = [3];
+                        writeData(writeVal);
+                        // setTimeout(() => {  
+                        //     isLoadingdRef.current = 0; 
+                        //     set_isLoading(false);
+                        //     navigation.navigate('SensorWiFiListComponent',{periId:data.peripheralId,defaultPetObj:defaultPetObj.current,isFromScreen:'connectSensor',devNumber:sensorNumber.current});
+                        // }, 3000);
                         setTimeout(() => {  
                             isLoadingdRef.current = 0; 
                             set_isLoading(false);
@@ -269,7 +277,6 @@ const  ConnectSensorComponent = ({ route, ...props }) => {
         SensorHandler.getInstance().writeDataToSensor(bleUUID.COMM_SERVICE,bleUUID.COMMAND_CHAR,command,({ data, error }) => {
 
             if (data) {  
-                
                 setTimeout(() => {  
                     set_isLoading(false);
                     isLoadingdRef.current = 0;  

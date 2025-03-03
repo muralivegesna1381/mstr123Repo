@@ -603,7 +603,6 @@ const QuestionnaireQuestionsService = ({navigation, route,...props}) => {
         set_isLoading(true);
         set_loaderMsg(Constant.LOADER_WAIT_MESSAGE);
         isLoadingdRef.current = 1;
-
         let apiMethod = apiMethodManager.SAVE_QUESTION_ANSWERS;
         let apiService = await apiRequest.postData(apiMethod,answersDictToBackend,Constant.SERVICE_JAVA,navigation);
         set_isLoading(false);
@@ -805,6 +804,7 @@ const QuestionnaireQuestionsService = ({navigation, route,...props}) => {
                 autoSubmitQuestRadioBtnAction = {autoSubmitQuestRadioBtnAction}
                 autoSubmitQuestionnaire = {autoSubmitQuestionnaire}
                 updateQstServiceDict = {updateQstServiceDict}
+                saveQuestionnaire = {saveQuestionnaire}
             />
 
         </>

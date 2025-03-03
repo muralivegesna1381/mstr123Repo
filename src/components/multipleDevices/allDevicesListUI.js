@@ -157,7 +157,7 @@ const  AllDevicesUI = ({route, ...props }) => {
 
                   </View>  
 
-                  {item.isDeviceSetupDone && item.battery ? <View style={{height:hp("4%"),width: DeviceInfo.isTablet()? wp("16%"): wp("25%"),backgroundColor: "#F5F7FB",alignItems: "center",
+                  {item && item.isDeviceSetupDone && item.battery ? <View style={{height:hp("4%"),width: DeviceInfo.isTablet()? wp("16%"): wp("25%"),backgroundColor: "#F5F7FB",alignItems: "center",
                     justifyContent: "center", borderRadius: 10,flexDirection: "row",alignSelf:'center'}}>
 
                     <ImageBackground style={{flexDirection: "row",marginLeft: hp("1%"),flex: 1,height:hp("2.5%"),}} resizeMode="stretch" source={require("../../../assets/images/otherImages/png/batterybg.png")}>
@@ -175,7 +175,7 @@ const  AllDevicesUI = ({route, ...props }) => {
               </View>}
 
               <View style={{width:wp('80%'),marginBottom:hp('1%')}}>
-                {item.lastSync ? <Text style={[styles.subHeaderStyle,{}]}>{"Last Sync: " + item.lastSync}</Text> : null}
+                {item && item.isDeviceSetupDone && item.lastSync ? <Text style={[styles.subHeaderStyle,{}]}>{"Last Sync: " + item.lastSync}</Text> : null}
               </View>
 
             </View>

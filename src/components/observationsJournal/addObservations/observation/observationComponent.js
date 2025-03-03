@@ -147,9 +147,59 @@ const  ObservationComponent = ({navigation, route, ...props }) => {
       
     if(!internet){
 
+<<<<<<< HEAD
+        set_popUpAlert(Constant.ALERT_NETWORK);
+        set_popUpMessage(Constant.NETWORK_STATUS);
+        set_isPopUp(true);
+        popIdRef.current = 1;
+
+      } else {
+
+        let obsObj = await DataStorageLocal.getDataFromAsync(Constant.OBSERVATION_DATA_OBJ);
+        obsObj = JSON.parse(obsObj);
+
+        if(obsObj) {
+            
+          if(fromScreen.current === 'quickVideo') {
+
+            let bName = item && item.behaviorName ? item.behaviorName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '') : 'NOBEHAVIOR';
+            bName = bName !== "" ? (bName.length > 15 ? bName.substring(0, 15) : bName) : 'NOBEHAVIOR';
+            // let temObsName = item && item.behaviorName && item.behaviorName.length > 15 ? item.behaviorName.slice(0,15) : item.behaviorName;
+            if(obsObj && obsObj.mediaArray[0]){
+              let fileName = obsObj.quickVideoFileName+'_'+ bName;
+              obsObj.mediaArray[0].fileName = fileName.toLocaleLowerCase() +'.mp4'
+            } 
+          }
+
+          obsObj.obsText = obsText;
+          obsObj.obserItem = item ? item : obsObj.obserItem;
+          obsObj.behaviourItem = item ? item : obsObj.behaviourItem;
+        }
+        await DataStorageLocal.saveDataToAsync(Constant.OBSERVATION_DATA_OBJ,JSON.stringify(obsObj));
+        navigation.navigate("SelectDateComponent");  
+      }        
+        
+    };
+
+    const navigateToPrevious = () => {   
+
+      // if(isLoadingdRef.current === 0 && popIdRef.current === 0){
+      //   navigation.navigate("CategorySelectComponent"); 
+      // }
+
+      navigation.pop();
+          
+    };
+
+    const createPopup = (title,msg,isPop) => {
+      set_popUpAlert(title);
+      set_popUpMessage(msg);
+      set_isPopUp(isPop);
+=======
       set_popUpAlert(Constant.ALERT_NETWORK);
       set_popUpMessage(Constant.NETWORK_STATUS);
       set_isPopUp(true);
+>>>>>>> feature/wearables_dev0.74_withoutEnhancements
       popIdRef.current = 1;
 
     } else {

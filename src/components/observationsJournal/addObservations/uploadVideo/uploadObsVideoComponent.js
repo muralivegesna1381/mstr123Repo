@@ -130,10 +130,16 @@ const UploadObsVideoComponent = ({ navigation, route, ...props }) => {
         if (oJson.selectedPet.devices[0].isDeviceSetupDone) {
           set_deviceNumber(oJson.selectedPet.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, ''));
         } else {
+<<<<<<< HEAD
+          set_deviceNumber('NODEVICE');
+        }
+
+=======
           set_deviceNumber(oJson.selectedPet.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, ''));
         }
       } else {
         set_deviceNumber('NODEVICE');
+>>>>>>> feature/wearables_dev0.74_withoutEnhancements
       }
 
     }

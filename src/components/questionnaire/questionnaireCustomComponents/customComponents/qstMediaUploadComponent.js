@@ -39,7 +39,6 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
   const [pName, set_pName] = useState('');
   const [sName, set_sName] = useState('');
   const [deviceNumber, set_deviceNumber] = useState();
-  const [setupStatus, set_setupStatus] = useState('XXXXXX');
 
   let editImgCountRef = useRef(0);
   let actualEditImgCountRef = useRef(0);
@@ -109,10 +108,15 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
 
       if (defaultPetObj && defaultPetObj.devices && defaultPetObj.devices.length > 0) {
         if (defaultPetObj.devices[0].isDeviceSetupDone) {
+<<<<<<< HEAD
+          set_deviceNumber(defaultPetObj.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, ''));
+        } else {
+=======
           set_setupStatus("Complete");
           set_deviceNumber(defaultPetObj.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, ''));
         } else {
           set_setupStatus("Pending");
+>>>>>>> feature/wearables_dev0.74_withoutEnhancements
           set_deviceNumber(defaultPetObj.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, ''));
         }
       } else {
@@ -214,7 +218,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
               let fileName = '';
 
               if (defaultPetObj) {
-                fileName = pName + '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '.jpg';
+                fileName = pName + '_' + petId + '_' + sName + '_' + deviceNumber + '_' + dateFile + '.jpg';
               }
 
               fileName = fileName.toLocaleLowerCase();
@@ -222,6 +226,10 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
               if (mArray && mArray.length > 0) {
 
                 const isFound = mArray.some(element => {
+<<<<<<< HEAD
+
+=======
+>>>>>>> feature/wearables_dev0.74_withoutEnhancements
                   if (element.fileName === fileName) {
                     isExists = true;
                   }
@@ -273,7 +281,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
 
               let fileName = '';
               if (defaultPetObj) {
-                fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '_' + '.mp4';
+                fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + dateFile + '.mp4';
 
               }
 
@@ -366,11 +374,16 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
           if (response[i].type.includes('image')) {
             let rNumber = await generatRandomNubmer.generateRandomNumber();
             let fileName = '';
+            let _uri = '';
+            _uri = response[i].realPath.replace("file:///", "/");
+            var dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
+            await MediaMeta.get(_uri).then((metadata) => {
+              dateFile = moment(metadata.creation_time).utcOffset("+00:00").format("MMDDYYHHmmss");
+            }).catch((err) => { });
 
             if (defaultPetObj) {
-              fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '_' + '.jpg';
+              fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + dateFile + '.jpg';
             }
-  
             fileName = fileName.toLocaleLowerCase();
 
             let imgObj = {
@@ -409,7 +422,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
             let rNumber = await generatRandomNubmer.generateRandomNumber();
 
             if (defaultPetObj) {
-              fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '_' + '.mp4';
+              fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + dateFile + '.mp4';
             }
   
             fileName = fileName.toLocaleLowerCase().replace(/\s+/g, '');
@@ -483,7 +496,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
             let fileName = '';
 
             if (defaultPetObj) {
-              fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '_' + '.mp4';
+              fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + dateFile + '.mp4';
             }
 
             fileName = fileName.toLocaleLowerCase();
@@ -520,7 +533,7 @@ const QstMediaUploadComponent = ({ navigation, value, setValue, setLoaderValue, 
 
           if (defaultPetObj) {
           
-            fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + setupStatus + '_' + dateFile + '_' + '.jpg';
+            fileName = pName+ '_' + petId + '_' + sName + '_' + deviceNumber + '_' + dateFile +'.jpg';
 
           }
 

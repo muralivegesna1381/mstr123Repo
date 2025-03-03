@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, Text, TouchableWithoutFeedback, FlatList, TouchableOpacity, Image, BackHandler } from 'react-native';
+import { View, StyleSheet, Text, TouchableWithoutFeedback, FlatList, TouchableOpacity, Image, BackHandler, Platform } from 'react-native';
 import BottomComponent from "./../../../utils/commonComponents/bottomComponent";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
@@ -248,7 +248,6 @@ const PetFeedingPreferencesComponentUI = ({ navigation, route, ...props }) => {
                                         tempAnswersArray.current = [];
                                         selectedItems.current = [];
                                     } else {
-                                        // var index = tempAnswersArray.current.findIndex(e => e.feedingPreferenceId === 6);
                                         selectedItems.current = selectedItems.current.filter(item1 => item1 !== 6);
                                         for (var i = tempAnswersArray.current.length - 1; i >= 0; i--) {
                                             if (tempAnswersArray.current[i].feedingPreferenceId === 6) {

@@ -58,9 +58,10 @@ const WriteDetailsToSensorUI = ({navigation, route, ...props }) => {
         set_isLoading(props.isLoading);
         set_loaderMsg(props.loaderMsg);
         set_setupSuccess(props.setupSuccess);
+        set_setupSuccess(props.setupSuccess1);
         set_isSensorAwaiting(props.isSensorAwaiting);
 
-    }, [props.isLoading,props.loaderMsg,props.setupSuccess,props.isSensorAwaiting]);
+    }, [props.isLoading,props.loaderMsg,props.setupSuccess,props.setupSuccess1,props.isSensorAwaiting]);
 
     const nextButtonAction = (value) => {
         props.nextButtonAction(value);
@@ -121,7 +122,6 @@ return (
                     <Text style={[styles.dataTxtStyleBold]}>{'Also, please shake the sensor periodically throughout the configuration process.'}</Text>
                 </View> : 
                 <Text style={setupSuccess === 100 ? [styles.txtStyleBold,{color:'#6BC100'}] : setupSuccess === 101 ? [styles.txtStyleBold,{color:'red'}] : [styles.txtStyleBold]}>{loaderMsg}</Text>} */}
-
             </View>
            
             {setupSuccess === 100 || setupSuccess === 101 ? <View style={styles.bottomViewComponentStyle}>

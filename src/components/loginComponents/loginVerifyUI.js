@@ -15,7 +15,7 @@ import TouchImg from "./../../../assets/images/otherImages/svg/touchIDIcon.svg";
 const  LoginVerifyUI = ({isAuthEnabled,authenticationType,route, ...props }) => {
 
     // Setting the values from login COmponent to local variables
-    const [userName, set_userName] = useState(undefined);
+    const [userName, set_userName] = useState('');
 
     useEffect(() => {
         getUserDetails();

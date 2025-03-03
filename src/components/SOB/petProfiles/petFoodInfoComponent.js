@@ -226,6 +226,26 @@ const PetFoodInfoComponent = ({ route, ...props }) => {
         } 
     };
 
+    const dropDownBtnAction = () => {
+        set_isDropdown(!isDropdown);
+        //set_isBtnEnable(false)
+
+        // if (item != "Cancel") {
+
+        //     if(petFoodAmountUnits !== item) {
+        //         set_petFoodAmount("");
+        //         foodAmountRef.current = 0;
+        //     }
+            
+        //     set_petFoodAmountUnits(item);
+        // }
+        // set_isDropdown(false);
+
+        // if (dietName && parseFloat(foodAmountRef.current) > 0) {
+        //     set_isBtnEnable(true);
+        // } 
+    }
+
     const searchFilterFunction = (text) => {
         set_searchText(text);
         const newData = dietArray.filter(function (item) {
@@ -569,8 +589,8 @@ const styles = StyleSheet.create({
         color: '#000000',
     },
     downArrowStyle: {
-        width: wp('4%'),
-        height: hp('4%'),
+        width: wp('10%'),
+        height: hp('10%'),
         resizeMode: 'contain',
         tintColor: '#707070',
         marginLeft: wp('2%'),

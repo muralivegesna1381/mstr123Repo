@@ -301,7 +301,10 @@ const  ViewObservationService = ({navigation, route, ...props }) => {
           navigateToPrevious();
         }
       }).catch((e)=>{
+<<<<<<< HEAD
+=======
             
+>>>>>>> feature/wearables_dev0.74_withoutEnhancements
         deleteCount.current = deleteCount.current + 1;
         if(deleteCount.current < totalCount.current){
           deleteFBFile();

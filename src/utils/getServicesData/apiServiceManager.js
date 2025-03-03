@@ -39,7 +39,7 @@ export async function apiRequest(methodName,url,reuestObj,serviceType,navigation
             body: methodName === "GET" ? null : JSON.stringify(reuestObj),
             headers: await getHeaders()
         }).then(res => { return res.json()}).then(data => { 
-            
+
             if(serviceType === Constant.SERVICE_MIGRATED) {
 
                 if(data && data.success) {

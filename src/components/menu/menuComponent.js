@@ -195,7 +195,7 @@ const  MenuComponent = ({navigation, route, ...props }) => {
       let menuItem = [
         {mobileAppConfigID : 0,title : 'Dashboard', iconImg : DashboardIcon, nav : "DashBoardService"},
         {mobileAppConfigID: 7, title: 'Onboard Pet', iconImg: OnboardIcon, nav: "PetNameComponent" }, 
-        {mobileAppConfigID : 10,title : 'Media', iconImg : MediaIcon, nav : "MediaComponent"}, 
+        // {mobileAppConfigID : 10,title : 'Media', iconImg : MediaIcon, nav : "MediaComponent"}, 
         {mobileAppConfigID : 11,title : 'Account', iconImg : AccountIcon, nav : "AccountInfoService"},
         {mobileAppConfigID : 13,title : 'Support', iconImg : SupportIcon, nav : "SupportComponent"},
         {mobileAppConfigID : 12,title : 'Feedback', iconImg : FeedbackIcon,nav : "FeedbackComponent"}, 

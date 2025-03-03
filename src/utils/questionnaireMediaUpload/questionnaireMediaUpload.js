@@ -124,33 +124,32 @@ const QuestionnaireMediaUpload = ({navigation, route,...props }) => {
 
     const startProcessingMedia = async (questData) => {
 
-            if(mediaType.current === 'image') {
+        if(mediaType.current === 'image') {
 
-                let pendingUploads = 10;
-                for (let i = 0; i < imagesArray.current.length; i++) {
-                    if (imagesArray.current[i].fbFilePath === '') {
-                        pendingUploads = i;
-                        break;
-                    } 
-                }
-                
-                completeMediaLength.current = pendingUploads;
-                if(completeMediaLength.current < actualMediaLength.current) {
-
-                    processMedia(questData,imagesArray.current);
-                    return;
-
-                } else {
-
-                    mediaType.current = 'video';
-                    processVideos(questData,videosArray.current);
-                    
-                    
-                }
-
-            } else if(mediaType.current === 'video') {
-                processVideos(questData,videosArray.current);
+            let pendingUploads = 10;
+            for (let i = 0; i < imagesArray.current.length; i++) {
+                if (imagesArray.current[i].fbFilePath === '') {
+                    pendingUploads = i;
+                    break;
+                } 
             }
+                
+            completeMediaLength.current = pendingUploads;
+            if(completeMediaLength.current < actualMediaLength.current) {
+
+                processMedia(questData,imagesArray.current);
+                return;
+
+            } else {
+
+                mediaType.current = 'video';
+                processVideos(questData,videosArray.current);
+                    
+            }
+
+        } else if(mediaType.current === 'video') {
+            processVideos(questData,videosArray.current);
+        }
 
     };
 
@@ -181,7 +180,6 @@ const QuestionnaireMediaUpload = ({navigation, route,...props }) => {
         let qestName = answers[0].questionnaireName;
 
         let fbObj = undefined;
-
         if(mediaType.current === 'image') {
             fbObj = await ImageProgress.prepareImages(mArray[completeMediaLength.current],petId,client,questId,'backGround',qestName);
         } else if(mediaType.current === 'video') {
@@ -190,13 +188,13 @@ const QuestionnaireMediaUpload = ({navigation, route,...props }) => {
 
         holdMediaArray.current.push(fbObj);
         completeMediaLength.current = completeMediaLength.current + 1;
-
         if(completeMediaLength.current < actualMediaLength.current) {
             processMedia(answers,mArray);
         } else {
             let tempArray = [];
 
             for (let i = 0; i < answers[0].questionAnswers.length; i++) {
+
                 if(answers[0].questionAnswers && answers[0].questionAnswers[i].mediaType === 1 || answers[0].questionAnswers && answers[0].questionAnswers[i].mediaType === 2) {
                     var temp = holdMediaArray.current.filter(item => item.id === answers[0].questionAnswers[i].answer.id);
                     if(temp && temp.length > 0) {
@@ -212,6 +210,7 @@ const QuestionnaireMediaUpload = ({navigation, route,...props }) => {
                             }
                             tempArray.push(newObj);
                         } else {
+                            
                             tempArray.push(answers[0].questionAnswers[i]);
                         }
 

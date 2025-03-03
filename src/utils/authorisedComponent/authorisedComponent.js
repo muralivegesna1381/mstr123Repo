@@ -72,5 +72,12 @@ export async function clearData () {
     await DataStorageLocal.removeDataFromAsync(Constant.IMAGES_UPLOAD_PROCESS_STARTED);
     await DataStorageLocal.removeDataFromAsync(Constant.IMAGE_UPLOAD_DATA);
     await DataStorageLocal.removeDataFromAsync(Constant.QUETIONNAIRE_PERMISSION);
+    await DataStorageLocal.removeDataFromAsync(Constant.CONFIG_SENSOR_OBJ);
+    await DataStorageLocal.removeDataFromAsync(Constant.MENU_ID);
+    await DataStorageLocal.removeDataFromAsync(Constant.BFIINSTRUCTIONSDATA);
+    await DataStorageLocal.removeDataFromAsync(Constant.TIMER_DIMENTIONS);
+    await DataStorageLocal.removeDataFromAsync(Constant.TIMER_DIMENTIONS_DEVICE);
+    await DataStorageLocal.removeDataFromAsync(Constant.FH_SELECTED_PET);
+    await DataStorageLocal.removeDataFromAsync(Constant.FH_PETS_ARRAY);
     await DataStorageLocal.removeDataFromAsync(Constant.QUESTIONNAIRE_SELECTED_PET);
 }

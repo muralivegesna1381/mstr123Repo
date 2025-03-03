@@ -28,6 +28,7 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
   const [videoName, set_videoName] = useState(undefined);
   const [isMediaSelection, set_isMediaSelection] = useState(false);
   const [mediaArray, set_mediaArray] = useState([]);
+  const [isFrom, set_isFrom] = useState(undefined)
 
   const [isPopUp, set_isPopUp] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
@@ -38,6 +39,7 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
 
   let popIdRef = useRef(0);
   let selectedPetRef = useRef(undefined);
+  let videoFileName = useRef(undefined);
   let trimmedPath;
   let vStartDate = null;
   let vEndDate = null;
@@ -46,12 +48,14 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
 
   React.useEffect(() => {
 
+    if(route.params?.isFrom) {
+      set_isFrom(route.params?.isFrom);
+    }
     getObsDetails();
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
 
     if (Platform.OS === 'android') {
       requestCameraPermission();
-
     } else {
       chooseCamera();
     }
@@ -75,7 +79,7 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
       unsubscribe();
     };
 
-  }, []);
+  }, [route.params?.isFrom]);
 
   const handleBackButtonClick = () => {
     navigateToPrevious();
@@ -97,6 +101,21 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
       firebaseHelper.logEvent(firebaseHelper.event_observation_quick_video, firebaseHelper.screen_quick_video, "User Selected Quick Video option", 'Pet Id : ' + oJson.selectedPet.petID);
       set_selectedPet(oJson.selectedPet);
       selectedPetRef.current = oJson.selectedPet;
+
+      let fileName = '';
+      let petId = selectedPetRef.current.petID;
+      let pName = selectedPetRef.current.petName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+      pName = pName.length > 15 ? pName.substring(0, 15) : pName;
+      let sName = selectedPetRef.current.studyName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
+      sName = sName !== "" ? (sName.length > 20 ? sName.substring(0, 20) : sName) : "NOSTUDY";
+
+      if (selectedPetRef.current && selectedPetRef.current.devices && selectedPetRef.current.devices.length > 0) {
+        let devNumber = selectedPetRef.current.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '')
+        fileName = pName + '_' + petId + '_' + sName+ '_' + devNumber;
+      } else {
+        fileName = pName+ '_' + petId + '_' + sName + '_' + "NO DEVICE";
+      }
+      videoFileName.current = fileName;
     }
 
   };
@@ -133,7 +152,12 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
 
     firebaseHelper.logEvent(firebaseHelper.event_observation_quick_video_action, firebaseHelper.screen_quick_video, "User clicked on Next", 'Pet Id : ' + obsObject ? obsObject.selectedPet.petID : '');
     if (obsPets && obsPets.length > 1) {
-      navigation.navigate('AddOBSSelectPetComponent', { petsArray: obsPets, defaultPetObj: obsObject.selectedPet });
+      if(isFrom === 'Dashboard') {
+        navigation.navigate('ObservationComponent');
+      } else {
+        navigation.navigate('AddOBSSelectPetComponent', { petsArray: obsPets, defaultPetObj: obsObject.selectedPet });
+      }
+      
     } else {
       navigation.navigate('ObservationComponent');
     }
@@ -288,29 +312,13 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
 
           dateFile = moment().utcOffset("+00:00").format("MMDDYYHHmmss");
           set_OriginalFilePath(response.assets[0].uri)
-          let fileName = '';
-
-          let petId = selectedPetRef.current.petID;
-          let pName = selectedPetRef.current.petName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
-          pName = pName.length > 15 ? pName.substring(0, 15) : pName;
-          let sName = selectedPetRef.current.studyName.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '');
-          sName = sName !== "" ? (sName.length > 20 ? sName.substring(0, 20) : sName) : "NOSTUDY";
-
-          if (selectedPetRef.current && selectedPetRef.current.devices && selectedPetRef.current.devices.length > 0) {
-            let devNumber = selectedPetRef.current.devices[0].deviceNumber.replace(/[\s~`!@#$%^&*(){}\[\];:"'<,.>?\/\\|_+=-]/g, '')
-            fileName = pName + '_' + petId + '_' + sName+ '_' + devNumber+ '_' + dateFile;
-          } else {
-            fileName = pName+ '_' + petId + '_' + sName + '_' + "NO DEVICE" + '_' + dateFile;
-          }
-
-          fileName = fileName.toLocaleLowerCase();
-
-          set_videoName(fileName)
+          videoFileName.current = videoFileName.current + '_' + dateFile.toLocaleLowerCase()
+          set_videoName(videoFileName.current)
 
           let vidObj = {
             'filePath': response.assets[0].uri,
             'fbFilePath': '',
-            'fileName': fileName,//dateFile+"_"+response.assets[0].fileName,
+            'fileName': videoFileName.current,//dateFile+"_"+response.assets[0].fileName,
             'observationVideoId': '',
             'localThumbImg': thumImg,
             'fileType': 'video',
@@ -398,83 +406,90 @@ const QuickVideoComponent = ({ navigation, route, ...props }) => {
 
   const moveToPhotoEditor = async () => {
 
-    if (Platform.OS === 'android') {
+           if (Platform.OS === 'android') {
+             let newPath = `${RNFS.DocumentDirectoryPath}/${"obs_video_" + Date.now() + '.mp4'}`;
+             RNFS.copyFile(item.filePath, newPath).then((success) => {
+               newPath = 'file://' + newPath;
+               NativeModules.K4lVideoTrimmer.navigateToTrimmer(newPath, "10", (convertedVal) => {
+                 convertedVal = convertedVal.replace("[", "");
+                 convertedVal = convertedVal.replace("]", "");
+                 timmedVideosArray = convertedVal.split(",");
+                 set_OriginalFilePath(timmedVideosArray[0])
+                 let fileName = originalFilePath.split('/').pop();
+                 let vidObj = {
+                  'filePath': timmedVideosArray[0],
+                  'fbFilePath': '',
+                  'fileName': videoFileName.current,//dateFile+"_"+response.assets[0].fileName,
+                  'observationVideoId': '',
+                  'localThumbImg': thumbnailImage,
+                  'fileType': 'video',
+                  "isDeleted": 0,
+                  "actualFbThumFile": '',
+                  'thumbFilePath': timmedVideosArray[0],
+                  'compressedFile': '',
+                  "videoStartDate": vStartDate,
+                  "videoEndDate": vEndDate,
+                  "quickVideoDateFile": dateFile,
+                }
+        
+                set_mediaArray([vidObj]);
+                set_loaderMsg('');
+                set_isLoading(false);
+               });
+     
+             }).catch((err) => {});
+           }
+           else if (Platform.OS === 'ios') {
+             set_loaderMsg(Constant.LOADER_WAIT_MESSAGE);
+             set_isLoading(true);
+             let vArray = [];
+             vArray.push(originalFilePath)
+             if (Platform.OS === 'ios') {
+              let myPromise = new Promise(function (resolve) {
+                NativeModules.ChangeViewBridge.changeToNativeView(
+                  vArray,
+                  eventId => {
+                    resolve(eventId);
+                  },
+                );
+              });
+              let videoArray = [];
+              videoArray = await myPromise;
+              set_loaderMsg('');
+              set_isLoading(false);
+              let updateFilePath = videoPath
+              if (videoArray[0].startsWith("file://")) {
+                updateFilePath = videoArray[0];
+              }
+              else {
+                updateFilePath = 'file://' + videoArray[0];
+              }
+              set_OriginalFilePath(updateFilePath)
+              let fileName = originalFilePath.split('/').pop();
+              let vidObj = {
+                'filePath': updateFilePath,
+                'fbFilePath': '',
+                'fileName': videoFileName.current,//dateFile+"_"+response.assets[0].fileName,
+                'observationVideoId': '',
+                'localThumbImg': thumbnailImage,
+                'fileType': 'video',
+                "isDeleted": 0,
+                "actualFbThumFile": '',
+                'thumbFilePath': thumImg,
+                'compressedFile': '',
+                "videoStartDate": vStartDate,
+                "videoEndDate": vEndDate,
+                "quickVideoDateFile": dateFile,
+              }
+      
+              set_mediaArray([vidObj]);
+              set_loaderMsg('');
+              set_isLoading(false);
+            }
+           }
+         
 
-      let fileName = originalFilePath.split('/').pop();
-      let timmedVideosArray = [];
-      NativeModules.K4lVideoTrimmer.navigateToTrimmer(originalFilePath, "10", (convertedVal) => {
-        convertedVal = convertedVal.replace("[", "");
-        convertedVal = convertedVal.replace("]", "");
-        timmedVideosArray = convertedVal.split(",");
-
-        let vidObj = {
-          'filePath': timmedVideosArray[0],
-          'fbFilePath': '',
-          'fileName': fileName,//dateFile+"_"+response.assets[0].fileName,
-          'observationVideoId': '',
-          'localThumbImg': thumbnailImage,
-          'fileType': 'video',
-          "isDeleted": 0,
-          "actualFbThumFile": '',
-          'thumbFilePath': timmedVideosArray[0],
-          'compressedFile': '',
-          "videoStartDate": vStartDate,
-          "videoEndDate": vEndDate,
-          "quickVideoDateFile": dateFile,
-        }
-
-        set_mediaArray([vidObj]);
-        set_loaderMsg('');
-        set_isLoading(false);
-      });
-    }
-    else if (Platform.OS === 'ios') {
-      set_loaderMsg(Constant.LOADER_WAIT_MESSAGE);
-      set_isLoading(true);
-      let vArray = [];
-      vArray.push(originalFilePath)
-      if (Platform.OS === 'ios') {
-        let myPromise = new Promise(function (resolve) {
-          NativeModules.ChangeViewBridge.changeToNativeView(
-            vArray,
-            eventId => {
-              resolve(eventId);
-            },
-          );
-        });
-        let videoArray = [];
-        videoArray = await myPromise;
-        set_loaderMsg('');
-        set_isLoading(false);
-        let updateFilePath = videoPath
-        if (videoArray[0].startsWith("file://")) {
-          updateFilePath = videoArray[0];
-        }
-        else {
-          updateFilePath = 'file://' + videoArray[0];
-        }
-        let fileName = originalFilePath.split('/').pop();
-        let vidObj = {
-          'filePath': updateFilePath,
-          'fbFilePath': '',
-          'fileName': fileName,//dateFile+"_"+response.assets[0].fileName,
-          'observationVideoId': '',
-          'localThumbImg': thumbnailImage,
-          'fileType': 'video',
-          "isDeleted": 0,
-          "actualFbThumFile": '',
-          'thumbFilePath': thumImg,
-          'compressedFile': '',
-          "videoStartDate": vStartDate,
-          "videoEndDate": vEndDate,
-          "quickVideoDateFile": dateFile,
-        }
-
-        set_mediaArray([vidObj]);
-        set_loaderMsg('');
-        set_isLoading(false);
-      }
-    }
+    
   }
 
   return (

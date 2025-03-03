@@ -21,8 +21,7 @@ const  GooglePlacesComponent = ({isBackBtnEnable,route,setValue,invalidAddress, 
 
         set_placeName(searchText);
 
-        // await fetch("https://maps.googleapis.com/maps/api/place/autocomplete/json?key=" + AppKeys.GOOGLE_PLACES_KEY + "&input=" + searchText + "&components=country:us|country:uk|country:ca",
-        await fetch("https://maps.googleapis.com/maps/api/place/autocomplete/json?key=" + AppKeys.GOOGLE_PLACES_KEY + "&input=" + searchText,
+        await fetch("https://maps.googleapis.com/maps/api/place/autocomplete/json?key=" + AppKeys.GOOGLE_PLACES_KEY + "&input=" + searchText + "&components=country:us|country:uk|country:ca",
             {
                 method: "GET",
                 headers: {

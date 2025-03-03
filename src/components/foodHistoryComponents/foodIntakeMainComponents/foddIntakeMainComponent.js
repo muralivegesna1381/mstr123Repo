@@ -93,7 +93,6 @@ const FoodIntakeMainComponent = ({navigation, route, ...props }) => {
       set_isLoading(true);
       isLoadingdRef.current = 1;
       let client = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
-
       let apiMethod = apiMethodManager.GET_FOODINTAKE_LIST + petId + "/" + client + "/" + dteString;
       let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
       set_isLoading(false);

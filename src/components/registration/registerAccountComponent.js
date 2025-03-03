@@ -33,7 +33,7 @@ const RegisterAccountComponent = ({ navigation, route, ...props }) => {
 
     React.useEffect(() => {
 
-        getISDCodes()
+        // getISDCodes()
 
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
         const focus = navigation.addListener("focus", () => {
@@ -88,6 +88,7 @@ const RegisterAccountComponent = ({ navigation, route, ...props }) => {
 
     ///Navigates the pet parent to Profile screen
     const navigateToPrevious = () => {
+        console.log(isLoadingdRef.current, popIdRef.current)
         if (isLoadingdRef.current === 0 && popIdRef.current === 0) {
             firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_register_account, "User clicked on back button to navigate to PetParentProfileComponent ", '');
             navigation.navigate('PetParentProfileComponent');

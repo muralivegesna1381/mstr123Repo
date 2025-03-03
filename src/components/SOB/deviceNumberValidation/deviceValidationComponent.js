@@ -458,8 +458,13 @@ const DeviceValidationComponent = ({ navigation, route, ...props }) => {
 
   const setDefaultPet = async (pets, petId) => {
     let obj = findArrayElementByPetId(pets, petId);
+<<<<<<< HEAD
+    await DataStorageLocal.saveDataToAsync(Constant.DEFAULT_PET_OBJECT, JSON.stringify(obj));
+    await DataStorageLocal.saveDataToAsync(Constant.QUESTIONNAIRE_SELECTED_PET, JSON.stringify(obj));
+=======
     AppPetsData.petsData.defaultPet = obj;
     AppPetsData.petsData.isDeviceMissing = false;
+>>>>>>> feature/wearables_dev0.74_withoutEnhancements
     await DataStorageLocal.saveDataToAsync(Constant.TOTAL_PETS_ARRAY, JSON.stringify(pets));
   };
 

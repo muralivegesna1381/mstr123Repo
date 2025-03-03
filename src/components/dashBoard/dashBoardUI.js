@@ -485,7 +485,7 @@ const  DashBoardUI = ({route, ...props }) => {
                 <HeaderComponent
                     isBackBtnEnable={false}
                     isSettingsEnable={true}
-                    isNotificationsEnable={true}
+                    isNotificationsEnable={false}
                     isTImerEnable={false}
                     isTitleHeaderEnable={true}
                     isNotitficationCount = {props.isNotificationCount ? true : false}

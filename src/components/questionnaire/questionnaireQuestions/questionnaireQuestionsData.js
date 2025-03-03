@@ -86,7 +86,6 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
     }, []);
       
      useEffect(() => {
-
         if(props.defaultPetObj){
             set_defaultPetObj(props.defaultPetObj);
             set_petURL(props.petURL);
@@ -838,12 +837,11 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
         if(mandatoryQuestions > 0 && Object.keys(questionnaireDict).length === 0){
             props.createPopup(Constant.QUESTIONS_ANSWER_MSG,Alert_Min_Answer_Id,Constant.ALERT_DEFAULT_TITLE,'OK',false,true,1);  
         }else {
-
             await QestionnaireDataObj.saveAnswer(questionnaireDict,questionnaireId,petId);
             let dict = await QestionnaireDataObj.getAnswer(questionnaireId,petId);
 
             if(dict) {
-                props.updateQstServiceDict(dict, completeQuestionsSet.current);
+                // props.updateQstServiceDict(dict, completeQuestionsSet.current);
                 let isAnswered
                 if(noOfSections.current.length > 1) {
                     const questions = completeQuestions.filter(question => question.isSkip === false);
@@ -863,6 +861,8 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
             }
 
             if(value !== 'nextAction' && value !== 'prevAction') {
+                props.saveQuestionnaire();
+                isChangesMade.current = false;
                 props.createPopup('Your responses saved successfully',Alert_Questions_Save_Id,Constant.ALERT_INFO,'OK',false,true,1);
             }
 
@@ -1117,11 +1117,13 @@ const QuestionnaireQuestionsData = ({route,...props}) => {
         if(temp && temp.length > 0) {
             set_questionsArray(temp);
             set_questionsArrayInitial(temp);
-        }   
+            // await checkNoSections(obj,temp);
+        }  else {
+            // await checkNoSections(obj,completeQuestionsSet.current);
+        }
         
-
-        await updateQuestionnaireQuestions(obj,value,obj.isMandatory,obj.questionType);
         await checkNoSections(obj,completeQuestionsSet.current);
+        await updateQuestionnaireQuestions(obj,value,obj.isMandatory,obj.questionType);       
         
     };
 

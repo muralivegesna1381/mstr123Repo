@@ -9,6 +9,7 @@ import Fonts from '../../../utils/commonStyles/fonts'
 import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.js';
 import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 import moment from 'moment';
+import * as AppPetsData from '../../../utils/appDataModels/appPetsModel.js';
 
 import CanceImg from "./../../../../assets/images/otherImages/svg/canceRedIcon.svg";
 
@@ -22,6 +23,7 @@ const FoodHistoryComponent = ({ setLoaderValue, updatePopup, fCalenderSdate, fCa
   const [dietList, set_dietList] = useState(undefined);
   const [selectedDatModel, set_SelectedDataModel] = useState(undefined);
   const [selectedIndex, set_SelectedIndex] = useState(undefined);
+  const [petObj, set_petObj] = useState(undefined);
 
   let stakedChartDataRef = useRef(0);
   let chartDataRef = useRef(undefined);
@@ -29,14 +31,23 @@ const FoodHistoryComponent = ({ setLoaderValue, updatePopup, fCalenderSdate, fCa
 
   React.useEffect(() => {
 
+    getPetDetails()
     if (fCalenderSdate && fCalenderedate) {
       getFoodIntakeHistoryApi(petId, fCalenderSdate, fCalenderedate)
     } else if (fCalenderSdate) {
 
       getFoodIntakeHistoryApi(petId, fCalenderSdate, fCalenderedate)
     }
-
+    
   }, [fCalenderSdate, fCalenderedate, selectdCategoryUnit]);
+
+  const getPetDetails = async () => {
+    let defaultPet = AppPetsData.petsData.defaultPet;
+    if(defaultPet) {
+      set_petObj(defaultPet)
+    }
+    
+  }
 
   const getFoodIntakeHistoryApi = async (petId, fCalenderSdate, fCalenderEdate) => {
 
@@ -217,7 +228,7 @@ const FoodHistoryComponent = ({ setLoaderValue, updatePopup, fCalenderSdate, fCa
           }
           // set_noLogsShow(false);             
         } else {
-          // set_noLogsShow(true);
+          set_noLogsShow(true);
         }
           
       } else if(apiService && apiService.isInternet === false) {
@@ -327,11 +338,13 @@ const FoodHistoryComponent = ({ setLoaderValue, updatePopup, fCalenderSdate, fCa
           </View>
         </View>
       </Modal>
+
       <FoodHistoryUI
         displayModelSheet={displayModelSheet}
         chartData={chartData}
         noLogsShow={noLogsShow}
         stakedChartData={stakedChartData}
+        petObj = {petObj}
         selectdCategoryUnit={selectdCategoryUnit}
       />
     </View>

@@ -64,6 +64,7 @@ const TimerActivityComponent = ({navigation, route, ...props }) => {
     };
 
     const navigateToPrevious = () => { 
+
         if(from.current === 'Timer'){
             navigation.navigate('TimerComponent');
         } else {

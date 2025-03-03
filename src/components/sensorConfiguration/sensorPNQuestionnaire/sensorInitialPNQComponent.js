@@ -72,8 +72,8 @@ const SensorInitialPNQComponent = ({navigation, route, ...props }) => {
 
     const backBtnAction = () => {
         firebaseHelper.logEvent(firebaseHelper.event_back_btn_action, firebaseHelper.screen_sensor_pn_noti_initial, "User clicked on back button to navigate to Dashboard", '');
-        // navigation.navigate('DashBoardService');
-        getFeedbackQuestionnaire();
+        navigation.navigate('DashBoardService');
+        // getFeedbackQuestionnaire();
     };
 
     const getFeedbackQuestionnaire = async () => {

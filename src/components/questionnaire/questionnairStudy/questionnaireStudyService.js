@@ -9,6 +9,7 @@ import * as apiRequest from './../../../utils/getServicesData/apiServiceManager.
 import * as apiMethodManager from './../../../utils/getServicesData/apiMethodManger.js';
 import * as Queries from "./../../../config/apollo/queries";
 import { useQuery} from "@apollo/react-hooks";
+import { json } from 'stream/consumers';
 
 let trace_inQuestionnaireScreen;
 let trace_Questionnaire_API_Complete;
@@ -119,10 +120,8 @@ const  QuestionnaireStudyComponent = ({navigation, route, ...props }) => {
       firebaseHelper.logEvent(firebaseHelper.event_questionnaire_study_api, firebaseHelper.screen_questionnaire_study, "Initiated API to get Questionnaires", 'Pet Id : '+petId);
 
       if(petId){
-        // set_isLoading(true);
         let apiMethod = apiMethodManager.GET_QUESTIONNAIRE_LIST + petId + '?isDateSupported=true';
         let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
-
         set_isLoading(false);
         stopFBTrace();
         isLoadingdRef.current = 0;

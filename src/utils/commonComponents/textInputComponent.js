@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     textInputStyle: {
         ...CommonStyles.textStyleRegular,
         fontSize: fonts.fontMedium,
-        color:'black',
+        color:'red',
         width: wp('80%'),
         flex:1,
         // height: hp('9%'),

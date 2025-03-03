@@ -340,12 +340,20 @@ const BFIScoreMain = ({ route, navigation }) => {
       <TouchableOpacity onPress={() => { updateSelectedItem(item, index) }}>
         <View style={styles.flatListContainer}>
           {index > -1 && index === currentBFISelected ?
+<<<<<<< HEAD
+            <ImageBackground height= {wp('20%')} width= {wp('20%')} style={styles.listItemBg} source={petImgArray[currentBFISelected]} >
+=======
             <ImageBackground height= {Platform.isPad ? wp('15%') : wp('20%')} width= {Platform.isPad ? wp('15%') : wp('20%')} style={styles.listItemBg} source={petImgArray[currentBFISelected]} >
+>>>>>>> feature/wearables_dev0.74
               <Text style={styles.itemTextStyleActive}>{item.name}</Text>
             </ImageBackground>
             :
             <View style= {{alignItems:'center',justifyContent:'center'}}>
+<<<<<<< HEAD
+              <BFIEmptyImg height= {wp('20%')} width= {wp('20%')} style={styles.listItemBg}/>
+=======
               <BFIEmptyImg height= {Platform.isPad ? wp('15%') : wp('20%')} width= {Platform.isPad ? wp('15%') : wp('20%')} style={styles.listItemBg}/>
+>>>>>>> feature/wearables_dev0.74
               <Text style={[styles.itemTextStyleInActive,{position:'absolute'}]}>{item.name}</Text>
             </View>
            

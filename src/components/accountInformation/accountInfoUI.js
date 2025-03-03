@@ -9,6 +9,7 @@ import CommonStyles from '../../utils/commonStyles/commonStyles';
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from "../../utils/constants/constant";
 import fonts from './../../utils/commonStyles/fonts'
+import DeviceInfo from 'react-native-device-info';
 
 import AuthImg from "./../../../assets/images/otherImages/svg/app-or.svg";
 import EditImg from "./../../../assets/images/otherImages/svg/editImg.svg";
@@ -23,9 +24,11 @@ const AccountInfoUi = ({ route, ...props }) => {
     const [phoneNo, set_phoneNo] = useState(undefined);
     const [isLoading, set_isLoading] = useState(false);
     const [secondaryEmail, set_secondaryEmail] = useState(undefined);
+    const [appName , set_AppName] = useState('')
 
     //Updating user details in UI
     useEffect(() => {
+        getAppName();
         set_phoneNo(props.phoneNo);
         set_email(props.email);
         set_secondaryEmail(props.secondaryEmail);
@@ -41,6 +44,11 @@ const AccountInfoUi = ({ route, ...props }) => {
     const backBtnAction = () => {
         props.navigateToPrevious();
     };
+
+    const getAppName = () => {
+        let appName = DeviceInfo.getApplicationName();
+        set_AppName(appName);
+    }
 
     // Logs out of the app
     const rightButtonAction = async () => {
@@ -211,7 +219,7 @@ const AccountInfoUi = ({ route, ...props }) => {
                         </TouchableOpacity> : null}
 
                         <View style={{alignItems:'center',marginTop: hp("2%"),bottom:0,alignSelf:'center',justifyContent:'center'}}>
-                        <Text style={styles.subHeaderTextStyle}>{props.versionNumber}</Text>
+                        <Text style={styles.subHeaderTextStyle}>{appName + ' ' + props.versionNumber}</Text>
                         {/* <Text style={styles.subHeaderTextStyle}>{props.buildVersion}<Text style={styles.subHeaderTextStyle}>{props.enviName === 'tst' ? " (Testing)" : ""}</Text></Text> */}
                         <Text style={styles.subHeaderTextStyle}>{props.buildVersion}<Text style={styles.subHeaderTextStyle}>{""}</Text></Text>
                     </View>

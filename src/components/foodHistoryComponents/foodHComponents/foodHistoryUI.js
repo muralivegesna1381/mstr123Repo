@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {View,StyleSheet,Text,Image} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview'
@@ -11,8 +11,10 @@ import * as Constant from "../../../utils/constants/constant";
 import NOLogsDogImg from "./../../../../assets/images/dogImages/noRecordsDog.svg";
 import NOLogsCatImg from "./../../../../assets/images/dogImages/noRecordsCat.svg";
 
-const  FoodHistoryUI = ({chartData,stakedChartData,selectdCategoryUnit, route, ...props }) => {
+const  FoodHistoryUI = ({chartData,stakedChartData,selectdCategoryUnit,noLogsShow,petObj, route, ...props }) => {
       
+    useEffect(() => {
+    }, []);
     // model sheet Action
     const displayModelSheet = () => {
         props.displayModelSheet();
@@ -25,7 +27,7 @@ const  FoodHistoryUI = ({chartData,stakedChartData,selectdCategoryUnit, route, .
 
                 <KeyboardAwareScrollView horizontal={false}>
 
-                    {!props.noLogsShow ? <View>
+                    {chartData && stakedChartData ? <View>
 
                         <View style={{ marginTop:hp('2%'),flexDirection:'row'}}>
 
@@ -43,7 +45,7 @@ const  FoodHistoryUI = ({chartData,stakedChartData,selectdCategoryUnit, route, .
 
                         </View>
                     </View> : (!props.isLoading ? <View style={{justifyContent:'center',alignItems:'center',height:hp('58%')}}>
-                        {props.petObj && props.petObj.speciesId && parseInt(props.petObj.speciesId) === 1 ? <NOLogsDogImg style= {[styles.nologsDogStyle]}/> : <NOLogsCatImg style= {[styles.nologsDogStyle]}/>}
+                        {petObj && petObj.speciesId && parseInt(petObj.speciesId) === 1 ? <NOLogsDogImg style= {[styles.nologsDogStyle]}/> : <NOLogsCatImg style= {[styles.nologsDogStyle]}/>}
                         <Text style={[CommonStyles.noRecordsTextStyle1]}>{Constant.NO_RECORDS_LOGS1}</Text>
                     </View> : null)}
 

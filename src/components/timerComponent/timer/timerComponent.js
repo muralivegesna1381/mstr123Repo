@@ -100,7 +100,11 @@ const TimerComponent = ({navigation, route, ...props }) => {
         //timerPetObj = JSON.parse(timerPetObj);
         firebaseHelper.logEvent(firebaseHelper.event_timer_go_action, firebaseHelper.screen_timer_main, "Timer Go button clicked", "");
         if(timerPets && timerPets.length>1){
-            navigation.navigate('TimerPetSelectionComponent',{petsArray : timerPets,defaultPetObj:timerPetObj});
+            if(isFrom === 'Dashboard') {
+                navigation.navigate('TimerActivityComponent',{timerPet : timerPetObj,fromScreen:'Timer'});
+            } else {
+                navigation.navigate('TimerPetSelectionComponent',{petsArray : timerPets,defaultPetObj:timerPetObj});
+            }
         } else {
             navigation.navigate('TimerActivityComponent',{timerPet : timerPetObj,fromScreen:'Timer'});
         }

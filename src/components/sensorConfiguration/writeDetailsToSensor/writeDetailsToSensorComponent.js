@@ -317,17 +317,16 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
           } else {
             // set_isSensorAwaiting(false);
             isLoadingdRef.current = 0;
-            clearTimeout(timerId);
             if (eventLogType == 2) {
-
+              replaceAPICalled.current = false;
               createPopups(Constant.SENSOR_FAIL_2,Constant.ALERT_DEFAULT_TITLE,true);
 
             } else if (eventLogType == 3) {
-
+              replaceAPICalled.current = false;
               createPopups(Constant.SENSOR_FAIL_3,Constant.ALERT_DEFAULT_TITLE,true);
 
             } else if (eventLogType == 4) {
-
+              replaceAPICalled.current = false;
               createPopups(Constant.SENSOR_FAIL_4,Constant.ALERT_DEFAULT_TITLE,true);
 
             } else {
@@ -339,7 +338,7 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
 
             }
           }
-            } else if (error) {
+        } else if (error) {
 
               if (retryCount < maxRetryChances) {
                 set_retryCount(retryCount + 1);
@@ -676,6 +675,9 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
       if(apiService && apiService.status && apiService.data && apiService.data.Key) {
 
         firebaseHelper.logEvent(firebaseHelper.event_sensor_write_details_api_success, firebaseHelper.screen_sensor_write_details, "Confirming Configuration status to Backend Success", 'Device Number : '+devNumber.current);
+        set_loaderMsg('YOUR SENSOR SETUP IS SUCCESSFUL');  
+        setUpSuccessRef.current = SETUP_STATUS_SUCCESS;
+        set_setupSuccess(SETUP_STATUS_SUCCESS); 
         getTotalPets();
 
       } else if(apiService && apiService.isInternet === false) {
@@ -697,6 +699,7 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
             
       } else {
 
+        replaceAPICalled.current = false;
         createPopups("Unable to Save the Wi-Fi details. Please try again.",'Alert',true);
         isLoadingdRef.current = 0;
         replaceAPICalled.current = false;
@@ -768,7 +771,7 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
       }
 
     };
-
+    
     const getTotalPets = async () => {
 
         let clientID = await DataStorageLocal.getDataFromAsync(Constant.CLIENT_ID);
@@ -780,7 +783,6 @@ const WriteDetailsToSensorComponent = ({navigation, route, ...props }) => {
         
         set_isLoading(false);
         isLoadingdRef.current = 0;
-        clearTimeout(timerId);    
         set_isSensorAwaiting(false);
         setUpSuccessRef.current = SETUP_STATUS_SUCCESS;
         set_setupSuccess(SETUP_STATUS_SUCCESS);           

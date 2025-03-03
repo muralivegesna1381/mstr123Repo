@@ -51,9 +51,9 @@ const CameraComponent = ({ navigation, route, ...props }) => {
 
             ImagePicker.openCropper({
                 path: 'file://' + photo.path,
-                width: 400,
-                height: 500,
-                compressImageQuality: 1
+                // width: 400,
+                // height: 500,
+                compressImageQuality: 1,
             }).then(image => {
                 navigation.navigate('PetImageCaptureComponent', {
                     indexPos: route.params?.indexPos,
@@ -62,7 +62,12 @@ const CameraComponent = ({ navigation, route, ...props }) => {
                 })
 
             }).catch((error) => {
-                navigation.pop()
+                // navigation.pop()
+                navigation.navigate('PetImageCaptureComponent', {
+                    indexPos: route.params?.indexPos,
+                    imagePath: photo.path,
+                    imageCroppedPath: photo.path
+                })
             })
         }
     };

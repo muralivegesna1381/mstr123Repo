@@ -169,7 +169,7 @@ const FeedbackUI = ({ route, ...props }) => {
 
                 {(!noLogsShow && !props.isLoading) || feedbackArray.length > 0 ? <View style={styles.mainViewStyle}>
 
-                    <FillGradiantImg width={wp('90%')} height={hp('5%')} imageStyle={{ borderRadius: 100 }}/>
+                    <FillGradiantImg width={wp('90%')} height={hp('5%')} style={{resizeMode:'contain'}} imageStyle={{ borderRadius: 100,  }}/>
 
                     <TouchableOpacity style={styles.filterBtnStyle} onPress={() => { set_ListOpen(!isListOpen) }}>
 

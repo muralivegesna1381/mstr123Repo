@@ -91,7 +91,6 @@ const AllDevicesListComponent = ({navigation, route, ...props }) => {
 
         let allPets = petsArray;
         let tempArray = [];
-
         if(allPets) {
             for (let i = 0; i < allPets.length; i++) {
                 if(allPets[i].devices && allPets[i].devices.length > 0) {
@@ -115,6 +114,7 @@ const AllDevicesListComponent = ({navigation, route, ...props }) => {
                 }
             }
         }
+
         if(tempArray.length > 0) {
             set_devices(tempArray.sort( (a, b) => (a.petName.toUpperCase() > b.petName.toUpperCase()) ? 1 : -1));
         }

@@ -152,6 +152,9 @@ const SensorPNQComponent = ({navigation, route, ...props }) => {
 
     const notficationRequest = async (json) => {
 
+        let sobPets = await DataStorageLocal.getDataFromAsync(Constant.SAVE_SOB_PETS); 
+        sobPets = JSON.parse(sobPets);
+        
         let apiMethod = apiMethodManager.APP_NOTIFICATION_SETTINGS;
         let apiService = await apiRequest.postData(apiMethod,json,Constant.SERVICE_MIGRATED,navigation);
         set_isLoading(false);
@@ -159,7 +162,8 @@ const SensorPNQComponent = ({navigation, route, ...props }) => {
             
         if(apiService && apiService.status) {
             set_isLoading(false);
-            getFeedbackQuestionnaire(petId);
+            navigation.navigate('DashBoardService',{loginPets:sobPets});
+            // getFeedbackQuestionnaire(petId);
         
         } else if(apiService && apiService.isInternet === false) {
             createPopup(Constant.NETWORK_STATUS,Constant.ALERT_NETWORK,true);

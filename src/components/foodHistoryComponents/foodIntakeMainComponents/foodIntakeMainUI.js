@@ -24,7 +24,7 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
 
     const [datePickerDate1, set_datePickerDate1] = useState(new Date());
     const [minimumDate, set_minimumDate] = useState(new Date('1900-01-01'));
-    const [datePickerDate, set_datePickerDate] = useState(moment(new Date()).format('MM-DD-YYYY'));
+    const [datePickerDate, set_datePickerDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
     const [fCalenderSdate, set_fCalenderSdate] = useState(undefined);
     const [fCalenderedate, set_fCalenderedate] = useState(undefined);
     const minDate = new Date(2023, 1, 1);
@@ -34,14 +34,14 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
 
     let fStartDate = useRef(undefined);
     let fEndDate = useRef(undefined)
-
+//YYYY-MM-DD
     React.useEffect(() => {
 
         if (props.tabSelection && props.tabSelection === 1) {
-            set_fCalenderedate(moment(new Date()).format('MM-DD-YYYY'))
+            set_fCalenderedate(moment(new Date()).format('YYYY-MM-DD'))
             const lastWeek = new Date();
             lastWeek.setDate(lastWeek.getDate() - 6);
-            set_fCalenderSdate(moment(new Date(lastWeek)).format('MM-DD-YYYY'))
+            set_fCalenderSdate(moment(new Date(lastWeek)).format('YYYY-MM-DD'))
         }
         
     }, [props.foodArray, props.datePickerDate, props.tabSelection]);
@@ -72,7 +72,7 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
     // Done btn action in Filter popup view
     const doneAction = (date) => {
 
-        datePickerDate1 ? set_datePickerDate(moment(datePickerDate1).format('MM-DD-YYYY')) : set_datePickerDate(moment(new Date()).format('MM-DD-YYYY'));
+        datePickerDate1 ? set_datePickerDate(moment(datePickerDate1).format('YYYY-MM-DD')) : set_datePickerDate(moment(new Date()).format('YYYY-MM-DD'));
         props.doneAction(datePickerDate1);
     };
 
@@ -224,9 +224,9 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
                                     <View style={{flexDirection:'row'}}>
 
                                         <Text style={[styles.selectedDateStyle,{marginTop: hp('0.5%')}]}>{fCalenderSdate && fCalenderSdate ?
-                                            (fCalenderSdate === fCalenderedate ? moment(fCalenderSdate, 'MM-DD-YYYY').format("DD MMM YYYY") 
-                                            : moment(fCalenderSdate, 'MM-DD-YYYY').format("DD MMM YYYY") + (fCalenderedate ? " - " + moment(fCalenderedate, 'MM-DD-YYYY').format("DD MMM YYYY") : "")) 
-                                            : (fCalenderSdate ? moment(fCalenderSdate, 'MM-DD-YYYY').format("DD MMM YYYY") : "Date")}</Text>
+                                            (fCalenderSdate === fCalenderedate ? moment(fCalenderSdate, 'YYYY-MM-DD').format("DD MMM YYYY") 
+                                            : moment(fCalenderSdate, 'YYYY-MM-DD').format("DD MMM YYYY") + (fCalenderedate ? " - " + moment(fCalenderedate, 'YYYY-MM-DD').format("DD MMM YYYY") : "")) 
+                                            : (fCalenderSdate ? moment(fCalenderSdate, 'YYYY-MM-DD').format("DD MMM YYYY") : "Date")}</Text>
                                         <DropDownImg width={Platform.isPad ? wp('4%') : wp('4%')} height={hp('1%')} style={{marginLeft: hp('1%')}}/>
 
                                     </View>
@@ -331,9 +331,9 @@ const FoodIntakeMainUI = ({ route, ...props }) => {
                             textStyle={{ fontFamily: 'Barlow-Regular', color: '#000000', }}
                             onDateChange={(date, type) => {
                                 if (type === 'START_DATE' && date) {
-                                    fStartDate.current = moment(date).format('MM-DD-YYYY')
+                                    fStartDate.current = moment(date).format('YYYY-MM-DD')
                                 } else if (type === 'END_DATE' && date) {
-                                    fEndDate.current = moment(date).format('MM-DD-YYYY')
+                                    fEndDate.current = moment(date).format('YYYY-MM-DD')
                                 }
 
                             }}

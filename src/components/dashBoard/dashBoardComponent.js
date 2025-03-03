@@ -69,8 +69,7 @@ const  DasBoardComponent = ({route, ...props }) => {
       autoNavigateNotifications();
       if(Platform.OS==='android'){
         requestStoragePermission();
-
-        requestNotificationPermission()
+        // requestNotificationPermission();
       } 
       // Logging out Zendesk from here
       // Calling android method from here for Zendesk logout
@@ -520,7 +519,7 @@ const  DasBoardComponent = ({route, ...props }) => {
         
         await DataStorageLocal.removeDataFromAsync(Constant.DELETE_MEDIA_RECORDS);
         await DataStorageLocal.saveDataToAsync(Constant.OBS_SELECTED_PET, JSON.stringify(AppPetsData.petsData.defaultPet));
-        navigation.navigate('QuickVideoComponent');
+        navigation.navigate('QuickVideoComponent',{isFrom:'Dashboard'});
         
       }
       
@@ -910,7 +909,8 @@ const  DasBoardComponent = ({route, ...props }) => {
         props.clearObjects();
         let fhPets = await DataStorageLocal.getDataFromAsync(Constant.FH_PETS_ARRAY);
         fhPets = JSON.parse(fhPets);
-        navigation.navigate("FoodHistoryPetSelectionComponent",{petsArray:fhPets,defaultPetObj:AppPetsData.petsData.defaultPet});
+        // navigation.navigate("FoodHistoryPetSelectionComponent",{petsArray:fhPets,defaultPetObj:AppPetsData.petsData.defaultPet});
+        navigation.navigate("FoodIntakeMainComponent",{petObject:AppPetsData.petsData.defaultPet});
       }
     };
 

@@ -70,15 +70,16 @@ const styles = StyleSheet.create({
         marginRight: wp('2%'),
         marginTop : hp('2%'),
         marginBottom : hp('2%'),
-        textAlign:'center'
+        textAlign:'center',
     },
 
     loaderBckViewStyle : {
-        width : wp('70%'),
+        width : Platform.isPad ? wp('100%') : wp('70%'),
         minHeight : hp('20%'),
         justifyContent: "center",
         alignItems: "center",
-        position:'absolute'
+        position:'absolute',
+        // backgroundColor:'green'
     },
 
     dogStyle: {

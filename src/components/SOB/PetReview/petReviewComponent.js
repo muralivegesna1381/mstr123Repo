@@ -168,22 +168,20 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
 
   const setDefaultPet = async (pets, petId) => {
 
-    if (!isWithoutDevice ) {
-      let obj = findArrayElementByPetId(pets, petId);
-      set_defaultPet(obj);
+    let obj = findArrayElementByPetId(pets, petId);
+    set_defaultPet(obj);
 
-      if(obj && obj.devices && obj.devices.length > 0) {
-        AppPetsData.petsData.isDeviceSetupDone = obj.devices[0].isDeviceSetupDone;
-        AppPetsData.petsData.isDeviceMissing = false;
-      } else {
-        AppPetsData.petsData.isDeviceSetupDone = true;
-        AppPetsData.petsData.isDeviceMissing = true;
-      }
-      AppPetsData.petsData.totalPets = pets;
-      AppPetsData.petsData.defaultPet = obj;
+    if(obj && obj.devices && obj.devices.length > 0) {
+      AppPetsData.petsData.isDeviceSetupDone = obj.devices[0].isDeviceSetupDone;
+      AppPetsData.petsData.isDeviceMissing = false;
+    } else {
+      AppPetsData.petsData.isDeviceSetupDone = true;
+      AppPetsData.petsData.isDeviceMissing = true;
     }
+    AppPetsData.petsData.totalPets = pets;
+    AppPetsData.petsData.defaultPet = obj;
 
-    let modularity = {
+    let modularity = modularPermissionsData = {
       "isFmGraph" : false,
       "isFmDataService" : false,
       "isFmGoalSet" : false,
@@ -224,7 +222,9 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
 
     let apiMethod = apiMethodManager.GET_PETPARENT_PETS + client;
     let apiService = await apiRequest.getData(apiMethod,'',Constant.SERVICE_JAVA,navigation);
-            
+    set_isLoading(false);
+    isLoadingdRef.current = 0;
+        
     if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
 
       if(apiService.data.petDevices.length > 0){
@@ -237,29 +237,18 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
           sendFeedingPrefsToBackend();   
         }
           
-      }  else {
-        if (isWithoutDevice ) {
-          set_isLoading(false);
-          isLoadingdRef.current = 0;
-          saveFirstTimeUser(true);
-          createPopup('Congratulations', Constant.PET_WITHOUT_SENSOR_MSG, true, 1, 'CANCEL', 'OK', false); 
-          firebaseHelper.logEvent(firebaseHelper.event_SOB_review_api, firebaseHelper.screen_SOB_Review, "User onboarded pet without device : " + client, '');
-        }
-      }
+      } 
             
     } else if(apiService && apiService.isInternet === false) {
-      set_isLoading(false);
-      isLoadingdRef.current = 0;
+
       createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 1, 'CANCEL', 'OK', false);
             
     } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
-      set_isLoading(false);
-      isLoadingdRef.current = 0;
+
       createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true, 1, 'CANCEL', 'OK', false);
     
     } else {
-      set_isLoading(false);
-      isLoadingdRef.current = 0;
+
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
 
     }
@@ -395,25 +384,22 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
 
     let apiMethod = apiMethodManager.VALIDATE_DUPLICATE_PET;
     let apiService = await apiRequest.postData(apiMethod,duplicateJson,Constant.SERVICE_JAVA,navigation);
-    
+    set_isLoading(false);
     isLoadingdRef.current = 0;
         
     if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
-      
       sobRequest();
 
     } else if(apiService && apiService.isInternet === false) {
-      set_isLoading(false);
+
       createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 1, 'CANCEL', 'OK', false);
       firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Validate_Pet_fail, firebaseHelper.screen_SOB_Review, "SOB Review Validate Pet fail", 'Internet : false');
             
     } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
-      set_isLoading(false);
       createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true, DUPLICATE_PET, 'NO', 'YES', true);
       firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Validate_Pet_fail, firebaseHelper.screen_SOB_Review, "SOB Review Validate Pet fail", 'error : ' + apiService.error.errorMsg);
     
     } else {
-      set_isLoading(false);
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
 
     }
@@ -424,7 +410,8 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
 
     let apiMethod = apiMethodManager.COMPLETE_ONBOARD_INFO;
     let apiService = await apiRequest.postData(apiMethod,finalJson.current,Constant.SERVICE_MIGRATED,navigation);
-    
+    set_isLoading(false);
+    isLoadingdRef.current = 0;
     stopFBTrace();
         
     if(apiService && apiService.data && apiService.data !== null && Object.keys(apiService.data).length !== 0) {
@@ -444,27 +431,22 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
         }
 
       } else {
-        set_isLoading(false);
-        isLoadingdRef.current = 0;
         createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.SERVICE_FAIL_MSG, true, 1, 'CANCEL', 'OK', false);
       }
       
     } else if(apiService && apiService.isInternet === false) {
-      set_isLoading(false);
-      isLoadingdRef.current = 0;
+
       createPopup(Constant.ALERT_NETWORK, Constant.NETWORK_STATUS, true, 1, 'CANCEL', 'OK', false);
       firebaseHelper.logEvent(firebaseHelper.event_SOB_review_api_fail, firebaseHelper.screen_SOB_Review, "Onboarding Api fail", 'Internet : false');
             
     } else if(apiService && apiService.error !== null && Object.keys(apiService.error).length !== 0) {
-      set_isLoading(false);
-      isLoadingdRef.current = 0;
+
       set_isSOBSubmitted(false);
       createPopup(Constant.ALERT_DEFAULT_TITLE, apiService.error.errorMsg, true, 1, 'CANCEL', 'OK', true);
       firebaseHelper.logEvent(firebaseHelper.event_SOB_review_api_fail, firebaseHelper.screen_SOB_Review, "Onboarding Api fail", 'error : '+apiService.error.errorMsg);
       
     } else {
-      set_isLoading(false);
-      isLoadingdRef.current = 0;
+
       firebaseHelper.logEvent(firebaseHelper.event_SOB_review_api_fail, firebaseHelper.screen_SOB_Review, "Onboarding Api fail", 'Service Status : false');
       set_isSOBSubmitted(false);
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', true);
@@ -491,6 +473,7 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
       "userId": clientId,
       "petFeedingPreferences": tempArray
     };
+
     let apiMethod = apiMethodManager.ADD_FEEDING_PREFERENCES;
     let apiService = await apiRequest.postData(apiMethod,obj,Constant.SERVICE_JAVA,navigation);
     set_isLoading(false);
@@ -502,12 +485,7 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
       if (type === Constant.IS_FROM_PET_BFI) {
         createPopup('Congratulations', Constant.PET_CREATE_SUCCESS_MSG_FROM_BFI, true, 1, 'CANCEL', 'OK', false);
       } else {
-        // createPopup('Congratulations', Constant.PET_CREATE_SUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
-        if (isWithoutDevice ) {
-          createPopup('Congratulations', Constant.PET_WITHOUT_SENSOR_MSG, true, 1, 'CANCEL', 'OK', false); 
-        } else {
-          createPopup('Congratulations', Constant.PET_CREATE_SUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
-        }
+        createPopup('Congratulations', Constant.PET_CREATE_SUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
         
       }
       
@@ -523,7 +501,6 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
       firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Feeding_Pref_fail, firebaseHelper.screen_SOB_Review, "SOB Feeding Pref Api fail", 'error : ' + apiService.error.errorMsg);
     
     } else {
-
       set_isSOBSubmitted(false);
       createPopup(Constant.ALERT_DEFAULT_TITLE, Constant.PET_CREATE_UNSUCCESS_MSG, true, 1, 'CANCEL', 'OK', false);
       firebaseHelper.logEvent(firebaseHelper.event_SOB_review_Feeding_Pref_fail, firebaseHelper.screen_SOB_Review, "SOB Feeding Pref Api fail", 'Service Status : false');
@@ -575,7 +552,9 @@ const PetReviewComponent = ({ navigation, route, ...props }) => {
         createPopup('', '', false, 0, '', '', false);
       }
     }else if (popUpMessage === Constant.PET_WITHOUT_SENSOR_MSG) {
-      updateDashboardData([]);
+
+      updateDashboardData(petsArray);
+
     }
     else if (popUpMessage === Constant.PET_CREATE_SUCCESS_MSG_FROM_BFI) {
       //navigate to capture images screen once onboarding success
